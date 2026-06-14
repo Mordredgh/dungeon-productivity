@@ -1,0 +1,21 @@
+﻿/* STATE */
+let db;
+let hero = null;
+let quests = [];
+let pomodoros = [];
+let timer = { running: false, phase: 'focus', seconds: 25*60, interval: null, duration: 25, pomsDone: 0, _nextPomDouble: false };
+let activeFilter = localStorage.getItem('dungeon-filter') || 'all';
+let sortMode = localStorage.getItem('dungeon-sort') || 'created';
+let compact = false;
+let spellState = {};
+let xpMultiplier = 1;
+let xpMultiplierEnd = 0;
+let tagFilter = null;
+let dateFilter = 'all';
+let historyTypeFilter = 'all';
+let pendingDeleteId = null;
+let lastCompletedUndo = null;
+let musicAudio = null;
+let heroRace = localStorage.getItem('dungeon-race') || 'humano';
+let guildName = localStorage.getItem('dungeon-guild') || '';
+let webhookUrl = localStorage.getItem('dungeon-webhook') || '';
