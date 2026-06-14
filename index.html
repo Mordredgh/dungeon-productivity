@@ -2771,8 +2771,8 @@ async function loadQuests() {
 async function addQuest(q) {
   const { data, error } = await db.from('dungeon_quests').insert(q).select().single();
   if (error || !data) {
-    console.error('addQuest error:', error);
-    toast('❌', 'Error al crear misión. Intenta de nuevo.');
+    console.error('addQuest error:', error?.message, error?.details, error?.hint, error?.code, JSON.stringify(error));
+    toast('❌', `Error ${error?.code}: ${error?.message || 'sin datos'}`);
     return;
   }
   quests.unshift(data);
