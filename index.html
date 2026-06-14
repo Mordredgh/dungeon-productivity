@@ -7,6 +7,8 @@
 <meta name="description" content="Dungeon Productivity - Sistema D&D para conquistar tus metas">
 <title>⚔️ Dungeon Productivity</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" as="style">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -1510,18 +1512,528 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   .header-logo { font-size: 15px; }
   .filter-tabs { display: none; }
 }
+
+/* ============================================================
+   TEMA OLED — negro puro para pantallas OLED
+   ============================================================ */
+[data-theme="oled"] {
+  --bg: #000000; --bg2: #030303; --bg3: #060606; --bg4: #0a0a0a;
+  --card: rgba(8,8,8,.95); --card2: rgba(12,12,12,.98);
+  --border: rgba(120,100,220,.15); --border2: rgba(168,85,247,.3);
+  --text: #ffffff; --text2: #a0a0c0; --text3: #404060;
+  --accent: #a855f7; --accent2: #22d3ee; --gold: #10b981;
+  --green: #4ade80; --red: #fb7185; --orange: #f0abfc; --blue: #38bdf8;
+  --glow: 0 0 30px rgba(168,85,247,.5); --glow2: 0 0 30px rgba(34,211,238,.3);
+  --aurora1: rgba(168,85,247,.04); --aurora2: rgba(34,211,238,.03); --aurora3: rgba(16,185,129,.02);
+  --glass: rgba(168,85,247,.04); --glass-border: rgba(168,85,247,.12);
+}
+[data-theme="oled"] .header { background: rgba(0,0,0,.9); }
+[data-theme="oled"] .right-panel { background: rgba(0,0,0,.95); }
+[data-theme="oled"] .view-tabs { background: rgba(0,0,0,.95); }
+
+/* ============================================================
+   TEMA PERGAMINO — medieval beige/sepia
+   ============================================================ */
+[data-theme="parchment"] {
+  --bg: #f4e4c1; --bg2: #fdf3e3; --bg3: #ede0bc; --bg4: #d4c4a0;
+  --card: rgba(244,228,193,.92); --card2: rgba(253,243,227,.95);
+  --border: rgba(139,69,19,.15); --border2: rgba(139,69,19,.4);
+  --text: #3d2b1f; --text2: #6b4c2a; --text3: #a07850;
+  --accent: #8b4513; --accent2: #b8860b; --gold: #8b6914;
+  --green: #2d7a3a; --red: #c0392b; --orange: #d2691e; --blue: #1a5276;
+  --glow: 0 0 20px rgba(139,69,19,.25); --glow2: 0 0 20px rgba(184,134,11,.2);
+  --aurora1: rgba(139,69,19,.04); --aurora2: rgba(184,134,11,.03); --aurora3: rgba(45,122,58,.02);
+  --glass: rgba(139,69,19,.05); --glass-border: rgba(139,69,19,.15);
+}
+[data-theme="parchment"] .header { background: rgba(244,228,193,.92); backdrop-filter: blur(20px); border-bottom-color: rgba(139,69,19,.2); }
+[data-theme="parchment"] .right-panel { background: rgba(253,243,227,.95); border-left-color: rgba(139,69,19,.15); }
+[data-theme="parchment"] .view-tabs { background: rgba(244,228,193,.85); }
+[data-theme="parchment"] .header-logo { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+[data-theme="parchment"] input, [data-theme="parchment"] textarea, [data-theme="parchment"] select { background: rgba(253,243,227,.8); color: var(--text); }
+[data-theme="parchment"] .xp-bar { background: rgba(139,69,19,.1); }
+
+/* ============================================================
+   CYBER THEME — grid lines neon
+   ============================================================ */
+[data-theme="cyber"] body::after {
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(56,189,248,.025) 40px, rgba(56,189,248,.025) 41px),
+    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(56,189,248,.025) 40px, rgba(56,189,248,.025) 41px),
+    radial-gradient(ellipse 40% 30% at 70% 30%, var(--aurora2), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 10% 80%, var(--aurora1), transparent 60%);
+}
+
+/* ============================================================
+   AVATAR LEVEL BADGE
+   ============================================================ */
+.avatar-level-badge {
+  position: absolute;
+  top: -5px; right: -5px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--bg);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ============================================================
+   GUILD NAME
+   ============================================================ */
+.guild-name {
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* ============================================================
+   XP BAR — más grande
+   ============================================================ */
+.xp-bar { height: 10px; }
+.xp-bar-fill { height: 100%; position: relative; }
+.xp-bar-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: rgba(255,255,255,.75);
+  font-weight: 600;
+  pointer-events: none;
+}
+
+/* ============================================================
+   HP CRÍTICO
+   ============================================================ */
+@keyframes hp-pulse {
+  0%   { opacity: 1; }
+  100% { opacity: .35; }
+}
+.hp-bar-fill.hp-critical {
+  background: linear-gradient(90deg, #dc2626, #ef4444);
+  animation: hp-pulse .9s ease-in-out infinite alternate;
+}
+.hp-bar-fill.hp-warning {
+  background: linear-gradient(90deg, #ea580c, #f97316);
+}
+.hp-danger-text {
+  font-size: 9px;
+  color: var(--red);
+  font-weight: 700;
+  animation: hp-pulse .9s ease-in-out infinite alternate;
+}
+
+/* ============================================================
+   AVATAR RING POR CLASE
+   ============================================================ */
+.avatar-class-guerrero { background: linear-gradient(var(--bg3),var(--bg3)) padding-box, linear-gradient(135deg,#ef4444,#f97316) border-box !important; }
+.avatar-class-mago     { background: linear-gradient(var(--bg3),var(--bg3)) padding-box, linear-gradient(135deg,#a855f7,#7c3aed) border-box !important; }
+.avatar-class-picaro   { background: linear-gradient(var(--bg3),var(--bg3)) padding-box, linear-gradient(135deg,#f97316,#eab308) border-box !important; }
+.avatar-class-clerigo  { background: linear-gradient(var(--bg3),var(--bg3)) padding-box, linear-gradient(135deg,#10b981,#06b6d4) border-box !important; }
+.avatar-class-fundador { background: linear-gradient(var(--bg3),var(--bg3)) padding-box, linear-gradient(135deg,#a855f7,#22d3ee) border-box !important; }
+.avatar-class-arquero  { background: linear-gradient(var(--bg3),var(--bg3)) padding-box, linear-gradient(135deg,#4ade80,#22d3ee) border-box !important; }
+
+/* ============================================================
+   SKELETON LOADING
+   ============================================================ */
+@keyframes skeleton-shimmer {
+  0%   { transform: translateX(-200%); }
+  100% { transform: translateX(300%); }
+}
+.skeleton-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  position: relative;
+}
+.skeleton-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent);
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+.skeleton-check { width: 22px; height: 22px; border-radius: 50%; background: var(--bg4); flex-shrink: 0; }
+.skeleton-body  { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.skeleton-line  { height: 12px; background: var(--bg4); border-radius: 6px; width: 70%; }
+.skeleton-line.short { width: 40%; height: 9px; }
+
+/* ============================================================
+   TYPE SEPARATORS
+   ============================================================ */
+.type-separator {
+  font-family: var(--font-head);
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding: 10px 0 5px;
+  border-bottom: 1px solid var(--border);
+  margin: 6px 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.type-separator span {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 1px 8px;
+  font-size: 9px;
+  color: var(--text3);
+}
+
+/* ============================================================
+   TAGS en quests
+   ============================================================ */
+.tag-badge {
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 20px;
+  background: rgba(56,189,248,.1);
+  color: var(--blue);
+  border: 1px solid rgba(56,189,248,.2);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.tag-badge:hover { background: rgba(56,189,248,.2); border-color: var(--blue); }
+
+/* ============================================================
+   TIEMPO ESTIMADO
+   ============================================================ */
+.esttime-badge {
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 20px;
+  background: rgba(168,85,247,.06);
+  color: var(--text3);
+  border: 1px solid var(--border);
+}
+
+/* ============================================================
+   DAILY PROGRESS BAR
+   ============================================================ */
+.daily-progress-wrap {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.daily-progress-label { font-size: 11px; color: var(--text2); white-space: nowrap; }
+.daily-progress-bar { flex: 1; height: 6px; background: rgba(74,222,128,.1); border-radius: 4px; overflow: hidden; }
+.daily-progress-fill { height: 100%; background: linear-gradient(90deg, var(--green), #86efac); border-radius: 4px; transition: width .6s cubic-bezier(.4,0,.2,1); }
+
+/* ============================================================
+   WELCOME SCREEN
+   ============================================================ */
+.welcome-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: radial-gradient(ellipse at center, rgba(16,12,56,.99), #04040e);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  pointer-events: none;
+}
+.welcome-screen.hiding {
+  animation: welcome-exit .6s ease forwards;
+}
+@keyframes welcome-exit {
+  to { opacity: 0; transform: scale(1.04); }
+}
+.welcome-logo {
+  font-family: var(--font-head);
+  font-size: 42px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: welcome-logo-in .6s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes welcome-logo-in {
+  from { opacity: 0; transform: translateY(20px) scale(.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.welcome-phrase {
+  font-size: 17px;
+  color: var(--text2);
+  text-align: center;
+  max-width: 400px;
+  line-height: 1.6;
+  font-style: italic;
+  animation: welcome-logo-in .6s cubic-bezier(.34,1.56,.64,1) .15s both;
+}
+.welcome-dots { display: flex; gap: 8px; animation: welcome-logo-in .6s ease .3s both; }
+.welcome-dot  { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); opacity: .3; animation: welcome-dot-pulse 1.2s ease-in-out infinite; }
+.welcome-dot:nth-child(2) { animation-delay: .2s; }
+.welcome-dot:nth-child(3) { animation-delay: .4s; }
+@keyframes welcome-dot-pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+
+/* ============================================================
+   D20 DADO
+   ============================================================ */
+@keyframes d20-spin {
+  from { transform: rotate(-360deg) scale(.4); opacity: 0; }
+  to   { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+.d20-rolling { animation: d20-spin .55s cubic-bezier(.34,1.56,.64,1); }
+
+/* ============================================================
+   MOBILE FAB
+   ============================================================ */
+.mobile-fab {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  font-size: 28px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(168,85,247,.5);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-spring);
+}
+.mobile-fab:hover { transform: scale(1.1); box-shadow: 0 12px 40px rgba(168,85,247,.65); }
+@media (max-width: 900px) { .mobile-fab { display: flex; } }
+
+/* ============================================================
+   CMD+K SEARCH MODAL
+   ============================================================ */
+.cmdk-modal .modal {
+  padding: 0;
+  max-width: 520px;
+}
+.cmdk-search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.cmdk-search-icon { font-size: 18px; color: var(--text3); }
+.cmdk-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  color: var(--text);
+  outline: none;
+}
+.cmdk-results { max-height: 340px; overflow-y: auto; padding: 8px; }
+.cmdk-result-item {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: var(--transition);
+}
+.cmdk-result-item:hover { background: var(--glass); border: 1px solid var(--glass-border); }
+.cmdk-result-name { font-size: 13px; color: var(--text); flex: 1; }
+.cmdk-result-type { font-size: 10px; color: var(--text3); }
+.cmdk-empty { text-align: center; padding: 30px; color: var(--text3); font-size: 13px; }
+.cmdk-hint { font-size: 10px; color: var(--text3); padding: 8px 16px; border-top: 1px solid var(--border); }
+
+/* ============================================================
+   WEEKLY MISSION BANNER
+   ============================================================ */
+.weekly-banner {
+  background: linear-gradient(135deg, rgba(56,189,248,.08), rgba(96,165,250,.06));
+  border: 1px solid rgba(56,189,248,.2);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.weekly-banner-title { font-size: 10px; color: var(--blue); text-transform: uppercase; letter-spacing: 1.5px; font-family: var(--font-head); }
+.weekly-banner-name { font-size: 13px; color: var(--text); }
+.weekly-boss-bar { flex: 1; }
+.weekly-boss-bg { height: 5px; background: rgba(56,189,248,.1); border-radius: 4px; overflow: hidden; margin-top: 4px; }
+.weekly-boss-fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--accent2)); border-radius: 4px; transition: width .6s cubic-bezier(.4,0,.2,1); }
+
+/* ============================================================
+   CONNECTION DOT
+   ============================================================ */
+.conn-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text3);
+  flex-shrink: 0;
+  transition: background .4s;
+}
+.conn-dot.ok  { background: var(--green); box-shadow: 0 0 6px rgba(74,222,128,.5); }
+.conn-dot.err { background: var(--red); }
+
+/* ============================================================
+   TOAST UNDO BUTTON
+   ============================================================ */
+.toast-undo-btn {
+  font-size: 12px;
+  color: var(--accent2);
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+.toast-undo-btn:hover { color: var(--accent); }
+
+/* ============================================================
+   SUBTASK PROGRESS
+   ============================================================ */
+.subtask-progress {
+  font-size: 10px;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.subtask-mini-bar { width: 30px; height: 4px; background: rgba(168,85,247,.1); border-radius: 2px; overflow: hidden; }
+.subtask-mini-fill { height: 100%; background: var(--green); border-radius: 2px; }
+
+/* ============================================================
+   COMPAÑERO DEL GREMIO
+   ============================================================ */
+.companion-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.companion-msg-box {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text2);
+  font-style: italic;
+  line-height: 1.5;
+  min-height: 50px;
+}
+.companion-input-row { display: flex; gap: 6px; }
+.companion-input { flex: 1; font-size: 12px; }
+
+/* ============================================================
+   ORÁCULO
+   ============================================================ */
+.oraculo-text {
+  font-size: 13px;
+  color: var(--text2);
+  font-style: italic;
+  line-height: 1.65;
+  padding: 8px 0;
+}
+
+/* ============================================================
+   NOTAS EXPANDIBLES
+   ============================================================ */
+.expand-notes-btn {
+  font-size: 10px;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+  font-family: var(--font-body);
+}
+
+/* ============================================================
+   URGENTE — fondo sutil
+   ============================================================ */
+.quest-item[data-priority="urgente"] {
+  background: linear-gradient(135deg, rgba(251,113,133,.04), var(--card));
+}
+
+/* ============================================================
+   KANBAN COLUMN COLORS
+   ============================================================ */
+.kanban-col[data-col="pending"] .kanban-col-header { background: rgba(168,85,247,.04); }
+.kanban-col[data-col="battle"]  .kanban-col-header { background: rgba(56,189,248,.04); }
+.kanban-col[data-col="done"]    .kanban-col-header { background: rgba(74,222,128,.04); }
+.kanban-col[data-col="pending"] { border-color: rgba(168,85,247,.1); }
+.kanban-col[data-col="battle"]  { border-color: rgba(56,189,248,.1); }
+.kanban-col[data-col="done"]    { border-color: rgba(74,222,128,.1); }
+
+/* ============================================================
+   MAP VIEW
+   ============================================================ */
+#view-map { padding: 20px; }
+.map-svg-wrap { width: 100%; overflow: auto; }
+
+/* ============================================================
+   DRAG FEEDBACK MEJORADO
+   ============================================================ */
+.quest-item.dragging {
+  opacity: .25;
+  border-style: dashed;
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(168,85,247,.3);
+}
+.quest-item.drag-over {
+  border-color: var(--accent2);
+  background: rgba(34,211,238,.05);
+  transform: translateY(-3px);
+}
 </style>
 </head>
 <body>
+
+<!-- Welcome Screen -->
+<div class="welcome-screen" id="welcomeScreen">
+  <div class="welcome-logo">⚔️ Dungeon Productivity</div>
+  <div class="welcome-phrase" id="welcomePhrase">El destino te llama de vuelta, Héroe...</div>
+  <div class="welcome-dots">
+    <div class="welcome-dot"></div>
+    <div class="welcome-dot"></div>
+    <div class="welcome-dot"></div>
+  </div>
+</div>
+
+<!-- Particle Canvas -->
+<canvas id="particleCanvas" style="position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.45"></canvas>
 
 <div class="app" id="app">
 
   <!-- HEADER -->
   <header class="header">
-    <div class="header-logo">⚔️ Dungeon</div>
+    <div style="display:flex;flex-direction:column;gap:1px">
+      <div class="header-logo">⚔️ Dungeon</div>
+      <div class="guild-name" id="guildNameDisplay"></div>
+    </div>
+    <div class="conn-dot" id="connDot" title="Conectando..."></div>
 
     <div class="header-hero">
-      <button class="hero-avatar-btn" id="heroAvatarBtn" title="Editar perfil">🧙</button>
+      <button class="hero-avatar-btn" id="heroAvatarBtn" title="Editar perfil">🧙<span class="avatar-level-badge" id="avatarLevelBadge">1</span></button>
       <div class="hero-info">
         <div class="hero-name" id="heroName">Héroe</div>
         <div class="hero-title" id="heroTitle">Nivel 1 · Aprendiz</div>
@@ -1545,19 +2057,23 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
     </div>
 
     <div class="header-stats">
-      <div class="stat-chip">Nivel <span id="statLevel">1</span></div>
-      <div class="stat-chip">Racha <span id="statStreak">0</span>🔥</div>
-      <div class="stat-chip">XP <span id="statTotalXP">0</span></div>
+      <div class="stat-chip" title="Nivel actual">Nivel <span id="statLevel">1</span></div>
+      <div class="stat-chip" title="Racha de días consecutivos">Racha <span id="statStreak">0</span>🔥</div>
+      <div class="stat-chip" title="XP total acumulado">XP <span id="statTotalXP">0</span></div>
+      <div class="stat-chip" title="Mejor racha histórica">🏆 <span id="statBestStreak">0</span></div>
     </div>
 
     <div id="spellActiveBadge" style="display:none" class="spell-active-badge">⚡ x2 XP</div>
 
     <div class="header-actions">
+      <button class="icon-btn" id="d20Btn" title="Tirar D20 🎲">🎲</button>
+      <button class="icon-btn" id="musicBtn" title="Música lofi 🎵">🎵</button>
       <button class="icon-btn" id="focusBtn" title="Modo Focus (F)">🎯</button>
       <button class="icon-btn" id="compactToggle" title="Modo compacto (C)">⊟</button>
       <button class="icon-btn" id="themeBtn" title="Cambiar tema (T)">🎨</button>
-      <button class="icon-btn" id="importBtn" title="Importar quests">📥</button>
+      <button class="icon-btn" id="importBtn" title="Importar misiones">📥</button>
       <button class="icon-btn" id="exportBtn" title="Exportar JSON">📤</button>
+      <button class="icon-btn" id="csvBtn" title="Exportar CSV 📊">📊</button>
       <button class="icon-btn" id="notifBtn" title="Notificaciones">🔔</button>
     </div>
   </header>
@@ -1571,9 +2087,10 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
       <div class="view-tabs">
         <button class="view-tab active" data-view="quests">⚔️ Misiones</button>
         <button class="view-tab" data-view="kanban">📋 Kanban</button>
-        <button class="view-tab" data-view="stats">📊 Stats</button>
+        <button class="view-tab" data-view="stats">📊 Sala del Trono</button>
         <button class="view-tab" data-view="achievements">🏆 Logros</button>
         <button class="view-tab" data-view="history">📜 Historial</button>
+        <button class="view-tab" data-view="map">🗺️ Mapa</button>
       </div>
 
       <div class="views">
@@ -1584,21 +2101,38 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
           <div class="boss-banner" id="bossBanner" style="display:none">
             <div class="boss-icon">👹</div>
             <div class="boss-info">
-              <div class="boss-label">⚠️ Misión prioritaria — ¡Ataca primero!</div>
+              <div class="boss-label">⚠️ Misión Épica — ¡Ataca primero!</div>
               <div class="boss-name" id="bossName">—</div>
               <div class="boss-meta" id="bossMeta"></div>
             </div>
           </div>
 
+          <div class="weekly-banner" id="weeklyBanner" style="display:none">
+            <div style="font-size:22px">📜</div>
+            <div style="flex:1">
+              <div class="weekly-banner-title">Crónica Semanal</div>
+              <div class="weekly-banner-name" id="weeklyBannerName">—</div>
+              <div class="weekly-boss-bar">
+                <div class="weekly-boss-bg"><div class="weekly-boss-fill" id="weeklyBossFill" style="width:0%"></div></div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--blue)" id="weeklyBannerMeta"></div>
+          </div>
+
+          <div class="daily-progress-wrap" id="dailyProgressWrap" style="display:none">
+            <div class="daily-progress-label" id="dailyProgressLabel">0/0 búsquedas</div>
+            <div class="daily-progress-bar"><div class="daily-progress-fill" id="dailyProgressFill" style="width:0%"></div></div>
+          </div>
+
           <div class="quest-toolbar">
             <input class="search-box" id="searchBox" placeholder="🔍 Buscar misiones..." type="text">
             <div class="filter-tabs">
-              <button class="filter-tab active" data-filter="all">Todas</button>
-              <button class="filter-tab" data-filter="main">Principal</button>
-              <button class="filter-tab" data-filter="side">Secundaria</button>
-              <button class="filter-tab" data-filter="daily">Diaria</button>
-              <button class="filter-tab" data-filter="weekly">Semanal</button>
-              <button class="filter-tab" data-filter="urgente" style="color:var(--red)">🔴 Urgente</button>
+              <button class="filter-tab active" data-filter="all" id="ft-all">Todas</button>
+              <button class="filter-tab" data-filter="main" id="ft-main">⚔️ Épicas</button>
+              <button class="filter-tab" data-filter="side" id="ft-side">🗡️ Encargos</button>
+              <button class="filter-tab" data-filter="daily" id="ft-daily">🌅 Búsquedas</button>
+              <button class="filter-tab" data-filter="weekly" id="ft-weekly">📜 Crónicas</button>
+              <button class="filter-tab" data-filter="urgente" id="ft-urgente" style="color:var(--red)">🔴 Urgente</button>
             </div>
             <select class="sort-select" id="sortSelect">
               <option value="created">Recientes</option>
@@ -1621,21 +2155,21 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
         <!-- KANBAN VIEW -->
         <div class="view" id="view-kanban">
           <div class="kanban-board">
-            <div class="kanban-col">
+            <div class="kanban-col" data-col="pending">
               <div class="kanban-col-header">
                 <span class="kanban-col-title">⏳ Pendiente</span>
                 <span class="kanban-col-count" id="k-pending-count">0</span>
               </div>
               <div class="kanban-cards" id="k-pending"></div>
             </div>
-            <div class="kanban-col">
+            <div class="kanban-col" data-col="battle">
               <div class="kanban-col-header">
                 <span class="kanban-col-title">⚔️ En Batalla</span>
                 <span class="kanban-col-count" id="k-battle-count">0</span>
               </div>
               <div class="kanban-cards" id="k-battle"></div>
             </div>
-            <div class="kanban-col">
+            <div class="kanban-col" data-col="done">
               <div class="kanban-col-header">
                 <span class="kanban-col-title">✅ Conquistado</span>
                 <span class="kanban-col-count" id="k-done-count">0</span>
@@ -1667,12 +2201,26 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
               </div>
             </div>
             <div class="stats-card">
-              <div class="stats-card-title">Resumen total</div>
+              <div class="stats-card-title">Resumen del Héroe</div>
               <div style="display:flex;flex-direction:column;gap:8px">
                 <div><span style="color:var(--gold);font-family:var(--font-head);font-size:20px" id="st-total-xp">0</span><span style="color:var(--text2);font-size:11px"> XP total</span></div>
-                <div><span style="color:var(--green);font-family:var(--font-head);font-size:20px" id="st-completed">0</span><span style="color:var(--text2);font-size:11px"> misiones completadas</span></div>
+                <div><span style="color:var(--green);font-family:var(--font-head);font-size:20px" id="st-completed">0</span><span style="color:var(--text2);font-size:11px"> ⚔️ monstruos derrotados</span></div>
                 <div><span style="color:var(--blue);font-family:var(--font-head);font-size:20px" id="st-pomodoros">0</span><span style="color:var(--text2);font-size:11px"> pomodoros</span></div>
                 <div><span style="color:var(--accent);font-family:var(--font-head);font-size:20px" id="st-level">1</span><span style="color:var(--text2);font-size:11px"> nivel actual</span></div>
+                <div><span style="color:var(--accent2);font-family:var(--font-head);font-size:20px" id="st-days-dungeon">0</span><span style="color:var(--text2);font-size:11px"> días en el dungeon</span></div>
+                <div><span style="color:var(--orange);font-family:var(--font-head);font-size:16px" id="st-focus-time">0h 0m</span><span style="color:var(--text2);font-size:11px"> en focus total</span></div>
+              </div>
+            </div>
+
+            <div class="stats-card">
+              <div class="stats-card-title">🔮 El Oráculo Habla</div>
+              <div class="oraculo-text" id="oraculoText">El oráculo observa tu jornada en silencio...</div>
+            </div>
+
+            <div class="stats-card">
+              <div class="stats-card-title">🏅 Top Búsquedas</div>
+              <div id="topQuestsContent" style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text2)">
+                <div style="color:var(--text3)">Completa misiones para ver tus favoritas</div>
               </div>
             </div>
             <div class="stats-card" style="grid-column:1/-1">
@@ -1699,6 +2247,16 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
         <!-- HISTORY VIEW -->
         <div class="view" id="view-history">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;flex-wrap:wrap">
+            <input id="historySearch" placeholder="🔍 Buscar historial..." style="flex:1;min-width:120px;border-radius:var(--radius-sm);font-size:13px;padding:7px 12px">
+            <div class="filter-tabs" style="flex-shrink:0">
+              <button class="filter-tab active" data-hfilter="all">Todas</button>
+              <button class="filter-tab" data-hfilter="main">⚔️ Épicas</button>
+              <button class="filter-tab" data-hfilter="side">🗡️ Encargos</button>
+              <button class="filter-tab" data-hfilter="daily">🌅 Búsquedas</button>
+              <button class="filter-tab" data-hfilter="weekly">📜 Crónicas</button>
+            </div>
+          </div>
           <div id="historyContent">
             <div class="empty-state">
               <div class="empty-state-icon">📜</div>
@@ -1708,15 +2266,20 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
           </div>
         </div>
 
+        <!-- MAP VIEW -->
+        <div class="view" id="view-map">
+          <div id="mapContent" class="map-svg-wrap"></div>
+        </div>
+
       </div>
     </div>
 
     <!-- RIGHT PANEL -->
     <aside class="right-panel">
 
-      <!-- POMODORO -->
+      <!-- POMODORO / POSADA -->
       <div class="panel-section">
-        <div class="panel-title">🍅 Pomodoro</div>
+        <div class="panel-title">🏠 Posada · Pomodoro</div>
         <div class="pomodoro-timer">
 
           <div class="timer-duration-select">
@@ -1755,9 +2318,9 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
         </div>
       </div>
 
-      <!-- SPELLS -->
+      <!-- SPELLS / TAVERNA -->
       <div class="panel-section">
-        <div class="panel-title">✨ Hechizos</div>
+        <div class="panel-title">🍺 Taverna de Hechizos</div>
         <div class="spells-list" id="spellsList"></div>
       </div>
 
@@ -1792,9 +2355,24 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
         </div>
       </div>
 
+      <!-- COMPANION -->
+      <div class="panel-section">
+        <div class="panel-title">👥 Compañero del Gremio</div>
+        <div class="companion-panel">
+          <div class="companion-msg-box" id="companionMsg">El compañero observa en silencio... ¿qué hay en tu corazón, héroe?</div>
+          <div class="companion-input-row">
+            <input class="companion-input" id="companionInput" placeholder="Cuéntame tu jornada...">
+            <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px" onclick="talkToCompanion()">Enviar</button>
+          </div>
+        </div>
+      </div>
+
     </aside>
   </div>
 </div>
+
+<!-- MOBILE FAB -->
+<button class="mobile-fab" id="mobileFab">+</button>
 
 <!-- MODALS -->
 
@@ -1845,12 +2423,23 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
         <input class="form-input" id="editQDeadline" type="date">
       </div>
       <div class="form-group">
-        <label class="form-label">Notas</label>
+        <label class="form-label">Notas / Pergaminos</label>
         <textarea class="form-input" id="editQNotes" rows="2"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tags (#trabajo #personal)</label>
+          <input class="form-input" id="editQTags" type="text" placeholder="#tag1 #tag2">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tiempo estimado (min)</label>
+          <input class="form-input" id="editQEstTime" type="number" min="5" step="5" placeholder="25">
+        </div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('editQuestModal')">Cancelar</button>
+      <button class="btn btn-ghost" id="duplicateQuestBtn" title="Duplicar misión">📋 Duplicar</button>
       <button class="btn btn-danger" id="deleteQuestBtn">Eliminar</button>
       <button class="btn btn-primary" id="saveQuestBtn">Guardar</button>
     </div>
@@ -1866,15 +2455,35 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
         <label class="form-label">Nombre del héroe</label>
         <input class="form-input" id="editHeroName" type="text">
       </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Clase</label>
+          <select class="form-input" id="editHeroClass">
+            <option value="guerrero">⚔️ Guerrero (+10% XP épicas)</option>
+            <option value="mago">🧙 Mago (+10% todo XP)</option>
+            <option value="picaro">🗡️ Pícaro (+10% XP encargos)</option>
+            <option value="clerigo">✝️ Clérigo (HP con búsquedas)</option>
+            <option value="arquero">🏹 Arquero (+10% XP crónicas)</option>
+            <option value="fundador">🚀 Fundador Caótico</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Raza</label>
+          <select class="form-input" id="editHeroRace">
+            <option value="humano">🧑 Humano (+10% todo XP)</option>
+            <option value="elfo">🧝 Elfo (+5min focus)</option>
+            <option value="enano">⛏️ Enano (+10 HP máx)</option>
+            <option value="orco">💪 Orco (racha perdona 1 día)</option>
+          </select>
+        </div>
+      </div>
       <div class="form-group">
-        <label class="form-label">Clase</label>
-        <select class="form-input" id="editHeroClass">
-          <option value="guerrero">⚔️ Guerrero (+10% XP misiones principales)</option>
-          <option value="mago">🧙 Mago (+10% todo XP)</option>
-          <option value="picaro">🗡️ Pícaro (+10% XP misiones secundarias)</option>
-          <option value="clerigo">✝️ Clérigo (recupera HP con misiones diarias)</option>
-          <option value="fundador">🚀 Fundador Caótico (clase especial)</option>
-        </select>
+        <label class="form-label">Nombre del Gremio</label>
+        <input class="form-input" id="editGuildName" type="text" placeholder="Ej: Gremio del Caos Productivo">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Webhook al subir de nivel (URL)</label>
+        <input class="form-input" id="editWebhookUrl" type="url" placeholder="https://n8n.tudominio.com/webhook/...">
       </div>
       <div class="form-group">
         <label class="form-label">Avatar</label>
@@ -1908,6 +2517,32 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
       <button class="btn btn-ghost" onclick="closeModal('importModal')">Cancelar</button>
       <button class="btn btn-primary" id="doImportBtn">Importar</button>
     </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation -->
+<div class="modal-overlay" id="deleteConfirmModal">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-title">🗑️ Eliminar misión</div>
+    <p id="deleteConfirmName" style="color:var(--text2);margin:14px 0;font-size:14px">¿Eliminar esta misión?</p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('deleteConfirmModal')">Cancelar</button>
+      <button class="btn btn-danger" id="confirmDeleteBtn">⚔️ Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cmd+K Search -->
+<div class="modal-overlay cmdk-modal" id="cmdkModal">
+  <div class="modal">
+    <div class="cmdk-search-row">
+      <span class="cmdk-search-icon">🔍</span>
+      <input class="cmdk-input" id="cmdkInput" placeholder="Buscar misiones, logros...">
+    </div>
+    <div class="cmdk-results" id="cmdkResults">
+      <div class="cmdk-empty">Escribe para buscar</div>
+    </div>
+    <div class="cmdk-hint">↑↓ navegar · Enter seleccionar · Esc cerrar</div>
   </div>
 </div>
 
@@ -1947,7 +2582,8 @@ const XP_TABLE = { main: 100, side: 50, daily: 25, weekly: 75 };
 const POM_XP = 15;
 const LEVEL_BASE = 100;
 const LEVEL_SCALE = 1.5;
-const THEMES = ['dark', 'light', 'cyber'];
+const THEMES = ['dark', 'light', 'cyber', 'oled', 'parchment'];
+const THEME_NAMES = { dark: 'Oscuro', light: 'Claro', cyber: 'Cyber', oled: 'OLED', parchment: 'Pergamino' };
 
 const AVATARS = ['🧙','⚔️','🛡️','🏹','🗡️','🔮','🦅','🐉','💀','👑',
                  '🦁','🐺','🦊','🐻','🧝','🧜','🤺','🥷','🧟','🧛',
@@ -2017,13 +2653,22 @@ let db;
 let hero = null;
 let quests = [];
 let pomodoros = [];
-let timer = { running: false, phase: 'focus', seconds: 25*60, interval: null, duration: 25, pomsDone: 0 };
-let activeFilter = 'all';
-let sortMode = 'created';
+let timer = { running: false, phase: 'focus', seconds: 25*60, interval: null, duration: 25, pomsDone: 0, _nextPomDouble: false };
+let activeFilter = localStorage.getItem('dungeon-filter') || 'all';
+let sortMode = localStorage.getItem('dungeon-sort') || 'created';
 let compact = false;
 let spellState = {};
 let xpMultiplier = 1;
 let xpMultiplierEnd = 0;
+let tagFilter = null;
+let dateFilter = 'all';
+let historyTypeFilter = 'all';
+let pendingDeleteId = null;
+let lastCompletedUndo = null;
+let musicAudio = null;
+let heroRace = localStorage.getItem('dungeon-race') || 'humano';
+let guildName = localStorage.getItem('dungeon-guild') || '';
+let webhookUrl = localStorage.getItem('dungeon-webhook') || '';
 
 /* SUPABASE */
 async function initDB() {
@@ -2082,11 +2727,16 @@ function xpForLevel(lvl) {
 
 function classXPBonus(type) {
   const cls = hero ? (hero.hero_class || 'guerrero') : 'guerrero';
-  if (cls === 'mago') return 1.1;
-  if (cls === 'guerrero' && type === 'main') return 1.1;
-  if (cls === 'picaro' && type === 'side') return 1.1;
-  if (cls === 'fundador') return 1.05;
-  return 1;
+  let bonus = 1;
+  if (cls === 'mago') bonus = 1.1;
+  else if (cls === 'guerrero' && type === 'main') bonus = 1.1;
+  else if (cls === 'picaro' && type === 'side') bonus = 1.1;
+  else if (cls === 'arquero' && type === 'weekly') bonus = 1.1;
+  else if (cls === 'clerigo' && type === 'daily') bonus = 1.05;
+  else if (cls === 'fundador') bonus = 1.05;
+  const race = heroRace || 'humano';
+  if (race === 'humano') bonus *= 1.1;
+  return bonus;
 }
 
 async function addXP(amount, type, sourceEl) {
@@ -2103,6 +2753,11 @@ async function addXP(amount, type, sourceEl) {
   if (newLevel > prevLevel) {
     showLevelUp(newLevel);
     checkAchievements();
+    if (webhookUrl) {
+      fetch(webhookUrl, { method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ hero: hero.name, newLevel, oldLevel: prevLevel, timestamp: new Date().toISOString() })
+      }).catch(() => {});
+    }
   }
   renderHeroUI();
 }
@@ -2130,7 +2785,7 @@ async function completeQuest(id, el) {
   await db.from('dungeon_quests').update({ done: true, done_at: now }).eq('id', id);
   q.done = true; q.done_at = now;
 
-  const xpAmt = XP_TABLE[q.type] || 50;
+  const xpAmt = calcQuestXP(q);
   await addXP(xpAmt, q.type, el);
 
   if (q.type === 'daily' && hero.hero_class === 'clerigo') {
@@ -2142,13 +2797,51 @@ async function completeQuest(id, el) {
   if (q.type === 'main') patch.main_done = (hero.main_done || 0) + 1;
   await saveHero(patch);
 
-  toast('✅', COMPLETIONS[Math.floor(Math.random() * COMPLETIONS.length)]);
+  // Undo state
+  lastCompletedUndo = { id, xpAmt, q: { ...q } };
+  let undoUsed = false;
+  const undoTimeout = setTimeout(() => { if (!undoUsed) lastCompletedUndo = null; }, 5500);
+
+  const msg = COMPLETIONS[Math.floor(Math.random() * COMPLETIONS.length)];
+  const container = document.getElementById('toastContainer');
+  const div = document.createElement('div');
+  div.className = 'toast';
+  div.innerHTML = `<span class="toast-icon">✅</span><span class="toast-msg">${escHtml(msg)}</span><span class="toast-undo-btn" id="undoBtn">Deshacer</span>`;
+  container.appendChild(div);
+  div.querySelector('#undoBtn').addEventListener('click', async () => {
+    undoUsed = true;
+    clearTimeout(undoTimeout);
+    div.remove();
+    await undoComplete();
+  });
+  setTimeout(() => { if (div.parentNode) div.remove(); }, 5000);
+
   checkAchievements();
   renderQuestList();
   renderKanban();
   renderHistory();
   renderStats();
   updateBossBanner();
+}
+
+async function undoComplete() {
+  if (!lastCompletedUndo) return;
+  const { id, xpAmt } = lastCompletedUndo;
+  const q = quests.find(x => x.id === id);
+  if (!q) return;
+  await db.from('dungeon_quests').update({ done: false, done_at: null }).eq('id', id);
+  q.done = false; q.done_at = null;
+  const newTotal = Math.max(0, (hero.xp_total || 0) - xpAmt);
+  const newLevel = calcLevel(newTotal);
+  const patch = {
+    xp_total: newTotal, level: newLevel,
+    quests_done: Math.max(0, (hero.quests_done || 0) - 1)
+  };
+  if (q.type === 'main') patch.main_done = Math.max(0, (hero.main_done || 0) - 1);
+  await saveHero(patch);
+  lastCompletedUndo = null;
+  toast('↩️', 'Misión revertida');
+  renderQuestList(); renderKanban(); renderHeroUI(); renderStats(); updateBossBanner();
 }
 
 async function deleteQuest(id) {
@@ -2179,10 +2872,14 @@ async function loadPomodoros() {
 }
 
 async function savePom() {
+  const doubleXP = timer._nextPomDouble;
+  timer._nextPomDouble = false;
   const rec = { hero_id: hero.id, duration: timer.duration, completed: true, started_at: new Date().toISOString() };
   const { data } = await db.from('dungeon_pomodoros').insert(rec).select().single();
   pomodoros.unshift(data);
-  await addXP(POM_XP, 'pom', null);
+  const xpAmt = doubleXP ? POM_XP * 2 : POM_XP;
+  await addXP(xpAmt, 'pom', null);
+  if (doubleXP) toast('🧠', `¡Mente de Acero! +${xpAmt} XP del pomodoro.`);
   const patch = { pomodoros_done: (hero.pomodoros_done || 0) + 1 };
   await saveHero(patch);
   checkAchievements();
@@ -2502,28 +3199,65 @@ function renderAll() {
 
 function renderHeroUI() {
   if (!hero) return;
-  document.getElementById('heroAvatarBtn').textContent = hero.avatar || '🧙';
-  document.getElementById('heroName').textContent = hero.name || 'Héroe';
 
+  const avatarBtn = document.getElementById('heroAvatarBtn');
+  const lvlBadge  = document.getElementById('avatarLevelBadge');
   const lvl = hero._level || 1;
+
+  // Avatar + level badge (preserve badge child)
+  avatarBtn.childNodes[0].textContent = hero.avatar || '🧙';
+  if (lvlBadge) lvlBadge.textContent = lvl;
+
+  // Avatar ring by class
+  avatarBtn.className = 'hero-avatar-btn avatar-class-' + (hero.hero_class || 'guerrero');
+
+  document.getElementById('heroName').textContent = hero.name || 'Héroe';
   const title = TITLES[Math.min(lvl - 1, TITLES.length - 1)];
   document.getElementById('heroTitle').textContent = `Nv.${lvl} · ${title}`;
   document.getElementById('statLevel').textContent = lvl;
   document.getElementById('statStreak').textContent = hero.streak || 0;
   document.getElementById('statTotalXP').textContent = (hero.xp_total || 0).toLocaleString();
 
-  const xpPrev = xpForLevel(lvl - 1);
-  const xpNext = xpForLevel(lvl);
-  const xpCur = (hero.xp_total || 0) - xpPrev;
-  const xpNeeded = xpNext - xpPrev;
-  const pct = Math.min(100, Math.round((xpCur / xpNeeded) * 100));
-  document.getElementById('xpLabel').textContent = `${xpCur} / ${xpNeeded}`;
-  document.getElementById('xpBarFill').style.width = pct + '%';
+  const bestStreak = hero.longest_streak || 0;
+  const stBest = document.getElementById('statBestStreak');
+  if (stBest) stBest.textContent = bestStreak;
 
-  const hp = hero.hp || 100;
+  const xpPrev   = xpForLevel(lvl - 1);
+  const xpNext   = xpForLevel(lvl);
+  const xpCur    = (hero.xp_total || 0) - xpPrev;
+  const xpNeeded = xpNext - xpPrev;
+  const pct      = Math.min(100, Math.round((xpCur / xpNeeded) * 100));
+  document.getElementById('xpLabel').textContent = `XP ${xpCur.toLocaleString()} / ${xpNeeded.toLocaleString()} (${pct}%)`;
+  const fill = document.getElementById('xpBarFill');
+  fill.style.width = pct + '%';
+  let pctEl = fill.querySelector('.xp-bar-pct');
+  if (!pctEl) { pctEl = document.createElement('div'); pctEl.className = 'xp-bar-pct'; fill.appendChild(pctEl); }
+  pctEl.textContent = pct + '%';
+
+  const hp    = hero.hp || 100;
   const hpMax = hero.hp_max || 100;
+  const hpPct = Math.round((hp / hpMax) * 100);
   document.getElementById('hpLabel').textContent = `${hp} / ${hpMax}`;
-  document.getElementById('hpBarFill').style.width = Math.round((hp / hpMax) * 100) + '%';
+  const hpFill = document.getElementById('hpBarFill');
+  hpFill.style.width = hpPct + '%';
+  hpFill.classList.toggle('hp-critical', hpPct < 25);
+  hpFill.classList.toggle('hp-warning',  hpPct >= 25 && hpPct < 50);
+
+  // HP danger text
+  let hpDanger = document.getElementById('hpDangerText');
+  if (hpPct < 25) {
+    if (!hpDanger) {
+      hpDanger = document.createElement('span');
+      hpDanger.id = 'hpDangerText';
+      hpDanger.className = 'hp-danger-text';
+      hpDanger.textContent = ' ⚠️';
+      document.getElementById('hpLabel').appendChild(hpDanger);
+    }
+  } else if (hpDanger) hpDanger.remove();
+
+  // Guild name
+  const gnd = document.getElementById('guildNameDisplay');
+  if (gnd) gnd.textContent = guildName || '';
 
   const stLvl = document.getElementById('st-level');
   if (stLvl) stLvl.textContent = lvl;
@@ -2536,11 +3270,34 @@ function renderQuestList() {
   if (!el) return;
 
   const search = (document.getElementById('searchBox').value || '').toLowerCase();
+  const today  = new Date().toISOString().split('T')[0];
+  const weekEnd = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
+
   let filtered = quests.filter(q => {
     if (activeFilter === 'urgente') { if (q.priority !== 'urgente') return false; }
     else if (activeFilter !== 'all' && q.type !== activeFilter) return false;
     if (search && !q.name.toLowerCase().includes(search)) return false;
+    if (tagFilter) {
+      const tags = (localStorage.getItem('dungeon-tags-' + q.id) || '').toLowerCase();
+      if (!tags.includes(tagFilter.toLowerCase())) return false;
+    }
+    if (dateFilter === 'today'   && !(q.deadline === today)) return false;
+    if (dateFilter === 'week'    && !(q.deadline && q.deadline <= weekEnd && q.deadline >= today)) return false;
+    if (dateFilter === 'overdue' && !(q.deadline && q.deadline < today && !q.done)) return false;
+    if (dateFilter === 'nodate'  && q.deadline) return false;
     return true;
+  });
+
+  // Update filter tab counts
+  const counts = { all: quests.filter(q=>!q.done).length, main: 0, side: 0, daily: 0, weekly: 0, urgente: 0 };
+  quests.filter(q=>!q.done).forEach(q => {
+    if (counts[q.type] !== undefined) counts[q.type]++;
+    if (q.priority === 'urgente') counts.urgente++;
+  });
+  const tabLabels = { all:'Todas', main:'⚔️ Épicas', side:'🗡️ Encargos', daily:'🌅 Búsquedas', weekly:'📜 Crónicas', urgente:'🔴 Urgente' };
+  Object.entries(counts).forEach(([key, n]) => {
+    const tb = document.getElementById('ft-' + key);
+    if (tb) tb.textContent = `${tabLabels[key]} (${n})`;
   });
 
   filtered.sort((a, b) => {
@@ -2549,49 +3306,100 @@ function renderQuestList() {
       return (p[a.priority] || 1) - (p[b.priority] || 1);
     }
     if (sortMode === 'deadline') {
-      if (!a.deadline) return 1;
-      if (!b.deadline) return -1;
+      if (!a.deadline) return 1; if (!b.deadline) return -1;
       return new Date(a.deadline) - new Date(b.deadline);
     }
-    if (sortMode === 'xp') {
-      return (XP_TABLE[b.type] || 0) - (XP_TABLE[a.type] || 0);
-    }
+    if (sortMode === 'xp') return (XP_TABLE[b.type] || 0) - (XP_TABLE[a.type] || 0);
     return new Date(b.created_at) - new Date(a.created_at);
   });
 
   const pending = filtered.filter(q => !q.done);
-  const done = filtered.filter(q => q.done);
-  const ordered = [...pending, ...done];
+  const done    = filtered.filter(q => q.done);
 
-  if (!ordered.length) {
+  if (!pending.length && !done.length) {
     el.innerHTML = `<div class="empty-state">
-      <div class="empty-state-icon">🗡️</div>
+      <svg width="80" height="80" viewBox="0 0 80 80" style="margin-bottom:14px;opacity:.4">
+        <rect x="10" y="30" width="60" height="40" rx="6" fill="none" stroke="currentColor" stroke-width="2"/>
+        <rect x="25" y="20" width="30" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>
+        <line x1="30" y1="46" x2="50" y2="46" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <line x1="30" y1="55" x2="45" y2="55" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="60" cy="15" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+        <line x1="60" y1="11" x2="60" y2="19" stroke="currentColor" stroke-width="2"/>
+        <line x1="56" y1="15" x2="64" y2="15" stroke="currentColor" stroke-width="2"/>
+      </svg>
       <h3>Sin misiones</h3>
-      <p>Añade una misión en el panel derecho</p>
+      <p>Añade tu primera misión en el panel derecho</p>
     </div>`;
+    updateDailyProgress();
     return;
   }
 
-  el.innerHTML = ordered.map(q => renderQuestItem(q)).join('');
+  // Group pending by type with separators
+  const typeOrder = ['urgente', 'main', 'weekly', 'side', 'daily'];
+  const typeLabelsGroup = { urgente:'🔴 Urgentes', main:'⚔️ Misiones Épicas', weekly:'📜 Crónicas Semanales', side:'🗡️ Encargos', daily:'🌅 Búsquedas Diarias' };
+  let html = '';
+
+  if (activeFilter === 'all') {
+    typeOrder.forEach(type => {
+      let group;
+      if (type === 'urgente') group = pending.filter(q => q.priority === 'urgente');
+      else group = pending.filter(q => q.type === type && q.priority !== 'urgente');
+      if (!group.length) return;
+      html += `<div class="type-separator">${typeLabelsGroup[type]}<span>${group.length}</span></div>`;
+      html += group.map(q => renderQuestItem(q)).join('');
+    });
+  } else {
+    html = pending.map(q => renderQuestItem(q)).join('');
+  }
+
+  if (done.length) {
+    html += `<div class="type-separator" style="opacity:.5">✅ Completadas<span>${done.length}</span></div>`;
+    html += done.map(q => renderQuestItem(q)).join('');
+  }
+
+  el.innerHTML = html;
+  initSwipeToComplete();
+  updateDailyProgress();
+}
+
+function formatRelativeDate(dateStr) {
+  if (!dateStr) return '';
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d     = new Date(dateStr + 'T00:00:00');
+  const diff  = Math.round((d - today) / 86400000);
+  if (diff === 0)  return '📅 Vence hoy';
+  if (diff === 1)  return '📅 Vence mañana';
+  if (diff === -1) return '⚠️ Venció ayer';
+  if (diff > 1 && diff < 8) return `📅 En ${diff} días`;
+  if (diff < 0)   return `⚠️ Hace ${Math.abs(diff)} días`;
+  return `📅 ${dateStr}`;
 }
 
 function renderQuestItem(q) {
-  const xp = calcQuestXP(q);
+  const xp   = calcQuestXP(q);
   const diff = getQuestDifficulty(q.id);
-  const today = new Date().toISOString().split('T')[0];
+  const today    = new Date().toISOString().split('T')[0];
   const isOverdue = q.deadline && !q.done && q.deadline < today;
-  const typeLabels = { main: '⭐ Principal', side: '🗡️ Secundaria', daily: '🌅 Diaria', weekly: '📅 Semanal' };
+  const typeLabels = { main: '⚔️ Épica', side: '🗡️ Encargo', daily: '🌅 Búsqueda', weekly: '📜 Crónica' };
   const diffEmoji = { easy: '🟢', normal: '', hard: '🔴' };
   const diffLabel = { easy: ' Fácil', normal: '', hard: ' Difícil' };
 
   // Parse subtasks from notes: lines starting with "- [ ]" or "- [x]"
   let notesHtml = '';
   let subtasksHtml = '';
+  let subtaskProgressHtml = '';
   if (q.notes) {
     const lines = q.notes.split('\n');
     const subtaskLines = lines.filter(l => /^- \[[ x]\]/.test(l));
-    const otherLines = lines.filter(l => !/^- \[[ x]\]/.test(l));
+    const otherLines   = lines.filter(l => !/^- \[[ x]\]/.test(l));
     if (subtaskLines.length) {
+      const doneCount  = subtaskLines.filter(l => l.startsWith('- [x]')).length;
+      const totalCount = subtaskLines.length;
+      const subPct = Math.round((doneCount / totalCount) * 100);
+      subtaskProgressHtml = `<span class="subtask-progress">
+        ${doneCount}/${totalCount} ✓
+        <div class="subtask-mini-bar"><div class="subtask-mini-fill" style="width:${subPct}%"></div></div>
+      </span>`;
       subtasksHtml = `<div class="subtask-list">` + subtaskLines.map((l, i) => {
         const done = l.startsWith('- [x]');
         const text = l.replace(/^- \[[ x]\] /, '');
@@ -2601,12 +3409,23 @@ function renderQuestItem(q) {
         </div>`;
       }).join('') + `</div>`;
     }
-    if (otherLines.join('').trim()) {
-      notesHtml = `<div class="quest-notes">${escHtml(otherLines.join(' ').trim())}</div>`;
+    const rawNotes = otherLines.join('\n').trim();
+    if (rawNotes) {
+      const MAX = 90;
+      const truncated = rawNotes.length > MAX;
+      const display = truncated ? rawNotes.slice(0, MAX) + '...' : rawNotes;
+      notesHtml = `<div class="quest-notes" id="notes-${q.id}">${escHtml(display)}${truncated ? `<button class="expand-notes-btn" onclick="expandNotes(event,'${q.id}',${JSON.stringify(rawNotes).replace(/'/g,'\\'+'\'')})"> ver más</button>` : ''}</div>`;
     }
   }
 
-  return `<div class="quest-item ${q.done ? 'done' : ''}" data-type="${q.type}" data-priority="${q.priority || 'normal'}"
+  // Tags & estimated time from localStorage
+  const tags    = (localStorage.getItem('dungeon-tags-' + q.id) || '').trim();
+  const estTime = localStorage.getItem('dungeon-esttime-' + q.id);
+  const tagsHtml = tags ? tags.split(' ').filter(t=>t.startsWith('#')).map(t =>
+    `<span class="tag-badge" onclick="setTagFilter('${escHtml(t)}')">${escHtml(t)}</span>`).join('') : '';
+  const estHtml = estTime ? `<span class="esttime-badge">⏱ ${estTime}m</span>` : '';
+
+  return `<div class="quest-item ${q.done ? 'done' : ''}" data-type="${q.type}" data-priority="${q.priority || 'normal'}" data-qid="${q.id}"
     draggable="true"
     ondragstart="draggedQuestId='${q.id}';event.dataTransfer.effectAllowed='move';this.classList.add('dragging')"
     ondragend="this.classList.remove('dragging')"
@@ -2620,8 +3439,11 @@ function renderQuestItem(q) {
       <div class="quest-meta">
         <span class="badge badge-type-${q.type}">${typeLabels[q.type] || q.type}</span>
         ${q.priority && q.priority !== 'normal' ? `<span class="badge badge-priority-${q.priority}">${q.priority}</span>` : ''}
-        ${q.deadline ? `<span class="deadline-badge ${isOverdue ? 'overdue' : ''}">📅 ${isOverdue ? '⚠️ ' : ''}${q.deadline}</span>` : ''}
+        ${q.deadline ? `<span class="deadline-badge ${isOverdue ? 'overdue' : ''}">${formatRelativeDate(q.deadline)}</span>` : ''}
         <span class="xp-reward">+${xp} XP</span>
+        ${subtaskProgressHtml}
+        ${estHtml}
+        ${tagsHtml}
         ${!q.done ? `<select style="font-size:10px;padding:1px 4px;height:18px" onchange="setQuestDifficulty('${q.id}',this.value)" onclick="event.stopPropagation()">
           <option value="easy" ${diff==='easy'?'selected':''}>Fácil</option>
           <option value="normal" ${diff==='normal'?'selected':''}>Normal</option>
@@ -2688,50 +3510,69 @@ function renderKanban() {
   document.getElementById('k-done-count').textContent = done.length;
 }
 
-function renderHistory() {
-  const el = document.getElementById('historyContent');
-  if (!el) return;
-  const done = quests.filter(q => q.done && q.done_at).sort((a, b) => new Date(b.done_at) - new Date(a.done_at));
-
-  if (!done.length) {
-    el.innerHTML = `<div class="empty-state">
-      <div class="empty-state-icon">📜</div>
-      <h3>Sin historial</h3>
-      <p>Completa misiones para verlas aquí</p>
-    </div>`;
-    return;
-  }
-
-  const grouped = {};
-  done.forEach(q => {
-    const d = new Date(q.done_at).toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    if (!grouped[d]) grouped[d] = [];
-    grouped[d].push(q);
-  });
-
-  const typeIcons = { main: '⭐', side: '🗡️', daily: '🌅', weekly: '📅' };
-  el.innerHTML = Object.entries(grouped).map(([date, qs]) => `
-    <div class="history-group">
-      <div class="history-date">${date} — ${qs.length} misión${qs.length > 1 ? 'es' : ''}</div>
-      ${qs.map(q => `<div class="history-item">
-        <span class="history-item-icon">${typeIcons[q.type] || '⚔️'}</span>
-        <span class="history-item-name">${escHtml(q.name)}</span>
-        <span class="history-item-xp">+${XP_TABLE[q.type] || 50} XP</span>
-      </div>`).join('')}
-    </div>
-  `).join('');
-}
-
 function renderStats() {
   renderXPChart();
   renderTypeDist();
   renderHeatmap();
-  const stCompleted = document.getElementById('st-completed');
-  if (stCompleted) stCompleted.textContent = hero ? (hero.quests_done || 0) : 0;
-  const stPoms = document.getElementById('st-pomodoros');
-  if (stPoms) stPoms.textContent = hero ? (hero.pomodoros_done || 0) : 0;
-  const stStreak = document.getElementById('statsStreak');
-  if (stStreak) stStreak.textContent = hero ? (hero.streak || 0) : 0;
+  if (!hero) return;
+
+  const setText = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+
+  setText('st-completed',  hero.quests_done || 0);
+  setText('st-pomodoros',  hero.pomodoros_done || 0);
+  setText('statsStreak',   hero.streak || 0);
+  setText('st-total-xp',  (hero.xp_total || 0).toLocaleString());
+  setText('st-level',      hero._level || 1);
+
+  // Days in dungeon
+  const created = hero.created_at ? new Date(hero.created_at) : new Date();
+  const daysDiff = Math.max(0, Math.round((Date.now() - created.getTime()) / 86400000));
+  setText('st-days-dungeon', daysDiff);
+
+  // Total focus time
+  const totalMins = (hero.pomodoros_done || 0) * 25;
+  setText('st-focus-time', `${Math.floor(totalMins/60)}h ${totalMins%60}m`);
+
+  // Top 3 quests
+  const nameCounts = {};
+  quests.filter(q => q.done).forEach(q => { nameCounts[q.name] = (nameCounts[q.name] || 0) + 1; });
+  const topEl = document.getElementById('topQuestsContent');
+  if (topEl) {
+    const top3 = Object.entries(nameCounts).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    topEl.innerHTML = top3.length
+      ? top3.map(([name,cnt],i) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">
+          <span>${['🥇','🥈','🥉'][i]} ${escHtml(name)}</span>
+          <span style="color:var(--gold);font-weight:600">${cnt}x</span></div>`).join('')
+      : '<div style="color:var(--text3)">Completa misiones para ver tus favoritas</div>';
+  }
+
+  // Oráculo
+  renderOraculo();
+}
+
+function renderOraculo() {
+  const el = document.getElementById('oraculoText');
+  if (!el || !hero) return;
+  const streak    = hero.streak || 0;
+  const completed = hero.quests_done || 0;
+  const hp        = hero.hp || 100;
+  const hpMax     = hero.hp_max || 100;
+  const lvl       = hero._level || 1;
+
+  let phrase = 'El oráculo observa tu jornada en silencio...';
+  if (hp / hpMax < 0.25) phrase = '⚠️ "El oráculo ve sombras densas sobre tu salud. El dungeon te cobra tributo, héroe. Descansa o sucumbirás."';
+  else if (streak >= 30)  phrase = '🌟 "Treinta soles has caminado sin descanso. Eres ya una leyenda que los libros del gremio recordarán por siglos."';
+  else if (streak >= 14)  phrase = '🔥 "Dos semanas de fuego imparable. El oráculo no ve rival en el horizonte que pueda detenerte."';
+  else if (streak >= 7)   phrase = '⚔️ "Siete días de batalla sin derrota. Los dioses del caos productivo te observan con respeto."';
+  else if (streak >= 3)   phrase = '💪 "Tu racha crece como la magia en el aire. Continúa y el gremio te coronará."';
+  else if (completed >= 100) phrase = '👑 "Cien monstruos caídos. Eres el azote del dungeon. Pocos alcanzan este honor, héroe."';
+  else if (completed >= 50) phrase = '🏆 "Cincuenta victorias graban tu nombre en el muro de los campeones. El oráculo inclina su cabeza."';
+  else if (lvl >= 8)      phrase = '🌙 "Tu nivel trasciende lo mortal. El oráculo apenas puede mirarte a los ojos sin deslumbrarse."';
+  else if (lvl >= 5)      phrase = '✨ "Nivel ' + lvl + '. El oráculo sonríe — estás en el camino de los grandes."';
+  else if (streak === 0)  phrase = '🌅 "El oráculo te invita a comenzar hoy. Una sola misión completada rompe el silencio del dungeon."';
+  else phrase = `🔮 "Día ${streak} de tu jornada. El oráculo ve potencial brillando en ti, héroe. No lo desperdicies."`;
+
+  el.textContent = phrase;
 }
 
 function renderXPChart() {
@@ -2785,30 +3626,58 @@ function renderTemplates() {
 function updateBossBanner() {
   const banner = document.getElementById('bossBanner');
   const urgent = quests.filter(q => !q.done && q.priority === 'urgente');
-  const mainP = quests.filter(q => !q.done && q.type === 'main');
-  const boss = urgent[0] || mainP[0];
+  const mainP  = quests.filter(q => !q.done && q.type === 'main');
+  const boss   = urgent[0] || mainP[0];
   if (boss) {
     banner.style.display = 'flex';
     document.getElementById('bossName').textContent = boss.name;
     const meta = [];
-    if (boss.type) meta.push(boss.type);
-    if (boss.deadline) meta.push(`Límite: ${boss.deadline}`);
+    if (boss.type) meta.push({ main:'⚔️ Épica', side:'🗡️ Encargo', daily:'🌅 Búsqueda', weekly:'📜 Crónica' }[boss.type] || boss.type);
+    if (boss.deadline) meta.push(formatRelativeDate(boss.deadline));
     document.getElementById('bossMeta').textContent = meta.join(' · ');
   } else {
     banner.style.display = 'none';
   }
+
+  // Weekly banner
+  const weeklies    = quests.filter(q => q.type === 'weekly');
+  const weeklyDone  = weeklies.filter(q => q.done).length;
+  const weeklyTotal = weeklies.length;
+  const wb = document.getElementById('weeklyBanner');
+  if (wb && weeklyTotal > 0) {
+    const pending = weeklies.find(q => !q.done);
+    wb.style.display = 'flex';
+    document.getElementById('weeklyBannerName').textContent = pending ? pending.name : '¡Todas completadas!';
+    document.getElementById('weeklyBossFill').style.width = Math.round((weeklyDone / weeklyTotal) * 100) + '%';
+    document.getElementById('weeklyBannerMeta').textContent = `${weeklyDone}/${weeklyTotal}`;
+  } else if (wb) wb.style.display = 'none';
+}
+
+function updateDailyProgress() {
+  const today   = new Date().toISOString().split('T')[0];
+  const dailies = quests.filter(q => q.type === 'daily');
+  const done    = dailies.filter(q => q.done && q.done_at && q.done_at.startsWith(today)).length;
+  const total   = dailies.length;
+  const wrap = document.getElementById('dailyProgressWrap');
+  if (!wrap) return;
+  if (!total) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'flex';
+  document.getElementById('dailyProgressLabel').textContent = `${done}/${total} búsquedas diarias`;
+  document.getElementById('dailyProgressFill').style.width = Math.round((done / total) * 100) + '%';
 }
 
 /* UI */
 function openEditQuest(id) {
   const q = quests.find(x => x.id === id);
   if (!q) return;
-  document.getElementById('editQuestId').value = id;
-  document.getElementById('editQName').value = q.name;
-  document.getElementById('editQType').value = q.type;
+  document.getElementById('editQuestId').value   = id;
+  document.getElementById('editQName').value     = q.name;
+  document.getElementById('editQType').value     = q.type;
   document.getElementById('editQPriority').value = q.priority || 'normal';
   document.getElementById('editQDeadline').value = q.deadline || '';
-  document.getElementById('editQNotes').value = q.notes || '';
+  document.getElementById('editQNotes').value    = q.notes || '';
+  document.getElementById('editQTags').value     = localStorage.getItem('dungeon-tags-' + id) || '';
+  document.getElementById('editQEstTime').value  = localStorage.getItem('dungeon-esttime-' + id) || '';
   openModal('editQuestModal');
 }
 
@@ -2882,11 +3751,11 @@ function escHtml(str) {
 
 /* THEME */
 function cycleTheme() {
-  const cur = document.documentElement.dataset.theme || 'dark';
+  const cur  = document.documentElement.dataset.theme || 'dark';
   const next = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
   document.documentElement.dataset.theme = next;
   localStorage.setItem('dungeon-theme', next);
-  toast('🎨', `Tema: ${next}`);
+  toast('🎨', `Tema: ${THEME_NAMES[next] || next}`);
 }
 
 /* AVATAR */
@@ -2932,6 +3801,7 @@ function switchView(v) {
   if (v === 'stats') renderStats();
   if (v === 'achievements') renderAchievements();
   if (v === 'history') renderHistory();
+  if (v === 'map') renderMapView();
 }
 
 function toggleCompact() {
@@ -2962,11 +3832,29 @@ document.addEventListener('keydown', e => {
 /* EVENTS */
 document.querySelectorAll('.view-tab').forEach(btn => btn.addEventListener('click', () => switchView(btn.dataset.view)));
 
-document.querySelectorAll('.filter-tab').forEach(btn => btn.addEventListener('click', () => {
+document.querySelectorAll('.filter-tab[data-filter]').forEach(btn => btn.addEventListener('click', () => {
   activeFilter = btn.dataset.filter;
-  document.querySelectorAll('.filter-tab').forEach(b => b.classList.toggle('active', b === btn));
+  localStorage.setItem('dungeon-filter', activeFilter);
+  document.querySelectorAll('.filter-tab[data-filter]').forEach(b => b.classList.toggle('active', b === btn));
   renderQuestList();
 }));
+
+// Restore saved filter
+const savedFilter = activeFilter;
+const savedFilterBtn = document.querySelector(`.filter-tab[data-filter="${savedFilter}"]`);
+if (savedFilterBtn) {
+  document.querySelectorAll('.filter-tab[data-filter]').forEach(b => b.classList.toggle('active', b === savedFilterBtn));
+}
+
+// History type filter
+document.querySelectorAll('.filter-tab[data-hfilter]').forEach(btn => btn.addEventListener('click', () => {
+  historyTypeFilter = btn.dataset.hfilter;
+  document.querySelectorAll('.filter-tab[data-hfilter]').forEach(b => b.classList.toggle('active', b === btn));
+  renderHistory();
+}));
+
+// History search
+document.getElementById('historySearch').addEventListener('input', () => renderHistory());
 
 document.getElementById('addQuestBtn').addEventListener('click', () => {
   const name = document.getElementById('qName').value.trim();
@@ -3009,18 +3897,31 @@ document.getElementById('notifBtn').addEventListener('click', async () => {
 
 document.getElementById('heroAvatarBtn').addEventListener('click', () => {
   if (!hero) return;
-  document.getElementById('editHeroName').value = hero.name || '';
+  document.getElementById('editHeroName').value  = hero.name || '';
   document.getElementById('editHeroClass').value = hero.hero_class || 'guerrero';
+  document.getElementById('editHeroRace').value  = heroRace;
+  document.getElementById('editGuildName').value = guildName;
+  document.getElementById('editWebhookUrl').value = webhookUrl;
   renderAvatarGrid();
   openModal('profileModal');
 });
 
 document.getElementById('saveProfileBtn').addEventListener('click', async () => {
   const name = document.getElementById('editHeroName').value.trim();
-  const cls = document.getElementById('editHeroClass').value;
+  const cls  = document.getElementById('editHeroClass').value;
   const avatar = hero._pendingAvatar || hero.avatar || '🧙';
   if (!name) return;
-  await saveHero({ name, hero_class: cls, avatar });
+
+  heroRace   = document.getElementById('editHeroRace').value;
+  guildName  = document.getElementById('editGuildName').value.trim();
+  webhookUrl = document.getElementById('editWebhookUrl').value.trim();
+  localStorage.setItem('dungeon-race',    heroRace);
+  localStorage.setItem('dungeon-guild',   guildName);
+  localStorage.setItem('dungeon-webhook', webhookUrl);
+
+  // Enano race: +10 HP max
+  const hpMaxBonus = heroRace === 'enano' ? 110 : 100;
+  await saveHero({ name, hero_class: cls, avatar, hp_max: hpMaxBonus });
   closeModal('profileModal');
   renderHeroUI();
   toast('🧙', 'Perfil actualizado.');
@@ -3028,26 +3929,60 @@ document.getElementById('saveProfileBtn').addEventListener('click', async () => 
 
 document.getElementById('saveQuestBtn').addEventListener('click', () => {
   const id = document.getElementById('editQuestId').value;
+  const tags    = document.getElementById('editQTags').value.trim();
+  const estTime = document.getElementById('editQEstTime').value.trim();
+  if (tags)    localStorage.setItem('dungeon-tags-' + id, tags);
+  else         localStorage.removeItem('dungeon-tags-' + id);
+  if (estTime) localStorage.setItem('dungeon-esttime-' + id, estTime);
+  else         localStorage.removeItem('dungeon-esttime-' + id);
   updateQuest(id, {
-    name: document.getElementById('editQName').value.trim(),
-    type: document.getElementById('editQType').value,
+    name:     document.getElementById('editQName').value.trim(),
+    type:     document.getElementById('editQType').value,
     priority: document.getElementById('editQPriority').value,
     deadline: document.getElementById('editQDeadline').value || null,
-    notes: document.getElementById('editQNotes').value || null
+    notes:    document.getElementById('editQNotes').value || null
   });
 });
 
 document.getElementById('deleteQuestBtn').addEventListener('click', () => {
   const id = document.getElementById('editQuestId').value;
-  if (confirm('¿Eliminar esta misión?')) deleteQuest(id);
+  closeModal('editQuestModal');
+  pendingDeleteId = id;
+  const q = quests.find(x => x.id === id);
+  document.getElementById('deleteConfirmName').textContent = `¿Eliminar "${q ? q.name : 'esta misión'}"?`;
+  openModal('deleteConfirmModal');
+});
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+  if (pendingDeleteId) { deleteQuest(pendingDeleteId); pendingDeleteId = null; }
+  closeModal('deleteConfirmModal');
+});
+
+document.getElementById('duplicateQuestBtn').addEventListener('click', async () => {
+  const id = document.getElementById('editQuestId').value;
+  const q  = quests.find(x => x.id === id);
+  if (!q || !hero) return;
+  closeModal('editQuestModal');
+  const copy = { name: q.name + ' (copia)', type: q.type, priority: q.priority, notes: q.notes || null, deadline: null, hero_id: hero.id };
+  await addQuest(copy);
+  toast('📋', `"${q.name}" duplicada.`);
 });
 
 document.getElementById('sortSelect').addEventListener('change', e => {
   sortMode = e.target.value;
+  localStorage.setItem('dungeon-sort', sortMode);
   renderQuestList();
 });
 
-document.getElementById('searchBox').addEventListener('input', renderQuestList);
+// Restore saved sort
+document.getElementById('sortSelect').value = sortMode;
+
+// Debounced search
+let _searchTimer;
+document.getElementById('searchBox').addEventListener('input', () => {
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(renderQuestList, 200);
+});
 
 document.querySelectorAll('.modal-overlay').forEach(o => {
   o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
@@ -3420,6 +4355,419 @@ function initKanbanDrag() {
   });
 }
 
+/* ============================================================
+   HISTORY con búsqueda y filtro de tipo
+   ============================================================ */
+function renderHistory() {
+  const el = document.getElementById('historyContent');
+  if (!el) return;
+  const search = (document.getElementById('historySearch')?.value || '').toLowerCase();
+  let done = quests.filter(q => {
+    if (!q.done || !q.done_at) return false;
+    if (historyTypeFilter !== 'all' && q.type !== historyTypeFilter) return false;
+    if (search && !q.name.toLowerCase().includes(search)) return false;
+    return true;
+  }).sort((a, b) => new Date(b.done_at) - new Date(a.done_at));
+
+  if (!done.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📜</div><h3>Sin historial</h3><p>Completa misiones para verlas aquí</p></div>`;
+    return;
+  }
+  const grouped = {};
+  done.forEach(q => {
+    const d = new Date(q.done_at).toLocaleDateString('es-MX', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    if (!grouped[d]) grouped[d] = [];
+    grouped[d].push(q);
+  });
+  const typeIcons = { main:'⭐', side:'🗡️', daily:'🌅', weekly:'📜' };
+  el.innerHTML = Object.entries(grouped).map(([date, qs]) => `
+    <div class="history-group">
+      <div class="history-date">${date} — ${qs.length} misión${qs.length>1?'es':''}</div>
+      ${qs.map(q=>`<div class="history-item">
+        <span class="history-item-icon">${typeIcons[q.type]||'⚔️'}</span>
+        <span class="history-item-name">${escHtml(q.name)}</span>
+        <span class="history-item-xp">+${XP_TABLE[q.type]||50} XP</span>
+      </div>`).join('')}
+    </div>`).join('');
+}
+
+/* ============================================================
+   NUEVOS HECHIZOS
+   ============================================================ */
+SPELL_DEFS.push(
+  {
+    id: 'berserker', icon: '🔥', name: 'Modo Berserker',
+    desc: '2x XP por 25 min (CD 24h)',
+    cd: 24 * 3600 * 1000,
+    cast() {
+      xpMultiplier = 2; xpMultiplierEnd = Date.now() + 25 * 60 * 1000;
+      updateSpellBadge();
+      toast('🔥', '¡Modo Berserker! 2x XP por 25 minutos. ¡Arremete!');
+    }
+  },
+  {
+    id: 'healing', icon: '💚', name: 'Curación Mayor',
+    desc: 'Recupera 20 HP (CD 24h)',
+    cd: 24 * 3600 * 1000,
+    async cast() {
+      const newHp = Math.min((hero.hp || 0) + 20, hero.hp_max || 100);
+      await saveHero({ hp: newHp });
+      renderHeroUI();
+      toast('💚', `¡Curación Mayor! +20 HP recuperados. HP: ${newHp}/${hero.hp_max || 100}`);
+    }
+  },
+  {
+    id: 'steelmind', icon: '🧠', name: 'Mente de Acero',
+    desc: 'Próximo pomodoro da 2x XP (CD 12h)',
+    cd: 12 * 3600 * 1000,
+    cast() {
+      timer._nextPomDouble = true;
+      toast('🧠', '¡Mente de Acero! El próximo pomodoro dará 2x XP.');
+    }
+  }
+);
+
+/* ============================================================
+   NUEVOS LOGROS
+   ============================================================ */
+ACHIEVEMENT_DEFS.push(
+  { id: 'centurion',    icon: '💯', name: 'Centurión',    desc: 'Completa 100 misiones',      cond: h => (h._completed||0) >= 100 },
+  { id: 'unstoppable',  icon: '⚡', name: 'Imparable',    desc: 'Racha actual de 7+ días',     cond: h => (h.streak||0) >= 7 },
+  { id: 'master_spell', icon: '🧙‍♂️', name: 'Archimago',   desc: 'Lanza 10 hechizos',          cond: h => (h._spells_cast||0) >= 10 },
+  { id: 'boss_slayer',  icon: '🐉', name: 'Matador de Jefes', desc: 'Completa 10 épicas',      cond: h => (h._main_done||0) >= 10 },
+  { id: 'healer',       icon: '💚', name: 'Inmortal',     desc: 'Mantén HP sobre 80%',         cond: h => (h.hp||0) / (h.hp_max||100) >= 0.8 },
+  { id: 'collector',    icon: '📚', name: 'Coleccionista', desc: '5+ misiones activas a la vez', cond: () => quests.filter(q=>!q.done).length >= 5 }
+);
+
+/* ============================================================
+   D20 DADO
+   ============================================================ */
+function rollD20() {
+  const btn = document.getElementById('d20Btn');
+  const roll = Math.floor(Math.random() * 20) + 1;
+  btn.classList.add('d20-rolling');
+  setTimeout(() => btn.classList.remove('d20-rolling'), 600);
+
+  let title, text, bonus = 0;
+  if (roll <= 3)       { title = `🎲 D20: ${roll} — Fallo Crítico`; text = '¡Los dados te traicionan! Hasta los dioses se ríen de tu suerte hoy.'; }
+  else if (roll <= 8)  { title = `🎲 D20: ${roll} — Resultado Mediocre`; text = 'El oráculo frunce el ceño. No es mal resultado... pero pudo ser peor.'; }
+  else if (roll <= 13) { title = `🎲 D20: ${roll} — Neutro`; text = 'Las runas son ambiguas. El destino espera tu próxima decisión.'; }
+  else if (roll <= 18) { title = `🎲 D20: ${roll} — ¡Éxito!`; text = 'El destino te favorece, héroe. ¡Aprovecha el momento!'; bonus = 15; }
+  else if (roll === 19){ title = `🎲 D20: ${roll} — ¡Gran Éxito!`; text = '¡Los bardos cantarán esta tirada esta noche! +25 XP bonus.'; bonus = 25; }
+  else                 { title = `🎲 D20: 20 — ¡CRÍTICO LEGENDARIO!`; text = '¡LOS DIOSES TE BENDICEN! Una vez en la vida. +50 XP. ¡Eres imparable!'; bonus = 50; }
+
+  showEventBanner({ title, text, bonus });
+  if (bonus > 0) { addXP(bonus, 'side', null); toast('🎲', `D20: ${roll}! +${bonus} XP bonus`); }
+  else toast('🎲', `Tiraste ${roll}. ${roll <= 3 ? '💀 Fallo crítico' : roll <= 8 ? 'Resultado mediocre' : 'Neutro'}`);
+}
+
+/* ============================================================
+   WELCOME SCREEN
+   ============================================================ */
+const WELCOME_PHRASES = [
+  'El destino te llama de vuelta, Héroe...',
+  'El gremio te necesita. ¿Estás listo para la batalla?',
+  'Los monstruos de la procrastinación tiemblan ante tu llegada.',
+  'Bienvenido de regreso, campeón del caos productivo.',
+  'La mazmorra despierta. Tu jornada épica comienza ahora.',
+  'El oráculo te aguardaba. Que empiece la batalla.',
+  'Tus misiones te esperan. El tiempo no perdona, héroe.',
+  'El libro de hazañas se abre para ti...',
+  'Otra jornada épica comienza. El gremio confía en ti.',
+  'El dungeon nunca duerme. Hoy tampoco tú.'
+];
+
+function showWelcomeScreen() {
+  const screen = document.getElementById('welcomeScreen');
+  if (!screen) return;
+  const phrase = WELCOME_PHRASES[Math.floor(Math.random() * WELCOME_PHRASES.length)];
+  document.getElementById('welcomePhrase').textContent = phrase;
+  setTimeout(() => {
+    screen.classList.add('hiding');
+    setTimeout(() => screen.remove(), 700);
+  }, 2200);
+}
+
+/* ============================================================
+   CANVAS PARTÍCULAS FLOTANTES
+   ============================================================ */
+function initParticles() {
+  const canvas = document.getElementById('particleCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, particles;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const isDark = () => !['light','parchment'].includes(document.documentElement.dataset.theme || 'dark');
+
+  particles = Array.from({ length: 55 }, () => ({
+    x: Math.random() * (W || 1200),
+    y: Math.random() * (H || 800),
+    r: Math.random() * 1.4 + 0.4,
+    vx: (Math.random() - 0.5) * 0.25,
+    vy: (Math.random() - 0.5) * 0.25,
+    a: Math.random()
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const theme = document.documentElement.dataset.theme || 'dark';
+    const color = theme === 'parchment' ? '184,134,11' : theme === 'cyber' ? '56,189,248' : '168,85,247';
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      p.a += 0.008;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      const alpha = (Math.sin(p.a) * 0.5 + 0.5) * 0.6;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${color},${alpha})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ============================================================
+   TAG FILTER
+   ============================================================ */
+function setTagFilter(tag) {
+  tagFilter = (tagFilter === tag) ? null : tag;
+  renderQuestList();
+  if (tagFilter) toast('🏷️', `Filtrando por: ${tag} (click de nuevo para quitar)`);
+}
+
+/* ============================================================
+   EXPAND NOTES
+   ============================================================ */
+function expandNotes(evt, questId, fullText) {
+  evt.stopPropagation();
+  const el = document.getElementById('notes-' + questId);
+  if (el) el.innerHTML = escHtml(fullText);
+}
+
+/* ============================================================
+   EXPORT CSV
+   ============================================================ */
+function exportCSV() {
+  const rows = [['Nombre','Tipo','Prioridad','Estado','Deadline','XP','Completada_en']];
+  quests.forEach(q => {
+    rows.push([
+      '"' + (q.name || '').replace(/"/g,'""') + '"',
+      q.type, q.priority || 'normal',
+      q.done ? 'Completada' : 'Pendiente',
+      q.deadline || '',
+      XP_TABLE[q.type] || 50,
+      q.done_at ? q.done_at.split('T')[0] : ''
+    ]);
+  });
+  const csv  = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `dungeon-quests-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  toast('📊', 'CSV exportado.');
+}
+
+/* ============================================================
+   CMD+K SEARCH
+   ============================================================ */
+function openCmdk() {
+  openModal('cmdkModal');
+  setTimeout(() => document.getElementById('cmdkInput').focus(), 50);
+}
+
+document.getElementById('cmdkInput').addEventListener('input', function() {
+  const q    = this.value.toLowerCase();
+  const res  = document.getElementById('cmdkResults');
+  if (!q) { res.innerHTML = '<div class="cmdk-empty">Escribe para buscar</div>'; return; }
+  const hits = quests.filter(x => x.name.toLowerCase().includes(q) || (x.notes||'').toLowerCase().includes(q)).slice(0, 8);
+  if (!hits.length) { res.innerHTML = '<div class="cmdk-empty">Sin resultados</div>'; return; }
+  const typeLabels = { main:'⚔️ Épica', side:'🗡️ Encargo', daily:'🌅 Búsqueda', weekly:'📜 Crónica' };
+  res.innerHTML = hits.map(h => `
+    <div class="cmdk-result-item" onclick="closeModal('cmdkModal');switchView('quests');document.getElementById('searchBox').value='${escHtml(h.name)}';renderQuestList()">
+      <span style="font-size:16px">${h.done?'✅':'⚔️'}</span>
+      <span class="cmdk-result-name">${escHtml(h.name)}</span>
+      <span class="cmdk-result-type">${typeLabels[h.type]||h.type}</span>
+    </div>`).join('');
+});
+
+/* ============================================================
+   COMPANION DEL GREMIO
+   ============================================================ */
+const COMPANION_RESPONSES = {
+  bien:     ['¡El gremio celebra con vino de enano! Sigue así, campeón.', '¡Los dioses asienten ante tu progreso!', '¡Magnífico! El libro de hazañas registra tu nombre.'],
+  mal:      ['El camino del héroe nunca es fácil, compañero. Mañana el dungeon será tuyo.', 'Hasta los más grandes cayeron antes de levantarse. Descansa y vuelve más fuerte.', 'El oráculo dice: las tormentas forjan a los mejores guerreros.'],
+  complete: ['¡Victoria épica! Tu leyenda crece con cada conquista.', '¡Monstruo derrotado! El gremio te aplaude.', '¡Otra misión destruida! El libro de hazañas se engrandece.'],
+  default:  ['Cuenta con el gremio, héroe. Siempre.', 'El oráculo te observa. Cada acción importa.', 'La mazmorra aguarda. ¿Qué estrategia sigues hoy?', 'Los mejores héroes piden consejo. Sabia decisión.']
+};
+
+function talkToCompanion() {
+  const input = document.getElementById('companionInput');
+  const msg   = document.getElementById('companionMsg');
+  const text  = (input.value || '').toLowerCase();
+  if (!text.trim()) return;
+
+  let category = 'default';
+  if (/bien|excelente|genial|increíble|perfecto|logré|conseguí/i.test(text)) category = 'bien';
+  else if (/mal|difícil|cansado|deprimido|no pude|fallé|terrible/i.test(text)) category = 'mal';
+  else if (/completé|terminé|acabé|hice|logré|gané/i.test(text)) category = 'complete';
+
+  const responses = COMPANION_RESPONSES[category];
+  const response  = responses[Math.floor(Math.random() * responses.length)];
+  msg.textContent = `🗡️ "${response}"`;
+  input.value = '';
+}
+
+document.getElementById('companionInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') talkToCompanion();
+});
+
+/* ============================================================
+   MUSIC TOGGLE
+   ============================================================ */
+function toggleMusic() {
+  const btn = document.getElementById('musicBtn');
+  if (musicAudio) {
+    musicAudio.pause(); musicAudio = null;
+    btn.style.color = '';
+    toast('🎵', 'Música detenida.');
+  } else {
+    musicAudio = new Audio('https://radio.plaza.one/ogg');
+    musicAudio.volume = 0.25;
+    musicAudio.play().then(() => {
+      btn.style.color = 'var(--green)';
+      toast('🎵', 'Música lofi activada. ¡A trabajar, héroe!');
+    }).catch(() => {
+      musicAudio = null;
+      toast('⚠️', 'No se pudo cargar la radio. Verifica tu conexión.');
+    });
+  }
+}
+
+/* ============================================================
+   MAP VIEW — Mapa del Dungeon SVG
+   ============================================================ */
+function renderMapView() {
+  const el = document.getElementById('mapContent');
+  if (!el) return;
+  const types = ['main','side','daily','weekly'];
+  const typeInfo = {
+    main:   { label:'⚔️ Épicas',    color:'#10b981', icon:'⚔️', x:80,  y:60  },
+    side:   { label:'🗡️ Encargos',  color:'#818cf8', icon:'🗡️', x:280, y:60  },
+    daily:  { label:'🌅 Búsquedas', color:'#4ade80', icon:'🌅', x:80,  y:220 },
+    weekly: { label:'📜 Crónicas',  color:'#38bdf8', icon:'📜', x:280, y:220 }
+  };
+  const counts = {};
+  types.forEach(t => {
+    counts[t] = { total: quests.filter(q=>q.type===t).length, done: quests.filter(q=>q.type===t&&q.done).length };
+  });
+  const W = 420, H = 360;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;font-family:var(--font-body)">
+    <defs>
+      <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <!-- Connections -->
+    <line x1="190" y1="100" x2="250" y2="100" stroke="var(--border)" stroke-width="2" stroke-dasharray="5,5"/>
+    <line x1="130" y1="160" x2="130" y2="200" stroke="var(--border)" stroke-width="2" stroke-dasharray="5,5"/>
+    <line x1="330" y1="160" x2="330" y2="200" stroke="var(--border)" stroke-width="2" stroke-dasharray="5,5"/>
+    <line x1="190" y1="260" x2="250" y2="260" stroke="var(--border)" stroke-width="2" stroke-dasharray="5,5"/>`;
+
+  types.forEach(t => {
+    const info = typeInfo[t];
+    const cnt  = counts[t];
+    const pct  = cnt.total > 0 ? Math.round((cnt.done / cnt.total) * 100) : 0;
+    svg += `
+    <g transform="translate(${info.x},${info.y})">
+      <rect x="-60" y="-45" width="120" height="90" rx="12" fill="var(--card)" stroke="${info.color}" stroke-width="1.5" opacity=".9"/>
+      <text x="0" y="-20" text-anchor="middle" font-size="22">${info.icon}</text>
+      <text x="0" y="2" text-anchor="middle" font-size="10" fill="var(--text2)">${info.label.replace(/[⚔️🗡️🌅📜]/,'').trim()}</text>
+      <text x="0" y="18" text-anchor="middle" font-size="13" fill="${info.color}" font-weight="bold">${cnt.done}/${cnt.total}</text>
+      <rect x="-35" y="28" width="70" height="6" rx="3" fill="var(--bg4)"/>
+      <rect x="-35" y="28" width="${Math.round(70 * pct / 100)}" height="6" rx="3" fill="${info.color}"/>
+    </g>`;
+  });
+
+  // Hero in center
+  svg += `
+    <g transform="translate(${W/2},${H/2})">
+      <circle r="28" fill="var(--glass)" stroke="var(--accent)" stroke-width="2"/>
+      <text x="0" y="8" text-anchor="middle" font-size="22">${hero ? hero.avatar || '🧙' : '🧙'}</text>
+    </g>
+  </svg>`;
+  el.innerHTML = svg;
+}
+
+/* ============================================================
+   SWIPE TO COMPLETE (mobile)
+   ============================================================ */
+function initSwipeToComplete() {
+  document.querySelectorAll('.quest-item:not(.done)').forEach(el => {
+    let startX, startY;
+    el.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+    el.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - startX;
+      const dy = e.changedTouches[0].clientY - startY;
+      if (Math.abs(dy) > 40 || Math.abs(dx) < 80) return;
+      const id = el.dataset.qid;
+      if (!id) return;
+      if (dx > 80) {
+        el.style.transform = 'translateX(60px)';
+        el.style.opacity   = '0';
+        setTimeout(() => completeQuest(id, el), 200);
+      } else if (dx < -80) {
+        pendingDeleteId = id;
+        const q = quests.find(x => x.id === id);
+        document.getElementById('deleteConfirmName').textContent = `¿Eliminar "${q ? q.name : 'esta misión'}"?`;
+        openModal('deleteConfirmModal');
+      }
+    }, { passive: true });
+  });
+}
+
+/* ============================================================
+   CONNECTION INDICATOR
+   ============================================================ */
+async function checkConnection() {
+  const dot = document.getElementById('connDot');
+  if (!dot) return;
+  try {
+    const { error } = await db.from('dungeon_heroes').select('id').limit(1);
+    dot.className = error ? 'conn-dot err' : 'conn-dot ok';
+    dot.title     = error ? 'Sin conexión a Supabase' : 'Supabase conectado';
+  } catch { dot.className = 'conn-dot err'; }
+}
+
+/* ============================================================
+   EVENT LISTENERS — nuevos botones
+   ============================================================ */
+document.getElementById('d20Btn').addEventListener('click', rollD20);
+document.getElementById('musicBtn').addEventListener('click', toggleMusic);
+document.getElementById('csvBtn').addEventListener('click', exportCSV);
+document.getElementById('mobileFab').addEventListener('click', () => {
+  switchView('quests');
+  document.getElementById('qName').focus();
+});
+
+// Cmd+K / Ctrl+K
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    openCmdk();
+  }
+});
+
 /* BOOT */
 (async () => {
   const savedTheme = localStorage.getItem('dungeon-theme');
@@ -3436,6 +4784,10 @@ function initKanbanDrag() {
   setInterval(renderSpells, 30000);
   setInterval(updateSpellBadge, 60000);
   setInterval(checkStreakDanger, 30 * 60 * 1000);
+  showWelcomeScreen();
+  initParticles();
+  checkConnection();
+  setInterval(checkConnection, 5 * 60 * 1000);
 })();
 </script>
 </body>
