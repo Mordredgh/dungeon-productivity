@@ -324,6 +324,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .main {
   display: grid;
   grid-template-columns: 1fr 320px;
+  grid-template-rows: 1fr;
   gap: 0;
   height: calc(100vh - 61px);
   overflow: hidden;
