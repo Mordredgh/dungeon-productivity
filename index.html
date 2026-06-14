@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Dungeon — Tablero del Aventurero</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg:      #0d0a05;
+      --bg2:     #16100a;
+      --bg3:     #201508;
+      --card:    #1a1208;
+      --border:  #3d2c12;
+      --border2: #5a4020;
+      --gold:    #c9a03c;
+      --gold2:   #f0d070;
+      --text:    #e8d5a0;
+      --text2:   #b09060;
+      --text3:   #7a6040;
+      --purple:  #9b7cc7;
+      --purple2: #c8a8f0;
+      --red2:    #e86050;
+      --amber2:  #f0a838;
+      --green:   #3a7830;
+      --green2:  #68b058;
+      --R: 8px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .hdr {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .hdr-icon { font-size: 26px; }
+    .hdr-title { font-family: 'Cinzel', serif; font-size: 20px; color: var(--gold); letter-spacing: 3px; }
+    .hdr-sub   { font-size: 11px; color: var(--text3); letter-spacing: 1px; }
+
+    /* ── Character strip ── */
+    .char {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+    .avatar {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--bg3);
+      border: 2px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; flex-shrink: 0;
+    }
+    .char-info { flex: 1; min-width: 0; }
+    .char-name  { font-family: 'Cinzel', serif; font-size: 17px; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .char-class { font-size: 11px; color: var(--text3); margin-top: 1px; }
+    .char-title { font-size: 12px; color: var(--text2); margin-top: 3px; font-style: italic; }
+    .xp-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+    .xp-bg   { flex: 1; height: 7px; background: var(--bg3); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+    .xp-fill { height: 100%; background: linear-gradient(90deg, var(--purple), var(--purple2)); border-radius: 4px; transition: width .5s ease; }
+    .xp-txt  { font-size: 11px; color: var(--text3); white-space: nowrap; }
+    .lvl-box {
+      text-align: center;
+      background: var(--bg3);
+      border: 1px solid var(--gold);
+      border-radius: var(--R);
+      padding: 6px 14px;
+      flex-shrink: 0;
+    }
+    .lvl-num { font-family: 'Cinzel', serif; font-size: 30px; color: var(--gold); line-height: 1; }
+    .lvl-lbl { font-size: 10px; color: var(--text3); letter-spacing: 1px; }
+
+    /* ── Stats bar ── */
+    .stats {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 20px;
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .stat {
+      flex: 1;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--R);
+      padding: 8px 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .stat-icon { font-size: 18px; }
+    .stat-val  { font-size: 18px; font-weight: 500; color: var(--gold); }
+    .stat-lbl  { font-size: 10px; color: var(--text3); }
+
+    /* ── Main grid ── */
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 14px;
+      padding: 14px 20px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ── Panels ── */
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--R);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-hdr {
+      padding: 12px 14px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      color: var(--gold);
+      letter-spacing: 1px;
+      flex-shrink: 0;
+    }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 4px; padding: 8px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .tab {
+      padding: 5px 11px;
+      border-radius: 5px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--text3);
+      border: 1px solid transparent;
+      background: transparent;
+      transition: all .15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .tab.active { background: var(--bg3); color: var(--text); border-color: var(--border); }
+    .tab:hover:not(.active) { color: var(--text2); }
+
+    /* ── Quest list ── */
+    .quest-list { flex: 1; overflow-y: auto; padding: 6px; min-height: 0; }
+    .quest-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 10px;
+      border-radius: 6px;
+      margin-bottom: 3px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .quest-item:hover { background: var(--bg3); border-color: var(--border); }
+    .quest-item.focused { border-color: var(--purple) !important; background: rgba(155,124,199,.08); }
+    .quest-item.done-item { opacity: .55; }
+
+    .q-check {
+      width: 20px; height: 20px; border-radius: 4px;
+      border: 1.5px solid var(--border2);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      transition: all .2s;
+    }
+    .q-check.done { background: var(--green); border-color: var(--green); color: #fff; }
+
+    .q-title { flex: 1; font-size: 13px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .q-title.done { text-decoration: line-through; color: var(--text3); }
+
+    .q-badge {
+      font-size: 10px; padding: 2px 6px; border-radius: 8px; font-weight: 500;
+      flex-shrink: 0; white-space: nowrap;
+    }
+    .badge-main  { background: rgba(200,60,60,.2);  color: var(--red2);   border: 1px solid rgba(200,60,60,.3); }
+    .badge-side  { background: rgba(210,120,30,.2); color: var(--amber2); border: 1px solid rgba(210,120,30,.3); }
+    .badge-daily { background: rgba(60,120,50,.2);  color: var(--green2); border: 1px solid rgba(60,120,50,.3); }
+
+    .q-xp  { font-size: 10px; color: var(--purple2); background: rgba(155,124,199,.15); border-radius: 4px; padding: 2px 5px; flex-shrink: 0; }
+    .q-del {
+      background: none; border: none; color: var(--text3); cursor: pointer;
+      font-size: 13px; padding: 2px 4px; opacity: 0; transition: opacity .2s;
+      flex-shrink: 0;
+    }
+    .quest-item:hover .q-del { opacity: 1; }
+    .q-del:hover { color: var(--red2); }
+
+    .add-btn {
+      margin: 8px; padding: 9px;
+      border: 1px dashed var(--border2);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text3);
+      font-size: 13px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all .2s;
+      flex-shrink: 0;
+    }
+    .add-btn:hover { color: var(--text); border-color: var(--gold); }
+
+    .empty { padding: 32px; text-align: center; color: var(--text3); font-size: 13px; line-height: 2; }
+
+    /* ── Right column ── */
+    .right { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+
+    /* ── Active quest ── */
+    .active-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--R);
+      padding: 12px 14px;
+      flex-shrink: 0;
+    }
+    .active-lbl   { font-size: 10px; color: var(--text3); letter-spacing: 1px; font-family: 'Cinzel', serif; margin-bottom: 6px; }
+    .active-title { font-size: 14px; color: var(--text); }
+    .active-none  { font-size: 12px; color: var(--text3); font-style: italic; }
+
+    /* ── Timer ── */
+    .timer-panel { flex: 1; }
+    .timer-body { padding: 16px; text-align: center; }
+    .timer-ring { position: relative; width: 130px; height: 130px; margin: 0 auto 12px; }
+    .timer-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .timer-ring circle { fill: none; stroke-width: 8; }
+    .c-bg   { stroke: var(--border); }
+    .c-prog { stroke: var(--purple); stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke .3s; }
+    .break .c-prog { stroke: var(--green); }
+    .timer-inner {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .t-time { font-family: 'Cinzel', serif; font-size: 26px; color: var(--gold); line-height: 1; }
+    .break .t-time { color: var(--green2); }
+    .t-mode { font-size: 9px; color: var(--text3); letter-spacing: 1px; margin-top: 3px; }
+    .timer-task { font-size: 11px; color: var(--text2); margin-bottom: 14px; min-height: 15px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 8px; }
+    .t-btns { display: flex; gap: 8px; justify-content: center; }
+    .btn {
+      padding: 8px 18px; border-radius: 6px; font-size: 13px;
+      cursor: pointer; font-family: 'Inter', sans-serif; transition: all .2s;
+    }
+    .btn-p { background: var(--purple); color: #fff; border: none; }
+    .btn-p:hover { background: var(--purple2); color: #1a1008; }
+    .btn-s { background: transparent; color: var(--text2); border: 1px solid var(--border2); }
+    .btn-s:hover { color: var(--text); border-color: var(--text3); }
+    .pom-row { display: flex; gap: 6px; justify-content: center; margin-top: 14px; }
+    .pom-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border2); transition: background .3s; }
+    .pom-dot.lit { background: var(--purple); }
+    .pom-info { font-size: 10px; color: var(--text3); margin-top: 5px; }
+
+    /* ── Modals ── */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.75);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--R);
+      padding: 22px; width: 360px; max-width: 92vw;
+      transform: translateY(16px); transition: transform .2s;
+    }
+    .overlay.open .modal { transform: translateY(0); }
+    .modal-title { font-family: 'Cinzel', serif; font-size: 15px; color: var(--gold); margin-bottom: 16px; }
+    .f-group { margin-bottom: 12px; }
+    .f-label { font-size: 11px; color: var(--text3); display: block; margin-bottom: 5px; letter-spacing: .5px; }
+    .f-input, .f-select {
+      width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+      border-radius: 6px; color: var(--text); padding: 8px 11px;
+      font-size: 13px; font-family: 'Inter', sans-serif; outline: none;
+    }
+    .f-input:focus, .f-select:focus { border-color: var(--purple); }
+    .f-select option { background: var(--bg2); }
+    .modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+
+    /* ── Level up ── */
+    .lvlup-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.88);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200; opacity: 0; pointer-events: none; transition: opacity .3s;
+    }
+    .lvlup-overlay.open { opacity: 1; pointer-events: all; }
+    .lvlup-box {
+      background: var(--bg2); border: 2px solid var(--gold); border-radius: 14px;
+      padding: 36px 40px; text-align: center; max-width: 320px;
+      transform: scale(.82); transition: transform .3s;
+    }
+    .lvlup-overlay.open .lvlup-box { transform: scale(1); }
+    .lvlup-icon  { font-size: 52px; margin-bottom: 10px; }
+    .lvlup-head  { font-family: 'Cinzel', serif; font-size: 22px; color: var(--gold); }
+    .lvlup-num   { font-family: 'Cinzel', serif; font-size: 52px; color: var(--gold2); line-height: 1.1; }
+    .lvlup-title { font-size: 15px; color: var(--text2); margin-bottom: 20px; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 20px; right: 20px;
+      background: var(--bg2); border: 1px solid var(--gold);
+      border-radius: 8px; padding: 11px 15px; font-size: 13px;
+      z-index: 300; transform: translateY(60px); opacity: 0; transition: all .3s;
+      max-width: 280px;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ── Keyboard hint ── */
+    .kb-hint {
+      font-size: 10px; color: var(--text3); text-align: center;
+      padding: 5px; border-top: 1px solid var(--border); flex-shrink: 0;
+    }
+    .kb-hint kbd {
+      background: var(--bg3); border: 1px solid var(--border2);
+      border-radius: 3px; padding: 1px 5px; font-size: 10px; font-family: 'Inter', sans-serif;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg2); }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 720px) {
+      .main { grid-template-columns: 1fr; overflow-y: auto; }
+      .stats .stat-lbl { display: none; }
+      body { overflow: auto; height: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="hdr">
+  <span class="hdr-icon">⚔️</span>
+  <div>
+    <div class="hdr-title">THE DUNGEON</div>
+    <div class="hdr-sub">tablero del aventurero</div>
+  </div>
+</header>
+
+<!-- Character -->
+<div class="char">
+  <div class="avatar">🧙</div>
+  <div class="char-info">
+    <div class="char-name" id="heroName">…</div>
+    <div class="char-class" id="heroClass"></div>
+    <div class="char-title" id="heroTitle"></div>
+    <div class="xp-row">
+      <div class="xp-bg"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+      <span class="xp-txt" id="xpTxt">0 / 100 XP</span>
+    </div>
+  </div>
+  <div class="lvl-box">
+    <div class="lvl-num" id="lvlNum">1</div>
+    <div class="lvl-lbl">NIVEL</div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat">
+    <span class="stat-icon">🔥</span>
+    <div>
+      <div class="stat-val" id="statStreak">0</div>
+      <div class="stat-lbl">racha días</div>
+    </div>
+  </div>
+  <div class="stat">
+    <span class="stat-icon">⚔️</span>
+    <div>
+      <div class="stat-val" id="statToday">0</div>
+      <div class="stat-lbl">misiones hoy</div>
+    </div>
+  </div>
+  <div class="stat">
+    <span class="stat-icon">🎯</span>
+    <div>
+      <div class="stat-val" id="statPoms">0</div>
+      <div class="stat-lbl">rondas hoy</div>
+    </div>
+  </div>
+  <div class="stat">
+    <span class="stat-icon">💜</span>
+    <div>
+      <div class="stat-val" id="statXP">0</div>
+      <div class="stat-lbl">XP total</div>
+    </div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Quest board -->
+  <div class="panel">
+    <div class="panel-hdr">📜 tablero de misiones</div>
+    <div class="tabs">
+      <button class="tab active" data-tab="all"   onclick="setTab('all')">Todas</button>
+      <button class="tab"        data-tab="main"  onclick="setTab('main')">⚔️ Principal</button>
+      <button class="tab"        data-tab="side"  onclick="setTab('side')">🗺️ Secundaria</button>
+      <button class="tab"        data-tab="daily" onclick="setTab('daily')">🌅 Diaria</button>
+    </div>
+    <div class="quest-list" id="questList">
+      <div class="empty">invocando misiones…</div>
+    </div>
+    <button class="add-btn" onclick="openModal()">＋ nueva misión &nbsp;<span style="font-size:10px;color:var(--text3)">[N]</span></button>
+  </div>
+
+  <!-- Right column -->
+  <div class="right">
+
+    <!-- Active quest -->
+    <div class="active-panel">
+      <div class="active-lbl">⚔️ MISIÓN ACTIVA</div>
+      <div id="activeDisp" class="active-none">haz clic en una misión para enfocarla</div>
+    </div>
+
+    <!-- Timer -->
+    <div class="panel timer-panel" id="timerPanel">
+      <div class="panel-hdr">⏳ ronda de combate — pomodoro</div>
+      <div class="timer-body">
+        <div class="timer-ring" id="timerRing">
+          <svg viewBox="0 0 120 120">
+            <circle class="c-bg"   cx="60" cy="60" r="52"/>
+            <circle class="c-prog" cx="60" cy="60" r="52"
+              id="tCircle"
+              stroke-dasharray="326.73"
+              stroke-dashoffset="0"/>
+          </svg>
+          <div class="timer-inner">
+            <div class="t-time" id="tDisp">25:00</div>
+            <div class="t-mode" id="tMode">ENFOQUE</div>
+          </div>
+        </div>
+        <div class="timer-task" id="tTask">sin misión activa</div>
+        <div class="t-btns">
+          <button class="btn btn-p" id="btnStart" onclick="toggleTimer()">▶ Iniciar</button>
+          <button class="btn btn-s" onclick="resetTimer()">↺ Reset</button>
+        </div>
+        <div class="pom-row"  id="pomRow"></div>
+        <div class="pom-info" id="pomInfo">0 de 4 rondas</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Keyboard hints -->
+<div class="kb-hint">
+  <kbd>N</kbd> nueva misión &nbsp;·&nbsp;
+  <kbd>Espacio</kbd> iniciar/pausar timer &nbsp;·&nbsp;
+  <kbd>Esc</kbd> cerrar
+</div>
+
+<!-- Add quest modal -->
+<div class="overlay" id="addOverlay">
+  <div class="modal">
+    <div class="modal-title">📜 nueva misión</div>
+    <div class="f-group">
+      <label class="f-label">NOMBRE DE LA MISIÓN</label>
+      <input class="f-input" id="fTitle" placeholder="¿qué debes conquistar?" />
+    </div>
+    <div class="f-group">
+      <label class="f-label">TIPO</label>
+      <select class="f-select" id="fType">
+        <option value="main">⚔️ Principal (+100 XP) — proyectos y objetivos grandes</option>
+        <option value="side">🗺️ Secundaria (+50 XP) — tareas importantes</option>
+        <option value="daily">🌅 Diaria (+25 XP) — hábitos y rutinas</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-s" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-p" onclick="addQuest()">Agregar misión</button>
+    </div>
+  </div>
+</div>
+
+<!-- Level up -->
+<div class="lvlup-overlay" id="lvlupOverlay">
+  <div class="lvlup-box">
+    <div class="lvlup-icon">🏆</div>
+    <div class="lvlup-head">¡SUBISTE DE NIVEL!</div>
+    <div class="lvlup-num"  id="lvlupNum">2</div>
+    <div class="lvlup-title" id="lvlupTitle">Escudero Inquieto</div>
+    <button class="btn btn-p" onclick="closeLvlUp()">¡Continuar aventura!</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPA_URL = 'https://stdedxhxxoyostymldqn.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0ZGVkeGh4eG95b3N0eW1sZHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MTQ2NTMsImV4cCI6MjA4ODQ5MDY1M30.OUhqeeqjlQa6ufECPzOJqZ-gQB93pg8nu0g1j4lEXyI';
+
+const TITLES = [
+  'Aprendiz del Gremio',    // 1
+  'Escudero Inquieto',      // 2
+  'Explorador del Caos',    // 3
+  'Guerrero del Enfoque',   // 4
+  'Cazador de Metas',       // 5
+  'Mago del Tiempo',        // 6
+  'Comandante del Gremio',  // 7
+  'Campeón Legendario',     // 8
+  'Guardián del Caos',      // 9
+  'Señor del Caos Productivo', // 10+
+];
+const XP = { main: 100, side: 50, daily: 25 };
+const POM_XP    = 15;
+const POM_MIN   = 25;
+const BREAK_MIN = 5;
+const CIRC      = 326.73;
+const MAX_POMS  = 4;
+
+let sb, hero, quests = [], tab = 'all', focusId = null;
+let tRunning = false, tInterval = null, tSec = POM_MIN * 60, tTotal = POM_MIN * 60;
+let isBreak = false, pomsDone = 0, pomsToday = 0, todayDone = 0, curPomId = null;
+
+/* ── INIT ── */
+async function init() {
+  sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+  let { data: rows } = await sb.from('dungeon_heroes').select('*').limit(1);
+  if (!rows || !rows.length) {
+    const { data } = await sb.from('dungeon_heroes').insert({ name: 'Gerardo el Emprendedor', class: 'Fundador Caótico' }).select().single();
+    rows = [data];
+  }
+  hero = rows[0];
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  // Reset daily quests if new day
+  if (hero.last_active_date && hero.last_active_date !== today) {
+    await sb.from('dungeon_quests')
+      .update({ completed: false, completed_at: null })
+      .eq('hero_id', hero.id).eq('type', 'daily').eq('completed', true);
+  }
+
+  // Update streak
+  let streak = hero.streak_days;
+  if (hero.last_active_date !== today) {
+    const yest = new Date(); yest.setDate(yest.getDate() - 1);
+    const yStr = yest.toISOString().slice(0, 10);
+    streak = hero.last_active_date === yStr ? streak + 1 : 1;
+    await sb.from('dungeon_heroes').update({ last_active_date: today, streak_days: streak }).eq('id', hero.id);
+    hero.last_active_date = today;
+    hero.streak_days = streak;
+  }
+
+  // Count today's pomodoros
+  const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
+  const { data: poms } = await sb.from('dungeon_pomodoros')
+    .select('id').eq('hero_id', hero.id).eq('completed', true)
+    .gte('started_at', dayStart.toISOString());
+  pomsToday = poms ? poms.length : 0;
+
+  await loadQuests();
+  renderHero();
+  renderPoms();
+}
+
+/* ── HERO RENDER ── */
+function titleFor(lvl) { return TITLES[Math.min(lvl - 1, TITLES.length - 1)]; }
+
+function totalXP() {
+  // XP to reach current level = sum(i*100 for i=1..level-1) = 100*(level-1)*level/2
+  return Math.round(100 * (hero.level - 1) * hero.level / 2) + hero.xp;
+}
+
+function renderHero() {
+  const xpNeeded = hero.level * 100;
+  const pct = Math.min((hero.xp / xpNeeded) * 100, 100);
+  document.getElementById('heroName').textContent  = hero.name;
+  document.getElementById('heroClass').textContent = hero.class;
+  document.getElementById('heroTitle').textContent = titleFor(hero.level);
+  document.getElementById('lvlNum').textContent    = hero.level;
+  document.getElementById('xpFill').style.width   = pct + '%';
+  document.getElementById('xpTxt').textContent     = hero.xp + ' / ' + xpNeeded + ' XP';
+  document.getElementById('statStreak').textContent = hero.streak_days;
+  document.getElementById('statXP').textContent    = totalXP();
+  document.getElementById('statPoms').textContent  = pomsToday;
+}
+
+/* ── QUESTS ── */
+async function loadQuests() {
+  const { data } = await sb.from('dungeon_quests')
+    .select('*').eq('hero_id', hero.id)
+    .order('sort_order').order('created_at');
+  quests = data || [];
+
+  const today = new Date().toISOString().slice(0, 10);
+  todayDone = quests.filter(q => q.completed_at && q.completed_at.slice(0, 10) === today).length;
+  document.getElementById('statToday').textContent = todayDone;
+  renderQuests();
+}
+
+function h(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderQuests() {
+  const el = document.getElementById('questList');
+  const list = tab === 'all' ? quests : quests.filter(q => q.type === tab);
+  if (!list.length) {
+    el.innerHTML = '<div class="empty">no hay misiones aquí…<br><small>agrega una con el botón de abajo</small></div>';
+    return;
+  }
+  // Sort: incomplete first
+  const sorted = [...list].sort((a, b) => a.completed - b.completed);
+  el.innerHTML = sorted.map(q => `
+    <div class="quest-item ${focusId === q.id ? 'focused' : ''} ${q.completed ? 'done-item' : ''}"
+         onclick="focusQuest('${q.id}')">
+      <div class="q-check ${q.completed ? 'done' : ''}"
+           onclick="event.stopPropagation(); toggleQuest('${q.id}')">
+        ${q.completed ? '✓' : ''}
+      </div>
+      <span class="q-title ${q.completed ? 'done' : ''}">${h(q.title)}</span>
+      <span class="q-badge badge-${q.type}">${q.type === 'main' ? '⚔️' : q.type === 'side' ? '🗺️' : '🌅'}</span>
+      <span class="q-xp">+${XP[q.type]}</span>
+      <button class="q-del" onclick="event.stopPropagation(); deleteQuest('${q.id}')" title="eliminar">✕</button>
+    </div>`).join('');
+}
+
+function setTab(t) {
+  tab = t;
+  document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.tab === t));
+  renderQuests();
+}
+
+function focusQuest(id) {
+  focusId = focusId === id ? null : id;
+  const q = quests.find(x => x.id === id);
+  const disp = document.getElementById('activeDisp');
+  const task = document.getElementById('tTask');
+  if (focusId && q) {
+    disp.className = 'active-title'; disp.textContent = q.title;
+    task.textContent = q.title;
+  } else {
+    disp.className = 'active-none'; disp.textContent = 'haz clic en una misión para enfocarla';
+    task.textContent = 'sin misión activa';
+  }
+  renderQuests();
+}
+
+async function toggleQuest(id) {
+  const q = quests.find(x => x.id === id);
+  if (!q) return;
+  if (q.completed) {
+    await sb.from('dungeon_quests').update({ completed: false, completed_at: null }).eq('id', id);
+    q.completed = false; q.completed_at = null;
+    todayDone = Math.max(0, todayDone - 1);
+  } else {
+    const now = new Date().toISOString();
+    await sb.from('dungeon_quests').update({ completed: true, completed_at: now }).eq('id', id);
+    q.completed = true; q.completed_at = now;
+    todayDone++;
+    await gainXP(XP[q.type]);
+    toast('⚔️ +' + XP[q.type] + ' XP — ¡misión completada!');
+  }
+  document.getElementById('statToday').textContent = todayDone;
+  renderQuests();
+}
+
+async function deleteQuest(id) {
+  await sb.from('dungeon_quests').delete().eq('id', id);
+  quests = quests.filter(x => x.id !== id);
+  if (focusId === id) focusQuest(null);
+  renderQuests();
+}
+
+function openModal() {
+  document.getElementById('fTitle').value = '';
+  document.getElementById('addOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('fTitle').focus(), 150);
+}
+function closeModal() { document.getElementById('addOverlay').classList.remove('open'); }
+
+async function addQuest() {
+  const title = document.getElementById('fTitle').value.trim();
+  const type  = document.getElementById('fType').value;
+  if (!title) { document.getElementById('fTitle').focus(); return; }
+  const { data, error } = await sb.from('dungeon_quests').insert({
+    hero_id: hero.id, title, type,
+    xp_reward: XP[type], sort_order: quests.length
+  }).select().single();
+  if (!error && data) { quests.push(data); renderQuests(); toast('📜 Misión agregada'); }
+  closeModal();
+}
+
+/* ── XP & LEVELING ── */
+async function gainXP(amount) {
+  let xp = hero.xp + amount, lvl = hero.level, leveled = false;
+  while (xp >= lvl * 100) { xp -= lvl * 100; lvl++; leveled = true; }
+  hero.xp = xp; hero.level = lvl;
+  await sb.from('dungeon_heroes').update({ xp, level: lvl, xp_to_next: lvl * 100 }).eq('id', hero.id);
+  renderHero();
+  if (leveled) setTimeout(() => showLvlUp(lvl), 400);
+}
+
+function showLvlUp(lvl) {
+  document.getElementById('lvlupNum').textContent   = lvl;
+  document.getElementById('lvlupTitle').textContent = titleFor(lvl);
+  document.getElementById('lvlupOverlay').classList.add('open');
+  beep(660); setTimeout(() => beep(880), 180); setTimeout(() => beep(1100), 360);
+}
+function closeLvlUp() { document.getElementById('lvlupOverlay').classList.remove('open'); }
+
+/* ── TIMER ── */
+function updTimer() {
+  const m = Math.floor(tSec / 60), s = tSec % 60;
+  document.getElementById('tDisp').textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  const offset = CIRC * (1 - tSec / tTotal);
+  document.getElementById('tCircle').style.strokeDashoffset = offset;
+}
+
+async function toggleTimer() {
+  if (tRunning) {
+    clearInterval(tInterval); tRunning = false;
+    document.getElementById('btnStart').textContent = '▶ Reanudar';
+    return;
+  }
+  // Start
+  if (tSec === tTotal && !isBreak) {
+    const { data } = await sb.from('dungeon_pomodoros').insert({
+      hero_id: hero.id, quest_id: focusId, duration_minutes: POM_MIN
+    }).select().single();
+    if (data) curPomId = data.id;
+  }
+  tRunning = true;
+  document.getElementById('btnStart').textContent = '⏸ Pausar';
+  tInterval = setInterval(async () => {
+    tSec--;
+    updTimer();
+    if (tSec > 0) return;
+    clearInterval(tInterval); tRunning = false;
+
+    if (!isBreak) {
+      // Pomodoro complete
+      pomsDone = Math.min(pomsDone + 1, MAX_POMS);
+      pomsToday++;
+      if (curPomId) {
+        await sb.from('dungeon_pomodoros')
+          .update({ completed: true, ended_at: new Date().toISOString() })
+          .eq('id', curPomId);
+        curPomId = null;
+      }
+      await gainXP(POM_XP);
+      renderPoms();
+      toast('🎯 +' + POM_XP + ' XP — ¡ronda completada! Descansa un momento.');
+      if (pomsDone >= MAX_POMS) { pomsDone = 0; renderPoms(); }
+
+      isBreak = true; tSec = BREAK_MIN * 60; tTotal = BREAK_MIN * 60;
+      document.getElementById('tMode').textContent = 'DESCANSO';
+      document.getElementById('timerRing').classList.add('break');
+    } else {
+      isBreak = false; tSec = POM_MIN * 60; tTotal = POM_MIN * 60;
+      document.getElementById('tMode').textContent = 'ENFOQUE';
+      document.getElementById('timerRing').classList.remove('break');
+      toast('⚔️ ¡Descanso listo! A combatir.');
+    }
+    document.getElementById('btnStart').textContent = '▶ Iniciar';
+    updTimer(); beep(880);
+  }, 1000);
+}
+
+function resetTimer() {
+  clearInterval(tInterval); tRunning = false; isBreak = false;
+  tSec = POM_MIN * 60; tTotal = POM_MIN * 60;
+  document.getElementById('btnStart').textContent = '▶ Iniciar';
+  document.getElementById('tMode').textContent = 'ENFOQUE';
+  document.getElementById('timerRing').classList.remove('break');
+  updTimer();
+}
+
+function renderPoms() {
+  document.getElementById('pomRow').innerHTML =
+    Array.from({ length: MAX_POMS }, (_, i) =>
+      `<div class="pom-dot ${i < pomsDone ? 'lit' : ''}"></div>`).join('');
+  document.getElementById('pomInfo').textContent = pomsDone + ' de ' + MAX_POMS + ' rondas completadas hoy: ' + pomsToday;
+}
+
+/* ── AUDIO ── */
+function beep(freq) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = freq; o.type = 'sine';
+    g.gain.setValueAtTime(.25, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .7);
+    o.start(); o.stop(ctx.currentTime + .7);
+  } catch (e) {}
+}
+
+/* ── TOAST ── */
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+/* ── KEYBOARD ── */
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement.tagName;
+  if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+  if (e.key === 'n' || e.key === 'N') openModal();
+  if (e.key === ' ') { e.preventDefault(); toggleTimer(); }
+  if (e.key === 'Escape') { closeModal(); closeLvlUp(); }
+});
+document.getElementById('fTitle').addEventListener('keydown', e => { if (e.key === 'Enter') addQuest(); });
+document.getElementById('addOverlay').addEventListener('click', e => { if (e.target.id === 'addOverlay') closeModal(); });
+
+/* ── BOOT ── */
+updTimer();
+renderPoms();
+init().catch(err => {
+  document.getElementById('questList').innerHTML =
+    '<div class="empty">⚠️ Error conectando a la base de datos.<br><small>' + err.message + '</small></div>';
+});
+</script>
+</body>
+</html>
