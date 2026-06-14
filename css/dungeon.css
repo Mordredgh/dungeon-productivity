@@ -112,7 +112,7 @@ body {
   position: relative;
 }
 
-/* Aurora background — GPU-only properties, no repaints */
+/* Aurora background — static, no animation */
 body::before {
   content: '';
   position: fixed;
@@ -121,27 +121,9 @@ body::before {
     radial-gradient(ellipse 80% 50% at 20% 20%, var(--aurora1), transparent 60%),
     radial-gradient(ellipse 60% 40% at 80% 80%, var(--aurora2), transparent 60%),
     radial-gradient(ellipse 50% 60% at 50% 0%, var(--aurora3), transparent 50%);
-  animation: aurora-fade 18s ease-in-out infinite alternate;
   pointer-events: none;
   z-index: 0;
-}
-
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 40% 30% at 70% 30%, var(--aurora2), transparent 60%),
-    radial-gradient(ellipse 50% 40% at 10% 80%, var(--aurora1), transparent 60%);
-  animation: aurora-fade 25s ease-in-out infinite alternate-reverse;
-  pointer-events: none;
-  z-index: 0;
-}
-
-@keyframes aurora-fade {
-  0%   { opacity: .6; }
-  50%  { opacity: 1; }
-  100% { opacity: .7; }
+  opacity: .8;
 }
 
 .app {
@@ -184,8 +166,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
    ============================================================ */
 .header {
   background: rgba(8,8,24,.75);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: rgba(8,8,24,.92);
   border-bottom: 1px solid var(--glass-border);
   padding: 10px 24px;
   display: flex;
@@ -232,20 +213,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   position: relative;
 }
 
-.hero-avatar-btn::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  z-index: -1;
-  opacity: 0;
-  transition: var(--transition);
-  filter: blur(6px);
-}
-
-.hero-avatar-btn:hover { transform: scale(1.12); }
-.hero-avatar-btn:hover::after { opacity: .6; }
+.hero-avatar-btn:hover { transform: scale(1.08); }
 
 .hero-info { display: flex; flex-direction: column; }
 
@@ -288,19 +256,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   position: relative;
 }
 
-.xp-bar-fill::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 60%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent);
-  animation: shimmer 2.5s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  0%   { transform: translateX(-200%); }
-  100% { transform: translateX(300%); }
-}
+.xp-bar-fill::after { display: none; }
 
 .hp-bar-wrap {
   max-width: 120px;
@@ -327,14 +283,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   position: relative;
 }
 
-.hp-bar-fill::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 60%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
-  animation: shimmer 3s ease-in-out infinite .5s;
-}
+.hp-bar-fill::after { display: none; }
 
 .header-stats { display: flex; gap: 8px; align-items: center; }
 
@@ -453,7 +402,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
    ============================================================ */
 .boss-banner {
   background: linear-gradient(135deg, rgba(168,85,247,.1), rgba(34,211,238,.06));
-  backdrop-filter: blur(20px);
+  /* backdrop-filter removed for perf */
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 14px 18px;
@@ -548,12 +497,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .quest-item[data-type="main"]::before   { background: linear-gradient(180deg, var(--gold), #34d399); }
 .quest-item[data-type="daily"]::before  { background: linear-gradient(180deg, var(--green), #86efac); }
 .quest-item[data-type="weekly"]::before { background: linear-gradient(180deg, var(--blue), #93c5fd); }
-.quest-item[data-priority="urgente"]::before { background: linear-gradient(180deg, var(--red), #fda4af); animation: blink-line 1s ease-in-out infinite; }
+.quest-item[data-priority="urgente"]::before { background: linear-gradient(180deg, var(--red), #fda4af); }
 
-@keyframes blink-line {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .3; }
-}
 
 .quest-item:hover {
   border-color: var(--border2);
@@ -607,7 +552,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   padding: 2px 8px;
   border-radius: 20px;
   font-weight: 500;
-  backdrop-filter: blur(8px);
+  /* backdrop-filter removed for perf */
 }
 
 .badge-type-main    { background: rgba(16,185,129,.12);  color: var(--gold);    border: 1px solid rgba(16,185,129,.25); }
@@ -819,7 +764,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .achievement-card.unlocked:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(16,185,129,.2); }
 
-.achievement-card.locked { opacity: .45; filter: grayscale(.6); }
+.achievement-card.locked { opacity: .45; }
 
 .achievement-icon { font-size: 30px; }
 
@@ -1099,7 +1044,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.75);
-  backdrop-filter: blur(12px);
+  /* backdrop-filter removed for perf */
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -1114,7 +1059,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .modal {
   background: var(--card2);
-  backdrop-filter: blur(30px) saturate(150%);
+  /* backdrop-filter removed for perf */
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 28px;
@@ -1166,7 +1111,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   background: var(--glass);
   border: 1px solid var(--glass-border);
   color: var(--text2);
-  backdrop-filter: blur(8px);
+  /* backdrop-filter removed for perf */
 }
 .btn-ghost:hover { border-color: var(--border2); color: var(--accent); transform: translateY(-1px); }
 
@@ -1249,7 +1194,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .toast {
   background: var(--card2);
-  backdrop-filter: blur(20px);
+  /* backdrop-filter removed for perf */
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 13px 18px;
@@ -1294,7 +1239,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   left: 50%;
   transform: translateX(-50%);
   background: var(--card2);
-  backdrop-filter: blur(24px);
+  /* backdrop-filter removed for perf */
   border: 1px solid rgba(16,185,129,.35);
   border-radius: var(--radius);
   padding: 14px 22px;
@@ -1329,7 +1274,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   position: fixed;
   inset: 0;
   background: radial-gradient(ellipse at center, rgba(12,12,40,.97), var(--bg));
-  backdrop-filter: blur(30px);
+  /* backdrop-filter removed for perf */
   z-index: 800;
   flex-direction: column;
   align-items: center;
@@ -1360,7 +1305,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 14px 20px;
-  backdrop-filter: blur(8px);
+  /* backdrop-filter removed for perf */
 }
 
 .focus-controls { display: flex; gap: 16px; }
@@ -1368,7 +1313,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .focus-exit-btn {
   position: absolute; top: 22px; right: 22px;
   padding: 9px 18px; border-radius: var(--radius-sm);
-  background: var(--glass); backdrop-filter: blur(12px);
+  background: var(--card2);
   border: 1px solid var(--glass-border);
   color: var(--text2); cursor: pointer; font-size: 13px;
   transition: var(--transition);
@@ -1383,13 +1328,9 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   font-weight: 600;
   padding: 4px 12px;
   border-radius: 20px;
-  animation: pulse-badge 1.2s ease-in-out infinite alternate;
+  /* pulse-badge removed for perf */
   white-space: nowrap;
   box-shadow: 0 2px 12px rgba(168,85,247,.4);
-}
-@keyframes pulse-badge {
-  from { opacity: 1; transform: scale(1); box-shadow: 0 2px 12px rgba(168,85,247,.4); }
-  to   { opacity: .85; transform: scale(1.04); box-shadow: 0 4px 20px rgba(168,85,247,.6); }
 }
 
 /* Streak danger banner */
@@ -1399,7 +1340,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   left: 50%;
   transform: translateX(-50%);
   background: var(--card2);
-  backdrop-filter: blur(20px);
+  /* backdrop-filter removed for perf */
   border: 1px solid rgba(251,113,133,.35);
   border-radius: var(--radius);
   padding: 14px 22px;
@@ -1531,7 +1472,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   --aurora1: rgba(139,69,19,.04); --aurora2: rgba(184,134,11,.03); --aurora3: rgba(45,122,58,.02);
   --glass: rgba(139,69,19,.05); --glass-border: rgba(139,69,19,.15);
 }
-[data-theme="parchment"] .header { background: rgba(244,228,193,.92); backdrop-filter: blur(20px); border-bottom-color: rgba(139,69,19,.2); }
+[data-theme="parchment"] .header { background: rgba(244,228,193,.96); border-bottom-color: rgba(139,69,19,.2); }
 [data-theme="parchment"] .right-panel { background: rgba(253,243,227,.95); border-left-color: rgba(139,69,19,.15); }
 [data-theme="parchment"] .view-tabs { background: rgba(244,228,193,.85); }
 [data-theme="parchment"] .header-logo { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -1541,13 +1482,6 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 /* ============================================================
    CYBER THEME — grid lines neon
    ============================================================ */
-[data-theme="cyber"] body::after {
-  background:
-    repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(56,189,248,.025) 40px, rgba(56,189,248,.025) 41px),
-    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(56,189,248,.025) 40px, rgba(56,189,248,.025) 41px),
-    radial-gradient(ellipse 40% 30% at 70% 30%, var(--aurora2), transparent 60%),
-    radial-gradient(ellipse 50% 40% at 10% 80%, var(--aurora1), transparent 60%);
-}
 
 /* ============================================================
    AVATAR LEVEL BADGE
@@ -1600,13 +1534,9 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 /* ============================================================
    HP CRÍTICO
    ============================================================ */
-@keyframes hp-pulse {
-  0%   { opacity: 1; }
-  100% { opacity: .35; }
-}
 .hp-bar-fill.hp-critical {
   background: linear-gradient(90deg, #dc2626, #ef4444);
-  animation: hp-pulse .9s ease-in-out infinite alternate;
+  /* hp-pulse removed for perf */
 }
 .hp-bar-fill.hp-warning {
   background: linear-gradient(90deg, #ea580c, #f97316);
@@ -1615,7 +1545,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   font-size: 9px;
   color: var(--red);
   font-weight: 700;
-  animation: hp-pulse .9s ease-in-out infinite alternate;
+  /* hp-pulse removed for perf */
 }
 
 /* ============================================================
