@@ -1926,10 +1926,10 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
    ══════════════════════════════════════════════════════════ */
 
 /* ── Sidebar collapse ─────────────────────────────────── */
-.right-panel { position:relative; transition:width .25s, min-width .25s, padding .25s; overflow:visible; }
-.right-panel-inner { overflow-y:auto; flex:1; min-height:0; display:flex; flex-direction:column; }
+.main { position:relative; }
+.right-panel { transition:width .25s, min-width .25s, padding .25s; }
 .sidebar-toggle-btn {
-  position:absolute; top:50%; left:-16px; transform:translateY(-50%);
+  position:absolute; top:50%; right:320px; transform:translateY(-50%);
   width:16px; height:44px; background:var(--card); border:1px solid var(--border);
   border-right:none; border-radius:6px 0 0 6px; cursor:pointer;
   font-size:9px; color:var(--text2); display:flex; align-items:center;
@@ -1937,6 +1937,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 .sidebar-toggle-btn:hover { background:var(--bg3); color:var(--accent); }
 .sidebar-collapsed .right-panel { width:0 !important; min-width:0 !important; padding:0 !important; overflow:hidden !important; }
+.sidebar-collapsed .sidebar-toggle-btn { right:0; }
 #sidebarReopenBtn {
   position:fixed; bottom:80px; right:10px; z-index:200;
   background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm);
