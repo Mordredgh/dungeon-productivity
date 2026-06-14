@@ -19,6 +19,3 @@
   checkConnection();
   setInterval(checkConnection, 5 * 60 * 1000);
 })();
-</script>
-</body>
-</html>
