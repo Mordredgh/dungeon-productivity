@@ -1147,6 +1147,133 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 [data-compact="true"] .quest-item { padding: 7px 12px; }
 [data-compact="true"] .quest-notes { display: none; }
 
+/* ============================================================
+   FOCUS MODE
+   ============================================================ */
+.focus-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 800;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+.focus-overlay.active { display: flex; }
+.focus-timer-big { font-family: var(--font-head); font-size: 80px; color: var(--accent); text-shadow: var(--glow); line-height: 1; }
+.focus-phase-big { font-size: 16px; color: var(--text2); letter-spacing: 2px; text-transform: uppercase; }
+.focus-task-big { font-size: 18px; color: var(--text); max-width: 400px; text-align: center; }
+.focus-controls { display: flex; gap: 16px; }
+.focus-exit-btn {
+  position: absolute; top: 20px; right: 20px;
+  padding: 8px 16px; border-radius: var(--radius-sm);
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--text2); cursor: pointer; font-size: 13px;
+}
+.focus-exit-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Active spell badge */
+.spell-active-badge {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  animation: pulse-badge 1s infinite alternate;
+  white-space: nowrap;
+}
+@keyframes pulse-badge {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: .8; transform: scale(1.03); }
+}
+
+/* Streak danger banner */
+.streak-danger {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, rgba(251,113,133,.15), rgba(168,85,247,.15));
+  border: 1px solid var(--red);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  z-index: 400;
+  text-align: center;
+  max-width: 380px;
+  backdrop-filter: blur(8px);
+  animation: event-drop .4s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.streak-danger-icon { font-size: 24px; }
+.streak-danger-text { font-size: 13px; color: var(--text); }
+.streak-danger-close { margin-left: auto; color: var(--text3); cursor: pointer; font-size: 18px; }
+
+/* Heatmap */
+.heatmap-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+.heatmap-day {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--bg4);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.heatmap-day:hover { transform: scale(1.3); }
+.heatmap-day[data-level="1"] { background: rgba(168,85,247,.3); }
+.heatmap-day[data-level="2"] { background: rgba(168,85,247,.55); }
+.heatmap-day[data-level="3"] { background: rgba(168,85,247,.8); }
+.heatmap-day[data-level="4"] { background: var(--accent); box-shadow: 0 0 6px rgba(168,85,247,.5); }
+.heatmap-months { display: flex; gap: 3px; margin-bottom: 4px; }
+.heatmap-month { font-size: 9px; color: var(--text3); }
+.heatmap-legend { display: flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 10px; color: var(--text3); }
+.heatmap-legend-box { width: 10px; height: 10px; border-radius: 2px; }
+
+/* Confetti */
+.confetti-piece {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  animation: confetti-fall var(--fall-dur, 1.2s) ease forwards;
+}
+@keyframes confetti-fall {
+  0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+  100% { opacity: 0; transform: translateY(var(--fall-dist, 300px)) rotate(var(--rot, 360deg)) scale(.3); }
+}
+
+/* Subtasks */
+.subtask-list { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.subtask-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); cursor: pointer; }
+.subtask-check { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 9px; flex-shrink: 0; }
+.subtask-done .subtask-check { background: var(--green); border-color: var(--green); color: white; }
+.subtask-done .subtask-text { text-decoration: line-through; opacity: .6; }
+
+/* Drag handle */
+.drag-handle {
+  color: var(--text3);
+  font-size: 14px;
+  cursor: grab;
+  padding: 0 4px;
+  flex-shrink: 0;
+  user-select: none;
+}
+.drag-handle:active { cursor: grabbing; }
+.quest-item.dragging { opacity: .4; border-style: dashed; }
+.quest-item.drag-over { border-color: var(--accent); background: var(--card2); }
+.kanban-card.dragging { opacity: .4; }
+.kanban-cards.drag-over { background: rgba(168,85,247,.05); border: 1px dashed var(--accent); border-radius: var(--radius-sm); }
+
 /* Scrollbars */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -1211,7 +1338,10 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
       <div class="stat-chip">XP <span id="statTotalXP">0</span></div>
     </div>
 
+    <div id="spellActiveBadge" style="display:none" class="spell-active-badge">⚡ x2 XP</div>
+
     <div class="header-actions">
+      <button class="icon-btn" id="focusBtn" title="Modo Focus (F)">🎯</button>
       <button class="icon-btn" id="compactToggle" title="Modo compacto (C)">⊟</button>
       <button class="icon-btn" id="themeBtn" title="Cambiar tema (T)">🎨</button>
       <button class="icon-btn" id="importBtn" title="Importar quests">📥</button>
@@ -1256,6 +1386,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
               <button class="filter-tab" data-filter="side">Secundaria</button>
               <button class="filter-tab" data-filter="daily">Diaria</button>
               <button class="filter-tab" data-filter="weekly">Semanal</button>
+              <button class="filter-tab" data-filter="urgente" style="color:var(--red)">🔴 Urgente</button>
             </div>
             <select class="sort-select" id="sortSelect">
               <option value="created">Recientes</option>
@@ -1330,6 +1461,20 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
                 <div><span style="color:var(--green);font-family:var(--font-head);font-size:20px" id="st-completed">0</span><span style="color:var(--text2);font-size:11px"> misiones completadas</span></div>
                 <div><span style="color:var(--blue);font-family:var(--font-head);font-size:20px" id="st-pomodoros">0</span><span style="color:var(--text2);font-size:11px"> pomodoros</span></div>
                 <div><span style="color:var(--accent);font-family:var(--font-head);font-size:20px" id="st-level">1</span><span style="color:var(--text2);font-size:11px"> nivel actual</span></div>
+              </div>
+            </div>
+            <div class="stats-card" style="grid-column:1/-1">
+              <div class="stats-card-title">📅 Actividad — últimos 90 días</div>
+              <div class="heatmap-months" id="heatmapMonths"></div>
+              <div class="heatmap-grid" id="heatmapGrid"></div>
+              <div class="heatmap-legend">
+                Menos
+                <div class="heatmap-legend-box" style="background:var(--bg4)"></div>
+                <div class="heatmap-legend-box" data-level="1"></div>
+                <div class="heatmap-legend-box" data-level="2"></div>
+                <div class="heatmap-legend-box" data-level="3"></div>
+                <div class="heatmap-legend-box" data-level="4"></div>
+                Más
               </div>
             </div>
           </div>
@@ -1555,6 +1700,23 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
+
+<!-- FOCUS MODE OVERLAY -->
+<div class="focus-overlay" id="focusOverlay">
+  <button class="focus-exit-btn" id="focusExitBtn">✕ Salir del focus</button>
+  <div class="focus-phase-big" id="focusPhase">ENFOQUE</div>
+  <div class="focus-timer-big" id="focusTimer">25:00</div>
+  <div class="focus-task-big" id="focusTask">Sin misión activa</div>
+  <div class="focus-controls">
+    <button class="timer-btn" style="width:48px;height:48px;font-size:18px" id="focusResetBtn">↺</button>
+    <button class="timer-btn primary" style="width:64px;height:64px;font-size:24px" id="focusStartBtn">▶</button>
+    <button class="timer-btn" style="width:48px;height:48px;font-size:18px" id="focusSkipBtn">⏭</button>
+  </div>
+  <div class="pom-count" id="focusPomCount">
+    <div class="pom-dot"></div><div class="pom-dot"></div>
+    <div class="pom-dot"></div><div class="pom-dot"></div>
+  </div>
+</div>
 
 <script>
 'use strict';
@@ -1872,7 +2034,8 @@ function advancePhase() {
 function updateTimerUI() {
   const m = Math.floor(timer.seconds / 60).toString().padStart(2, '0');
   const s = (timer.seconds % 60).toString().padStart(2, '0');
-  document.getElementById('timerDisplay').textContent = `${m}:${s}`;
+  const timeStr = `${m}:${s}`;
+  document.getElementById('timerDisplay').textContent = timeStr;
 
   const isBreak = timer.phase === 'break';
   const breakDur = timer.pomsDone % 4 === 0 && timer.pomsDone > 0 ? 900 : 300;
@@ -1881,6 +2044,10 @@ function updateTimerUI() {
   const circ = 2 * Math.PI * 60;
   document.getElementById('timerRing').style.strokeDashoffset = circ * (1 - pct);
   document.getElementById('timerRing').style.stroke = isBreak ? 'var(--green)' : 'var(--accent)';
+
+  if (focusMode) syncFocusUI();
+  if (timer.running) saveTimerState();
+  document.title = timer.running ? `${timeStr} ⚔️ Dungeon` : '⚔️ Dungeon Productivity';
 }
 
 function setTimerDuration(min) {
@@ -1992,6 +2159,7 @@ function castSpell(spellId) {
   spellState[spellId] = Date.now();
   saveHero({ spells: JSON.stringify(spellState), spells_cast: (hero.spells_cast || 0) + 1 });
   renderSpells();
+  updateSpellBadge();
   checkAchievements();
 }
 
@@ -2157,7 +2325,8 @@ function renderQuestList() {
 
   const search = (document.getElementById('searchBox').value || '').toLowerCase();
   let filtered = quests.filter(q => {
-    if (activeFilter !== 'all' && q.type !== activeFilter) return false;
+    if (activeFilter === 'urgente') { if (q.priority !== 'urgente') return false; }
+    else if (activeFilter !== 'all' && q.type !== activeFilter) return false;
     if (search && !q.name.toLowerCase().includes(search)) return false;
     return true;
   });
@@ -2195,22 +2364,60 @@ function renderQuestList() {
 }
 
 function renderQuestItem(q) {
-  const xp = XP_TABLE[q.type] || 50;
+  const xp = calcQuestXP(q);
+  const diff = getQuestDifficulty(q.id);
   const today = new Date().toISOString().split('T')[0];
   const isOverdue = q.deadline && !q.done && q.deadline < today;
   const typeLabels = { main: '⭐ Principal', side: '🗡️ Secundaria', daily: '🌅 Diaria', weekly: '📅 Semanal' };
+  const diffEmoji = { easy: '🟢', normal: '', hard: '🔴' };
+  const diffLabel = { easy: ' Fácil', normal: '', hard: ' Difícil' };
 
-  return `<div class="quest-item ${q.done ? 'done' : ''}" data-type="${q.type}" data-priority="${q.priority || 'normal'}">
+  // Parse subtasks from notes: lines starting with "- [ ]" or "- [x]"
+  let notesHtml = '';
+  let subtasksHtml = '';
+  if (q.notes) {
+    const lines = q.notes.split('\n');
+    const subtaskLines = lines.filter(l => /^- \[[ x]\]/.test(l));
+    const otherLines = lines.filter(l => !/^- \[[ x]\]/.test(l));
+    if (subtaskLines.length) {
+      subtasksHtml = `<div class="subtask-list">` + subtaskLines.map((l, i) => {
+        const done = l.startsWith('- [x]');
+        const text = l.replace(/^- \[[ x]\] /, '');
+        return `<div class="subtask-row ${done ? 'subtask-done' : ''}" onclick="toggleSubtask('${q.id}', ${i}, ${done})">
+          <div class="subtask-check">${done ? '✓' : ''}</div>
+          <span class="subtask-text">${escHtml(text)}</span>
+        </div>`;
+      }).join('') + `</div>`;
+    }
+    if (otherLines.join('').trim()) {
+      notesHtml = `<div class="quest-notes">${escHtml(otherLines.join(' ').trim())}</div>`;
+    }
+  }
+
+  return `<div class="quest-item ${q.done ? 'done' : ''}" data-type="${q.type}" data-priority="${q.priority || 'normal'}"
+    draggable="true"
+    ondragstart="draggedQuestId='${q.id}';event.dataTransfer.effectAllowed='move';this.classList.add('dragging')"
+    ondragend="this.classList.remove('dragging')"
+    ondragover="event.preventDefault();this.classList.add('drag-over')"
+    ondragleave="this.classList.remove('drag-over')"
+    ondrop="event.preventDefault();this.classList.remove('drag-over');reorderQuest('${q.id}')">
+    <span class="drag-handle">⠿</span>
     <div class="quest-check" onclick="completeQuest('${q.id}', this)">${q.done ? '✓' : ''}</div>
     <div class="quest-body">
-      <div class="quest-name">${escHtml(q.name)}</div>
+      <div class="quest-name">${escHtml(q.name)}${diff !== 'normal' ? ` <span style="font-size:10px">${diffEmoji[diff]}${diffLabel[diff]}</span>` : ''}</div>
       <div class="quest-meta">
         <span class="badge badge-type-${q.type}">${typeLabels[q.type] || q.type}</span>
         ${q.priority && q.priority !== 'normal' ? `<span class="badge badge-priority-${q.priority}">${q.priority}</span>` : ''}
-        ${q.deadline ? `<span class="deadline-badge ${isOverdue ? 'overdue' : ''}">📅 ${isOverdue ? '⚠️ Vencida: ' : ''}${q.deadline}</span>` : ''}
+        ${q.deadline ? `<span class="deadline-badge ${isOverdue ? 'overdue' : ''}">📅 ${isOverdue ? '⚠️ ' : ''}${q.deadline}</span>` : ''}
         <span class="xp-reward">+${xp} XP</span>
+        ${!q.done ? `<select style="font-size:10px;padding:1px 4px;height:18px" onchange="setQuestDifficulty('${q.id}',this.value)" onclick="event.stopPropagation()">
+          <option value="easy" ${diff==='easy'?'selected':''}>Fácil</option>
+          <option value="normal" ${diff==='normal'?'selected':''}>Normal</option>
+          <option value="hard" ${diff==='hard'?'selected':''}>Difícil</option>
+        </select>` : ''}
       </div>
-      ${q.notes ? `<div class="quest-notes">${escHtml(q.notes)}</div>` : ''}
+      ${notesHtml}
+      ${subtasksHtml}
     </div>
     <div class="quest-actions">
       ${!q.done ? `<button class="quest-action-btn" onclick="setActiveQuest('${q.id}')" title="Vincular a pomodoro">🍅</button>` : ''}
@@ -2219,16 +2426,44 @@ function renderQuestItem(q) {
   </div>`;
 }
 
+function toggleSubtask(questId, lineIndex, isDone) {
+  const q = quests.find(x => x.id === questId);
+  if (!q || !q.notes) return;
+  const lines = q.notes.split('\n');
+  const subtaskLines = lines.reduce((acc, l, i) => { if (/^- \[[ x]\]/.test(l)) acc.push(i); return acc; }, []);
+  const targetLineIdx = subtaskLines[lineIndex];
+  if (targetLineIdx === undefined) return;
+  lines[targetLineIdx] = isDone
+    ? lines[targetLineIdx].replace('- [x]', '- [ ]')
+    : lines[targetLineIdx].replace('- [ ]', '- [x]');
+  const newNotes = lines.join('\n');
+  updateQuest(questId, { notes: newNotes });
+}
+
+let questOrder = [];
+function reorderQuest(targetId) {
+  if (!draggedQuestId || draggedQuestId === targetId) return;
+  const fromIdx = quests.findIndex(q => q.id === draggedQuestId);
+  const toIdx = quests.findIndex(q => q.id === targetId);
+  if (fromIdx === -1 || toIdx === -1) return;
+  const [moved] = quests.splice(fromIdx, 1);
+  quests.splice(toIdx, 0, moved);
+  renderQuestList();
+  draggedQuestId = null;
+}
+
 function renderKanban() {
   const pending = quests.filter(q => !q.done && q.type !== 'daily');
   const inBattle = quests.filter(q => !q.done && q.type === 'daily');
   const done = quests.filter(q => q.done).slice(0, 20);
 
-  const makeCard = q => `<div class="kanban-card" data-type="${q.type}">
+  const makeCard = q => `<div class="kanban-card" data-type="${q.type}" draggable="true"
+    ondragstart="draggedQuestId='${q.id}';event.dataTransfer.effectAllowed='move';this.classList.add('dragging')"
+    ondragend="this.classList.remove('dragging')">
     <div class="kanban-card-name">${escHtml(q.name)}</div>
     <div class="quest-meta">
       <span class="badge badge-type-${q.type}">${q.type}</span>
-      <span class="xp-reward">+${XP_TABLE[q.type] || 50} XP</span>
+      <span class="xp-reward">+${calcQuestXP(q)} XP</span>
     </div>
   </div>`;
 
@@ -2278,6 +2513,7 @@ function renderHistory() {
 function renderStats() {
   renderXPChart();
   renderTypeDist();
+  renderHeatmap();
   const stCompleted = document.getElementById('st-completed');
   if (stCompleted) stCompleted.textContent = hero ? (hero.quests_done || 0) : 0;
   const stPoms = document.getElementById('st-pomodoros');
@@ -2379,8 +2615,9 @@ function showLevelUp(lvl) {
   document.getElementById('luTitle').textContent = TITLES[Math.min(lvl - 1, TITLES.length - 1)];
   document.getElementById('luDesc').textContent = `¡Has ascendido a ${TITLES[Math.min(lvl - 1, TITLES.length - 1)]}!`;
   openModal('levelupModal');
-  playBeep('complete');
+  playLevelUpSound();
   spawnLevelUpParticles();
+  spawnConfetti();
 }
 
 function toast(icon, msg, duration) {
@@ -2501,6 +2738,7 @@ document.addEventListener('keydown', e => {
   if (key === 'R') resetTimer();
   if (key === 'T') cycleTheme();
   if (key === 'C') toggleCompact();
+  if (key === 'F') toggleFocusMode();
   if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
   if (key === '1') switchView('quests');
   if (key === '2') switchView('kanban');
@@ -2603,6 +2841,373 @@ document.querySelectorAll('.modal-overlay').forEach(o => {
   o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
 });
 
+document.getElementById('focusBtn').addEventListener('click', toggleFocusMode);
+document.getElementById('focusExitBtn').addEventListener('click', toggleFocusMode);
+document.getElementById('focusStartBtn').addEventListener('click', () => { startTimer(); syncFocusUI(); });
+document.getElementById('focusResetBtn').addEventListener('click', () => { resetTimer(); syncFocusUI(); });
+document.getElementById('focusSkipBtn').addEventListener('click', () => { skipTimer(); syncFocusUI(); });
+
+/* ============================================================
+   FEATURE 1: PWA — manifest + service worker via blob
+   ============================================================ */
+function initPWA() {
+  const manifest = {
+    name: 'Dungeon Productivity',
+    short_name: 'Dungeon',
+    description: 'Sistema D&D para conquistar tus metas',
+    start_url: '/',
+    display: 'standalone',
+    background_color: '#05050f',
+    theme_color: '#a855f7',
+    icons: [{ src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">⚔️</text></svg>', sizes: '192x192', type: 'image/svg+xml' }]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = URL.createObjectURL(blob);
+  document.head.appendChild(link);
+
+  if ('serviceWorker' in navigator) {
+    const sw = `
+      const CACHE = 'dungeon-v1';
+      const ASSETS = ['/'];
+      self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS))));
+      self.addEventListener('fetch', e => e.respondWith(
+        caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+          return res;
+        }))
+      ));
+    `;
+    const swBlob = new Blob([sw], { type: 'application/javascript' });
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+  }
+}
+
+/* ============================================================
+   FEATURE 2: Auto-reset de misiones diarias
+   ============================================================ */
+async function resetDailyQuests() {
+  const today = new Date().toISOString().split('T')[0];
+  const toReset = quests.filter(q =>
+    q.type === 'daily' && q.done && q.done_at && !q.done_at.startsWith(today)
+  );
+  for (const q of toReset) {
+    await db.from('dungeon_quests').update({ done: false, done_at: null }).eq('id', q.id);
+    q.done = false;
+    q.done_at = null;
+  }
+  if (toReset.length) {
+    toast('🌅', `${toReset.length} misiones diarias reseteadas para hoy.`);
+    renderQuestList();
+    renderKanban();
+  }
+}
+
+/* ============================================================
+   FEATURE 4: Indicador visual de hechizo activo
+   ============================================================ */
+function updateSpellBadge() {
+  const badge = document.getElementById('spellActiveBadge');
+  if (!badge) return;
+  if (xpMultiplier > 1 && xpMultiplierEnd > Date.now()) {
+    const remaining = Math.ceil((xpMultiplierEnd - Date.now()) / 60000);
+    badge.textContent = `⚡ x2 XP (${remaining}m)`;
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+/* ============================================================
+   FEATURE 5: Modo Focus
+   ============================================================ */
+let focusMode = false;
+
+function toggleFocusMode() {
+  focusMode = !focusMode;
+  const overlay = document.getElementById('focusOverlay');
+  overlay.classList.toggle('active', focusMode);
+  if (focusMode) {
+    syncFocusUI();
+    toast('🎯', 'Modo Focus activado. Espacio para start/pause.');
+  }
+}
+
+function syncFocusUI() {
+  const m = Math.floor(timer.seconds / 60).toString().padStart(2, '0');
+  const s = (timer.seconds % 60).toString().padStart(2, '0');
+  const focusEl = document.getElementById('focusTimer');
+  if (focusEl) focusEl.textContent = `${m}:${s}`;
+  const phaseEl = document.getElementById('focusPhase');
+  if (phaseEl) phaseEl.textContent = timer.phase === 'focus' ? 'ENFOQUE' : 'DESCANSO';
+  const taskEl = document.getElementById('focusTask');
+  if (taskEl) {
+    const activeQ = quests.find(q => q.id === timer.activeQuest);
+    taskEl.textContent = activeQ ? `⚔️ ${activeQ.name}` : 'Sin misión activa';
+  }
+  const startBtn = document.getElementById('focusStartBtn');
+  if (startBtn) startBtn.textContent = timer.running ? '⏸' : '▶';
+  const dots = document.querySelectorAll('#focusPomCount .pom-dot');
+  const filled = timer.pomsDone % 4;
+  dots.forEach((d, i) => d.classList.toggle('done', i < filled));
+}
+
+/* ============================================================
+   FEATURE 7: HP penalty por misiones vencidas
+   ============================================================ */
+async function checkOverdueHP() {
+  if (!hero) return;
+  const today = new Date().toISOString().split('T')[0];
+  const overdue = quests.filter(q => !q.done && q.deadline && q.deadline < today);
+  if (!overdue.length) return;
+  const lastCheck = localStorage.getItem('dungeon-overdue-check');
+  if (lastCheck === today) return;
+  localStorage.setItem('dungeon-overdue-check', today);
+  const penalty = Math.min(overdue.length * 5, 30);
+  const newHp = Math.max(10, (hero.hp || 100) - penalty);
+  if (newHp < (hero.hp || 100)) {
+    await saveHero({ hp: newHp });
+    renderHeroUI();
+    toast('💔', `${overdue.length} misiones vencidas: -${penalty} HP`);
+  }
+}
+
+/* ============================================================
+   FEATURE 8: Heatmap de actividad
+   ============================================================ */
+function renderHeatmap() {
+  const gridEl = document.getElementById('heatmapGrid');
+  const monthsEl = document.getElementById('heatmapMonths');
+  if (!gridEl) return;
+
+  const days = 90;
+  const xpByDay = {};
+  quests.forEach(q => {
+    if (q.done && q.done_at) {
+      const d = q.done_at.split('T')[0];
+      xpByDay[d] = (xpByDay[d] || 0) + (XP_TABLE[q.type] || 50);
+    }
+  });
+
+  const maxXP = Math.max(...Object.values(xpByDay), 1);
+  let html = '';
+  let monthHtml = '';
+  let lastMonth = '';
+
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 86400000);
+    const key = d.toISOString().split('T')[0];
+    const xp = xpByDay[key] || 0;
+    const level = xp === 0 ? 0 : xp < maxXP * 0.25 ? 1 : xp < maxXP * 0.5 ? 2 : xp < maxXP * 0.75 ? 3 : 4;
+    const month = d.toLocaleDateString('es', { month: 'short' });
+    if (month !== lastMonth) {
+      monthHtml += `<span class="heatmap-month" style="margin-left:${i === days-1 ? 0 : 4}px">${month}</span>`;
+      lastMonth = month;
+    }
+    html += `<div class="heatmap-day" data-level="${level}" title="${key}: ${xp} XP"></div>`;
+  }
+
+  gridEl.innerHTML = html;
+  if (monthsEl) monthsEl.innerHTML = monthHtml;
+
+  document.querySelectorAll('.heatmap-legend-box[data-level]').forEach(el => {
+    const lvl = el.dataset.level;
+    const colors = { '1': 'rgba(168,85,247,.3)', '2': 'rgba(168,85,247,.55)', '3': 'rgba(168,85,247,.8)', '4': 'var(--accent)' };
+    el.style.background = colors[lvl] || 'var(--bg4)';
+  });
+}
+
+/* ============================================================
+   FEATURE 9: Confetti elaborado en level up
+   ============================================================ */
+function spawnConfetti() {
+  const colors = ['#a855f7','#22d3ee','#4ade80','#fb7185','#f0abfc','#38bdf8','#fbbf24'];
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.cssText = `
+        left:${Math.random() * 100}vw;
+        top:${-10 + Math.random() * 30}vh;
+        background:${colors[Math.floor(Math.random() * colors.length)]};
+        --fall-dist:${200 + Math.random() * 400}px;
+        --fall-dur:${0.8 + Math.random() * 1}s;
+        --rot:${Math.random() > .5 ? '' : '-'}${180 + Math.floor(Math.random() * 360)}deg;
+        width:${6 + Math.random() * 8}px;
+        height:${6 + Math.random() * 8}px;
+        border-radius:${Math.random() > .5 ? '50%' : '2px'};
+      `;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2000);
+    }, i * 30);
+  }
+}
+
+/* ============================================================
+   FEATURE 10: Sonido de level up (fanfare)
+   ============================================================ */
+function playLevelUpSound() {
+  try {
+    const ctx = getAudioCtx();
+    const fanfare = [523, 659, 784, 1047, 784, 1047, 1319];
+    fanfare.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = i % 2 === 0 ? 'sine' : 'triangle';
+      const t = ctx.currentTime + i * 0.12;
+      gain.gain.setValueAtTime(0.25, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+      osc.start(t); osc.stop(t + 0.35);
+    });
+  } catch {}
+}
+
+/* ============================================================
+   FEATURE 12: Timer persistente (localStorage)
+   ============================================================ */
+function saveTimerState() {
+  if (!timer.running) return;
+  localStorage.setItem('dungeon-timer', JSON.stringify({
+    phase: timer.phase,
+    endsAt: Date.now() + timer.seconds * 1000,
+    duration: timer.duration,
+    pomsDone: timer.pomsDone,
+    activeQuest: timer.activeQuest
+  }));
+}
+
+function restoreTimerState() {
+  const saved = localStorage.getItem('dungeon-timer');
+  if (!saved) return;
+  try {
+    const s = JSON.parse(saved);
+    const remaining = Math.floor((s.endsAt - Date.now()) / 1000);
+    if (remaining > 0 && remaining < s.duration * 60) {
+      timer.phase = s.phase;
+      timer.seconds = remaining;
+      timer.duration = s.duration || 25;
+      timer.pomsDone = s.pomsDone || 0;
+      timer.activeQuest = s.activeQuest || null;
+      document.querySelectorAll('.dur-btn').forEach(b => b.classList.toggle('active', +b.dataset.min === timer.duration));
+      updateTimerUI();
+      document.getElementById('timerPhase').textContent = 'Pausado (tenías uno activo)';
+      if (s.activeQuest) {
+        const q = quests.find(x => x.id === s.activeQuest);
+        if (q) document.getElementById('pomTaskLabel').textContent = `⚔️ ${q.name}`;
+      }
+      updatePomDots();
+      toast('⏱️', `Timer restaurado: ${Math.floor(remaining/60)}m restantes.`);
+    }
+  } catch {}
+  localStorage.removeItem('dungeon-timer');
+}
+
+/* ============================================================
+   FEATURE 13: Dificultad de misiones (localStorage por quest)
+   ============================================================ */
+const DIFFICULTY_XP = { easy: 0.75, normal: 1, hard: 1.5 };
+
+function getQuestDifficulty(id) {
+  const stored = localStorage.getItem(`dungeon-diff-${id}`);
+  return stored || 'normal';
+}
+
+function setQuestDifficulty(id, diff) {
+  localStorage.setItem(`dungeon-diff-${id}`, diff);
+  renderQuestList();
+}
+
+function calcQuestXP(q) {
+  const base = XP_TABLE[q.type] || 50;
+  const diff = getQuestDifficulty(q.id);
+  return Math.round(base * (DIFFICULTY_XP[diff] || 1));
+}
+
+/* ============================================================
+   FEATURE 15: Racha en peligro
+   ============================================================ */
+function checkStreakDanger() {
+  if (!hero || !(hero.streak > 0)) return;
+  const hour = new Date().getHours();
+  if (hour < 17) return;
+  const today = new Date().toISOString().split('T')[0];
+  const completedToday = quests.some(q => q.done && q.done_at && q.done_at.startsWith(today));
+  if (completedToday) return;
+  const dismissed = localStorage.getItem('dungeon-streak-danger-dismissed');
+  if (dismissed === today) return;
+  showStreakDanger();
+}
+
+function showStreakDanger() {
+  if (document.getElementById('streakDangerBanner')) return;
+  const today = new Date().toISOString().split('T')[0];
+  const div = document.createElement('div');
+  div.id = 'streakDangerBanner';
+  div.className = 'streak-danger';
+  div.innerHTML = `
+    <span class="streak-danger-icon">🔥</span>
+    <span class="streak-danger-text">¡Tu racha de <strong>${hero.streak} días</strong> está en peligro! Completa algo antes de medianoche.</span>
+    <span class="streak-danger-close" onclick="dismissStreakDanger()">✕</span>
+  `;
+  document.body.appendChild(div);
+}
+
+function dismissStreakDanger() {
+  const today = new Date().toISOString().split('T')[0];
+  localStorage.setItem('dungeon-streak-danger-dismissed', today);
+  const el = document.getElementById('streakDangerBanner');
+  if (el) el.remove();
+}
+
+/* ============================================================
+   FEATURE 6+14: Subtareas en notas + Drag reorder quests
+   Update renderQuestItem para subtareas y drag handle
+   ============================================================ */
+
+/* ============================================================
+   FEATURE 3: Drag-and-drop Kanban — status change
+   ============================================================ */
+let draggedQuestId = null;
+
+function initKanbanDrag() {
+  document.querySelectorAll('.kanban-cards').forEach(col => {
+    col.addEventListener('dragover', e => {
+      e.preventDefault();
+      col.classList.add('drag-over');
+    });
+    col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
+    col.addEventListener('drop', async e => {
+      e.preventDefault();
+      col.classList.remove('drag-over');
+      if (!draggedQuestId) return;
+      const colId = col.id;
+      const q = quests.find(x => x.id === draggedQuestId);
+      if (!q) return;
+      if (colId === 'k-done' && !q.done) {
+        await completeQuest(q.id, null);
+      } else if (colId === 'k-battle' && q.type !== 'daily') {
+        await updateQuest(q.id, { type: 'daily' });
+        renderKanban();
+      } else if (colId === 'k-pending' && (q.done || q.type === 'daily')) {
+        if (q.done) {
+          await db.from('dungeon_quests').update({ done: false, done_at: null }).eq('id', q.id);
+          q.done = false; q.done_at = null;
+        }
+        if (q.type === 'daily') {
+          await db.from('dungeon_quests').update({ type: 'side' }).eq('id', q.id);
+          q.type = 'side';
+        }
+        renderQuestList(); renderKanban();
+      }
+      draggedQuestId = null;
+    });
+  });
+}
+
 /* BOOT */
 (async () => {
   const savedTheme = localStorage.getItem('dungeon-theme');
@@ -2610,7 +3215,15 @@ document.querySelectorAll('.modal-overlay').forEach(o => {
   updateTimerUI();
   document.getElementById('timerPhase').textContent = 'Listo';
   await initDB();
+  await resetDailyQuests();
+  await checkOverdueHP();
+  restoreTimerState();
+  checkStreakDanger();
+  initPWA();
+  initKanbanDrag();
   setInterval(renderSpells, 30000);
+  setInterval(updateSpellBadge, 60000);
+  setInterval(checkStreakDanger, 30 * 60 * 1000);
 })();
 </script>
 </body>
