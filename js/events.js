@@ -576,7 +576,11 @@ ACHIEVEMENT_DEFS.push(
   { id: 'master_spell', icon: '🧙‍♂️', name: 'Archimago',   desc: 'Lanza 10 hechizos',          cond: h => (h._spells_cast||0) >= 10 },
   { id: 'boss_slayer',  icon: '🐉', name: 'Matador de Jefes', desc: 'Completa 10 épicas',      cond: h => (h._main_done||0) >= 10 },
   { id: 'healer',       icon: '💚', name: 'Inmortal',     desc: 'Mantén HP sobre 80%',         cond: h => (h.hp||0) / (h.hp_max||100) >= 0.8 },
-  { id: 'collector',    icon: '📚', name: 'Coleccionista', desc: '5+ misiones activas a la vez', cond: () => quests.filter(q=>!q.done).length >= 5 }
+  { id: 'collector',    icon: '📚', name: 'Coleccionista', desc: '5+ misiones activas a la vez', cond: () => quests.filter(q=>!q.done).length >= 5 },
+  { id: 'maratonista',  icon: '🍅', name: 'Maratonista',  desc: '10 pomodoros en un día',        cond: h => {
+    const today = new Date().toISOString().split('T')[0];
+    return pomodoros.filter(p => p.started_at && p.started_at.startsWith(today)).length >= 10;
+  }}
 );
 
 /* ============================================================

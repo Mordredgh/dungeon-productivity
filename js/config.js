@@ -53,7 +53,7 @@ const COMPLETIONS = [
 ];
 
 const RANDOM_EVENTS = [
-  { title: '⚡ ¡Tormenta Mágica!', text: 'Un hechizo errante duplica tu próximo XP ganado.', bonus: 0 },
+  { title: '⚡ ¡Tormenta Mágica!', text: 'Un hechizo errante activa 2x XP por 30 minutos.', bonus: 0, doubleXP: true },
   { title: '🍀 ¡Día de Suerte!', text: 'El destino te favorece. +25 XP de bonus.', bonus: 25 },
   { title: '🐉 ¡Dragón Dormido!', text: 'El dragón duerme. Momento ideal para completar misiones.', bonus: 0 },
   { title: '⚔️ ¡Hora de Batalla!', text: '¡La guerra llama! Completa una misión principal ahora.', bonus: 0 },

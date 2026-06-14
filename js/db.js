@@ -1,6 +1,15 @@
 ﻿/* SUPABASE */
 async function initDB() {
   db = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+  // Show cached data instantly while Supabase loads
+  try {
+    const ch = localStorage.getItem('dungeon-cache-hero');
+    const cq = localStorage.getItem('dungeon-cache-quests');
+    if (ch) { hero = JSON.parse(ch); deriveHero(); renderHeroUI(); }
+    if (cq) { quests = JSON.parse(cq); renderQuestList(); renderKanban(); }
+  } catch {}
+
   await loadHero();
   await loadQuests();
   await loadPomodoros();

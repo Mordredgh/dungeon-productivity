@@ -172,6 +172,7 @@ function triggerRandomEvent() {
   const ev = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
   showEventBanner(ev);
   if (ev.bonus > 0) addXP(ev.bonus, 'side', null);
+  if (ev.doubleXP) { xpMultiplier = 2; xpMultiplierEnd = Date.now() + 30 * 60 * 1000; updateSpellBadge(); }
   scheduleRandomEvent();
 }
 

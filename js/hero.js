@@ -12,6 +12,7 @@ async function loadHero() {
     hero = nh;
   }
   deriveHero();
+  try { localStorage.setItem('dungeon-cache-hero', JSON.stringify(hero)); } catch {}
 }
 
 function deriveHero() {

@@ -2,6 +2,7 @@
 async function loadQuests() {
   const { data } = await db.from('dungeon_quests').select('*').order('created_at', { ascending: false });
   quests = data || [];
+  try { localStorage.setItem('dungeon-cache-quests', JSON.stringify(quests)); } catch {}
 }
 
 async function addQuest(q) {
