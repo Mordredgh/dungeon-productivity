@@ -23,66 +23,66 @@
 }
 
 [data-theme="dark"] {
-  --bg: #0d0d1a;
-  --bg2: #1a1a2e;
-  --bg3: #16213e;
-  --bg4: #0f3460;
-  --card: #1e1e3a;
-  --card2: #252550;
-  --border: #2a2a5a;
-  --text: #e8e8f0;
-  --text2: #a0a0c0;
-  --text3: #6060a0;
-  --accent: #c084fc;
-  --accent2: #818cf8;
-  --gold: #fbbf24;
-  --green: #34d399;
-  --red: #f87171;
-  --orange: #fb923c;
-  --blue: #60a5fa;
-  --glow: 0 0 20px rgba(192,132,252,.3);
+  --bg: #05050f;
+  --bg2: #0c0c20;
+  --bg3: #111130;
+  --bg4: #1a1a45;
+  --card: #10103a;
+  --card2: #18184e;
+  --border: #2a2a6a;
+  --text: #e4e4ff;
+  --text2: #8888cc;
+  --text3: #4444aa;
+  --accent: #a855f7;
+  --accent2: #22d3ee;
+  --gold: #10b981;
+  --green: #4ade80;
+  --red: #fb7185;
+  --orange: #f0abfc;
+  --blue: #38bdf8;
+  --glow: 0 0 20px rgba(168,85,247,.35);
 }
 
 [data-theme="light"] {
-  --bg: #f0f0ff;
+  --bg: #f5f3ff;
   --bg2: #ffffff;
-  --bg3: #e8e8f8;
-  --bg4: #d0d0f0;
+  --bg3: #ede9fe;
+  --bg4: #ddd6fe;
   --card: #ffffff;
-  --card2: #f5f5ff;
-  --border: #c0c0e0;
-  --text: #1a1a3a;
-  --text2: #4a4a7a;
-  --text3: #8080b0;
+  --card2: #faf5ff;
+  --border: #c4b5fd;
+  --text: #1e1b4b;
+  --text2: #4c1d95;
+  --text3: #7c3aed;
   --accent: #7c3aed;
-  --accent2: #4f46e5;
-  --gold: #d97706;
-  --green: #059669;
-  --red: #dc2626;
-  --orange: #ea580c;
-  --blue: #2563eb;
-  --glow: 0 0 20px rgba(124,58,237,.2);
+  --accent2: #0891b2;
+  --gold: #059669;
+  --green: #16a34a;
+  --red: #e11d48;
+  --orange: #a21caf;
+  --blue: #0284c7;
+  --glow: 0 0 20px rgba(124,58,237,.25);
 }
 
 [data-theme="cyber"] {
-  --bg: #000a00;
-  --bg2: #001a00;
-  --bg3: #002200;
-  --bg4: #003300;
-  --card: #001500;
-  --card2: #002000;
-  --border: #00ff0033;
-  --text: #00ff88;
-  --text2: #00cc66;
-  --text3: #006633;
-  --accent: #00ffaa;
-  --accent2: #00cc88;
-  --gold: #ffff00;
-  --green: #00ff44;
-  --red: #ff4444;
-  --orange: #ff8800;
-  --blue: #00ffff;
-  --glow: 0 0 20px rgba(0,255,136,.3);
+  --bg: #000510;
+  --bg2: #000d20;
+  --bg3: #001030;
+  --bg4: #001545;
+  --card: #000e28;
+  --card2: #001235;
+  --border: #0ea5e933;
+  --text: #e0f2fe;
+  --text2: #7dd3fc;
+  --text3: #0ea5e9;
+  --accent: #38bdf8;
+  --accent2: #e879f9;
+  --gold: #34d399;
+  --green: #4ade80;
+  --red: #f43f5e;
+  --orange: #c084fc;
+  --blue: #60a5fa;
+  --glow: 0 0 20px rgba(56,189,248,.35);
 }
 
 /* ============================================================
@@ -484,7 +484,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   font-weight: 500;
 }
 
-.badge-type-main { background: rgba(251,191,36,.15); color: var(--gold); border: 1px solid rgba(251,191,36,.3); }
+.badge-type-main { background: rgba(16,185,129,.15); color: var(--gold); border: 1px solid rgba(16,185,129,.3); }
 .badge-type-side { background: rgba(129,140,248,.15); color: var(--accent2); border: 1px solid rgba(129,140,248,.3); }
 .badge-type-daily { background: rgba(52,211,153,.15); color: var(--green); border: 1px solid rgba(52,211,153,.3); }
 .badge-type-weekly { background: rgba(96,165,250,.15); color: var(--blue); border: 1px solid rgba(96,165,250,.3); }
@@ -675,7 +675,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .achievement-card.unlocked {
   border-color: var(--gold);
-  box-shadow: 0 0 12px rgba(251,191,36,.2);
+  box-shadow: 0 0 12px rgba(16,185,129,.25);
 }
 
 .achievement-card.locked { opacity: .5; filter: grayscale(.5); }
@@ -1007,8 +1007,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .levelup-modal .modal {
   text-align: center;
   background: linear-gradient(135deg, var(--bg2), var(--bg4));
-  border-color: var(--gold);
-  box-shadow: 0 0 60px rgba(251,191,36,.3);
+  border-color: var(--accent);
+  box-shadow: 0 0 60px rgba(168,85,247,.35);
 }
 
 .levelup-icon { font-size: 64px; animation: bounce 1s ease infinite alternate; }
@@ -1021,8 +1021,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .levelup-level {
   font-family: var(--font-head);
   font-size: 48px;
-  color: var(--gold);
-  text-shadow: 0 0 30px rgba(251,191,36,.5);
+  color: var(--accent);
+  text-shadow: 0 0 30px rgba(168,85,247,.6);
 }
 
 .levelup-title {
@@ -1056,7 +1056,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 
 .avatar-opt:hover { border-color: var(--accent); transform: scale(1.1); }
-.avatar-opt.selected { border-color: var(--gold); background: var(--bg4); }
+.avatar-opt.selected { border-color: var(--accent); background: var(--bg4); }
 
 /* Toast */
 .toast-container {
@@ -1099,8 +1099,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   z-index: 9999;
   font-size: 14px;
   font-weight: 600;
-  color: var(--gold);
-  text-shadow: 0 0 10px rgba(251,191,36,.8);
+  color: var(--accent2);
+  text-shadow: 0 0 10px rgba(34,211,238,.8);
   animation: float-up .8s ease forwards;
 }
 
