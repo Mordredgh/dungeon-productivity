@@ -11,8 +11,7 @@
   checkStreakDanger();
   initPWA();
   initKanbanDrag();
-  setInterval(renderSpells, 30000);
-  setInterval(updateSpellBadge, 60000);
+  setInterval(renderSpells, 2 * 60 * 1000);
   setInterval(checkStreakDanger, 30 * 60 * 1000);
   showWelcomeScreen();
   initParticles();

@@ -17,6 +17,7 @@ async function addQuest(q) {
   renderKanban();
   updateBossBanner();
   toast('⚔️', `Misión creada: ${q.name}`);
+  showContratoEffect(q.name);
 }
 
 async function completeQuest(id, el) {

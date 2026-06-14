@@ -76,6 +76,7 @@
     <div class="header-actions">
       <button class="icon-btn" id="d20Btn" title="Tirar D20 🎲">🎲</button>
       <button class="icon-btn" id="musicBtn" title="Música lofi 🎵">🎵</button>
+      <button class="icon-btn" id="bulkToggleBtn" title="Selección múltiple (B)">☑️</button>
       <button class="icon-btn" id="focusBtn" title="Modo Focus (F)">🎯</button>
       <button class="icon-btn" id="compactToggle" title="Modo compacto (C)">⊟</button>
       <button class="icon-btn" id="themeBtn" title="Cambiar tema (T)">🎨</button>
@@ -99,6 +100,7 @@
         <button class="view-tab" data-view="achievements">🏆 Logros</button>
         <button class="view-tab" data-view="history">📜 Historial</button>
         <button class="view-tab" data-view="map">🗺️ Mapa</button>
+        <button class="view-tab" data-view="calendar">📅 Calendario</button>
       </div>
 
       <div class="views">
@@ -150,6 +152,12 @@
             </select>
           </div>
 
+          <div class="bulk-bar" id="bulkBar" style="display:none">
+            <span id="bulkCount">0 seleccionadas</span>
+            <button class="btn btn-primary" onclick="bulkComplete()">✅ Completar</button>
+            <button class="btn btn-danger" onclick="bulkDelete()">🗑️ Eliminar</button>
+            <button class="btn btn-ghost" onclick="exitBulkMode()">Cancelar</button>
+          </div>
           <div class="quest-list" id="questList">
             <div class="empty-state">
               <div class="empty-state-icon">🗡️</div>
@@ -231,6 +239,18 @@
                 <div style="color:var(--text3)">Completa misiones para ver tus favoritas</div>
               </div>
             </div>
+            <div class="stats-card">
+              <div class="stats-card-title">⏰ Horario más productivo</div>
+              <div class="hourly-chart" id="hourlyChart"></div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-card-title">📊 Esta semana vs anterior</div>
+              <div id="weekCompare" style="display:flex;flex-direction:column;gap:8px;font-size:13px"></div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-card-title">⏱️ Tiempo promedio por misión</div>
+              <div id="avgTimeContent" style="display:flex;flex-direction:column;gap:6px;font-size:13px"></div>
+            </div>
             <div class="stats-card" style="grid-column:1/-1">
               <div class="stats-card-title">📅 Actividad — últimos 90 días</div>
               <div class="heatmap-months" id="heatmapMonths"></div>
@@ -279,11 +299,23 @@
           <div id="mapContent" class="map-svg-wrap"></div>
         </div>
 
+        <!-- CALENDAR VIEW -->
+        <div class="view" id="view-calendar">
+          <div class="cal-nav">
+            <button class="btn btn-ghost" onclick="calPrev()">◀</button>
+            <div class="cal-month-title" id="calMonthTitle"></div>
+            <button class="btn btn-ghost" onclick="calNext()">▶</button>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div class="cal-detail" id="calDetail"></div>
+        </div>
+
       </div>
     </div>
 
     <!-- RIGHT PANEL -->
     <aside class="right-panel">
+      <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Colapsar panel (S)">◀</button>
 
       <!-- POMODORO / POSADA -->
       <div class="panel-section">
@@ -444,6 +476,20 @@
           <input class="form-input" id="editQEstTime" type="number" min="5" step="5" placeholder="25">
         </div>
       </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">🔄 Repetir cada (días)</label>
+          <input class="form-input" id="editQRepeat" type="number" min="1" max="365" placeholder="Ej: 3">
+        </div>
+        <div class="form-group">
+          <label class="form-label">📅 Fecha de inicio</label>
+          <input class="form-input" id="editQStartDate" type="date">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">🔒 Requiere completar primero</label>
+        <input class="form-input" id="editQDependsOn" type="text" placeholder="Nombre exacto de otra misión">
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('editQuestModal')">Cancelar</button>
@@ -520,10 +566,14 @@
           <option value="daily">Diaria</option>
         </select>
       </div>
+      <hr style="border-color:var(--border);margin:12px 0">
+      <p style="color:var(--text2);font-size:12px">📊 CSV con columnas: <code>nombre,tipo,prioridad,deadline</code></p>
+      <textarea class="import-area form-input" id="importCsvText" placeholder="Terminar reporte,main,urgente,2024-12-31&#10;Llamar cliente,side,normal," rows="3"></textarea>
+      <button class="btn btn-ghost" style="margin-top:6px;width:100%" id="doImportCsvBtn">📊 Importar CSV</button>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('importModal')">Cancelar</button>
-      <button class="btn btn-primary" id="doImportBtn">Importar</button>
+      <button class="btn btn-primary" id="doImportBtn">Importar texto</button>
     </div>
   </div>
 </div>
@@ -555,6 +605,7 @@
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
+<button id="sidebarReopenBtn" style="display:none" title="Abrir panel">▶ Panel</button>
 
 <!-- FOCUS MODE OVERLAY -->
 <div class="focus-overlay" id="focusOverlay">

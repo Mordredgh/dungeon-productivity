@@ -30,10 +30,12 @@ async function saveHero(patch) {
   await db.from('dungeon_heroes').update(patch).eq('id', hero.id);
 }
 
+const _lvlCache = {};
 function calcLevel(totalXP) {
+  if (_lvlCache[totalXP] !== undefined) return _lvlCache[totalXP];
   let lvl = 1;
   while (lvl < 10 && totalXP >= xpForLevel(lvl)) lvl++;
-  return Math.min(lvl, 10);
+  return (_lvlCache[totalXP] = Math.min(lvl, 10));
 }
 
 function xpForLevel(lvl) {

@@ -94,6 +94,7 @@ function castSpell(spellId) {
   renderSpells();
   updateSpellBadge();
   checkAchievements();
+  document.dispatchEvent(new CustomEvent('dungeon:spellcast'));
 }
 
 function renderSpells() {
@@ -143,22 +144,53 @@ function checkAchievements() {
   }
 }
 
+const ACH_CATS = [
+  { name: '⚔️ Combate',    ids: ['first_quest','ten_quests','fifty_quests','centurion'] },
+  { name: '📈 Progresión', ids: ['first_level','level_five','level_ten','thousand_xp'] },
+  { name: '🍅 Pomodoro',   ids: ['first_pom','ten_poms','maratonista'] },
+  { name: '🔥 Rachas',     ids: ['streak_3','streak_7','streak_30','unstoppable','semana_perfecta'] },
+  { name: '⭐ Épicas',     ids: ['first_main','five_main','boss_slayer'] },
+  { name: '✨ Magia',      ids: ['spell_cast','master_spell'] },
+  { name: '❤️ Salud',      ids: ['full_hp','healer'] },
+  { name: '🌟 Especiales', ids: ['collector'] },
+];
+
 function renderAchievements() {
   const el = document.getElementById('achievementsGrid');
   if (!el) return;
   let unlocked;
   try { unlocked = JSON.parse(hero ? hero.achievements || '[]' : '[]'); } catch { unlocked = []; }
-  el.innerHTML = ACHIEVEMENT_DEFS.map(a => {
+
+  const achById = {};
+  ACHIEVEMENT_DEFS.forEach(a => achById[a.id] = a);
+
+  const renderCard = a => {
+    if (!a) return '';
     const ok = unlocked.includes(a.id);
     return `<div class="achievement-card ${ok ? 'unlocked' : 'locked'}">
       <div class="achievement-icon">${a.icon}</div>
       <div class="achievement-info">
         <div class="achievement-name">${a.name}</div>
         <div class="achievement-desc">${ok ? a.desc : '???'}</div>
-        ${ok ? `<div style="font-size:10px;color:var(--green);margin-top:4px">✅ Desbloqueado</div>` : ''}
+        ${ok ? `<div style="font-size:10px;color:var(--green);margin-top:4px">✅</div>` : ''}
       </div>
     </div>`;
-  }).join('');
+  };
+
+  const knownIds = new Set(ACH_CATS.flatMap(c => c.ids));
+  const extraAchs = ACHIEVEMENT_DEFS.filter(a => !knownIds.has(a.id));
+
+  el.innerHTML = ACH_CATS.map(cat => {
+    const cards = cat.ids.map(id => renderCard(achById[id])).filter(Boolean);
+    if (!cards.length) return '';
+    return `<div class="ach-cat-section">
+      <div class="ach-cat-header">${cat.name}</div>
+      <div class="ach-cat-grid">${cards.join('')}</div>
+    </div>`;
+  }).join('') + (extraAchs.length ? `<div class="ach-cat-section">
+    <div class="ach-cat-header">🎖️ Otros</div>
+    <div class="ach-cat-grid">${extraAchs.map(renderCard).join('')}</div>
+  </div>` : '');
 }
 
 /* RANDOM EVENTS */

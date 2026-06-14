@@ -2,15 +2,41 @@
 function openEditQuest(id) {
   const q = quests.find(x => x.id === id);
   if (!q) return;
-  document.getElementById('editQuestId').value   = id;
-  document.getElementById('editQName').value     = q.name;
-  document.getElementById('editQType').value     = q.type;
-  document.getElementById('editQPriority').value = q.priority || 'normal';
-  document.getElementById('editQDeadline').value = q.deadline || '';
-  document.getElementById('editQNotes').value    = q.notes || '';
-  document.getElementById('editQTags').value     = localStorage.getItem('dungeon-tags-' + id) || '';
-  document.getElementById('editQEstTime').value  = localStorage.getItem('dungeon-esttime-' + id) || '';
+  document.getElementById('editQuestId').value     = id;
+  document.getElementById('editQName').value       = q.name;
+  document.getElementById('editQType').value       = q.type;
+  document.getElementById('editQPriority').value   = q.priority || 'normal';
+  document.getElementById('editQDeadline').value   = q.deadline || '';
+  document.getElementById('editQNotes').value      = q.notes || '';
+  document.getElementById('editQTags').value       = localStorage.getItem('dungeon-tags-' + id) || '';
+  document.getElementById('editQEstTime').value    = localStorage.getItem('dungeon-esttime-' + id) || '';
+  document.getElementById('editQRepeat').value     = localStorage.getItem('dungeon-repeat-' + id) || '';
+  document.getElementById('editQStartDate').value  = localStorage.getItem('dungeon-start-' + id) || '';
+  document.getElementById('editQDependsOn').value  = localStorage.getItem('dungeon-deps-' + id) || '';
   openModal('editQuestModal');
+}
+
+async function doImportCSV() {
+  const text = document.getElementById('importCsvText').value.trim();
+  if (!text || !hero) return;
+  const validTypes = ['main','side','daily','weekly'];
+  const validPrio  = ['urgente','normal','baja'];
+  let count = 0;
+  for (const line of text.split('\n').map(l=>l.trim()).filter(Boolean)) {
+    const [name, tipo, prioridad, deadline] = line.split(',').map(s => s.trim());
+    if (!name) continue;
+    await addQuest({
+      name,
+      type:     validTypes.includes(tipo) ? tipo : 'side',
+      priority: validPrio.includes(prioridad) ? prioridad : 'normal',
+      deadline: deadline || null,
+      hero_id:  hero.id
+    });
+    count++;
+  }
+  closeModal('importModal');
+  document.getElementById('importCsvText').value = '';
+  toast('📊', `${count} misiones importadas desde CSV.`);
 }
 
 function setActiveQuest(id) {
@@ -130,10 +156,11 @@ async function doImport() {
 function switchView(v) {
   document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('active', t.dataset.view === v));
   document.querySelectorAll('.view').forEach(el => el.classList.toggle('active', el.id === `view-${v}`));
-  if (v === 'stats') renderStats();
+  if (v === 'stats')        renderStats();
   if (v === 'achievements') renderAchievements();
-  if (v === 'history') renderHistory();
-  if (v === 'map') renderMapView();
+  if (v === 'history')      { historyPage = 1; renderHistory(); }
+  if (v === 'map')          renderMapView();
+  if (v === 'calendar')     renderCalendar();
 }
 
 function toggleCompact() {
@@ -153,6 +180,8 @@ document.addEventListener('keydown', e => {
   if (key === 'T') cycleTheme();
   if (key === 'C') toggleCompact();
   if (key === 'F') toggleFocusMode();
+  if (key === 'S') toggleSidebar();
+  if (key === 'B') { bulkMode ? exitBulkMode() : enterBulkMode(); }
   if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
   if (key === '1') switchView('quests');
   if (key === '2') switchView('kanban');

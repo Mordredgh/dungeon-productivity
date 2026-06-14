@@ -1920,4 +1920,105 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   background: rgba(34,211,238,.05);
   transform: translateY(-3px);
 }
+
+/* ══════════════════════════════════════════════════════════
+   NEW FEATURES — appended
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Sidebar collapse ─────────────────────────────────── */
+.right-panel { position:relative; transition:width .25s, min-width .25s, padding .25s; overflow:visible; }
+.sidebar-toggle-btn {
+  position:absolute; top:50%; left:-16px; transform:translateY(-50%);
+  width:16px; height:44px; background:var(--card); border:1px solid var(--border);
+  border-right:none; border-radius:6px 0 0 6px; cursor:pointer;
+  font-size:9px; color:var(--text2); display:flex; align-items:center;
+  justify-content:center; z-index:20; padding:0; line-height:1;
+}
+.sidebar-toggle-btn:hover { background:var(--bg3); color:var(--accent); }
+.sidebar-collapsed .right-panel { width:0 !important; min-width:0 !important; padding:0 !important; overflow:hidden !important; }
+#sidebarReopenBtn {
+  position:fixed; bottom:80px; right:10px; z-index:200;
+  background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:6px 12px; cursor:pointer; font-size:12px; color:var(--text1);
+  box-shadow:var(--shadow);
+}
+#sidebarReopenBtn:hover { border-color:var(--accent); }
+
+/* ── Contrato de Gremio ───────────────────────────────── */
+.contrato-banner {
+  position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(40px);
+  background:var(--card); border:1px solid var(--gold); border-radius:var(--radius);
+  padding:10px 20px; font-size:13px; color:var(--text1); text-align:center;
+  z-index:9000; box-shadow:0 4px 20px rgba(0,0,0,.5); pointer-events:none;
+  animation:contrato-in .3s ease forwards;
+}
+@keyframes contrato-in { to { transform:translateX(-50%) translateY(0); } }
+
+/* ── Bulk actions bar ─────────────────────────────────── */
+.bulk-bar {
+  display:flex; align-items:center; gap:8px; padding:8px 12px;
+  background:var(--card); border:1px solid var(--accent); border-radius:var(--radius-sm);
+  margin-bottom:8px; flex-wrap:wrap;
+}
+.bulk-bar span { font-size:12px; color:var(--text2); font-weight:600; }
+.bulk-check { width:16px; height:16px; accent-color:var(--accent); cursor:pointer; flex-shrink:0; }
+.quest-locked { opacity:.65; }
+
+/* ── Load more button ─────────────────────────────────── */
+.load-more-btn {
+  display:block; width:100%; padding:10px; margin-top:8px;
+  background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm);
+  color:var(--text2); font-size:12px; cursor:pointer; text-align:center;
+}
+.load-more-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+/* ── Calendar view ────────────────────────────────────── */
+.cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.cal-month-title { font-family:var(--font-head); font-size:16px; color:var(--accent); text-transform:capitalize; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:12px; }
+.cal-header-cell { text-align:center; font-size:10px; color:var(--text3); padding:4px 0; font-weight:600; }
+.cal-day {
+  background:var(--card); border:1px solid var(--border); border-radius:6px;
+  padding:4px 3px; min-height:44px; cursor:pointer; transition:background .15s;
+}
+.cal-day:hover { background:var(--bg3); }
+.cal-day.empty { background:transparent; border-color:transparent; cursor:default; }
+.cal-day.today { border-color:var(--accent); background:rgba(168,85,247,.08); }
+.cal-day.has-quests { background:rgba(168,85,247,.05); }
+.cal-day-num { font-size:11px; font-weight:600; color:var(--text2); margin-bottom:3px; }
+.cal-day.today .cal-day-num { color:var(--accent); }
+.cal-dots { display:flex; flex-wrap:wrap; gap:2px; }
+.cal-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); }
+.cal-dot.done { background:var(--green); }
+.cal-dot.urgent { background:var(--red); }
+.cal-detail { margin-top:4px; }
+.cal-detail-title { font-family:var(--font-head); font-size:13px; color:var(--accent); margin-bottom:8px; text-transform:capitalize; }
+.cal-detail-item {
+  padding:6px 10px; background:var(--card); border-radius:6px; font-size:12px;
+  margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;
+  border:1px solid var(--border);
+}
+.cal-detail-item.done { opacity:.55; text-decoration:line-through; }
+
+/* ── Hourly chart ─────────────────────────────────────── */
+.hourly-bars { display:flex; align-items:flex-end; gap:2px; height:68px; padding-bottom:18px; }
+.hourly-col { display:flex; flex-direction:column; align-items:center; flex:1; min-width:0; }
+.hourly-bar { width:100%; min-height:2px; border-radius:2px 2px 0 0; transition:height .3s; }
+.hourly-label { font-size:8px; color:var(--text3); margin-top:2px; white-space:nowrap; }
+
+/* ── Achievement categories ───────────────────────────── */
+.ach-cat-section { margin-bottom:20px; }
+.ach-cat-header {
+  font-family:var(--font-head); font-size:12px; color:var(--accent);
+  padding:5px 0 6px; border-bottom:1px solid var(--border); margin-bottom:10px; letter-spacing:.5px;
+}
+.ach-cat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:8px; }
+
+/* ── Quest extra badges ───────────────────────────────── */
+.repeat-badge, .scheduled-badge, .locked-badge {
+  font-size:9px; padding:1px 5px; border-radius:10px; display:inline-flex; align-items:center; gap:2px;
+}
+.repeat-badge    { background:rgba(56,189,248,.15); color:var(--blue); }
+.scheduled-badge { background:rgba(250,204,21,.15); color:var(--gold); }
+.locked-badge    { background:rgba(248,113,113,.15); color:var(--red); }
 </style>

@@ -236,18 +236,28 @@ function renderQuestItem(q) {
   // Tags & estimated time from localStorage
   const tags    = (localStorage.getItem('dungeon-tags-' + q.id) || '').trim();
   const estTime = localStorage.getItem('dungeon-esttime-' + q.id);
+  const repeat  = localStorage.getItem('dungeon-repeat-' + q.id);
+  const startDate = localStorage.getItem('dungeon-start-' + q.id);
+  const depName = localStorage.getItem('dungeon-deps-' + q.id);
+  const todayStr = new Date().toISOString().split('T')[0];
+  const isScheduled = startDate && startDate > todayStr;
+  const isLocked    = depName && !quests.find(x => x.name === depName && x.done);
+
   const tagsHtml = tags ? tags.split(' ').filter(t=>t.startsWith('#')).map(t =>
     `<span class="tag-badge" onclick="setTagFilter('${escHtml(t)}')">${escHtml(t)}</span>`).join('') : '';
-  const estHtml = estTime ? `<span class="esttime-badge">⏱ ${estTime}m</span>` : '';
+  const estHtml       = estTime   ? `<span class="esttime-badge">⏱ ${estTime}m</span>` : '';
+  const repeatHtml    = repeat    ? `<span class="repeat-badge">🔄 c/${repeat}d</span>` : '';
+  const scheduledHtml = isScheduled ? `<span class="scheduled-badge">📅 desde ${startDate}</span>` : '';
+  const lockHtml      = isLocked  ? `<span class="locked-badge">🔒 Req: ${escHtml(depName)}</span>` : '';
 
-  return `<div class="quest-item ${q.done ? 'done' : ''}" data-type="${q.type}" data-priority="${q.priority || 'normal'}" data-qid="${q.id}"
+  return `<div class="quest-item ${q.done ? 'done' : ''} ${isLocked ? 'quest-locked' : ''}" data-type="${q.type}" data-priority="${q.priority || 'normal'}" data-qid="${q.id}"
     draggable="true"
     ondragstart="draggedQuestId='${q.id}';event.dataTransfer.effectAllowed='move';this.classList.add('dragging')"
     ondragend="this.classList.remove('dragging')"
     ondragover="event.preventDefault();this.classList.add('drag-over')"
     ondragleave="this.classList.remove('drag-over')"
     ondrop="event.preventDefault();this.classList.remove('drag-over');reorderQuest('${q.id}')">
-    <span class="drag-handle">⠿</span>
+    ${bulkMode ? `<input type="checkbox" class="bulk-check" ${bulkSelected.has(q.id)?'checked':''} onclick="event.stopPropagation();toggleBulkSelect('${q.id}')">` : '<span class="drag-handle">⠿</span>'}
     <div class="quest-check" onclick="completeQuest('${q.id}', this)">${q.done ? '✓' : ''}</div>
     <div class="quest-body">
       <div class="quest-name">${escHtml(q.name)}${diff !== 'normal' ? ` <span style="font-size:10px">${diffEmoji[diff]}${diffLabel[diff]}</span>` : ''}</div>
@@ -258,6 +268,9 @@ function renderQuestItem(q) {
         <span class="xp-reward">+${xp} XP</span>
         ${subtaskProgressHtml}
         ${estHtml}
+        ${repeatHtml}
+        ${scheduledHtml}
+        ${lockHtml}
         ${tagsHtml}
         ${!q.done ? `<select style="font-size:10px;padding:1px 4px;height:18px" onchange="setQuestDifficulty('${q.id}',this.value)" onclick="event.stopPropagation()">
           <option value="easy" ${diff==='easy'?'selected':''}>Fácil</option>
@@ -329,6 +342,9 @@ function renderStats() {
   renderXPChart();
   renderTypeDist();
   renderHeatmap();
+  renderHourlyChart();
+  renderWeekComparison();
+  renderAvgTime();
   if (!hero) return;
 
   const setText = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
@@ -479,4 +495,57 @@ function updateDailyProgress() {
   wrap.style.display = 'flex';
   document.getElementById('dailyProgressLabel').textContent = `${done}/${total} búsquedas diarias`;
   document.getElementById('dailyProgressFill').style.width = Math.round((done / total) * 100) + '%';
+}
+
+/* ── Hourly distribution chart ─────────────────── */
+function renderHourlyChart() {
+  const el = document.getElementById('hourlyChart');
+  if (!el) return;
+  const counts = Array(24).fill(0);
+  quests.forEach(q => {
+    if (q.done && q.done_at) counts[new Date(q.done_at).getHours()]++;
+  });
+  const max  = Math.max(...counts, 1);
+  const peak = counts.indexOf(Math.max(...counts));
+  el.innerHTML = `<div class="hourly-bars">` +
+    counts.map((c, h) => `
+      <div class="hourly-col" title="${h}:00 — ${c} misiones">
+        <div class="hourly-bar" style="height:${Math.round((c/max)*50)}px;background:${h===peak&&c>0?'var(--accent)':'var(--bg4)'}"></div>
+        <div class="hourly-label">${h%6===0?h+'h':''}</div>
+      </div>`).join('') + `</div>` +
+    (counts[peak] ? `<div style="font-size:11px;color:var(--text2);text-align:center;margin-top:4px">Pico: ${peak}:00h (${counts[peak]})</div>` : '<div style="font-size:11px;color:var(--text3);text-align:center">Completa misiones para ver tu horario</div>');
+}
+
+/* ── Week comparison ────────────────────────────── */
+function renderWeekComparison() {
+  const el = document.getElementById('weekCompare');
+  if (!el) return;
+  const now      = Date.now();
+  const wkStart  = now - 7  * 86400000;
+  const pwkStart = now - 14 * 86400000;
+  const thisWeek = quests.filter(q => q.done && q.done_at && new Date(q.done_at).getTime() >= wkStart).length;
+  const lastWeek = quests.filter(q => q.done && q.done_at && new Date(q.done_at).getTime() >= pwkStart && new Date(q.done_at).getTime() < wkStart).length;
+  const diff = thisWeek - lastWeek;
+  const pct  = lastWeek > 0 ? Math.round(Math.abs(diff / lastWeek) * 100) : (thisWeek > 0 ? 100 : 0);
+  const arrow = diff > 0 ? '▲' : diff < 0 ? '▼' : '→';
+  const color = diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--red)' : 'var(--text2)';
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Esta semana</span><strong style="color:var(--accent)">${thisWeek}</strong></div>
+    <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Semana anterior</span><strong>${lastWeek}</strong></div>
+    <div style="text-align:center;font-size:16px;font-weight:700;color:${color};margin-top:4px">${arrow} ${pct}%${diff!==0?(diff>0?' más':' menos'):' igual'}</div>`;
+}
+
+/* ── Average time per quest ─────────────────────── */
+function renderAvgTime() {
+  const el = document.getElementById('avgTimeContent');
+  if (!el || !hero) return;
+  const done = hero.quests_done || 0;
+  const poms = hero.pomodoros_done || 0;
+  const avgP = done > 0 ? (poms / done).toFixed(1) : '—';
+  const avgM = done > 0 ? Math.round((poms * 25) / done) : 0;
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Pomodoros totales</span><strong style="color:var(--blue)">${poms}</strong></div>
+    <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Misiones completadas</span><strong style="color:var(--green)">${done}</strong></div>
+    <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Prom. poms / misión</span><strong style="color:var(--accent)">${avgP}</strong></div>
+    ${avgM ? `<div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Prom. minutos / misión</span><strong style="color:var(--gold)">${avgM}m</strong></div>` : ''}`;
 }

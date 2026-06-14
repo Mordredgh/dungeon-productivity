@@ -18,12 +18,13 @@ if (savedFilterBtn) {
 // History type filter
 document.querySelectorAll('.filter-tab[data-hfilter]').forEach(btn => btn.addEventListener('click', () => {
   historyTypeFilter = btn.dataset.hfilter;
+  historyPage = 1;
   document.querySelectorAll('.filter-tab[data-hfilter]').forEach(b => b.classList.toggle('active', b === btn));
   renderHistory();
 }));
 
 // History search
-document.getElementById('historySearch').addEventListener('input', () => renderHistory());
+document.getElementById('historySearch').addEventListener('input', () => { historyPage = 1; renderHistory(); });
 
 document.getElementById('addQuestBtn').addEventListener('click', () => {
   const name = document.getElementById('qName').value.trim();
@@ -97,13 +98,17 @@ document.getElementById('saveProfileBtn').addEventListener('click', async () => 
 });
 
 document.getElementById('saveQuestBtn').addEventListener('click', () => {
-  const id = document.getElementById('editQuestId').value;
+  const id      = document.getElementById('editQuestId').value;
   const tags    = document.getElementById('editQTags').value.trim();
   const estTime = document.getElementById('editQEstTime').value.trim();
-  if (tags)    localStorage.setItem('dungeon-tags-' + id, tags);
-  else         localStorage.removeItem('dungeon-tags-' + id);
-  if (estTime) localStorage.setItem('dungeon-esttime-' + id, estTime);
-  else         localStorage.removeItem('dungeon-esttime-' + id);
+  const repeat  = document.getElementById('editQRepeat').value.trim();
+  const startDate = document.getElementById('editQStartDate').value;
+  const deps    = document.getElementById('editQDependsOn').value.trim();
+  if (tags)      localStorage.setItem('dungeon-tags-'   + id, tags);      else localStorage.removeItem('dungeon-tags-'   + id);
+  if (estTime)   localStorage.setItem('dungeon-esttime-'+ id, estTime);   else localStorage.removeItem('dungeon-esttime-'+ id);
+  if (repeat)    localStorage.setItem('dungeon-repeat-' + id, repeat);    else localStorage.removeItem('dungeon-repeat-' + id);
+  if (startDate) localStorage.setItem('dungeon-start-'  + id, startDate); else localStorage.removeItem('dungeon-start-'  + id);
+  if (deps)      localStorage.setItem('dungeon-deps-'   + id, deps);      else localStorage.removeItem('dungeon-deps-'   + id);
   updateQuest(id, {
     name:     document.getElementById('editQName').value.trim(),
     type:     document.getElementById('editQType').value,
@@ -513,14 +518,19 @@ function renderHistory() {
     el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📜</div><h3>Sin historial</h3><p>Completa misiones para verlas aquí</p></div>`;
     return;
   }
+
+  const PAGE_SIZE = 30;
+  const visible  = done.slice(0, PAGE_SIZE * historyPage);
+  const remaining = done.length - visible.length;
+
   const grouped = {};
-  done.forEach(q => {
+  visible.forEach(q => {
     const d = new Date(q.done_at).toLocaleDateString('es-MX', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
     if (!grouped[d]) grouped[d] = [];
     grouped[d].push(q);
   });
   const typeIcons = { main:'⭐', side:'🗡️', daily:'🌅', weekly:'📜' };
-  el.innerHTML = Object.entries(grouped).map(([date, qs]) => `
+  let html = Object.entries(grouped).map(([date, qs]) => `
     <div class="history-group">
       <div class="history-date">${date} — ${qs.length} misión${qs.length>1?'es':''}</div>
       ${qs.map(q=>`<div class="history-item">
@@ -529,7 +539,14 @@ function renderHistory() {
         <span class="history-item-xp">+${XP_TABLE[q.type]||50} XP</span>
       </div>`).join('')}
     </div>`).join('');
+
+  if (remaining > 0) {
+    html += `<button class="load-more-btn" onclick="historyPage++;renderHistory()">📜 Cargar más (${remaining} restantes)</button>`;
+  }
+  el.innerHTML = html;
 }
+
+function resetHistoryPage() { historyPage = 1; }
 
 /* ============================================================
    NUEVOS HECHIZOS
@@ -911,3 +928,161 @@ document.addEventListener('keydown', e => {
     openCmdk();
   }
 });
+
+/* ============================================================
+   FEATURE 8: Spell event listener
+   ============================================================ */
+document.addEventListener('dungeon:spellcast', renderSpells);
+
+/* ============================================================
+   FEATURE 19: Skeleton loading
+   ============================================================ */
+function showSkeleton() {
+  const el = document.getElementById('questList');
+  if (!el) return;
+  el.innerHTML = Array.from({length:5}, () => `
+    <div class="skeleton-item">
+      <div class="skeleton-check"></div>
+      <div class="skeleton-body">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+    </div>`).join('');
+}
+
+/* ============================================================
+   FEATURE 22: Sidebar collapse
+   ============================================================ */
+function toggleSidebar() {
+  sidebarCollapsed = !sidebarCollapsed;
+  document.getElementById('app').classList.toggle('sidebar-collapsed', sidebarCollapsed);
+  const reopenBtn = document.getElementById('sidebarReopenBtn');
+  if (reopenBtn) reopenBtn.style.display = sidebarCollapsed ? 'block' : 'none';
+  const toggleBtn = document.getElementById('sidebarToggleBtn');
+  if (toggleBtn) toggleBtn.textContent = sidebarCollapsed ? '▶' : '◀';
+}
+document.getElementById('sidebarToggleBtn').addEventListener('click', toggleSidebar);
+document.getElementById('sidebarReopenBtn').addEventListener('click', toggleSidebar);
+
+/* ============================================================
+   FEATURE 51: Contrato de Gremio visual
+   ============================================================ */
+function showContratoEffect(name) {
+  const el = document.createElement('div');
+  el.className = 'contrato-banner';
+  el.innerHTML = `<div>📜 <em>Contrato firmado:</em><br><strong>${escHtml(name)}</strong></div>`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2500);
+}
+
+/* ============================================================
+   FEATURE 58: Bulk actions
+   ============================================================ */
+function enterBulkMode() {
+  bulkMode = true; bulkSelected.clear();
+  document.getElementById('bulkBar').style.display = 'flex';
+  document.getElementById('bulkToggleBtn').style.background = 'var(--accent)';
+  renderQuestList();
+}
+function exitBulkMode() {
+  bulkMode = false; bulkSelected.clear();
+  document.getElementById('bulkBar').style.display = 'none';
+  document.getElementById('bulkToggleBtn').style.background = '';
+  renderQuestList();
+}
+function toggleBulkSelect(id) {
+  if (bulkSelected.has(id)) bulkSelected.delete(id); else bulkSelected.add(id);
+  document.getElementById('bulkCount').textContent = `${bulkSelected.size} seleccionada${bulkSelected.size!==1?'s':''}`;
+  // update checkbox visual without full re-render
+  const el = document.querySelector(`.quest-item[data-qid="${id}"] .bulk-check`);
+  if (el) el.checked = bulkSelected.has(id);
+}
+async function bulkComplete() {
+  const ids = [...bulkSelected];
+  for (const id of ids) await completeQuest(id, null);
+  exitBulkMode();
+  toast('✅', `${ids.length} misiones completadas.`);
+}
+async function bulkDelete() {
+  const ids = [...bulkSelected];
+  if (!confirm(`¿Eliminar ${ids.length} misiones?`)) return;
+  for (const id of ids) await deleteQuest(id);
+  exitBulkMode();
+}
+document.getElementById('bulkToggleBtn').addEventListener('click', () => bulkMode ? exitBulkMode() : enterBulkMode());
+
+/* ============================================================
+   FEATURE 63: Calendar view
+   ============================================================ */
+function renderCalendar() {
+  const yr = calDate.getFullYear();
+  const mo = calDate.getMonth();
+  const title = calDate.toLocaleDateString('es', { month:'long', year:'numeric' });
+  document.getElementById('calMonthTitle').textContent = title;
+
+  const firstDay    = new Date(yr, mo, 1).getDay();
+  const daysInMonth = new Date(yr, mo + 1, 0).getDate();
+  const todayStr    = new Date().toISOString().split('T')[0];
+
+  const questsByDay = {};
+  quests.forEach(q => {
+    if (!q.deadline) return;
+    const d = new Date(q.deadline + 'T00:00:00');
+    if (d.getFullYear() === yr && d.getMonth() === mo) {
+      const day = d.getDate();
+      if (!questsByDay[day]) questsByDay[day] = [];
+      questsByDay[day].push(q);
+    }
+  });
+
+  const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  let html = dayNames.map(d => `<div class="cal-header-cell">${d}</div>`).join('');
+  for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const qs = questsByDay[day] || [];
+    const isToday = dateStr === todayStr;
+    html += `<div class="cal-day ${isToday?'today':''} ${qs.length?'has-quests':''}" onclick="showCalDay('${dateStr}')">
+      <div class="cal-day-num">${day}</div>
+      ${qs.length ? `<div class="cal-dots">${qs.slice(0,4).map(q=>`<div class="cal-dot ${q.done?'done':q.priority==='urgente'?'urgent':''}" title="${escHtml(q.name)}"></div>`).join('')}</div>` : ''}
+    </div>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+  document.getElementById('calDetail').innerHTML = '';
+}
+
+function showCalDay(dateStr) {
+  const qs = quests.filter(q => q.deadline === dateStr);
+  const label = new Date(dateStr + 'T00:00:00').toLocaleDateString('es', { weekday:'long', day:'numeric', month:'long' });
+  const el = document.getElementById('calDetail');
+  if (!qs.length) { el.innerHTML = `<div style="color:var(--text3);text-align:center;padding:14px">Sin misiones para ${label}</div>`; return; }
+  const typeIcons = { main:'⚔️', side:'🗡️', daily:'🌅', weekly:'📜' };
+  el.innerHTML = `<div class="cal-detail-title">${label}</div>` +
+    qs.map(q => `<div class="cal-detail-item ${q.done?'done':''}">
+      <span>${typeIcons[q.type]||'⚔️'} ${escHtml(q.name)}</span>
+      <span style="font-size:10px">${q.done?'✅':q.priority==='urgente'?'🔴':''}</span>
+    </div>`).join('');
+}
+
+function calPrev() { calDate.setMonth(calDate.getMonth()-1); renderCalendar(); }
+function calNext() { calDate.setMonth(calDate.getMonth()+1); renderCalendar(); }
+
+/* ============================================================
+   FEATURE 77: Semana perfecta achievement + FEATURE 92 CSV listener
+   ============================================================ */
+ACHIEVEMENT_DEFS.push(
+  { id: 'semana_perfecta', icon: '🌟', name: 'Semana Perfecta',
+    desc: 'Completa búsquedas diarias 7 días seguidos',
+    cond: () => {
+      const completedDays = new Set(quests.filter(q => q.done && q.done_at && q.type === 'daily').map(q => q.done_at.split('T')[0]));
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(Date.now() - i * 86400000).toISOString().split('T')[0];
+        if (!completedDays.has(d)) return false;
+      }
+      return true;
+    }
+  }
+);
+
+document.getElementById('doImportCsvBtn').addEventListener('click', doImportCSV);

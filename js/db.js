@@ -10,9 +10,8 @@ async function initDB() {
     if (cq) { quests = JSON.parse(cq); renderQuestList(); renderKanban(); }
   } catch {}
 
-  await loadHero();
-  await loadQuests();
-  await loadPomodoros();
+  if (!quests.length) showSkeleton();
+  await Promise.all([loadHero(), loadQuests(), loadPomodoros()]);
   renderAll();
   scheduleRandomEvent();
   checkDailyStreak();
