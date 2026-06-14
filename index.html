@@ -2769,7 +2769,12 @@ async function loadQuests() {
 }
 
 async function addQuest(q) {
-  const { data } = await db.from('dungeon_quests').insert(q).select().single();
+  const { data, error } = await db.from('dungeon_quests').insert(q).select().single();
+  if (error || !data) {
+    console.error('addQuest error:', error);
+    toast('❌', 'Error al crear misión. Intenta de nuevo.');
+    return;
+  }
   quests.unshift(data);
   renderQuestList();
   renderKanban();
@@ -3274,6 +3279,7 @@ function renderQuestList() {
   const weekEnd = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
 
   let filtered = quests.filter(q => {
+    if (!q) return false;
     if (activeFilter === 'urgente') { if (q.priority !== 'urgente') return false; }
     else if (activeFilter !== 'all' && q.type !== activeFilter) return false;
     if (search && !q.name.toLowerCase().includes(search)) return false;
