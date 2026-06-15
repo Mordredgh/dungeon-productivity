@@ -9,13 +9,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "logo-icon.png",
+      "src": "https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "logo-icon.png",
+      "src": "https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -27,7 +27,7 @@
       "short_name": "Agregar",
       "description": "Añadir una misión rápidamente",
       "url": "/?action=add",
-      "icons": [{ "src": "logo-icon.png", "sizes": "512x512" }]
+      "icons": [{ "src": "https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png", "sizes": "512x512" }]
     }
   ]
 }
