@@ -1156,7 +1156,7 @@ document.getElementById('helpBtn').addEventListener('click', () => openModal('sh
 /* ============================================================
    SONIDO AMBIENTAL (Web Audio API)
    ============================================================ */
-function _createWhiteNoise(ctx) {
+function _createWhiteNoise(ctx, dest) {
   const bufSize = ctx.sampleRate * 2;
   const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
   const d = buf.getChannelData(0);
@@ -1165,12 +1165,11 @@ function _createWhiteNoise(ctx) {
   src.buffer = buf; src.loop = true;
   const filter = ctx.createBiquadFilter();
   filter.type = 'bandpass'; filter.frequency.value = 400; filter.Q.value = 0.5;
-  const gain = ctx.createGain(); gain.gain.value = 0.25;
-  src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+  src.connect(filter); filter.connect(dest);
   src.start(); return src;
 }
 
-function _createFire(ctx) {
+function _createFire(ctx, dest) {
   const bufSize = ctx.sampleRate * 2;
   const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
   const d = buf.getChannelData(0);
@@ -1179,12 +1178,11 @@ function _createFire(ctx) {
   src.buffer = buf; src.loop = true;
   const filter = ctx.createBiquadFilter();
   filter.type = 'lowpass'; filter.frequency.value = 200; filter.Q.value = 1;
-  const gain = ctx.createGain(); gain.gain.value = 0.3;
-  src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+  src.connect(filter); filter.connect(dest);
   src.start(); return src;
 }
 
-function _createForest(ctx) {
+function _createForest(ctx, dest) {
   const bufSize = ctx.sampleRate * 2;
   const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
   const d = buf.getChannelData(0);
@@ -1193,17 +1191,22 @@ function _createForest(ctx) {
   src.buffer = buf; src.loop = true;
   const filter = ctx.createBiquadFilter();
   filter.type = 'bandpass'; filter.frequency.value = 800; filter.Q.value = 0.3;
-  const gain = ctx.createGain(); gain.gain.value = 0.15;
-  src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+  src.connect(filter); filter.connect(dest);
   src.start(); return src;
 }
 
 function startAmbient(type) {
   stopAmbient();
   const ctx = getAudioCtx();
-  if (type === 'rain')        ambientNode = _createWhiteNoise(ctx);
-  else if (type === 'fire')   ambientNode = _createFire(ctx);
-  else if (type === 'forest') ambientNode = _createForest(ctx);
+  ambientGainNode = ctx.createGain();
+  const vol = parseInt(localStorage.getItem('dungeon-ambient-vol') || '30') / 100;
+  ambientGainNode.gain.value = vol;
+  ambientGainNode.connect(ctx.destination);
+  const volSlider = document.getElementById('ambientVolume');
+  if (volSlider) { volSlider.value = vol * 100; volSlider.style.display = 'inline-block'; }
+  if (type === 'rain')        ambientNode = _createWhiteNoise(ctx, ambientGainNode);
+  else if (type === 'fire')   ambientNode = _createFire(ctx, ambientGainNode);
+  else if (type === 'forest') ambientNode = _createForest(ctx, ambientGainNode);
   ambientType = type;
   localStorage.setItem('dungeon-ambient', type);
   const icons = { rain: '🌧️', fire: '🔥', forest: '🌿' };
@@ -1215,10 +1218,13 @@ function startAmbient(type) {
 
 function stopAmbient() {
   if (ambientNode) { try { ambientNode.stop(); } catch {} ambientNode = null; }
+  if (ambientGainNode) { try { ambientGainNode.disconnect(); } catch {} ambientGainNode = null; }
   ambientType = null;
   localStorage.removeItem('dungeon-ambient');
   const btn = document.getElementById('ambientBtn');
   if (btn) { btn.style.color = ''; btn.title = 'Sonido ambiental'; btn.textContent = '🌧️'; }
+  const volSlider = document.getElementById('ambientVolume');
+  if (volSlider) volSlider.style.display = 'none';
 }
 
 function cycleAmbient() {
@@ -1230,6 +1236,11 @@ function cycleAmbient() {
 }
 
 document.getElementById('ambientBtn').addEventListener('click', cycleAmbient);
+
+document.getElementById('ambientVolume').addEventListener('input', function() {
+  if (ambientGainNode) ambientGainNode.gain.value = this.value / 100;
+  localStorage.setItem('dungeon-ambient-vol', this.value);
+});
 
 /* More menu toggle */
 document.getElementById('moreBtn').addEventListener('click', e => {
