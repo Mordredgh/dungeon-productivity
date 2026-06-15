@@ -45,50 +45,15 @@
 
 <div class="app" id="app">
 
-  <!-- HEADER -->
+  <!-- HEADER — ultra minimal -->
   <header class="header">
-    <div style="display:flex;flex-direction:column;gap:1px">
+    <div class="header-brand">
       <div class="header-logo">⚔️ Dungeon</div>
       <div class="guild-name" id="guildNameDisplay"></div>
     </div>
     <div class="conn-dot" id="connDot" title="Conectando..."></div>
-
-    <div class="header-hero">
-      <button class="hero-avatar-btn" id="heroAvatarBtn" title="Editar perfil">🧙<span class="avatar-level-badge" id="avatarLevelBadge">1</span></button>
-      <div class="hero-info">
-        <div class="hero-name" id="heroName">Héroe</div>
-        <div class="hero-title" id="heroTitle">Nivel 1 · Aprendiz</div>
-      </div>
-    </div>
-
-    <div class="xp-bar-wrap">
-      <div class="xp-bar-label">
-        <span>XP</span>
-        <span id="xpLabel">0 / 100</span>
-      </div>
-      <div class="xp-bar"><div class="xp-bar-fill" id="xpBarFill" style="width:0%"></div></div>
-    </div>
-
-    <div class="hp-bar-wrap">
-      <div class="hp-bar-label">
-        <span>❤️ HP</span>
-        <span id="hpLabel">100 / 100</span>
-      </div>
-      <div class="hp-bar"><div class="hp-bar-fill" id="hpBarFill" style="width:100%"></div></div>
-    </div>
-
-    <div class="header-stats">
-      <div class="stat-chip" title="Nivel actual">Nivel <span id="statLevel">1</span></div>
-      <div class="stat-chip" title="Racha de días consecutivos">Racha <span id="statStreak">0</span>🔥</div>
-      <div class="stat-chip" title="XP total acumulado">XP <span id="statTotalXP">0</span></div>
-      <div class="stat-chip" title="Mejor racha histórica">🏆 <span id="statBestStreak">0</span></div>
-      <div class="stat-chip gold-display" id="goldDisplay" title="Monedas de oro — gástalas en la Tienda" onclick="openShop()" style="cursor:pointer">🪙 0</div>
-      <div class="stat-chip weather-chip" id="weatherDisplay" title="Clima del reino">☀️</div>
-      <div class="stat-chip" id="focusTodayChip" title="Focus acumulado hoy (pomodoros × duración)">⏱ <span id="focusTodayVal">0h 0m</span></div>
-    </div>
-
+    <div style="flex:1"></div>
     <div id="spellActiveBadge" style="display:none" class="spell-active-badge">⚡ x2 XP</div>
-
     <div class="header-actions">
       <button class="icon-btn" id="ambientBtn" title="Sonido ambiental">🌧️</button>
       <input type="range" id="ambientVolume" class="vol-slider" min="0" max="100" value="30" style="display:none" title="Volumen ambiental">
@@ -101,7 +66,6 @@
       <button class="icon-btn" id="shopBtn"   title="Tienda del Gremio" onclick="openShop()">🏪</button>
       <button class="icon-btn" id="diaryBtn"  title="Diario del Héroe"  onclick="openDiary()">📖</button>
       <button class="icon-btn" id="oracleBtn" title="Oráculo Arcano (IA)">🔮</button>
-      <!-- Más opciones -->
       <div class="more-menu-wrap" id="moreMenuWrap">
         <button class="icon-btn" id="moreBtn" title="Más opciones">⋯</button>
         <div class="more-menu" id="moreMenu">
@@ -119,16 +83,69 @@
   <!-- MAIN -->
   <div class="main">
 
-    <!-- SIDEBAR NAV -->
+    <!-- SIDEBAR — hero profile + nav -->
     <nav class="sidebar" id="sidebarNav">
-      <button class="sidebar-item active" data-view="quests"       onclick="switchView('quests')"       title="Misiones">⚔️</button>
-      <button class="sidebar-item"        data-view="kanban"       onclick="switchView('kanban')"       title="Kanban">📋</button>
-      <button class="sidebar-item"        data-view="stats"        onclick="switchView('stats')"        title="Sala del Trono">📊</button>
-      <button class="sidebar-item"        data-view="achievements" onclick="switchView('achievements')" title="Logros">🏆</button>
-      <div class="sidebar-divider"></div>
-      <button class="sidebar-item"        data-view="history"      onclick="switchView('history')"      title="Historial">📜</button>
-      <button class="sidebar-item"        data-view="map"          onclick="switchView('map')"          title="Mapa del Reino">🗺️</button>
-      <button class="sidebar-item"        data-view="calendar"     onclick="switchView('calendar')"     title="Calendario">📅</button>
+
+      <!-- PERFIL DEL HÉROE -->
+      <div class="sb-profile">
+        <button class="hero-avatar-btn" id="heroAvatarBtn" title="Editar perfil">🧙<span class="avatar-level-badge" id="avatarLevelBadge">1</span></button>
+        <div class="hero-info">
+          <div class="hero-name" id="heroName">Héroe</div>
+          <div class="hero-title" id="heroTitle">Nivel 1 · Aprendiz</div>
+        </div>
+      </div>
+
+      <!-- BARRAS XP / HP -->
+      <div class="sb-bars">
+        <div class="sb-bar-row">
+          <span class="sb-bar-lbl">XP</span>
+          <div class="xp-bar sb-bar"><div class="xp-bar-fill" id="xpBarFill" style="width:0%"></div></div>
+          <span class="sb-bar-val" id="xpLabel">0/100</span>
+        </div>
+        <div class="sb-bar-row">
+          <span class="sb-bar-lbl">HP</span>
+          <div class="hp-bar sb-bar"><div class="hp-bar-fill" id="hpBarFill" style="width:100%"></div></div>
+          <span class="sb-bar-val" id="hpLabel">100/100</span>
+        </div>
+      </div>
+
+      <!-- MINI STATS -->
+      <div class="sb-stats">
+        <div class="sb-stat-card">
+          <div class="sb-stat-val"><span id="statLevel">1</span></div>
+          <div class="sb-stat-lbl">Nivel</div>
+        </div>
+        <div class="sb-stat-card">
+          <div class="sb-stat-val"><span id="statStreak">0</span>🔥</div>
+          <div class="sb-stat-lbl">Racha</div>
+        </div>
+        <div class="sb-stat-card" id="goldDisplay" onclick="openShop()" style="cursor:pointer" title="Tienda del Gremio">
+          <div class="sb-stat-val">🪙 0</div>
+          <div class="sb-stat-lbl">Oro</div>
+        </div>
+      </div>
+
+      <!-- XP Total y Best Streak — ocultos, sólo para JS -->
+      <span id="statTotalXP"   style="display:none">0</span>
+      <span id="statBestStreak" style="display:none">0</span>
+      <div  id="weatherDisplay" style="display:none">☀️</div>
+      <div  id="focusTodayChip" style="display:none">⏱ <span id="focusTodayVal">0h 0m</span></div>
+
+      <div class="sb-divider"></div>
+
+      <!-- NAVEGACIÓN -->
+      <div class="sb-nav">
+        <div class="sb-nav-label">Aventura</div>
+        <button class="sidebar-item active" data-view="quests"       onclick="switchView('quests')">       <span class="si-icon">⚔️</span><span class="si-label">Misiones</span></button>
+        <button class="sidebar-item"        data-view="kanban"       onclick="switchView('kanban')">       <span class="si-icon">📋</span><span class="si-label">Kanban</span></button>
+        <button class="sidebar-item"        data-view="stats"        onclick="switchView('stats')">        <span class="si-icon">📊</span><span class="si-label">Sala del Trono</span></button>
+        <button class="sidebar-item"        data-view="achievements" onclick="switchView('achievements')"> <span class="si-icon">🏆</span><span class="si-label">Logros</span></button>
+        <div class="sb-nav-label">Archivo</div>
+        <button class="sidebar-item"        data-view="history"      onclick="switchView('history')">      <span class="si-icon">📜</span><span class="si-label">Historial</span></button>
+        <button class="sidebar-item"        data-view="map"          onclick="switchView('map')">          <span class="si-icon">🗺️</span><span class="si-label">Mapa</span></button>
+        <button class="sidebar-item"        data-view="calendar"     onclick="switchView('calendar')">     <span class="si-icon">📅</span><span class="si-label">Calendario</span></button>
+      </div>
+
     </nav>
 
     <!-- CONTENT -->
