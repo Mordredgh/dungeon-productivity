@@ -303,7 +303,7 @@ function renderQuestItem(q) {
   </div>`;
 }
 
-function toggleSubtask(questId, lineIndex, isDone) {
+async function toggleSubtask(questId, lineIndex, isDone) {
   const q = quests.find(x => x.id === questId);
   if (!q || !q.notes) return;
   const lines = q.notes.split('\n');
@@ -314,7 +314,15 @@ function toggleSubtask(questId, lineIndex, isDone) {
     ? lines[targetLineIdx].replace('- [x]', '- [ ]')
     : lines[targetLineIdx].replace('- [ ]', '- [x]');
   const newNotes = lines.join('\n');
-  updateQuest(questId, { notes: newNotes });
+  // Silent save — no toast, no modal close
+  await db.from('dungeon_quests').update({ notes: newNotes }).eq('id', q.id);
+  q.notes = newNotes;
+  renderQuestList();
+  // Auto-complete when last subtask is checked
+  if (!isDone && !q.done) {
+    const remaining = newNotes.split('\n').filter(l => l.startsWith('- [ ]')).length;
+    if (remaining === 0) setTimeout(() => completeQuest(questId, null), 350);
+  }
 }
 
 let questOrder = [];

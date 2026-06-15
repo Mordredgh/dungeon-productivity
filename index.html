@@ -531,6 +531,15 @@
         <label class="form-label">Notas / Pergaminos</label>
         <textarea class="form-input" id="editQNotes" rows="2"></textarea>
       </div>
+      <div class="form-group">
+        <label class="form-label">⚔️ Generar subtareas en lote</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="form-input" id="subtaskPrefix" type="text" placeholder="Ej: Dibujo" style="flex:2">
+          <input class="form-input" id="subtaskCount" type="number" min="1" max="100" placeholder="20" style="flex:1;min-width:60px">
+          <button class="btn btn-ghost" onclick="generateSubtasks()" type="button" style="white-space:nowrap;flex-shrink:0">+ Generar</button>
+        </div>
+        <div style="font-size:10px;color:var(--text2);margin-top:4px">Genera "Dibujo 1 … Dibujo 20" en las notas. Guarda la misión para activarlas.</div>
+      </div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Tags (#trabajo #personal)</label>

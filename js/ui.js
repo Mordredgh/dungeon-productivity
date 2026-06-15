@@ -1,4 +1,14 @@
 ﻿/* UI */
+function generateSubtasks() {
+  const prefix = (document.getElementById('subtaskPrefix').value.trim()) || 'Ítem';
+  const count  = Math.min(100, Math.max(1, parseInt(document.getElementById('subtaskCount').value) || 0));
+  if (!count) { toast('⚠️', 'Escribe un número de subtareas'); return; }
+  const notesEl = document.getElementById('editQNotes');
+  const existing = notesEl.value.trimEnd();
+  const items = Array.from({ length: count }, (_, i) => `- [ ] ${prefix} ${i + 1}`).join('\n');
+  notesEl.value = existing ? existing + '\n' + items : items;
+}
+
 function openEditQuest(id) {
   const q = quests.find(x => x.id === id);
   if (!q) return;
