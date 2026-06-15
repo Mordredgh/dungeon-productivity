@@ -474,12 +474,6 @@
         </div>
       </div>
 
-      <!-- SPELLS / TAVERNA -->
-      <div class="panel-section">
-        <div class="panel-title">✨ Hechizos</div>
-        <div class="spells-list" id="spellsList"></div>
-      </div>
-
       <!-- FAMILIAR -->
       <div class="panel-section">
         <div class="panel-title">🐾 Compañero</div>
@@ -487,10 +481,15 @@
         <button class="class-skill-btn" id="classSkillBtn" onclick="useClassSkill()" style="display:none;margin-top:8px;width:100%">⚡ Habilidad</button>
       </div>
 
-      <!-- PROPHECY -->
-      <div class="panel-section prophecy-section" id="prophecySection">
-        <div class="panel-title">🔭 Profecía de la Semana</div>
-        <p class="prophecy-text" id="prophecyText" style="font-size:12px;color:var(--text2);font-style:italic;line-height:1.5;margin:0"></p>
+      <!-- SPELLS / TAVERNA -->
+      <div class="panel-section">
+        <div class="panel-title">✨ Hechizos</div>
+        <div class="spells-list" id="spellsList"></div>
+      </div>
+
+      <!-- PROPHECY (hidden, kept for JS compatibility) -->
+      <div style="display:none">
+        <p id="prophecyText"></p>
       </div>
 
 

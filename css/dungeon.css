@@ -1248,7 +1248,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .spell-orb:active:not(.cd) { transform: scale(.95); }
 .spell-orb.cd { opacity: .5; cursor: not-allowed; }
 
-.spell-orb-icon  { font-size: 28px; line-height: 1; }
+.spell-orb-icon  { font-size: 20px; line-height: 1; }
 .spell-orb-name  { font-size: 11px; font-weight: 600; color: var(--text); font-family: var(--font-head); text-align: center; letter-spacing: .02em; }
 .spell-orb-ready { font-size: 10px; color: color-mix(in srgb, var(--spell-clr) 80%, white); font-weight: 500; }
 .spell-orb-cd    { font-size: 10px; color: var(--text3); }
