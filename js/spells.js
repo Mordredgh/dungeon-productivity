@@ -202,9 +202,11 @@ function scheduleRandomEvent() {
 function triggerRandomEvent() {
   if (Math.random() > 0.4) { scheduleRandomEvent(); return; }
   const ev = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
-  showEventBanner(ev);
-  if (ev.bonus > 0) addXP(ev.bonus, 'side', null);
-  if (ev.doubleXP) { xpMultiplier = 2; xpMultiplierEnd = Date.now() + 30 * 60 * 1000; updateSpellBadge(); }
+  if (typeof showEventModal === 'function') {
+    showEventModal(ev);
+  } else {
+    showEventBanner(ev);
+  }
   scheduleRandomEvent();
 }
 
@@ -214,7 +216,7 @@ function showEventBanner(ev) {
   const div = document.createElement('div');
   div.id = 'eventBanner';
   div.className = 'event-banner';
-  div.innerHTML = `<div class="event-banner-title">${ev.title}</div><div class="event-banner-text">${ev.text}</div>`;
+  div.innerHTML = `<div class="event-banner-title">${ev.title}</div><div class="event-banner-text">${ev.desc || ev.text || ''}</div>`;
   document.body.appendChild(div);
   setTimeout(() => div.remove(), 8000);
 }

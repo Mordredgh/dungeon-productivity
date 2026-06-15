@@ -86,29 +86,6 @@ function damageBoss(dmg) {
   updateBossBanner();
 }
 
-function updateBossBanner() {
-  const banner = document.getElementById('bossBanner');
-  if (!banner) return;
-  const state = getBossState();
-  banner.style.display = 'flex';
-  if (state.defeated) {
-    banner.innerHTML = `<div class="boss-defeated">🏆 ¡${escHtml(state.name)} DERROTADO! Semana conquistada.</div>`;
-    return;
-  }
-  const pct = Math.round((state.hp / state.maxHp) * 100);
-  const hpColor = pct > 60 ? 'var(--red)' : pct > 30 ? 'var(--gold)' : 'var(--green)';
-  banner.innerHTML = `
-    <div class="boss-icon">👹</div>
-    <div class="boss-info">
-      <div class="boss-label">⚔️ Jefe Semanal — ¡Atácalo completando misiones!</div>
-      <div class="boss-name">${escHtml(state.name)}</div>
-      <div class="boss-hp-wrap">
-        <div class="boss-hp-bar"><div class="boss-hp-fill" style="width:${pct}%;background:${hpColor}"></div></div>
-        <span class="boss-hp-text">${state.hp}/${state.maxHp} HP</span>
-      </div>
-    </div>`;
-}
-
 /* ── RANDOM EVENTS ────────────────────────────────────────── */
 function checkRandomEvent() {
   const today = new Date().toISOString().split('T')[0];
