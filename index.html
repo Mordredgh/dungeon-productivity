@@ -45,39 +45,14 @@
 
 <div class="app" id="app">
 
-  <!-- HEADER — ultra minimal -->
+  <!-- HEADER — solo branding -->
   <header class="header">
     <div class="header-brand">
       <div class="header-logo">⚔️ Dungeon</div>
       <div class="guild-name" id="guildNameDisplay"></div>
     </div>
     <div class="conn-dot" id="connDot" title="Conectando..."></div>
-    <div style="flex:1"></div>
     <div id="spellActiveBadge" style="display:none" class="spell-active-badge">⚡ x2 XP</div>
-    <div class="header-actions">
-      <button class="icon-btn" id="ambientBtn" title="Sonido ambiental">🌧️</button>
-      <input type="range" id="ambientVolume" class="vol-slider" min="0" max="100" value="30" style="display:none" title="Volumen ambiental">
-      <button class="icon-btn" id="musicBtn" title="Música lofi">🎵</button>
-      <input type="range" id="musicVolume" class="vol-slider" min="0" max="100" value="25" style="display:none" title="Volumen música">
-      <button class="icon-btn" id="d20Btn" title="Tirar D20">🎲</button>
-      <button class="icon-btn" id="focusBtn" title="Modo Focus (F)">🎯</button>
-      <button class="icon-btn" id="themeBtn" title="Cambiar tema (T)">🎨</button>
-      <button class="icon-btn" id="helpBtn" title="Atajos de teclado (?)">⌨️</button>
-      <button class="icon-btn" id="shopBtn"   title="Tienda del Gremio" onclick="openShop()">🏪</button>
-      <button class="icon-btn" id="diaryBtn"  title="Diario del Héroe"  onclick="openDiary()">📖</button>
-      <button class="icon-btn" id="oracleBtn" title="Oráculo Arcano (IA)">🔮</button>
-      <div class="more-menu-wrap" id="moreMenuWrap">
-        <button class="icon-btn" id="moreBtn" title="Más opciones">⋯</button>
-        <div class="more-menu" id="moreMenu">
-          <button class="more-menu-item" id="bulkToggleBtn">☑️ Selección múltiple</button>
-          <button class="more-menu-item" id="compactToggle">⊟ Modo compacto</button>
-          <button class="more-menu-item" id="notifBtn">🔔 Notificaciones</button>
-          <button class="more-menu-item" id="importBtn">📥 Importar</button>
-          <button class="more-menu-item" id="exportBtn">📤 Exportar JSON</button>
-          <button class="more-menu-item" id="csvBtn">📊 Exportar CSV</button>
-        </div>
-      </div>
-    </div>
   </header>
 
   <!-- MAIN -->
@@ -125,8 +100,8 @@
         </div>
       </div>
 
-      <!-- XP Total y Best Streak — ocultos, sólo para JS -->
-      <span id="statTotalXP"   style="display:none">0</span>
+      <!-- ocultos, solo para JS -->
+      <span id="statTotalXP"    style="display:none">0</span>
       <span id="statBestStreak" style="display:none">0</span>
       <div  id="weatherDisplay" style="display:none">☀️</div>
       <div  id="focusTodayChip" style="display:none">⏱ <span id="focusTodayVal">0h 0m</span></div>
@@ -144,6 +119,36 @@
         <button class="sidebar-item"        data-view="history"      onclick="switchView('history')">      <span class="si-icon">📜</span><span class="si-label">Historial</span></button>
         <button class="sidebar-item"        data-view="map"          onclick="switchView('map')">          <span class="si-icon">🗺️</span><span class="si-label">Mapa</span></button>
         <button class="sidebar-item"        data-view="calendar"     onclick="switchView('calendar')">     <span class="si-icon">📅</span><span class="si-label">Calendario</span></button>
+      </div>
+
+      <!-- ACCIONES — fondo del sidebar -->
+      <div class="sb-actions">
+        <div class="sb-actions-label">Herramientas</div>
+        <div class="sb-actions-grid">
+          <button class="sb-action-btn" id="shopBtn"   onclick="openShop()"  title="Tienda">🏪</button>
+          <button class="sb-action-btn" id="diaryBtn"  onclick="openDiary()" title="Diario">📖</button>
+          <button class="sb-action-btn" id="oracleBtn" title="Oráculo IA">🔮</button>
+          <button class="sb-action-btn" id="d20Btn"    title="Tirar D20">🎲</button>
+          <button class="sb-action-btn" id="ambientBtn" title="Sonido ambiental">🌧️</button>
+          <button class="sb-action-btn" id="musicBtn"  title="Música lofi">🎵</button>
+          <button class="sb-action-btn" id="focusBtn"  title="Modo Focus (F)">🎯</button>
+          <button class="sb-action-btn" id="themeBtn"  title="Cambiar tema (T)">🎨</button>
+          <button class="sb-action-btn" id="helpBtn"   title="Atajos (?)">⌨️</button>
+          <div class="more-menu-wrap sb-more" id="moreMenuWrap">
+            <button class="sb-action-btn" id="moreBtn" title="Más opciones">⋯</button>
+            <div class="more-menu more-menu-up" id="moreMenu">
+              <button class="more-menu-item" id="bulkToggleBtn">☑️ Selección múltiple</button>
+              <button class="more-menu-item" id="compactToggle">⊟ Modo compacto</button>
+              <button class="more-menu-item" id="notifBtn">🔔 Notificaciones</button>
+              <button class="more-menu-item" id="importBtn">📥 Importar</button>
+              <button class="more-menu-item" id="exportBtn">📤 Exportar JSON</button>
+              <button class="more-menu-item" id="csvBtn">📊 Exportar CSV</button>
+            </div>
+          </div>
+        </div>
+        <!-- sliders ocultos — JS los activa -->
+        <input type="range" id="ambientVolume" class="vol-slider" min="0" max="100" value="30" style="display:none">
+        <input type="range" id="musicVolume"   class="vol-slider" min="0" max="100" value="25" style="display:none">
       </div>
 
     </nav>
