@@ -497,15 +497,17 @@ function updateBossBanner() {
       banner.innerHTML = `<div class="boss-defeated">🏆 ¡${escHtml(state.name)} DERROTADO! Semana conquistada.</div>`;
     } else {
       const pct      = Math.round((state.hp / state.maxHp) * 100);
-      const hpColor  = pct > 60 ? 'var(--red)' : pct > 30 ? 'var(--gold)' : 'var(--green)';
+      const hpColor  = pct > 60 ? '#fb7185' : pct > 30 ? '#facc15' : '#4ade80';
       banner.innerHTML = `
         <div class="boss-icon">👹</div>
-        <div class="boss-info">
+        <div class="boss-info" style="flex:1;min-width:0">
           <div class="boss-label">⚔️ Jefe Semanal — ¡Atácalo completando misiones!</div>
           <div class="boss-name">${escHtml(state.name)}</div>
-          <div class="boss-hp-wrap">
-            <div class="boss-hp-bar"><div class="boss-hp-fill" style="width:${pct}%;background:${hpColor}"></div></div>
-            <span class="boss-hp-text">${state.hp}/${state.maxHp} HP</span>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+            <div style="flex:1;height:14px;background:rgba(255,255,255,.15);border-radius:7px;overflow:hidden;border:1px solid rgba(255,255,255,.2)">
+              <div style="width:${pct}%;height:100%;background:${hpColor};border-radius:7px"></div>
+            </div>
+            <span style="font-size:12px;font-weight:700;color:#fff;white-space:nowrap">❤️ ${state.hp}/${state.maxHp}</span>
           </div>
         </div>`;
     }
