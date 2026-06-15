@@ -106,7 +106,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: 16px;
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
@@ -293,7 +293,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   border: 1px solid var(--glass-border);
   border-radius: 20px;
   padding: 4px 12px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text2);
   white-space: nowrap;
   transition: var(--transition);
@@ -357,7 +357,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   border: 1px solid transparent;
   border-bottom: none;
   color: var(--text2);
-  font-size: 14px;
+  font-size: 15px;
   cursor: pointer;
   transition: var(--transition);
   position: relative;
@@ -458,7 +458,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .filter-tab {
   padding: 5px 12px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text2);
   cursor: pointer;
   transition: var(--transition);
@@ -470,7 +470,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   box-shadow: 0 2px 12px rgba(168,85,247,.4);
 }
 
-.sort-select { font-size: 13px; padding: 6px 10px; }
+.sort-select { font-size: 14px; padding: 6px 10px; }
 
 .quest-list { display: flex; flex-direction: column; gap: 8px; }
 
@@ -539,7 +539,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .quest-body { flex: 1; min-width: 0; }
 
-.quest-name { font-size: 15px; color: var(--text); line-height: 1.4; }
+.quest-name { font-size: 16px; color: var(--text); line-height: 1.4; }
 
 .quest-meta {
   display: flex;
@@ -550,7 +550,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 
 .badge {
-  font-size: 11px;
+  font-size: 12px;
   padding: 2px 8px;
   border-radius: 20px;
   font-weight: 500;
@@ -565,12 +565,12 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .badge-priority-urgente { background: rgba(248,113,113,.12); color: var(--red); border: 1px solid rgba(248,113,133,.3); }
 .badge-priority-baja    { background: rgba(96,165,250,.07);  color: var(--text3); border: 1px solid var(--border); }
 
-.deadline-badge { font-size: 11px; color: var(--text3); }
+.deadline-badge { font-size: 12px; color: var(--text3); }
 .deadline-badge.overdue { color: var(--red); font-weight: 600; }
 
-.xp-reward { font-size: 11px; color: var(--gold); font-weight: 500; }
+.xp-reward { font-size: 12px; color: var(--gold); font-weight: 500; }
 
-.quest-notes { font-size: 12px; color: var(--text2); margin-top: 5px; font-style: italic; line-height: 1.5; }
+.quest-notes { font-size: 13px; color: var(--text2); margin-top: 5px; font-style: italic; line-height: 1.5; }
 
 .quest-actions { display: flex; gap: 4px; }
 
@@ -689,7 +689,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .stats-card-title {
   font-family: var(--font-head);
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text3);
   text-transform: uppercase;
   letter-spacing: 1.5px;
@@ -808,9 +808,9 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .history-item-icon { font-size: 15px; }
 
-.history-item-name { flex: 1; font-size: 14px; color: var(--text2); text-decoration: line-through; }
+.history-item-name { flex: 1; font-size: 15px; color: var(--text2); text-decoration: line-through; }
 
-.history-item-xp { font-size: 12px; color: var(--gold); font-weight: 500; }
+.history-item-xp { font-size: 13px; color: var(--gold); font-weight: 500; }
 
 /* ============================================================
    RIGHT PANEL — Glass sidebar
@@ -832,7 +832,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .panel-title {
   font-family: var(--font-head);
-  font-size: 12px;
+  font-size: 13px;
   background: linear-gradient(90deg, var(--accent), var(--accent2));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -882,7 +882,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   line-height: 1;
 }
 
-.timer-phase { font-size: 12px; color: var(--text3); margin-top: 3px; letter-spacing: .5px; }
+.timer-phase { font-size: 13px; color: var(--text3); margin-top: 3px; letter-spacing: .5px; }
 
 .timer-controls { display: flex; gap: 10px; justify-content: center; margin-bottom: 14px; }
 
@@ -920,7 +920,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .dur-btn {
   padding: 4px 10px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 13px;
   background: var(--glass);
   border: 1px solid var(--glass-border);
   color: var(--text2);
@@ -954,7 +954,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 
 .pom-task-label {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text2);
   text-align: center;
   background: var(--glass);
@@ -989,11 +989,11 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .spell-info { flex: 1; }
 
-.spell-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.spell-name { font-size: 14px; font-weight: 600; color: var(--text); }
 
-.spell-desc { font-size: 11px; color: var(--text2); }
+.spell-desc { font-size: 12px; color: var(--text2); }
 
-.spell-cd { font-size: 11px; color: var(--red); }
+.spell-cd { font-size: 12px; color: var(--red); }
 
 .spell-cast-btn {
   padding: 5px 10px;
@@ -1093,7 +1093,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .form-group { display: flex; flex-direction: column; gap: 5px; }
 
-.form-label { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: .7px; font-weight: 500; }
+.form-label { font-size: 13px; color: var(--text3); text-transform: uppercase; letter-spacing: .7px; font-weight: 500; }
 
 .form-input { width: 100%; }
 
@@ -1852,7 +1852,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text2);
   font-style: italic;
   line-height: 1.5;
