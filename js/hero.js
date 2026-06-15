@@ -95,7 +95,7 @@ async function checkDailyStreak() {
 
   let newHp = hero.hp || 100;
   if (lastDay && lastDay !== yesterday) {
-    newHp = Math.max(10, newHp - 20);
+    newHp = Math.max(10, newHp - 10);
     toast('💔', 'Perdiste HP por días sin actividad.');
   }
 

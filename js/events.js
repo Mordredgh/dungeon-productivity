@@ -261,7 +261,7 @@ async function checkOverdueHP() {
   const lastCheck = localStorage.getItem('dungeon-overdue-check');
   if (lastCheck === today) return;
   localStorage.setItem('dungeon-overdue-check', today);
-  const penalty = Math.min(overdue.length * 5, 30);
+  const penalty = Math.min(overdue.length * 3, 15);
   const newHp = Math.max(10, (hero.hp || 100) - penalty);
   if (newHp < (hero.hp || 100)) {
     await saveHero({ hp: newHp });

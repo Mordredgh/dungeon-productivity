@@ -31,9 +31,27 @@ async function completeQuest(id, el) {
   const xpAmt = calcQuestXP(q);
   await addXP(xpAmt, q.type, el);
 
-  if (q.type === 'daily' && hero.hero_class === 'clerigo') {
-    const newHp = Math.min(hero.hp + 10, hero.hp_max);
+  // HP recovery on quest completion (all classes)
+  if (q.type === 'main') {
+    const newHp = Math.min((hero.hp || 100) + 25, hero.hp_max || 100);
+    hero.hp = newHp;
     await saveHero({ hp: newHp });
+    setTimeout(() => toast('💚', `¡Misión Principal! +25 HP`), 600);
+  } else if (q.type === 'daily') {
+    const todayDailies = quests.filter(x => x.type === 'daily' && x.id !== id);
+    const allDone = todayDailies.length > 0 && todayDailies.every(x => x.done);
+    if (allDone) {
+      const newHp = hero.hp_max || 100;
+      hero.hp = newHp;
+      await saveHero({ hp: newHp });
+      setTimeout(() => toast('✨', '¡Todas las dailies completadas! HP al máximo'), 600);
+    } else {
+      const gain = hero.hero_class === 'clerigo' ? 10 : 5;
+      const newHp = Math.min((hero.hp || 100) + gain, hero.hp_max || 100);
+      hero.hp = newHp;
+      await saveHero({ hp: newHp });
+      setTimeout(() => toast('💚', `+${gain} HP`), 600);
+    }
   }
 
   const patch = { quests_done: (hero.quests_done || 0) + 1 };
