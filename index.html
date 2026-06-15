@@ -404,7 +404,7 @@
 
       <!-- POMODORO / POSADA -->
       <div class="panel-section">
-        <div class="panel-title">🏠 Posada · Pomodoro</div>
+        <div class="panel-title">⏱ Pomodoro</div>
         <div class="pomodoro-timer">
 
           <div class="timer-duration-select">
@@ -415,7 +415,13 @@
           </div>
 
           <div class="timer-ring">
-            <svg viewBox="0 0 140 140" width="140" height="140">
+            <svg viewBox="0 0 140 140" width="164" height="164">
+              <defs>
+                <linearGradient id="timerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#a855f7"/>
+                  <stop offset="100%" stop-color="#22d3ee"/>
+                </linearGradient>
+              </defs>
               <circle class="timer-ring-bg" cx="70" cy="70" r="60"/>
               <circle class="timer-ring-fill" id="timerRing" cx="70" cy="70" r="60"
                 stroke-dasharray="377" stroke-dashoffset="0"/>
@@ -468,7 +474,7 @@
 
       <!-- SPELLS / TAVERNA -->
       <div class="panel-section">
-        <div class="panel-title">🍺 Taverna de Hechizos</div>
+        <div class="panel-title">✨ Hechizos</div>
         <div class="spells-list" id="spellsList"></div>
       </div>
 

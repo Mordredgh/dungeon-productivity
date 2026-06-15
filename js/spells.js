@@ -56,29 +56,44 @@ const SPELL_DEFS = [
   {
     id: 'frenzy', icon: '⚡', name: 'Frenesí Arcano',
     desc: 'Dobla XP por 1 hora', cd: 3 * 24 * 3600 * 1000,
+    color: '#a855f7',
     cast() {
       xpMultiplier = 2; xpMultiplierEnd = Date.now() + 3600000;
       toast('⚡', '¡Frenesí Arcano! XP x2 por 1 hora.');
     }
   },
   {
-    id: 'wisdom', icon: '🧙', name: 'Sabiduría',
-    desc: 'Auto-completa todas las misiones diarias', cd: 24 * 3600 * 1000,
-    async cast() {
-      const dailies = quests.filter(q => q.type === 'daily' && !q.done);
-      for (const q of dailies) await completeQuest(q.id, null);
-      toast('🧙', `¡Sabiduría! ${dailies.length} misiones diarias completadas.`);
-    }
-  },
-  {
     id: 'speed', icon: '💨', name: 'Velocidad',
-    desc: 'Próximo pomodoro dura 10 min con XP completo', cd: 2 * 24 * 3600 * 1000,
+    desc: 'Próximo pom: 10 min con XP completo', cd: 2 * 24 * 3600 * 1000,
+    color: '#22d3ee',
     cast() {
       if (timer.running) { toast('⚠️', 'Pausa el pomodoro primero.'); return; }
       timer.duration = 10; timer.seconds = 600;
       document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
       updateTimerUI();
       toast('💨', '¡Velocidad! Próximo pomodoro: 10 min con XP completo.');
+    }
+  },
+  {
+    id: 'berserker', icon: '🔥', name: 'Berserker',
+    desc: 'XP x1.5 durante 25 min de pom activo', cd: 24 * 3600 * 1000,
+    color: '#fb7185',
+    cast() {
+      xpMultiplier = 1.5; xpMultiplierEnd = Date.now() + 25 * 60 * 1000;
+      toast('🔥', '¡Modo Berserker! XP x1.5 durante el próximo pomodoro.');
+    }
+  },
+  {
+    id: 'shield', icon: '🛡️', name: 'Escudo Arcano',
+    desc: 'Recupera 25 HP de forma instantánea', cd: 12 * 3600 * 1000,
+    color: '#4ade80',
+    cast() {
+      if (!hero) return;
+      const newHp = Math.min(hero.hp_max || 100, (hero.hp || 0) + 25);
+      hero.hp = newHp;
+      saveHero({ hp: newHp });
+      renderHero();
+      toast('🛡️', `¡Escudo Arcano! +25 HP recuperado.`);
     }
   }
 ];
@@ -99,23 +114,20 @@ function castSpell(spellId) {
 
 function renderSpells() {
   const el = document.getElementById('spellsList');
-  el.innerHTML = SPELL_DEFS.map(s => {
+  el.innerHTML = `<div class="spell-orbs-grid">${SPELL_DEFS.map(s => {
     const lastCast = spellState[s.id] || 0;
     const elapsed = Date.now() - lastCast;
     const onCD = elapsed < s.cd;
     const cdLeft = onCD ? formatCDTime(s.cd - elapsed) : null;
-    return `<div class="spell-card ${onCD ? 'cd' : ''}">
-      <div class="spell-icon">${s.icon}</div>
-      <div class="spell-info">
-        <div class="spell-name">${s.name}</div>
-        <div class="spell-desc">${s.desc}</div>
-        ${onCD ? `<div class="spell-cd">CD: ${cdLeft}</div>` : ''}
-      </div>
-      <button class="spell-cast-btn" ${onCD ? 'disabled' : ''} onclick="castSpell('${s.id}')">
-        ${onCD ? '⏳' : 'Lanzar'}
-      </button>
-    </div>`;
-  }).join('');
+    const clr = s.color || '#a855f7';
+    return `<button class="spell-orb ${onCD ? 'cd' : ''}" onclick="castSpell('${s.id}')"
+        title="${escHtml(s.name)}: ${escHtml(s.desc)}"
+        style="--spell-clr:${clr}">
+      <div class="spell-orb-icon">${s.icon}</div>
+      <div class="spell-orb-name">${escHtml(s.name)}</div>
+      ${onCD ? `<div class="spell-orb-cd">${cdLeft}</div>` : '<div class="spell-orb-ready">Listo</div>'}
+    </button>`;
+  }).join('')}</div>`;
 }
 
 function formatCDTime(ms) {
