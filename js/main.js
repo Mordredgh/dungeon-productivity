@@ -22,6 +22,8 @@
   setInterval(checkConnection, 5 * 60 * 1000);
   checkDailySummary();
   checkWeeklyRetro();
-  setInterval(() => { checkDailySummary(); checkWeeklyRetro(); }, 60 * 60 * 1000);
+  checkMorningBriefing();
+  checkDeadlineAlerts();
+  setInterval(() => { checkDailySummary(); checkWeeklyRetro(); checkDeadlineAlerts(); }, 60 * 60 * 1000);
   updateFocusTodayChip();
 })();

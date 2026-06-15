@@ -1535,6 +1535,61 @@ Dame una reflexión honesta: qué funcionó, qué mejorar, y 3 objetivos concret
   if (input) { input.value = prompt; input.focus(); }
 }
 
+/* ============================================================
+   MORNING BRIEFING + DEADLINE ALERTS
+   ============================================================ */
+async function _oracleAutoSend(text) {
+  openOracle();
+  if (!_oracleLoaded) await _loadOracleHistory();
+  _oracleAppend('user', text);
+  const thinkEl = _oracleAppend('thinking', '🔮 El oráculo medita...');
+  try {
+    const r = await fetch('/openclaw/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: _buildOracleContext(text) })
+    });
+    thinkEl.remove();
+    const data = await r.json();
+    const reply = data.reply || '⚠️ Sin respuesta.';
+    _oracleAppend('assistant', reply);
+    _oracleAddActions(reply);
+  } catch {
+    thinkEl.remove();
+    _oracleAppend('assistant', '⚠️ Error al contactar el oráculo.');
+  }
+}
+
+function checkMorningBriefing() {
+  const today = new Date().toISOString().split('T')[0];
+  if (localStorage.getItem('dungeon-briefing-' + today)) return;
+  localStorage.setItem('dungeon-briefing-' + today, '1');
+  setTimeout(() => {
+    const todayQ   = quests.filter(q => !q.done && (q.deadline === today || q.type === 'daily'));
+    const urgentes = quests.filter(q => !q.done && q.priority === 'urgente');
+    const msg = `${todayQ.length} misiones hoy${urgentes.length ? ` · ${urgentes.length} urgentes` : ''}`;
+    toastAction('🌅', msg, 'Briefing →', () => {
+      _oracleAutoSend('Buenos días. Briefing de hoy en 3 líneas: mis prioridades más urgentes, algo que no debo olvidar, y una motivación corta.');
+    }, 10000);
+  }, 2500);
+}
+
+function checkDeadlineAlerts() {
+  const today    = new Date().toISOString().split('T')[0];
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+  const alertKey = 'dungeon-alerts-' + today;
+  if (localStorage.getItem(alertKey)) return;
+  const due = quests.filter(q => !q.done && q.deadline === tomorrow);
+  if (!due.length) return;
+  localStorage.setItem(alertKey, '1');
+  setTimeout(() => {
+    due.slice(0, 3).forEach((q, i) => {
+      setTimeout(() => toast('⏰', `Vence mañana: "${q.name}"`, 6000), i * 900);
+    });
+    if (due.length > 3) setTimeout(() => toast('⏰', `+${due.length - 3} misiones más vencen mañana`, 5000), 3 * 900);
+  }, 5000);
+}
+
 document.getElementById('oracleBtn').addEventListener('click', openOracle);
 document.getElementById('oracleSend').addEventListener('click', oracleSend);
 document.getElementById('oracleInput').addEventListener('keydown', e => {

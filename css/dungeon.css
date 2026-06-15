@@ -1826,6 +1826,21 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 .toast-undo-btn:hover { color: var(--accent); }
 
+.toast-action { align-items: center; gap: 8px; }
+.toast-btn {
+  flex-shrink: 0;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.toast-btn:hover { opacity: 0.85; }
+
 /* ============================================================
    SUBTASK PROGRESS
    ============================================================ */

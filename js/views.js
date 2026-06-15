@@ -88,7 +88,10 @@ function renderQuestList() {
 
   let filtered = quests.filter(q => {
     if (!q) return false;
-    if (activeFilter === 'urgente') { if (q.priority !== 'urgente') return false; }
+    if (activeFilter === 'today') {
+      if (q.done) return false;
+      if (!(q.deadline === today || q.type === 'daily')) return false;
+    } else if (activeFilter === 'urgente') { if (q.priority !== 'urgente') return false; }
     else if (activeFilter !== 'all' && q.type !== activeFilter) return false;
     if (search && !q.name.toLowerCase().includes(search)) return false;
     if (tagFilter) {
@@ -103,12 +106,13 @@ function renderQuestList() {
   });
 
   // Update filter tab counts
-  const counts = { all: quests.filter(q=>!q.done).length, main: 0, side: 0, daily: 0, weekly: 0, urgente: 0 };
+  const counts = { all: quests.filter(q=>!q.done).length, today: 0, main: 0, side: 0, daily: 0, weekly: 0, urgente: 0 };
   quests.filter(q=>!q.done).forEach(q => {
     if (counts[q.type] !== undefined) counts[q.type]++;
     if (q.priority === 'urgente') counts.urgente++;
+    if (q.deadline === today || q.type === 'daily') counts.today++;
   });
-  const tabLabels = { all:'Todas', main:'⚔️ Épicas', side:'🗡️ Encargos', daily:'🌅 Búsquedas', weekly:'📜 Crónicas', urgente:'🔴 Urgente' };
+  const tabLabels = { all:'Todas', today:'📅 Hoy', main:'⚔️ Épicas', side:'🗡️ Encargos', daily:'🌅 Búsquedas', weekly:'📜 Crónicas', urgente:'🔴 Urgente' };
   Object.entries(counts).forEach(([key, n]) => {
     const tb = document.getElementById('ft-' + key);
     if (tb) tb.textContent = `${tabLabels[key]} (${n})`;

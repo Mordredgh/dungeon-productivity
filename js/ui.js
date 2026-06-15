@@ -68,6 +68,16 @@ function toast(icon, msg, duration) {
   setTimeout(() => div.remove(), duration || 4000);
 }
 
+function toastAction(icon, msg, btnText, fn, duration) {
+  const container = document.getElementById('toastContainer');
+  const div = document.createElement('div');
+  div.className = 'toast toast-action';
+  div.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-msg">${escHtml(msg)}</span><button class="toast-btn">${escHtml(btnText)}</button>`;
+  div.querySelector('.toast-btn').addEventListener('click', () => { fn(); div.remove(); });
+  container.appendChild(div);
+  setTimeout(() => div.remove(), duration || 9000);
+}
+
 function spawnParticle(text, sourceEl) {
   playXpSound();
   const rect = sourceEl ? sourceEl.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2 };
