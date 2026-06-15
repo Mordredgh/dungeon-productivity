@@ -2072,4 +2072,21 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .quest-item.pinned { border-color:rgba(250,204,21,.45) !important; }
 .quest-item.pinned::before { background:linear-gradient(180deg,var(--gold),#34d399) !important; }
 .pin-indicator { font-size:9px; color:var(--gold); margin-left:2px; }
+
+/* ── More menu (header overflow) ─────────────── */
+.more-menu-wrap { position:relative; }
+.more-menu {
+  display:none; position:absolute; top:calc(100% + 6px); right:0;
+  background:var(--card); border:1px solid var(--glass-border); border-radius:10px;
+  padding:6px; min-width:180px; z-index:200; box-shadow:0 8px 24px rgba(0,0,0,.4);
+  flex-direction:column; gap:2px;
+}
+.more-menu.open { display:flex; }
+.more-menu-item {
+  display:flex; align-items:center; gap:8px; padding:7px 12px; border-radius:7px;
+  background:none; border:none; color:var(--text1); font-size:13px;
+  font-family:var(--font-body); cursor:pointer; text-align:left;
+  transition:var(--transition); white-space:nowrap;
+}
+.more-menu-item:hover { background:var(--glass); color:var(--accent); }
 </style>

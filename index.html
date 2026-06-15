@@ -75,19 +75,25 @@
     <div id="spellActiveBadge" style="display:none" class="spell-active-badge">⚡ x2 XP</div>
 
     <div class="header-actions">
-      <button class="icon-btn" id="d20Btn" title="Tirar D20 🎲">🎲</button>
-      <button class="icon-btn" id="musicBtn" title="Música lofi 🎵">🎵</button>
+      <button class="icon-btn" id="ambientBtn" title="Sonido ambiental">🌧️</button>
+      <button class="icon-btn" id="musicBtn" title="Música lofi">🎵</button>
       <input type="range" id="musicVolume" class="vol-slider" min="0" max="100" value="25" style="display:none" title="Volumen música">
-      <button class="icon-btn" id="bulkToggleBtn" title="Selección múltiple (B)">☑️</button>
+      <button class="icon-btn" id="d20Btn" title="Tirar D20">🎲</button>
       <button class="icon-btn" id="focusBtn" title="Modo Focus (F)">🎯</button>
-      <button class="icon-btn" id="compactToggle" title="Modo compacto (C)">⊟</button>
       <button class="icon-btn" id="themeBtn" title="Cambiar tema (T)">🎨</button>
-      <button class="icon-btn" id="importBtn" title="Importar misiones">📥</button>
-      <button class="icon-btn" id="exportBtn" title="Exportar JSON">📤</button>
-      <button class="icon-btn" id="csvBtn" title="Exportar CSV 📊">📊</button>
-      <button class="icon-btn" id="notifBtn" title="Notificaciones">🔔</button>
       <button class="icon-btn" id="helpBtn" title="Atajos de teclado (?)">⌨️</button>
-      <button class="icon-btn" id="ambientBtn" title="Sonido ambiental: lluvia / chimenea / bosque">🌧️</button>
+      <!-- Más opciones -->
+      <div class="more-menu-wrap" id="moreMenuWrap">
+        <button class="icon-btn" id="moreBtn" title="Más opciones">⋯</button>
+        <div class="more-menu" id="moreMenu">
+          <button class="more-menu-item" id="bulkToggleBtn">☑️ Selección múltiple</button>
+          <button class="more-menu-item" id="compactToggle">⊟ Modo compacto</button>
+          <button class="more-menu-item" id="notifBtn">🔔 Notificaciones</button>
+          <button class="more-menu-item" id="importBtn">📥 Importar</button>
+          <button class="more-menu-item" id="exportBtn">📤 Exportar JSON</button>
+          <button class="more-menu-item" id="csvBtn">📊 Exportar CSV</button>
+        </div>
+      </div>
     </div>
   </header>
 

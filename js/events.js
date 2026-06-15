@@ -1231,6 +1231,13 @@ function cycleAmbient() {
 
 document.getElementById('ambientBtn').addEventListener('click', cycleAmbient);
 
+/* More menu toggle */
+document.getElementById('moreBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('moreMenu').classList.toggle('open');
+});
+document.addEventListener('click', () => document.getElementById('moreMenu').classList.remove('open'));
+
 /* ============================================================
    FOCUS TODAY CHIP
    ============================================================ */
