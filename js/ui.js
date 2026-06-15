@@ -96,12 +96,6 @@ function spawnLevelUpParticles() {
   }
 }
 
-function applyTemplate(idx) {
-  const t = QUEST_TEMPLATES[idx];
-  if (!t || !hero) return;
-  t.quests.forEach(name => addQuest({ name, type: 'daily', priority: 'normal', hero_id: hero.id }));
-  toast('📦', `Plantilla "${t.name}" aplicada.`);
-}
 
 function escHtml(str) {
   return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');

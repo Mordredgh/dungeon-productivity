@@ -275,6 +275,11 @@
               <div id="weekdayChart"></div>
             </div>
             <div class="stats-card" style="grid-column:1/-1">
+              <div class="stats-card-title">⚔️ Misiones completadas — últimos 30 días</div>
+              <div class="bc30-wrap" id="missionsChart30"></div>
+            </div>
+
+            <div class="stats-card" style="grid-column:1/-1">
               <div class="stats-card-title">📅 Actividad — últimos 90 días</div>
               <div class="heatmap-months" id="heatmapMonths"></div>
               <div class="heatmap-grid" id="heatmapGrid"></div>
@@ -436,10 +441,6 @@
           <button class="add-btn" id="addQuestBtn">⚔️ Crear Misión</button>
         </div>
 
-        <div style="margin-top:14px">
-          <div class="panel-title" style="margin-bottom:8px">📦 Plantillas</div>
-          <div style="display:flex;flex-direction:column;gap:4px" id="templatesList"></div>
-        </div>
       </div>
 
       <!-- QUICK NOTES -->
@@ -698,6 +699,21 @@
   <div class="pom-count" id="focusPomCount">
     <div class="pom-dot"></div><div class="pom-dot"></div>
     <div class="pom-dot"></div><div class="pom-dot"></div>
+  </div>
+</div>
+
+<!-- Weekly Retro Modal -->
+<div class="modal-backdrop" id="retroModal" style="display:none">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-title">📊 Retrospectiva Semanal</div>
+      <button class="modal-close" onclick="closeModal('retroModal')">✕</button>
+    </div>
+    <div id="retroContent" style="display:flex;flex-direction:column;gap:12px;padding:4px 0 8px"></div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn" style="flex:1" onclick="closeModal('retroModal')">Cerrar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="closeModal('retroModal');oracleWeeklyReview()">🔮 Hablar con el Oráculo</button>
+    </div>
   </div>
 </div>
 

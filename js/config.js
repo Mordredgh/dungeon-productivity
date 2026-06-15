@@ -21,13 +21,6 @@ const AVATARS = ['🧙','⚔️','🛡️','🏹','🗡️','🔮','🦅','🐉'
                  '🦁','🐺','🦊','🐻','🧝','🧜','🤺','🥷','🧟','🧛',
                  '🎯','🔥','⚡','💎','🌟','🌙','☀️','🌊','🌪️','🍀'];
 
-const QUEST_TEMPLATES = [
-  { name: '🏋️ Rutina fitness', quests: ['Ejercicio 30 min','Hidratación 2L agua','Meditar 10 min','Dormir 7h+'] },
-  { name: '💼 Sprint trabajo', quests: ['Revisar email','Reunión equipo','Deep work 2h','Revisar métricas'] },
-  { name: '📚 Día de aprendizaje', quests: ['Leer 30 min','Ver tutorial','Tomar notas','Repasar conceptos'] },
-  { name: '🧹 Limpieza digital', quests: ['Limpiar escritorio','Organizar archivos','Vaciar bandeja entrada','Actualizar contraseñas'] },
-  { name: '🚀 Lanzamiento', quests: ['Revisar checklist','Testing QA','Deploy producción','Anunciar en redes'] },
-];
 
 const COMPLETIONS = [
   '¡El enemigo ha caído! La mazmorra tiembla ante tu poder.',

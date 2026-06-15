@@ -1494,6 +1494,77 @@ function oracleQuestAdvice(questId) {
   if (input) { input.value = parts; input.focus(); }
 }
 
+/* ============================================================
+   RETROSPECTIVA SEMANAL (domingos 8pm)
+   ============================================================ */
+function _weekNumber(d) {
+  const jan1 = new Date(d.getFullYear(), 0, 1);
+  return Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+}
+
+function _weekDates() {
+  const arr = [];
+  for (let i = 6; i >= 0; i--) arr.push(new Date(Date.now() - i * 86400000).toISOString().split('T')[0]);
+  return arr;
+}
+
+function checkWeeklyRetro() {
+  const now = new Date();
+  if (now.getDay() !== 0 || now.getHours() < 20) return;
+  const key = `dungeon-retro-${now.getFullYear()}-${_weekNumber(now)}`;
+  if (localStorage.getItem(key)) return;
+  localStorage.setItem(key, '1');
+  showWeeklyRetro();
+}
+
+function showWeeklyRetro() {
+  const dates    = _weekDates();
+  const wQuests  = quests.filter(q => q.done && q.done_at && dates.some(d => q.done_at.startsWith(d)));
+  const wPoms    = pomodoros.filter(p => p.started_at && dates.some(d => p.started_at.startsWith(d)));
+  const wXP      = wQuests.reduce((s, q) => s + (XP_TABLE[q.type] || 50), 0);
+  const dayCount = Object.fromEntries(dates.map(d => [d, quests.filter(q => q.done && q.done_at?.startsWith(d)).length]));
+  const best     = Object.entries(dayCount).sort((a, b) => b[1] - a[1])[0];
+  const bestLbl  = best ? new Date(best[0] + 'T12:00').toLocaleDateString('es-MX', { weekday:'long' }) : '-';
+  const maxC     = Math.max(...Object.values(dayCount), 1);
+
+  const el = document.getElementById('retroContent');
+  if (!el) return;
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="retro-stat"><span class="retro-stat-num" style="color:var(--green)">${wQuests.length}</span><span class="retro-stat-lbl">misiones</span></div>
+      <div class="retro-stat"><span class="retro-stat-num" style="color:var(--gold)">${wXP}</span><span class="retro-stat-lbl">XP ganado</span></div>
+      <div class="retro-stat"><span class="retro-stat-num" style="color:var(--blue)">${wPoms.length}</span><span class="retro-stat-lbl">pomodoros</span></div>
+      <div class="retro-stat"><span class="retro-stat-num" style="color:var(--accent);font-size:16px">${bestLbl}</span><span class="retro-stat-lbl">mejor día</span></div>
+    </div>
+    <div class="mini-bar-chart">${dates.map(d => `
+      <div class="mini-bar-wrap">
+        <div class="mini-bar" style="height:${Math.max(2, Math.round((dayCount[d]/maxC)*60))}px;background:var(--accent)"></div>
+        <div class="mini-bar-label">${new Date(d+'T12:00').toLocaleDateString('es',{weekday:'narrow'})}</div>
+      </div>`).join('')}</div>`;
+  openModal('retroModal');
+}
+
+function oracleWeeklyReview() {
+  const dates   = _weekDates();
+  const wQuests = quests.filter(q => q.done && q.done_at && dates.some(d => q.done_at.startsWith(d)));
+  const wPoms   = pomodoros.filter(p => p.started_at && dates.some(d => p.started_at.startsWith(d)));
+  const wXP     = wQuests.reduce((s, q) => s + (XP_TABLE[q.type] || 50), 0);
+  const byType  = ['main','side','daily','weekly'].map(t => `${t}: ${wQuests.filter(q=>q.type===t).length}`).join(', ');
+  const pending = quests.filter(q => !q.done).slice(0, 8).map(q => `- ${q.name}`).join('\n');
+
+  const prompt = `Retrospectiva semanal del dungeon:
+• Misiones completadas: ${wQuests.length} (${byType})
+• XP ganado: ${wXP} | Pomodoros: ${wPoms.length}
+Misiones pendientes para la próxima semana:
+${pending || '(ninguna)'}
+
+Dame una reflexión honesta: qué funcionó, qué mejorar, y 3 objetivos concretos para la próxima semana.`;
+
+  openOracle();
+  const input = document.getElementById('oracleInput');
+  if (input) { input.value = prompt; input.focus(); }
+}
+
 document.getElementById('oracleBtn').addEventListener('click', openOracle);
 document.getElementById('oracleSend').addEventListener('click', oracleSend);
 document.getElementById('oracleInput').addEventListener('keydown', e => {

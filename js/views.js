@@ -7,7 +7,6 @@ function renderAll() {
   renderAchievements();
   renderHistory();
   renderStats();
-  renderTemplates();
   updateBossBanner();
 }
 
@@ -348,9 +347,32 @@ function renderKanban() {
   document.getElementById('k-done-count').textContent = done.length;
 }
 
+function renderMissionsChart() {
+  const el = document.getElementById('missionsChart30');
+  if (!el) return;
+  const today = new Date().toISOString().split('T')[0];
+  const days = [];
+  for (let i = 29; i >= 0; i--) {
+    const d    = new Date(Date.now() - i * 86400000);
+    const dStr = d.toISOString().split('T')[0];
+    const cnt  = quests.filter(q => q.done && q.done_at && q.done_at.startsWith(dStr)).length;
+    const showLabel = (i % 7 === 0) || i === 0;
+    days.push({ dStr, cnt, label: showLabel ? d.toLocaleDateString('es', { day:'numeric', month:'short' }) : '' });
+  }
+  const max = Math.max(...days.map(d => d.cnt), 1);
+  el.innerHTML = `<div class="bc30-inner">${days.map(d => `
+    <div class="bc30-col">
+      <div class="bc30-bar ${d.dStr === today ? 'today' : ''}"
+           style="height:${Math.max(3, Math.round((d.cnt / max) * 72))}px"
+           title="${d.dStr}: ${d.cnt} misiones"></div>
+      <div class="bc30-lbl">${d.label}</div>
+    </div>`).join('')}</div>`;
+}
+
 function renderStats() {
   renderXPChart();
   renderTypeDist();
+  renderMissionsChart();
   renderHeatmap();
   renderHourlyChart();
   renderWeekComparison();
@@ -457,13 +479,6 @@ function renderTypeDist() {
   `).join('');
 }
 
-function renderTemplates() {
-  const el = document.getElementById('templatesList');
-  if (!el) return;
-  el.innerHTML = QUEST_TEMPLATES.map((t, i) =>
-    `<button class="dur-btn" style="text-align:left;width:100%;padding:5px 10px" onclick="applyTemplate(${i})">${t.name}</button>`
-  ).join('');
-}
 
 function updateBossBanner() {
   const banner = document.getElementById('bossBanner');
