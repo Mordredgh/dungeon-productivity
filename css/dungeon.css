@@ -499,6 +499,13 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .quest-item[data-type="main"]::before   { background: linear-gradient(180deg, var(--gold), #34d399); }
 .quest-item[data-type="daily"]::before  { background: linear-gradient(180deg, var(--green), #86efac); }
 .quest-item[data-type="weekly"]::before { background: linear-gradient(180deg, var(--blue), #93c5fd); }
+/* rarity left-bar colors */
+.quest-item[data-priority="mitico"]::before     { background: linear-gradient(180deg, #ef4444, #fca5a5); }
+.quest-item[data-priority="legendario"]::before { background: linear-gradient(180deg, var(--gold), #fde68a); }
+.quest-item[data-priority="epico"]::before      { background: linear-gradient(180deg, #a855f7, #d8b4fe); }
+.quest-item[data-priority="normal"]::before     { background: linear-gradient(180deg, var(--blue), #93c5fd); }
+.quest-item[data-priority="comun"]::before      { background: var(--border); }
+/* legacy */
 .quest-item[data-priority="urgente"]::before { background: linear-gradient(180deg, var(--red), #fda4af); }
 
 
@@ -562,8 +569,16 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .badge-type-daily   { background: rgba(52,211,153,.12);  color: var(--green);   border: 1px solid rgba(52,211,153,.25); }
 .badge-type-weekly  { background: rgba(96,165,250,.12);  color: var(--blue);    border: 1px solid rgba(96,165,250,.25); }
 
-.badge-priority-urgente { background: rgba(248,113,113,.12); color: var(--red); border: 1px solid rgba(248,113,133,.3); }
+/* legacy — keep so old saved quests don't break */
+.badge-priority-urgente { background: rgba(248,113,113,.12); color: var(--red);   border: 1px solid rgba(248,113,133,.3); }
 .badge-priority-baja    { background: rgba(96,165,250,.07);  color: var(--text3); border: 1px solid var(--border); }
+
+/* rarity badges */
+.badge-rarity-mitico    { background: rgba(239,68,68,.15);   color: #f87171; border: 1px solid rgba(239,68,68,.4);   font-weight:700; letter-spacing:.3px; }
+.badge-rarity-legendario{ background: rgba(245,158,11,.15);  color: var(--gold); border: 1px solid rgba(245,158,11,.4); font-weight:700; }
+.badge-rarity-epico     { background: rgba(168,85,247,.15);  color: #c084fc; border: 1px solid rgba(168,85,247,.4);  font-weight:600; }
+.badge-rarity-normal    { background: rgba(96,165,250,.12);  color: var(--blue); border: 1px solid rgba(96,165,250,.3); }
+.badge-rarity-comun     { background: rgba(148,163,184,.08); color: var(--text3); border: 1px solid var(--border); }
 
 .deadline-badge { font-size: 12px; color: var(--text3); }
 .deadline-badge.overdue { color: var(--red); font-weight: 600; }
@@ -1901,8 +1916,21 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 
 /* ============================================================
-   URGENTE — fondo sutil
+   RARITY — fondos y glow
    ============================================================ */
+.quest-item[data-priority="mitico"] {
+  background: linear-gradient(135deg, rgba(239,68,68,.06), var(--card));
+  box-shadow: 0 0 0 1px rgba(239,68,68,.18), 0 2px 12px rgba(239,68,68,.08);
+}
+.quest-item[data-priority="legendario"] {
+  background: linear-gradient(135deg, rgba(245,158,11,.05), var(--card));
+  box-shadow: 0 0 0 1px rgba(245,158,11,.18);
+}
+.quest-item[data-priority="epico"] {
+  background: linear-gradient(135deg, rgba(168,85,247,.05), var(--card));
+  box-shadow: 0 0 0 1px rgba(168,85,247,.18);
+}
+/* legacy */
 .quest-item[data-priority="urgente"] {
   background: linear-gradient(135deg, rgba(251,113,133,.04), var(--card));
 }

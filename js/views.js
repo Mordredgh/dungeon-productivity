@@ -1,4 +1,6 @@
-﻿/* RENDER */
+﻿const RARITY_LABELS = { mitico:'Mítico', legendario:'Legendario', epico:'Épico', normal:'Normal', comun:'Común' };
+
+/* RENDER */
 function renderAll() {
   renderHeroUI();
   renderQuestList();
@@ -91,7 +93,7 @@ function renderQuestList() {
     if (activeFilter === 'today') {
       if (q.done) return false;
       if (!(q.deadline === today || q.type === 'daily')) return false;
-    } else if (activeFilter === 'urgente') { if (q.priority !== 'urgente') return false; }
+    } else if (activeFilter === 'mitico') { if (q.priority !== 'mitico') return false; }
     else if (activeFilter !== 'all' && q.type !== activeFilter) return false;
     if (search && !q.name.toLowerCase().includes(search)) return false;
     if (tagFilter) {
@@ -106,13 +108,13 @@ function renderQuestList() {
   });
 
   // Update filter tab counts
-  const counts = { all: quests.filter(q=>!q.done).length, today: 0, main: 0, side: 0, daily: 0, weekly: 0, urgente: 0 };
+  const counts = { all: quests.filter(q=>!q.done).length, today: 0, main: 0, side: 0, daily: 0, weekly: 0, mitico: 0 };
   quests.filter(q=>!q.done).forEach(q => {
     if (counts[q.type] !== undefined) counts[q.type]++;
-    if (q.priority === 'urgente') counts.urgente++;
+    if (q.priority === 'mitico') counts.mitico++;
     if (q.deadline === today || q.type === 'daily') counts.today++;
   });
-  const tabLabels = { all:'Todas', today:'📅 Hoy', main:'⚔️ Épicas', side:'🗡️ Encargos', daily:'🌅 Búsquedas', weekly:'📜 Crónicas', urgente:'🔴 Urgente' };
+  const tabLabels = { all:'Todas', today:'📅 Hoy', main:'⚔️ Épicas', side:'🗡️ Encargos', daily:'🌅 Búsquedas', weekly:'📜 Crónicas', mitico:'💎 Mítico' };
   Object.entries(counts).forEach(([key, n]) => {
     const tb = document.getElementById('ft-' + key);
     if (tb) tb.textContent = `${tabLabels[key]} (${n})`;
@@ -120,8 +122,8 @@ function renderQuestList() {
 
   filtered.sort((a, b) => {
     if (sortMode === 'priority') {
-      const p = { urgente: 0, normal: 1, baja: 2 };
-      return (p[a.priority] || 1) - (p[b.priority] || 1);
+      const p = { mitico: 0, legendario: 1, epico: 2, normal: 3, comun: 4 };
+      return (p[a.priority] ?? 3) - (p[b.priority] ?? 3);
     }
     if (sortMode === 'deadline') {
       if (!a.deadline) return 1; if (!b.deadline) return -1;
@@ -155,8 +157,8 @@ function renderQuestList() {
   }
 
   // Group pending by type with separators
-  const typeOrder = ['urgente', 'main', 'weekly', 'side', 'daily'];
-  const typeLabelsGroup = { urgente:'🔴 Urgentes', main:'⚔️ Misiones Épicas', weekly:'📜 Crónicas Semanales', side:'🗡️ Encargos', daily:'🌅 Búsquedas Diarias' };
+  const typeOrder = ['mitico', 'main', 'weekly', 'side', 'daily'];
+  const typeLabelsGroup = { mitico:'💎 Míticas', main:'⚔️ Misiones Épicas', weekly:'📜 Crónicas Semanales', side:'🗡️ Encargos', daily:'🌅 Búsquedas Diarias' };
   let html = '';
 
   if (pinned.length) {
@@ -167,8 +169,8 @@ function renderQuestList() {
   if (activeFilter === 'all') {
     typeOrder.forEach(type => {
       let group;
-      if (type === 'urgente') group = pending.filter(q => q.priority === 'urgente');
-      else group = pending.filter(q => q.type === type && q.priority !== 'urgente');
+      if (type === 'mitico') group = pending.filter(q => q.priority === 'mitico');
+      else group = pending.filter(q => q.type === type && q.priority !== 'mitico');
       if (!group.length) return;
       html += `<div class="type-separator">${typeLabelsGroup[type]}<span>${group.length}</span></div>`;
       html += group.map(q => renderQuestItem(q)).join('');
@@ -274,7 +276,7 @@ function renderQuestItem(q) {
       <div class="quest-name">${escHtml(q.name)}${diff !== 'normal' ? ` <span style="font-size:10px">${diffEmoji[diff]}${diffLabel[diff]}</span>` : ''}</div>
       <div class="quest-meta">
         <span class="badge badge-type-${q.type}">${typeLabels[q.type] || q.type}</span>
-        ${q.priority && q.priority !== 'normal' ? `<span class="badge badge-priority-${q.priority}">${q.priority}</span>` : ''}
+        ${q.priority ? `<span class="badge badge-rarity-${q.priority}">${RARITY_LABELS[q.priority] || q.priority}</span>` : ''}
         ${q.deadline ? `<span class="deadline-badge ${isOverdue ? 'overdue' : ''}">${formatRelativeDate(q.deadline)}</span>` : ''}
         <span class="xp-reward">+${xp} XP</span>
         ${subtaskProgressHtml}

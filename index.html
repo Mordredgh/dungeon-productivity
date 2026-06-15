@@ -155,11 +155,11 @@
               <button class="filter-tab" data-filter="side" id="ft-side">🗡️ Encargos</button>
               <button class="filter-tab" data-filter="daily" id="ft-daily">🌅 Búsquedas</button>
               <button class="filter-tab" data-filter="weekly" id="ft-weekly">📜 Crónicas</button>
-              <button class="filter-tab" data-filter="urgente" id="ft-urgente" style="color:var(--red)">🔴 Urgente</button>
+              <button class="filter-tab" data-filter="mitico" id="ft-mitico" style="color:var(--red)">💎 Mítico</button>
             </div>
             <select class="sort-select" id="sortSelect">
               <option value="created">Recientes</option>
-              <option value="priority">Prioridad</option>
+              <option value="priority">Rareza</option>
               <option value="deadline">Fecha límite</option>
               <option value="xp">XP</option>
             </select>
@@ -430,9 +430,11 @@
               <option value="weekly">📅 Semanal</option>
             </select>
             <select id="qPriority">
-              <option value="urgente">🔴 Urgente</option>
-              <option value="normal" selected>🟡 Normal</option>
-              <option value="baja">🟢 Baja</option>
+              <option value="mitico">💎 Mítico</option>
+              <option value="legendario">🟡 Legendario</option>
+              <option value="epico">🟣 Épico</option>
+              <option value="normal" selected>🔵 Normal</option>
+              <option value="comun">⬜ Común</option>
             </select>
           </div>
           <div class="form-row">
@@ -496,9 +498,11 @@
         <div class="form-group">
           <label class="form-label">Prioridad</label>
           <select class="form-input" id="editQPriority">
-            <option value="urgente">🔴 Urgente</option>
-            <option value="normal">🟡 Normal</option>
-            <option value="baja">🟢 Baja</option>
+            <option value="mitico">💎 Mítico</option>
+            <option value="legendario">🟡 Legendario</option>
+            <option value="epico">🟣 Épico</option>
+            <option value="normal">🔵 Normal</option>
+            <option value="comun">⬜ Común</option>
           </select>
         </div>
       </div>

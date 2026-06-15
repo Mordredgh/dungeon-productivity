@@ -5,7 +5,8 @@ function openEditQuest(id) {
   document.getElementById('editQuestId').value     = id;
   document.getElementById('editQName').value       = q.name;
   document.getElementById('editQType').value       = q.type;
-  document.getElementById('editQPriority').value   = q.priority || 'normal';
+  const validRarities = ['mitico','legendario','epico','normal','comun'];
+  document.getElementById('editQPriority').value   = validRarities.includes(q.priority) ? q.priority : 'normal';
   document.getElementById('editQDeadline').value   = q.deadline || '';
   document.getElementById('editQNotes').value      = q.notes || '';
   document.getElementById('editQTags').value       = localStorage.getItem('dungeon-tags-' + id) || '';
@@ -20,7 +21,7 @@ async function doImportCSV() {
   const text = document.getElementById('importCsvText').value.trim();
   if (!text || !hero) return;
   const validTypes = ['main','side','daily','weekly'];
-  const validPrio  = ['urgente','normal','baja'];
+  const validPrio  = ['mitico','legendario','epico','normal','comun'];
   let count = 0;
   for (const line of text.split('\n').map(l=>l.trim()).filter(Boolean)) {
     const [name, tipo, prioridad, deadline] = line.split(',').map(s => s.trim());

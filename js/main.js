@@ -6,6 +6,7 @@
   document.getElementById('timerPhase').textContent = 'Listo';
   if (Notification.permission === 'granted') notifEnabled = true;
   await initDB();
+  await migrateRarity();
   await resetDailyQuests();
   await resetRepeatQuests();
   await checkOverdueHP();

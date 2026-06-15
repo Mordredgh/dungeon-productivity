@@ -251,6 +251,22 @@ function syncFocusUI() {
 }
 
 /* ============================================================
+   MIGRACIÓN: urgente/baja → rareza nueva (corre una vez)
+   ============================================================ */
+async function migrateRarity() {
+  if (!hero || localStorage.getItem('dungeon-rarity-migrated')) return;
+  const map = { urgente: 'mitico', baja: 'comun' };
+  const toUpdate = quests.filter(q => map[q.priority]);
+  for (const q of toUpdate) {
+    const newPrio = map[q.priority];
+    await db.from('dungeon_quests').update({ priority: newPrio }).eq('id', q.id);
+    q.priority = newPrio;
+  }
+  localStorage.setItem('dungeon-rarity-migrated', '1');
+  if (toUpdate.length) renderQuestList();
+}
+
+/* ============================================================
    FEATURE 7: HP penalty por misiones vencidas
    ============================================================ */
 async function checkOverdueHP() {
@@ -1063,7 +1079,7 @@ function renderCalendar() {
     const isToday = dateStr === todayStr;
     html += `<div class="cal-day ${isToday?'today':''} ${qs.length?'has-quests':''}" onclick="showCalDay('${dateStr}')">
       <div class="cal-day-num">${day}</div>
-      ${qs.length ? `<div class="cal-dots">${qs.slice(0,4).map(q=>`<div class="cal-dot ${q.done?'done':q.priority==='urgente'?'urgent':''}" title="${escHtml(q.name)}"></div>`).join('')}</div>` : ''}
+      ${qs.length ? `<div class="cal-dots">${qs.slice(0,4).map(q=>`<div class="cal-dot ${q.done?'done':q.priority==='mitico'?'urgent':''}" title="${escHtml(q.name)}"></div>`).join('')}</div>` : ''}
     </div>`;
   }
   document.getElementById('calGrid').innerHTML = html;
@@ -1079,7 +1095,7 @@ function showCalDay(dateStr) {
   el.innerHTML = `<div class="cal-detail-title">${label}</div>` +
     qs.map(q => `<div class="cal-detail-item ${q.done?'done':''}">
       <span>${typeIcons[q.type]||'⚔️'} ${escHtml(q.name)}</span>
-      <span style="font-size:10px">${q.done?'✅':q.priority==='urgente'?'🔴':''}</span>
+      <span style="font-size:10px">${q.done?'✅':q.priority==='mitico'?'💎':q.priority==='legendario'?'🟡':''}</span>
     </div>`).join('');
 }
 
@@ -1322,7 +1338,7 @@ function _buildOracleContext(userText) {
   const questLines = pending.length
     ? pending.map(q =>
         `- [${typeMap[q.type] || q.type}] ${q.name}` +
-        (q.priority === 'urgente' ? ' ⚠️URGENTE' : '') +
+        (q.priority && q.priority !== 'normal' && q.priority !== 'comun' ? ` [${(RARITY_LABELS||{})[q.priority]||q.priority}]` : '') +
         (q.deadline ? ` (deadline: ${q.deadline})` : '')
       ).join('\n')
     : '- (ninguna pendiente)';
@@ -1455,7 +1471,7 @@ function oracleQuestAdvice(questId) {
   const parts = [
     `¿Cómo abordo esta misión: "${q.name}"?`,
     `Tipo: ${typeMap[q.type] || q.type}`,
-    q.priority && q.priority !== 'normal' ? `Prioridad: ${q.priority}` : '',
+    q.priority && q.priority !== 'normal' && q.priority !== 'comun' ? `Rareza: ${(RARITY_LABELS||{})[q.priority]||q.priority}` : '',
     q.deadline ? `Deadline: ${q.deadline}` : '',
     q.notes ? `Notas: ${q.notes.slice(0, 200)}` : ''
   ].filter(Boolean).join(' | ');
@@ -1566,8 +1582,8 @@ function checkMorningBriefing() {
   localStorage.setItem('dungeon-briefing-' + today, '1');
   setTimeout(() => {
     const todayQ   = quests.filter(q => !q.done && (q.deadline === today || q.type === 'daily'));
-    const urgentes = quests.filter(q => !q.done && q.priority === 'urgente');
-    const msg = `${todayQ.length} misiones hoy${urgentes.length ? ` · ${urgentes.length} urgentes` : ''}`;
+    const miticas = quests.filter(q => !q.done && q.priority === 'mitico');
+    const msg = `${todayQ.length} misiones hoy${miticas.length ? ` · ${miticas.length} míticas` : ''}`;
     toastAction('🌅', msg, 'Briefing →', () => {
       _oracleAutoSend('Buenos días. Briefing de hoy en 3 líneas: mis prioridades más urgentes, algo que no debo olvidar, y una motivación corta.');
     }, 10000);
