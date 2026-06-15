@@ -1464,6 +1464,36 @@ async function oracleSend() {
   }
 }
 
+const _ORACLE_QUICK_PROMPTS = {
+  plan:     'Planea mi día de hoy priorizando mis misiones. Dame un plan de acción concreto con orden de ataque.',
+  priority: '¿Cuál de mis misiones pendientes debo atacar primero ahora mismo y por qué?',
+  summary:  'Dame un resumen motivacional de lo que logré hoy y qué me falta para mañana.'
+};
+
+function oracleQuickPrompt(type) {
+  const text = _ORACLE_QUICK_PROMPTS[type];
+  if (!text) return;
+  openOracle();
+  const input = document.getElementById('oracleInput');
+  if (input) { input.value = text; input.focus(); }
+}
+
+function oracleQuestAdvice(questId) {
+  const q = quests.find(x => x.id === questId);
+  if (!q) return;
+  const typeMap = { main:'épica', side:'encargo', daily:'búsqueda', weekly:'crónica' };
+  const parts = [
+    `¿Cómo abordo esta misión: "${q.name}"?`,
+    `Tipo: ${typeMap[q.type] || q.type}`,
+    q.priority && q.priority !== 'normal' ? `Prioridad: ${q.priority}` : '',
+    q.deadline ? `Deadline: ${q.deadline}` : '',
+    q.notes ? `Notas: ${q.notes.slice(0, 200)}` : ''
+  ].filter(Boolean).join(' | ');
+  openOracle();
+  const input = document.getElementById('oracleInput');
+  if (input) { input.value = parts; input.focus(); }
+}
+
 document.getElementById('oracleBtn').addEventListener('click', openOracle);
 document.getElementById('oracleSend').addEventListener('click', oracleSend);
 document.getElementById('oracleInput').addEventListener('keydown', e => {

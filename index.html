@@ -711,6 +711,11 @@
   <div class="oracle-msgs" id="oracleMsgs">
     <div class="oracle-loading" id="oracleLoading">Invocando al oráculo...</div>
   </div>
+  <div class="oracle-prompts">
+    <button class="oracle-prompt-chip" onclick="oracleQuickPrompt('plan')">📋 Planea mi día</button>
+    <button class="oracle-prompt-chip" onclick="oracleQuickPrompt('priority')">⚡ ¿Qué primero?</button>
+    <button class="oracle-prompt-chip" onclick="oracleQuickPrompt('summary')">🌙 Resumen</button>
+  </div>
   <div class="oracle-input-wrap">
     <input type="text" id="oracleInput" class="oracle-input" placeholder="Consulta al oráculo..." maxlength="2000">
     <button class="oracle-send" id="oracleSend">⚡</button>

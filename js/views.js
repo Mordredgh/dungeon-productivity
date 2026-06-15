@@ -292,6 +292,7 @@ function renderQuestItem(q) {
     <div class="quest-actions">
       ${!q.done ? `<button class="quest-action-btn" onclick="setActiveQuest('${q.id}')" title="Vincular a pomodoro">🍅</button>` : ''}
       ${!q.done ? `<button class="quest-action-btn" onclick="event.stopPropagation();togglePin('${q.id}')" title="${isPinned ? 'Desanclar' : 'Anclar'}">📌</button>` : ''}
+      ${!q.done ? `<button class="quest-action-btn" onclick="event.stopPropagation();oracleQuestAdvice('${q.id}')" title="Pedir consejo al Oráculo">🔮</button>` : ''}
       <button class="quest-action-btn" onclick="openEditQuest('${q.id}')" title="Editar">✏️</button>
     </div>
   </div>`;

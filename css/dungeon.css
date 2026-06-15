@@ -2174,4 +2174,18 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   font-family:var(--font-body);
 }
 .oracle-action-btn:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+.oracle-prompts {
+  display:flex; gap:6px; padding:8px 14px;
+  border-top:1px solid var(--glass-border);
+  overflow-x:auto; flex-shrink:0; scrollbar-width:none;
+}
+.oracle-prompts::-webkit-scrollbar { display:none; }
+.oracle-prompt-chip {
+  white-space:nowrap; background:var(--glass);
+  border:1px solid var(--glass-border); border-radius:20px;
+  color:var(--text2); font-size:12px; padding:5px 12px;
+  cursor:pointer; transition:var(--transition); font-family:var(--font-body);
+}
+.oracle-prompt-chip:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
 </style>
