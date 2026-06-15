@@ -409,10 +409,9 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   border-radius: var(--radius);
   padding: 14px 18px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 14px;
   position: relative;
-  overflow: hidden;
 }
 
 .boss-banner {
