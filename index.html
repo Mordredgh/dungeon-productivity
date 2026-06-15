@@ -119,6 +119,18 @@
   <!-- MAIN -->
   <div class="main">
 
+    <!-- SIDEBAR NAV -->
+    <nav class="sidebar" id="sidebarNav">
+      <button class="sidebar-item active" data-view="quests"       onclick="switchView('quests')"       title="Misiones">⚔️</button>
+      <button class="sidebar-item"        data-view="kanban"       onclick="switchView('kanban')"       title="Kanban">📋</button>
+      <button class="sidebar-item"        data-view="stats"        onclick="switchView('stats')"        title="Sala del Trono">📊</button>
+      <button class="sidebar-item"        data-view="achievements" onclick="switchView('achievements')" title="Logros">🏆</button>
+      <div class="sidebar-divider"></div>
+      <button class="sidebar-item"        data-view="history"      onclick="switchView('history')"      title="Historial">📜</button>
+      <button class="sidebar-item"        data-view="map"          onclick="switchView('map')"          title="Mapa del Reino">🗺️</button>
+      <button class="sidebar-item"        data-view="calendar"     onclick="switchView('calendar')"     title="Calendario">📅</button>
+    </nav>
+
     <!-- CONTENT -->
     <div class="content-area">
 

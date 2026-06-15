@@ -169,7 +169,7 @@ async function doImport() {
 
 /* VIEW NAV */
 function switchView(v) {
-  document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('active', t.dataset.view === v));
+  document.querySelectorAll('.view-tab, .sidebar-item').forEach(t => t.classList.toggle('active', t.dataset.view === v));
   document.querySelectorAll('.view').forEach(el => el.classList.toggle('active', el.id === `view-${v}`));
   if (v === 'stats')        renderStats();
   if (v === 'achievements') renderAchievements();
