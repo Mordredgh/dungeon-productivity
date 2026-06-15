@@ -44,6 +44,7 @@ document.getElementById('addQuestBtn').addEventListener('click', () => {
   document.getElementById('qName').value = '';
   document.getElementById('qDeadline').value = '';
   document.getElementById('qNotes').value = '';
+  closeModal('quickAddModal');
 });
 
 document.getElementById('qName').addEventListener('keydown', e => {
@@ -987,7 +988,8 @@ document.getElementById('musicBtn').addEventListener('click', toggleMusic);
 document.getElementById('csvBtn').addEventListener('click', exportCSV);
 document.getElementById('mobileFab').addEventListener('click', () => {
   switchView('quests');
-  document.getElementById('qName').focus();
+  openModal('quickAddModal');
+  setTimeout(() => document.getElementById('qName').focus(), 50);
 });
 
 // Cmd+K / Ctrl+K
@@ -1417,9 +1419,12 @@ function _oracleAddActions(replyText) {
 function _oracleCreateQuest(suggestion) {
   closeOracle();
   switchView('quests');
-  const input = document.getElementById('qName');
-  if (input) { input.value = suggestion; input.focus(); input.select(); }
-  toast('➕', 'Edita el nombre y pulsa Añadir misión');
+  openModal('quickAddModal');
+  setTimeout(() => {
+    const input = document.getElementById('qName');
+    if (input) { input.value = suggestion; input.focus(); input.select(); }
+  }, 50);
+  toast('➕', 'Edita el nombre y pulsa Crear Misión');
 }
 
 async function _loadOracleHistory() {

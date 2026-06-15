@@ -141,6 +141,7 @@
           <div class="more-menu-wrap sb-more" id="moreMenuWrap">
             <button class="sb-action-btn" id="moreBtn" title="Más opciones">⋯</button>
             <div class="more-menu more-menu-up" id="moreMenu">
+              <button class="more-menu-item" onclick="openModal('quickNotesModal')">📝 Pergamino Rápido</button>
               <button class="more-menu-item" id="bulkToggleBtn">☑️ Selección múltiple</button>
               <button class="more-menu-item" id="compactToggle">⊟ Modo compacto</button>
               <button class="more-menu-item" id="notifBtn">🔔 Notificaciones</button>
@@ -203,6 +204,7 @@
 
           <div class="quest-toolbar">
             <input class="search-box" id="searchBox" placeholder="🔍 Buscar misiones..." type="text">
+            <button class="add-quest-trigger-btn" onclick="openModal('quickAddModal')" title="Nueva misión (N)">➕ Nueva</button>
             <div class="filter-tabs">
               <button class="filter-tab" data-filter="today" id="ft-today" style="color:var(--gold)">📅 Hoy</button>
               <button class="filter-tab active" data-filter="all" id="ft-all">Todas</button>
@@ -491,40 +493,6 @@
         <p class="prophecy-text" id="prophecyText" style="font-size:12px;color:var(--text2);font-style:italic;line-height:1.5;margin:0"></p>
       </div>
 
-      <!-- QUICK ADD -->
-      <div class="panel-section">
-        <div class="panel-title">➕ Nueva Misión</div>
-        <div class="quick-add-form">
-          <input class="quick-input" id="qName" placeholder="Nombre de la misión..." type="text">
-          <div class="form-row">
-            <select id="qType">
-              <option value="main">⭐ Principal</option>
-              <option value="side">🗡️ Secundaria</option>
-              <option value="daily" selected>🌅 Diaria</option>
-              <option value="weekly">📅 Semanal</option>
-            </select>
-            <select id="qPriority">
-              <option value="mitico">💎 Mítico</option>
-              <option value="legendario">🟡 Legendario</option>
-              <option value="epico">🟣 Épico</option>
-              <option value="normal" selected>🔵 Normal</option>
-              <option value="comun">⬜ Común</option>
-            </select>
-          </div>
-          <div class="form-row">
-            <input type="date" id="qDeadline">
-            <input type="text" id="qNotes" placeholder="Notas">
-          </div>
-          <button class="add-btn" id="addQuestBtn">⚔️ Crear Misión</button>
-        </div>
-
-      </div>
-
-      <!-- QUICK NOTES -->
-      <div class="panel-section">
-        <div class="panel-title">📝 Pergamino Rápido</div>
-        <textarea id="quickNotesArea" class="quick-notes-area" placeholder="Apuntes del dungeon..."></textarea>
-      </div>
 
 
     </aside>
@@ -778,6 +746,58 @@
       <div class="cmdk-empty">Escribe para buscar</div>
     </div>
     <div class="cmdk-hint">↑↓ navegar · Enter seleccionar · Esc cerrar</div>
+  </div>
+</div>
+
+<!-- QUICK ADD MODAL -->
+<div class="modal-overlay" id="quickAddModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title">⚔️ Nueva Misión</div>
+      <button class="modal-close" onclick="closeModal('quickAddModal')">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:10px">
+      <input class="form-input" id="qName" placeholder="Nombre de la misión..." type="text" autocomplete="off">
+      <div class="form-row">
+        <select class="form-input" id="qType">
+          <option value="main">⭐ Principal</option>
+          <option value="side">🗡️ Secundaria</option>
+          <option value="daily" selected>🌅 Diaria</option>
+          <option value="weekly">📅 Semanal</option>
+        </select>
+        <select class="form-input" id="qPriority">
+          <option value="mitico">💎 Mítico</option>
+          <option value="legendario">🟡 Legendario</option>
+          <option value="epico">🟣 Épico</option>
+          <option value="normal" selected>🔵 Normal</option>
+          <option value="comun">⬜ Común</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <input class="form-input" type="date" id="qDeadline">
+        <input class="form-input" type="text" id="qNotes" placeholder="Notas rápidas">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('quickAddModal')">Cancelar</button>
+      <button class="btn btn-primary" id="addQuestBtn">⚔️ Crear Misión</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUICK NOTES MODAL -->
+<div class="modal-overlay" id="quickNotesModal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">📝 Pergamino Rápido</div>
+      <button class="modal-close" onclick="closeModal('quickNotesModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="quickNotesArea" class="quick-notes-area" placeholder="Apuntes del dungeon..." style="min-height:260px;width:100%"></textarea>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button class="btn btn-primary" onclick="closeModal('quickNotesModal')">Guardar y cerrar</button>
+    </div>
   </div>
 </div>
 

@@ -220,7 +220,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   white-space: nowrap;
 }
 .header-logo-img {
-  height: 42px;
+  height: 56px;
   width: auto;
   object-fit: contain;
   display: block;
@@ -609,6 +609,19 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   align-items: center;
   flex-wrap: wrap;
 }
+.add-quest-trigger-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity .15s;
+}
+.add-quest-trigger-btn:hover { opacity: .85; }
 
 .search-box {
   flex: 1;
