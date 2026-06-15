@@ -1,23 +1,23 @@
 {
-  "name": "Dungeon Productivity",
-  "short_name": "Dungeon",
-  "description": "Sistema D&D para conquistar tus metas",
+  "name": "Arcanum",
+  "short_name": "Arcanum",
+  "description": "Sistema RPG para conquistar tus metas",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0d0d1a",
-  "theme_color": "#a855f7",
+  "background_color": "#0f1117",
+  "theme_color": "#89b4fa",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "logo-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "logo-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "maskable"
     }
   ],
@@ -27,7 +27,7 @@
       "short_name": "Agregar",
       "description": "Añadir una misión rápidamente",
       "url": "/?action=add",
-      "icons": [{ "src": "icon.svg", "sizes": "any" }]
+      "icons": [{ "src": "logo-icon.png", "sizes": "512x512" }]
     }
   ]
 }

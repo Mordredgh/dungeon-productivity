@@ -219,6 +219,12 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   background-clip: text;
   white-space: nowrap;
 }
+.header-logo-img {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
 
 .header-hero {
   display: flex;
