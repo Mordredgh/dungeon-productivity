@@ -1342,14 +1342,63 @@ function closeOracle() {
   document.getElementById('oracleOverlay').classList.remove('open');
 }
 
+function _buildOracleContext(userText) {
+  const today      = new Date().toISOString().split('T')[0];
+  const pending    = quests.filter(q => !q.done).slice(0, 15);
+  const todayPoms  = pomodoros.filter(p => p.started_at && p.started_at.startsWith(today)).length;
+  const todayDone  = quests.filter(q => q.done && q.done_at && q.done_at.startsWith(today)).length;
+  const typeMap    = { main:'épica', side:'encargo', daily:'búsqueda', weekly:'crónica' };
+
+  const questLines = pending.length
+    ? pending.map(q =>
+        `- [${typeMap[q.type] || q.type}] ${q.name}` +
+        (q.priority === 'urgente' ? ' ⚠️URGENTE' : '') +
+        (q.deadline ? ` (deadline: ${q.deadline})` : '')
+      ).join('\n')
+    : '- (ninguna pendiente)';
+
+  return `[CONTEXTO DEL HÉROE - ${new Date().toLocaleDateString('es-MX')}]
+Nivel ${hero ? hero.level : '?'} | Racha: ${hero ? (hero.streak || 0) : 0} días | HP: ${hero ? hero.hp : 100}/${hero ? hero.max_hp : 100}
+Hoy: ${todayDone} misiones completadas · ${todayPoms} pomodoros
+Misiones pendientes (${pending.length}):
+${questLines}
+[FIN CONTEXTO]
+
+${userText}`;
+}
+
 function _oracleAppend(role, text) {
   const msgs = document.getElementById('oracleMsgs');
-  const el = document.createElement('div');
+  const el   = document.createElement('div');
   el.className = 'oracle-msg ' + role;
   el.textContent = text;
   msgs.appendChild(el);
   msgs.scrollTop = msgs.scrollHeight;
   return el;
+}
+
+function _oracleAddActions(replyText) {
+  const msgs = document.getElementById('oracleMsgs');
+  const wrap = document.createElement('div');
+  wrap.className = 'oracle-msg-actions';
+
+  const btn = document.createElement('button');
+  btn.className   = 'oracle-action-btn';
+  btn.textContent = '➕ Crear misión';
+  const suggestion = replyText.split('\n')[0].replace(/^[-*•#>\s]+/, '').trim().slice(0, 150);
+  btn.addEventListener('click', () => _oracleCreateQuest(suggestion));
+  wrap.appendChild(btn);
+
+  msgs.appendChild(wrap);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function _oracleCreateQuest(suggestion) {
+  closeOracle();
+  switchView('quests');
+  const input = document.getElementById('qName');
+  if (input) { input.value = suggestion; input.focus(); input.select(); }
+  toast('➕', 'Edita el nombre y pulsa Añadir misión');
 }
 
 async function _loadOracleHistory() {
@@ -1363,7 +1412,7 @@ async function _loadOracleHistory() {
     const items = (data.items || []).slice(-20);
     if (!items.length) {
       const ph = document.createElement('div');
-      ph.className = 'oracle-loading';
+      ph.className   = 'oracle-loading';
       ph.textContent = '🔮 El oráculo aguarda tu primera consulta...';
       msgs.appendChild(ph);
       return;
@@ -1372,7 +1421,8 @@ async function _loadOracleHistory() {
       let text = typeof item.content === 'string'
         ? item.content
         : (Array.isArray(item.content) ? item.content.filter(b => b.type === 'text').map(b => b.text).join('') : '');
-      if (text) _oracleAppend(item.role === 'user' ? 'user' : 'assistant', text);
+      if (!text) return;
+      _oracleAppend(item.role === 'user' ? 'user' : 'assistant', text);
     });
     msgs.scrollTop = msgs.scrollHeight;
   } catch {
@@ -1397,11 +1447,13 @@ async function oracleSend() {
     const r    = await fetch('/openclaw/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text })
+      body: JSON.stringify({ text: _buildOracleContext(text) })
     });
     thinkEl.remove();
-    const data = await r.json();
-    _oracleAppend('assistant', data.reply || '⚠️ Sin respuesta del oráculo.');
+    const data  = await r.json();
+    const reply = data.reply || '⚠️ Sin respuesta del oráculo.';
+    _oracleAppend('assistant', reply);
+    _oracleAddActions(reply);
   } catch {
     thinkEl.remove();
     _oracleAppend('assistant', '⚠️ Error al consultar el oráculo.');
