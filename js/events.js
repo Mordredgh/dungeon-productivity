@@ -767,36 +767,6 @@ document.getElementById('cmdkInput').addEventListener('input', function() {
     </div>`).join('');
 });
 
-/* ============================================================
-   COMPANION DEL GREMIO
-   ============================================================ */
-const COMPANION_RESPONSES = {
-  bien:     ['¡El gremio celebra con vino de enano! Sigue así, campeón.', '¡Los dioses asienten ante tu progreso!', '¡Magnífico! El libro de hazañas registra tu nombre.'],
-  mal:      ['El camino del héroe nunca es fácil, compañero. Mañana el dungeon será tuyo.', 'Hasta los más grandes cayeron antes de levantarse. Descansa y vuelve más fuerte.', 'El oráculo dice: las tormentas forjan a los mejores guerreros.'],
-  complete: ['¡Victoria épica! Tu leyenda crece con cada conquista.', '¡Monstruo derrotado! El gremio te aplaude.', '¡Otra misión destruida! El libro de hazañas se engrandece.'],
-  default:  ['Cuenta con el gremio, héroe. Siempre.', 'El oráculo te observa. Cada acción importa.', 'La mazmorra aguarda. ¿Qué estrategia sigues hoy?', 'Los mejores héroes piden consejo. Sabia decisión.']
-};
-
-function talkToCompanion() {
-  const input = document.getElementById('companionInput');
-  const msg   = document.getElementById('companionMsg');
-  const text  = (input.value || '').toLowerCase();
-  if (!text.trim()) return;
-
-  let category = 'default';
-  if (/bien|excelente|genial|increíble|perfecto|logré|conseguí/i.test(text)) category = 'bien';
-  else if (/mal|difícil|cansado|deprimido|no pude|fallé|terrible/i.test(text)) category = 'mal';
-  else if (/completé|terminé|acabé|hice|logré|gané/i.test(text)) category = 'complete';
-
-  const responses = COMPANION_RESPONSES[category];
-  const response  = responses[Math.floor(Math.random() * responses.length)];
-  msg.textContent = `🗡️ "${response}"`;
-  input.value = '';
-}
-
-document.getElementById('companionInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') talkToCompanion();
-});
 
 /* ============================================================
    REPEAT QUEST AUTO-RESET
