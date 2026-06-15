@@ -413,14 +413,11 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   border-bottom: 1px solid rgba(168,85,247,.08);
   flex-shrink: 0;
 }
-.sb-bar-row {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-.sb-bar-lbl { font-size: 10px; color: var(--text2); width: 20px; flex-shrink: 0; font-weight: 500; }
-.sb-bar     { flex: 1; height: 8px; border-radius: 6px; overflow: hidden; }
-.sb-bar-val { font-size: 10px; color: var(--text2); width: 54px; text-align: right; flex-shrink: 0; white-space: nowrap; }
+.sb-bar-block  { display: flex; flex-direction: column; gap: 5px; }
+.sb-bar-header { display: flex; justify-content: space-between; align-items: center; }
+.sb-bar-lbl { font-size: 11px; color: var(--text2); font-weight: 600; letter-spacing: .04em; }
+.sb-bar     { width: 100%; height: 10px; border-radius: 6px; overflow: hidden; }
+.sb-bar-val { font-size: 11px; color: var(--text2); white-space: nowrap; }
 
 /* Mini stat cards */
 .sb-stats {
@@ -504,16 +501,16 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 .sb-actions-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 5px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
 }
 .sb-action-btn {
   aspect-ratio: 1;
-  border-radius: 8px;
+  border-radius: 10px;
   background: rgba(168,85,247,.07);
   border: 1px solid rgba(168,85,247,.1);
   color: var(--text2);
-  font-size: 17px;
+  font-size: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
