@@ -69,6 +69,7 @@
       <div class="stat-chip" title="Racha de días consecutivos">Racha <span id="statStreak">0</span>🔥</div>
       <div class="stat-chip" title="XP total acumulado">XP <span id="statTotalXP">0</span></div>
       <div class="stat-chip" title="Mejor racha histórica">🏆 <span id="statBestStreak">0</span></div>
+      <div class="stat-chip" id="focusTodayChip" title="Focus acumulado hoy (pomodoros × duración)">⏱ <span id="focusTodayVal">0h 0m</span></div>
     </div>
 
     <div id="spellActiveBadge" style="display:none" class="spell-active-badge">⚡ x2 XP</div>
@@ -86,6 +87,7 @@
       <button class="icon-btn" id="csvBtn" title="Exportar CSV 📊">📊</button>
       <button class="icon-btn" id="notifBtn" title="Notificaciones">🔔</button>
       <button class="icon-btn" id="helpBtn" title="Atajos de teclado (?)">⌨️</button>
+      <button class="icon-btn" id="ambientBtn" title="Sonido ambiental: lluvia / chimenea / bosque">🌧️</button>
     </div>
   </header>
 
@@ -152,6 +154,13 @@
               <option value="deadline">Fecha límite</option>
               <option value="xp">XP</option>
             </select>
+          </div>
+
+          <div class="date-filter-tabs" id="dateFilterTabs">
+            <button class="date-filter-btn active" data-df="all">Todo</button>
+            <button class="date-filter-btn" data-df="today">📅 Hoy</button>
+            <button class="date-filter-btn" data-df="week">📆 Semana</button>
+            <button class="date-filter-btn" data-df="overdue">⚠️ Vencidas</button>
           </div>
 
           <div class="bulk-bar" id="bulkBar" style="display:none">
@@ -365,6 +374,10 @@
 
           <div class="pom-extras">
             <div class="pom-extra-row">
+              <label style="font-size:11px;color:var(--text2)">Auto-desc.:</label>
+              <button id="autoBreakBtn" class="pom-mini-btn" title="Iniciar descanso automáticamente al terminar pom">ON</button>
+            </div>
+            <div class="pom-extra-row">
               <label style="font-size:11px;color:var(--text2)">Descanso:</label>
               <select id="breakDurSelect" class="pom-mini-select">
                 <option value="3">3m</option>
@@ -419,6 +432,12 @@
           <div class="panel-title" style="margin-bottom:8px">📦 Plantillas</div>
           <div style="display:flex;flex-direction:column;gap:4px" id="templatesList"></div>
         </div>
+      </div>
+
+      <!-- QUICK NOTES -->
+      <div class="panel-section">
+        <div class="panel-title">📝 Pergamino Rápido</div>
+        <textarea id="quickNotesArea" class="quick-notes-area" placeholder="Apuntes del dungeon..."></textarea>
       </div>
 
       <!-- COMPANION -->
