@@ -27,11 +27,15 @@ document.querySelectorAll('.filter-tab[data-hfilter]').forEach(btn => btn.addEve
 document.getElementById('historySearch').addEventListener('input', () => { historyPage = 1; renderHistory(); });
 
 document.getElementById('addQuestBtn').addEventListener('click', () => {
-  const name = document.getElementById('qName').value.trim();
+  let name = document.getElementById('qName').value.trim();
   if (!name || !hero) { toast('⚠️', 'Escribe el nombre de la misión.'); return; }
+  let type = document.getElementById('qType').value;
+  const slashMap = { '/daily':'daily', '/main':'main', '/side':'side', '/weekly':'weekly' };
+  for (const [cmd, t] of Object.entries(slashMap)) {
+    if (name.toLowerCase().startsWith(cmd + ' ')) { type = t; name = name.slice(cmd.length + 1).trim(); break; }
+  }
   addQuest({
-    name,
-    type: document.getElementById('qType').value,
+    name, type,
     priority: document.getElementById('qPriority').value,
     deadline: document.getElementById('qDeadline').value || null,
     notes: document.getElementById('qNotes').value || null,
@@ -830,6 +834,7 @@ function updatePomGoalUI() {
   if (elTgt) elTgt.textContent = pomGoal;
   if (elFill) elFill.style.width = pct + '%';
   if (pct >= 100) toast('🎯', '¡Meta de pomodoros del día cumplida!');
+  updateFocusTodayChip();
 }
 
 /* ============================================================
@@ -1147,3 +1152,158 @@ document.getElementById('pomGoalInput').addEventListener('change', function() {
 });
 
 document.getElementById('helpBtn').addEventListener('click', () => openModal('shortcutsModal'));
+
+/* ============================================================
+   SONIDO AMBIENTAL (Web Audio API)
+   ============================================================ */
+function _createWhiteNoise(ctx) {
+  const bufSize = ctx.sampleRate * 2;
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) d[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  src.buffer = buf; src.loop = true;
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass'; filter.frequency.value = 400; filter.Q.value = 0.5;
+  const gain = ctx.createGain(); gain.gain.value = 0.25;
+  src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+  src.start(); return src;
+}
+
+function _createFire(ctx) {
+  const bufSize = ctx.sampleRate * 2;
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) d[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  src.buffer = buf; src.loop = true;
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass'; filter.frequency.value = 200; filter.Q.value = 1;
+  const gain = ctx.createGain(); gain.gain.value = 0.3;
+  src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+  src.start(); return src;
+}
+
+function _createForest(ctx) {
+  const bufSize = ctx.sampleRate * 2;
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) d[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  src.buffer = buf; src.loop = true;
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass'; filter.frequency.value = 800; filter.Q.value = 0.3;
+  const gain = ctx.createGain(); gain.gain.value = 0.15;
+  src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+  src.start(); return src;
+}
+
+function startAmbient(type) {
+  stopAmbient();
+  const ctx = getAudioCtx();
+  if (type === 'rain')        ambientNode = _createWhiteNoise(ctx);
+  else if (type === 'fire')   ambientNode = _createFire(ctx);
+  else if (type === 'forest') ambientNode = _createForest(ctx);
+  ambientType = type;
+  localStorage.setItem('dungeon-ambient', type);
+  const icons = { rain: '🌧️', fire: '🔥', forest: '🌿' };
+  const btn = document.getElementById('ambientBtn');
+  if (btn) { btn.style.color = 'var(--blue)'; btn.title = `Ambiental: ${type}`; btn.textContent = icons[type] || '🌧️'; }
+  const labels = { rain: 'Lluvia activada', fire: 'Fuego activado', forest: 'Bosque activado' };
+  toast(icons[type] || '🎵', labels[type] || 'Ambiental activado');
+}
+
+function stopAmbient() {
+  if (ambientNode) { try { ambientNode.stop(); } catch {} ambientNode = null; }
+  ambientType = null;
+  localStorage.removeItem('dungeon-ambient');
+  const btn = document.getElementById('ambientBtn');
+  if (btn) { btn.style.color = ''; btn.title = 'Sonido ambiental'; btn.textContent = '🌧️'; }
+}
+
+function cycleAmbient() {
+  const cycle = [null, 'rain', 'fire', 'forest'];
+  const next  = cycle[(cycle.indexOf(ambientType) + 1) % cycle.length];
+  const btn   = document.getElementById('ambientBtn');
+  if (!next) { stopAmbient(); toast('🔇', 'Ambiental desactivado.'); if (btn) btn.textContent = '🌧️'; }
+  else startAmbient(next);
+}
+
+document.getElementById('ambientBtn').addEventListener('click', cycleAmbient);
+
+/* ============================================================
+   FOCUS TODAY CHIP
+   ============================================================ */
+function updateFocusTodayChip() {
+  const el = document.getElementById('focusTodayVal');
+  if (!el) return;
+  const today = new Date().toISOString().split('T')[0];
+  const mins  = pomodoros.filter(p => p.started_at && p.started_at.startsWith(today)).length * 25;
+  el.textContent = `${Math.floor(mins / 60)}h ${mins % 60}m`;
+}
+
+/* ============================================================
+   AUTO-BREAK TOGGLE
+   ============================================================ */
+function toggleAutoBreak() {
+  autoBreak = !autoBreak;
+  localStorage.setItem('dungeon-auto-break', autoBreak ? 'true' : 'false');
+  const btn = document.getElementById('autoBreakBtn');
+  if (btn) { btn.textContent = autoBreak ? 'ON' : 'OFF'; btn.classList.toggle('off', !autoBreak); }
+  toast(autoBreak ? '⏩' : '⏸', autoBreak ? 'Auto-descanso activado.' : 'Auto-descanso desactivado.');
+}
+
+(function initAutoBreakBtn() {
+  const btn = document.getElementById('autoBreakBtn');
+  if (!btn) return;
+  btn.textContent = autoBreak ? 'ON' : 'OFF';
+  btn.classList.toggle('off', !autoBreak);
+})();
+
+document.getElementById('autoBreakBtn').addEventListener('click', toggleAutoBreak);
+
+/* ============================================================
+   DATE FILTER TABS
+   ============================================================ */
+document.querySelectorAll('.date-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    dateFilter = btn.dataset.df;
+    document.querySelectorAll('.date-filter-btn').forEach(b => b.classList.toggle('active', b === btn));
+    renderQuestList();
+  });
+});
+
+/* ============================================================
+   QUICK NOTES PAD
+   ============================================================ */
+(function initQuickNotes() {
+  const area = document.getElementById('quickNotesArea');
+  if (!area) return;
+  area.value = localStorage.getItem('dungeon-quick-notes') || '';
+  area.addEventListener('input', () => localStorage.setItem('dungeon-quick-notes', area.value));
+})();
+
+/* ============================================================
+   DAILY SUMMARY TOAST (8pm)
+   ============================================================ */
+function checkDailySummary() {
+  if (new Date().getHours() < 20) return;
+  const today = new Date().toISOString().split('T')[0];
+  if (localStorage.getItem('dungeon-summary-shown') === today) return;
+  localStorage.setItem('dungeon-summary-shown', today);
+  const done  = quests.filter(q => q.done && q.done_at && q.done_at.startsWith(today)).length;
+  const poms  = pomodoros.filter(p => p.started_at && p.started_at.startsWith(today)).length;
+  const xp    = quests.filter(q => q.done && q.done_at && q.done_at.startsWith(today))
+                      .reduce((s, q) => s + (XP_TABLE[q.type] || 50), 0);
+  toast('📜', `Resumen del día: ${done} misiones · ${poms} pomodoros · +${xp} XP`);
+}
+
+/* ============================================================
+   PIN QUEST
+   ============================================================ */
+function togglePin(id) {
+  const key = 'dungeon-pin-' + id;
+  if (localStorage.getItem(key)) { localStorage.removeItem(key); toast('📌', 'Misión desanclada.'); }
+  else { localStorage.setItem(key, '1'); toast('📌', 'Misión anclada al inicio.'); }
+  renderQuestList();
+}

@@ -128,10 +128,12 @@ function renderQuestList() {
     return new Date(b.created_at) - new Date(a.created_at);
   });
 
-  const pending = filtered.filter(q => !q.done);
+  const allPending = filtered.filter(q => !q.done);
+  const pinned  = allPending.filter(q => localStorage.getItem('dungeon-pin-' + q.id));
+  const pending = allPending.filter(q => !localStorage.getItem('dungeon-pin-' + q.id));
   const done    = filtered.filter(q => q.done);
 
-  if (!pending.length && !done.length) {
+  if (!allPending.length && !done.length) {
     el.innerHTML = `<div class="empty-state">
       <svg width="80" height="80" viewBox="0 0 80 80" style="margin-bottom:14px;opacity:.4">
         <rect x="10" y="30" width="60" height="40" rx="6" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -153,6 +155,11 @@ function renderQuestList() {
   const typeOrder = ['urgente', 'main', 'weekly', 'side', 'daily'];
   const typeLabelsGroup = { urgente:'🔴 Urgentes', main:'⚔️ Misiones Épicas', weekly:'📜 Crónicas Semanales', side:'🗡️ Encargos', daily:'🌅 Búsquedas Diarias' };
   let html = '';
+
+  if (pinned.length) {
+    html += `<div class="type-separator">📌 Ancladas<span>${pinned.length}</span></div>`;
+    html += pinned.map(q => renderQuestItem(q)).join('');
+  }
 
   if (activeFilter === 'all') {
     typeOrder.forEach(type => {
@@ -250,7 +257,8 @@ function renderQuestItem(q) {
   const scheduledHtml = isScheduled ? `<span class="scheduled-badge">📅 desde ${startDate}</span>` : '';
   const lockHtml      = isLocked  ? `<span class="locked-badge">🔒 Req: ${escHtml(depName)}</span>` : '';
 
-  return `<div class="quest-item ${q.done ? 'done' : ''} ${isLocked ? 'quest-locked' : ''} ${isOverdue ? 'quest-overdue' : ''}" data-type="${q.type}" data-priority="${q.priority || 'normal'}" data-qid="${q.id}"
+  const isPinned = !!localStorage.getItem('dungeon-pin-' + q.id);
+  return `<div class="quest-item ${q.done ? 'done' : ''} ${isLocked ? 'quest-locked' : ''} ${isOverdue ? 'quest-overdue' : ''} ${isPinned ? 'pinned' : ''}" data-type="${q.type}" data-priority="${q.priority || 'normal'}" data-qid="${q.id}"
     draggable="true"
     ondragstart="draggedQuestId='${q.id}';event.dataTransfer.effectAllowed='move';this.classList.add('dragging')"
     ondragend="this.classList.remove('dragging')"
@@ -283,6 +291,7 @@ function renderQuestItem(q) {
     </div>
     <div class="quest-actions">
       ${!q.done ? `<button class="quest-action-btn" onclick="setActiveQuest('${q.id}')" title="Vincular a pomodoro">🍅</button>` : ''}
+      ${!q.done ? `<button class="quest-action-btn" onclick="event.stopPropagation();togglePin('${q.id}')" title="${isPinned ? 'Desanclar' : 'Anclar'}">📌</button>` : ''}
       <button class="quest-action-btn" onclick="openEditQuest('${q.id}')" title="Editar">✏️</button>
     </div>
   </div>`;

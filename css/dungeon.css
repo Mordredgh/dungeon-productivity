@@ -302,16 +302,16 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .stat-chip:hover { border-color: var(--border2); box-shadow: var(--glow); }
 .stat-chip span { color: var(--gold); font-weight: 600; }
 
-.header-actions { display: flex; gap: 6px; align-items: center; }
+.header-actions { display: flex; gap: 2px; align-items: center; }
 
 .icon-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-sm);
   background: var(--glass);
   border: 1px solid var(--glass-border);
   color: var(--text2);
-  font-size: 16px;
+  font-size: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
