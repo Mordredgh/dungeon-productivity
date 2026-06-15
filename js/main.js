@@ -4,9 +4,12 @@
   if (savedTheme) document.documentElement.dataset.theme = savedTheme;
   updateTimerUI();
   document.getElementById('timerPhase').textContent = 'Listo';
+  if (Notification.permission === 'granted') notifEnabled = true;
   await initDB();
   await resetDailyQuests();
+  await resetRepeatQuests();
   await checkOverdueHP();
+  updatePomGoalUI();
   restoreTimerState();
   checkStreakDanger();
   initPWA();

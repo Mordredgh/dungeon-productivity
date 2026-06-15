@@ -250,7 +250,7 @@ function renderQuestItem(q) {
   const scheduledHtml = isScheduled ? `<span class="scheduled-badge">📅 desde ${startDate}</span>` : '';
   const lockHtml      = isLocked  ? `<span class="locked-badge">🔒 Req: ${escHtml(depName)}</span>` : '';
 
-  return `<div class="quest-item ${q.done ? 'done' : ''} ${isLocked ? 'quest-locked' : ''}" data-type="${q.type}" data-priority="${q.priority || 'normal'}" data-qid="${q.id}"
+  return `<div class="quest-item ${q.done ? 'done' : ''} ${isLocked ? 'quest-locked' : ''} ${isOverdue ? 'quest-overdue' : ''}" data-type="${q.type}" data-priority="${q.priority || 'normal'}" data-qid="${q.id}"
     draggable="true"
     ondragstart="draggedQuestId='${q.id}';event.dataTransfer.effectAllowed='move';this.classList.add('dragging')"
     ondragend="this.classList.remove('dragging')"
@@ -345,6 +345,7 @@ function renderStats() {
   renderHourlyChart();
   renderWeekComparison();
   renderAvgTime();
+  renderWeekdayChart();
   if (!hero) return;
 
   const setText = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
@@ -533,6 +534,28 @@ function renderWeekComparison() {
     <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Esta semana</span><strong style="color:var(--accent)">${thisWeek}</strong></div>
     <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Semana anterior</span><strong>${lastWeek}</strong></div>
     <div style="text-align:center;font-size:16px;font-weight:700;color:${color};margin-top:4px">${arrow} ${pct}%${diff!==0?(diff>0?' más':' menos'):' igual'}</div>`;
+}
+
+/* ── XP por día de la semana (histórico) ───────── */
+function renderWeekdayChart() {
+  const el = document.getElementById('weekdayChart');
+  if (!el) return;
+  const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const xpByDay = Array(7).fill(0);
+  quests.forEach(q => {
+    if (q.done && q.done_at) xpByDay[new Date(q.done_at).getDay()] += XP_TABLE[q.type] || 50;
+  });
+  const max = Math.max(...xpByDay, 1);
+  const peak = xpByDay.indexOf(Math.max(...xpByDay));
+  el.innerHTML = `<div class="hourly-bars">` +
+    xpByDay.map((xp, i) => `
+      <div class="hourly-col" title="${days[i]}: ${xp} XP">
+        <div class="hourly-bar" style="height:${Math.round((xp/max)*50)}px;background:${i===peak&&xp>0?'var(--accent)':'var(--bg4)'}"></div>
+        <div class="hourly-label">${days[i]}</div>
+      </div>`).join('') + `</div>` +
+    (xpByDay[peak] > 0
+      ? `<div style="font-size:11px;color:var(--text2);text-align:center;margin-top:4px">Más productivo: ${days[peak]} (${xpByDay[peak]} XP)</div>`
+      : `<div style="font-size:11px;color:var(--text3);text-align:center">Completa misiones para ver tu patrón semanal</div>`);
 }
 
 /* ── Average time per quest ─────────────────────── */

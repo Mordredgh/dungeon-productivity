@@ -38,7 +38,7 @@ function advancePhase() {
     updatePomDots();
     const isLong = timer.pomsDone % 4 === 0;
     timer.phase = 'break';
-    timer.seconds = (isLong ? 15 : 5) * 60;
+    timer.seconds = (isLong ? 15 : breakDuration) * 60;
     document.getElementById('timerPhase').textContent = isLong ? '☕ Descanso largo' : '☕ Descanso';
     toast('🍅', isLong ? '¡4 pomodoros! Descanso largo 15 min.' : '¡Pomodoro listo! Descansa 5 min.');
     sendNotif('🍅 Pomodoro completado', isLong ? 'Descanso largo: 15 min' : 'Descanso: 5 min');

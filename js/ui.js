@@ -182,6 +182,7 @@ document.addEventListener('keydown', e => {
   if (key === 'F') toggleFocusMode();
   if (key === 'S') toggleSidebar();
   if (key === 'B') { bulkMode ? exitBulkMode() : enterBulkMode(); }
+  if (e.key === '?') { e.preventDefault(); openModal('shortcutsModal'); }
   if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
   if (key === '1') switchView('quests');
   if (key === '2') switchView('kanban');

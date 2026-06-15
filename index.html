@@ -76,6 +76,7 @@
     <div class="header-actions">
       <button class="icon-btn" id="d20Btn" title="Tirar D20 🎲">🎲</button>
       <button class="icon-btn" id="musicBtn" title="Música lofi 🎵">🎵</button>
+      <input type="range" id="musicVolume" class="vol-slider" min="0" max="100" value="25" style="display:none" title="Volumen música">
       <button class="icon-btn" id="bulkToggleBtn" title="Selección múltiple (B)">☑️</button>
       <button class="icon-btn" id="focusBtn" title="Modo Focus (F)">🎯</button>
       <button class="icon-btn" id="compactToggle" title="Modo compacto (C)">⊟</button>
@@ -84,6 +85,7 @@
       <button class="icon-btn" id="exportBtn" title="Exportar JSON">📤</button>
       <button class="icon-btn" id="csvBtn" title="Exportar CSV 📊">📊</button>
       <button class="icon-btn" id="notifBtn" title="Notificaciones">🔔</button>
+      <button class="icon-btn" id="helpBtn" title="Atajos de teclado (?)">⌨️</button>
     </div>
   </header>
 
@@ -251,6 +253,10 @@
               <div class="stats-card-title">⏱️ Tiempo promedio por misión</div>
               <div id="avgTimeContent" style="display:flex;flex-direction:column;gap:6px;font-size:13px"></div>
             </div>
+            <div class="stats-card">
+              <div class="stats-card-title">📅 XP por día de la semana</div>
+              <div id="weekdayChart"></div>
+            </div>
             <div class="stats-card" style="grid-column:1/-1">
               <div class="stats-card-title">📅 Actividad — últimos 90 días</div>
               <div class="heatmap-months" id="heatmapMonths"></div>
@@ -356,6 +362,25 @@
           </div>
 
           <div class="pom-task-label" id="pomTaskLabel">Sin misión activa</div>
+
+          <div class="pom-extras">
+            <div class="pom-extra-row">
+              <label style="font-size:11px;color:var(--text2)">Descanso:</label>
+              <select id="breakDurSelect" class="pom-mini-select">
+                <option value="3">3m</option>
+                <option value="5" selected>5m</option>
+                <option value="10">10m</option>
+                <option value="15">15m</option>
+              </select>
+              <label style="font-size:11px;color:var(--text2);margin-left:8px">Meta:</label>
+              <input id="pomGoalInput" type="number" min="1" max="20" value="8" class="pom-mini-input">
+              <span style="font-size:11px;color:var(--text2)">poms</span>
+            </div>
+            <div class="pom-goal-wrap">
+              <span class="pom-goal-label">Hoy: <span id="pomGoalCurrent">0</span>/<span id="pomGoalTarget">8</span></span>
+              <div class="pom-goal-bar"><div class="pom-goal-fill" id="pomGoalFill" style="width:0%"></div></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -575,6 +600,30 @@
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('importModal')">Cancelar</button>
       <button class="btn btn-primary" id="doImportBtn">Importar texto</button>
+    </div>
+  </div>
+</div>
+
+<!-- Shortcuts -->
+<div class="modal-overlay" id="shortcutsModal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-title">⌨️ Atajos de Teclado</div>
+    <div class="modal-body shortcuts-grid">
+      <div class="shortcut-row"><kbd>Espacio</kbd><span>Start / Pause Pomodoro</span></div>
+      <div class="shortcut-row"><kbd>N</kbd><span>Nueva misión (enfocar campo)</span></div>
+      <div class="shortcut-row"><kbd>R</kbd><span>Reiniciar timer</span></div>
+      <div class="shortcut-row"><kbd>T</kbd><span>Cambiar tema</span></div>
+      <div class="shortcut-row"><kbd>C</kbd><span>Modo compacto</span></div>
+      <div class="shortcut-row"><kbd>F</kbd><span>Modo Focus</span></div>
+      <div class="shortcut-row"><kbd>S</kbd><span>Colapsar / abrir panel</span></div>
+      <div class="shortcut-row"><kbd>B</kbd><span>Selección múltiple</span></div>
+      <div class="shortcut-row"><kbd>1 – 5</kbd><span>Cambiar vista</span></div>
+      <div class="shortcut-row"><kbd>Ctrl K</kbd><span>Búsqueda rápida</span></div>
+      <div class="shortcut-row"><kbd>Esc</kbd><span>Cerrar modal</span></div>
+      <div class="shortcut-row"><kbd>?</kbd><span>Mostrar esta ayuda</span></div>
+    </div>
+    <div class="modal-footer" style="justify-content:center">
+      <button class="btn btn-primary" onclick="closeModal('shortcutsModal')">¡Entendido! ⚔️</button>
     </div>
   </div>
 </div>

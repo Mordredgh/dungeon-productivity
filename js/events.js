@@ -793,19 +793,60 @@ document.getElementById('companionInput').addEventListener('keydown', e => {
 });
 
 /* ============================================================
+   REPEAT QUEST AUTO-RESET
+   ============================================================ */
+async function resetRepeatQuests() {
+  const today = new Date().toISOString().split('T')[0];
+  const lastCheck = localStorage.getItem('dungeon-repeat-check');
+  if (lastCheck === today) return;
+  localStorage.setItem('dungeon-repeat-check', today);
+  let count = 0;
+  for (const q of quests) {
+    const repeat = parseInt(localStorage.getItem('dungeon-repeat-' + q.id));
+    if (!repeat || !q.done || !q.done_at) continue;
+    const daysSince = Math.floor((Date.now() - new Date(q.done_at).getTime()) / 86400000);
+    if (daysSince >= repeat) {
+      await db.from('dungeon_quests').update({ done: false, done_at: null }).eq('id', q.id);
+      q.done = false; q.done_at = null;
+      count++;
+    }
+  }
+  if (count) { toast('🔄', `${count} misión(es) repetible(s) restablecida(s).`); renderQuestList(); }
+}
+
+/* ============================================================
+   POM GOAL UI
+   ============================================================ */
+function updatePomGoalUI() {
+  const today = new Date().toISOString().split('T')[0];
+  const todayPoms = pomodoros.filter(p => p.started_at && p.started_at.startsWith(today)).length;
+  const pct = Math.min(100, Math.round((todayPoms / pomGoal) * 100));
+  const elCur = document.getElementById('pomGoalCurrent');
+  const elTgt = document.getElementById('pomGoalTarget');
+  const elFill = document.getElementById('pomGoalFill');
+  if (elCur) elCur.textContent = todayPoms;
+  if (elTgt) elTgt.textContent = pomGoal;
+  if (elFill) elFill.style.width = pct + '%';
+  if (pct >= 100) toast('🎯', '¡Meta de pomodoros del día cumplida!');
+}
+
+/* ============================================================
    MUSIC TOGGLE
    ============================================================ */
 function toggleMusic() {
   const btn = document.getElementById('musicBtn');
+  const vol = document.getElementById('musicVolume');
   if (musicAudio) {
     musicAudio.pause(); musicAudio = null;
     btn.style.color = '';
+    if (vol) vol.style.display = 'none';
     toast('🎵', 'Música detenida.');
   } else {
     musicAudio = new Audio('https://radio.plaza.one/ogg');
-    musicAudio.volume = 0.25;
+    musicAudio.volume = (vol ? vol.value : 25) / 100;
     musicAudio.play().then(() => {
       btn.style.color = 'var(--green)';
+      if (vol) vol.style.display = 'inline-block';
       toast('🎵', 'Música lofi activada. ¡A trabajar, héroe!');
     }).catch(() => {
       musicAudio = null;
@@ -1086,3 +1127,21 @@ ACHIEVEMENT_DEFS.push(
 );
 
 document.getElementById('doImportCsvBtn').addEventListener('click', doImportCSV);
+
+document.getElementById('musicVolume').addEventListener('input', function() {
+  if (musicAudio) musicAudio.volume = this.value / 100;
+});
+
+document.getElementById('breakDurSelect').addEventListener('change', function() {
+  breakDuration = parseInt(this.value);
+  localStorage.setItem('dungeon-break-dur', breakDuration);
+  toast('☕', `Descanso: ${breakDuration} min`);
+});
+
+document.getElementById('pomGoalInput').addEventListener('change', function() {
+  pomGoal = Math.max(1, parseInt(this.value) || 8);
+  localStorage.setItem('dungeon-pom-goal', pomGoal);
+  updatePomGoalUI();
+});
+
+document.getElementById('helpBtn').addEventListener('click', () => openModal('shortcutsModal'));

@@ -36,4 +36,5 @@ async function savePom() {
   await saveHero(patch);
   checkAchievements();
   renderStats();
+  updatePomGoalUI();
 }
