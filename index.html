@@ -83,6 +83,7 @@
       <button class="icon-btn" id="focusBtn" title="Modo Focus (F)">🎯</button>
       <button class="icon-btn" id="themeBtn" title="Cambiar tema (T)">🎨</button>
       <button class="icon-btn" id="helpBtn" title="Atajos de teclado (?)">⌨️</button>
+      <button class="icon-btn" id="oracleBtn" title="Oráculo Arcano (IA)">🔮</button>
       <!-- Más opciones -->
       <div class="more-menu-wrap" id="moreMenuWrap">
         <button class="icon-btn" id="moreBtn" title="Más opciones">⋯</button>
@@ -697,6 +698,22 @@
   <div class="pom-count" id="focusPomCount">
     <div class="pom-dot"></div><div class="pom-dot"></div>
     <div class="pom-dot"></div><div class="pom-dot"></div>
+  </div>
+</div>
+
+<!-- Oracle Panel -->
+<div class="oracle-overlay" id="oracleOverlay"></div>
+<div class="oracle-panel" id="oraclePanel">
+  <div class="oracle-header">
+    <span>🔮 Oráculo Arcano</span>
+    <button class="oracle-close" onclick="closeOracle()">✕</button>
+  </div>
+  <div class="oracle-msgs" id="oracleMsgs">
+    <div class="oracle-loading" id="oracleLoading">Invocando al oráculo...</div>
+  </div>
+  <div class="oracle-input-wrap">
+    <input type="text" id="oracleInput" class="oracle-input" placeholder="Consulta al oráculo..." maxlength="2000">
+    <button class="oracle-send" id="oracleSend">⚡</button>
   </div>
 </div>
 

@@ -1325,3 +1325,95 @@ function togglePin(id) {
   else { localStorage.setItem(key, '1'); toast('📌', 'Misión anclada al inicio.'); }
   renderQuestList();
 }
+
+/* ============================================================
+   ORÁCULO ARCANO — OpenClaw via proxy
+   ============================================================ */
+let _oracleLoaded = false;
+
+function openOracle() {
+  document.getElementById('oraclePanel').classList.add('open');
+  document.getElementById('oracleOverlay').classList.add('open');
+  if (!_oracleLoaded) _loadOracleHistory();
+}
+
+function closeOracle() {
+  document.getElementById('oraclePanel').classList.remove('open');
+  document.getElementById('oracleOverlay').classList.remove('open');
+}
+
+function _oracleAppend(role, text) {
+  const msgs = document.getElementById('oracleMsgs');
+  const el = document.createElement('div');
+  el.className = 'oracle-msg ' + role;
+  el.textContent = text;
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+  return el;
+}
+
+async function _loadOracleHistory() {
+  const loading = document.getElementById('oracleLoading');
+  const msgs    = document.getElementById('oracleMsgs');
+  try {
+    const r    = await fetch('/openclaw/history');
+    const data = await r.json();
+    if (loading) loading.remove();
+    _oracleLoaded = true;
+    const items = (data.items || []).slice(-20);
+    if (!items.length) {
+      const ph = document.createElement('div');
+      ph.className = 'oracle-loading';
+      ph.textContent = '🔮 El oráculo aguarda tu primera consulta...';
+      msgs.appendChild(ph);
+      return;
+    }
+    items.forEach(item => {
+      let text = typeof item.content === 'string'
+        ? item.content
+        : (Array.isArray(item.content) ? item.content.filter(b => b.type === 'text').map(b => b.text).join('') : '');
+      if (text) _oracleAppend(item.role === 'user' ? 'user' : 'assistant', text);
+    });
+    msgs.scrollTop = msgs.scrollHeight;
+  } catch {
+    if (loading) loading.textContent = '⚠️ No se pudo conectar con el oráculo.';
+  }
+}
+
+async function oracleSend() {
+  const input   = document.getElementById('oracleInput');
+  const sendBtn = document.getElementById('oracleSend');
+  const text    = (input.value || '').trim();
+  if (!text || sendBtn.disabled) return;
+
+  input.value      = '';
+  input.disabled   = true;
+  sendBtn.disabled = true;
+
+  _oracleAppend('user', text);
+  const thinkEl = _oracleAppend('thinking', '🔮 El oráculo medita...');
+
+  try {
+    const r    = await fetch('/openclaw/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    thinkEl.remove();
+    const data = await r.json();
+    _oracleAppend('assistant', data.reply || '⚠️ Sin respuesta del oráculo.');
+  } catch {
+    thinkEl.remove();
+    _oracleAppend('assistant', '⚠️ Error al consultar el oráculo.');
+  } finally {
+    input.disabled   = false;
+    sendBtn.disabled = false;
+    input.focus();
+  }
+}
+
+document.getElementById('oracleBtn').addEventListener('click', openOracle);
+document.getElementById('oracleSend').addEventListener('click', oracleSend);
+document.getElementById('oracleInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); oracleSend(); }
+});
