@@ -179,8 +179,8 @@ function renderQuestList() {
     html = pending.map(q => renderQuestItem(q)).join('');
   }
 
-  if (done.length) {
-    html += `<div class="type-separator" style="opacity:.5">✅ Completadas<span>${done.length}</span></div>`;
+  if (done.length && activeFilter === 'all') {
+    html += `<div class="type-separator type-sep-done">✅ Completadas<span>${done.length}</span></div>`;
     html += done.map(q => renderQuestItem(q)).join('');
   }
 

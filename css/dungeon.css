@@ -641,9 +641,9 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .quest-item {
   background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 16px;
+  border: 1px solid rgba(168,85,247,.1);
+  border-radius: 12px;
+  padding: 13px 14px 13px 20px;
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -656,34 +656,44 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   content: '';
   position: absolute;
   left: 0; top: 0; bottom: 0;
-  width: 3px;
+  width: 4px;
   background: linear-gradient(180deg, var(--accent2), var(--accent));
-  border-radius: var(--radius) 0 0 var(--radius);
 }
 
-.quest-item[data-type="main"]::before   { background: linear-gradient(180deg, var(--gold), #34d399); }
-.quest-item[data-type="daily"]::before  { background: linear-gradient(180deg, var(--green), #86efac); }
-.quest-item[data-type="weekly"]::before { background: linear-gradient(180deg, var(--blue), #93c5fd); }
-/* rarity left-bar colors */
+/* Type bars */
+.quest-item[data-type="main"]::before   { background: linear-gradient(180deg, #fbbf24, #34d399); }
+.quest-item[data-type="daily"]::before  { background: linear-gradient(180deg, #4ade80, #22d3ee); }
+.quest-item[data-type="weekly"]::before { background: linear-gradient(180deg, #60a5fa, #a78bfa); }
+
+/* Rarity bars — override type */
 .quest-item[data-priority="mitico"]::before     { background: linear-gradient(180deg, #ef4444, #fca5a5); }
-.quest-item[data-priority="legendario"]::before { background: linear-gradient(180deg, var(--gold), #fde68a); }
+.quest-item[data-priority="legendario"]::before { background: linear-gradient(180deg, #f59e0b, #fde68a); }
 .quest-item[data-priority="epico"]::before      { background: linear-gradient(180deg, #a855f7, #d8b4fe); }
-.quest-item[data-priority="normal"]::before     { background: linear-gradient(180deg, var(--blue), #93c5fd); }
-.quest-item[data-priority="comun"]::before      { background: var(--border); }
-/* legacy */
-.quest-item[data-priority="urgente"]::before { background: linear-gradient(180deg, var(--red), #fda4af); }
+.quest-item[data-priority="normal"]::before     { background: linear-gradient(180deg, #60a5fa, #93c5fd); }
+.quest-item[data-priority="comun"]::before      { background: rgba(168,85,247,.2); }
+.quest-item[data-priority="urgente"]::before    { background: linear-gradient(180deg, var(--red), #fda4af); }
 
+/* Rarity card backgrounds */
+.quest-item[data-priority="mitico"]     { background: linear-gradient(100deg, rgba(239,68,68,.1) 0%, var(--card) 55%); border-color: rgba(239,68,68,.22); }
+.quest-item[data-priority="legendario"] { background: linear-gradient(100deg, rgba(245,158,11,.08) 0%, var(--card) 55%); border-color: rgba(245,158,11,.18); }
+.quest-item[data-priority="epico"]      { background: linear-gradient(100deg, rgba(168,85,247,.1) 0%, var(--card) 55%); border-color: rgba(168,85,247,.22); }
 
+/* Hover — slide right instead of lift */
 .quest-item:hover {
-  border-color: rgba(168,85,247,.3);
-  transform: translateY(-2px) scale(1.005);
-  box-shadow: 0 8px 32px rgba(0,0,0,.4), var(--glow);
+  border-color: rgba(168,85,247,.4);
+  transform: translateX(3px);
+  box-shadow: 0 4px 24px rgba(0,0,0,.45);
   background: var(--card2);
 }
-.quest-item:active { transform: translateY(0) scale(.998); }
+.quest-item[data-priority="mitico"]:hover     { background: linear-gradient(100deg, rgba(239,68,68,.14) 0%, var(--card2) 55%); border-color: rgba(239,68,68,.4); }
+.quest-item[data-priority="legendario"]:hover { background: linear-gradient(100deg, rgba(245,158,11,.11) 0%, var(--card2) 55%); border-color: rgba(245,158,11,.35); }
+.quest-item[data-priority="epico"]:hover      { background: linear-gradient(100deg, rgba(168,85,247,.14) 0%, var(--card2) 55%); border-color: rgba(168,85,247,.5); }
 
-.quest-item.done { opacity: .45; }
-.quest-item.done .quest-name { text-decoration: line-through; }
+.quest-item:active { transform: translateX(0) scale(.998); }
+
+.quest-item.done { opacity: .38; }
+.quest-item.done .quest-name { text-decoration: line-through; color: var(--text3); }
+.quest-item.done:hover { transform: none; box-shadow: none; }
 
 .quest-check {
   width: 22px;
@@ -712,7 +722,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .quest-body { flex: 1; min-width: 0; }
 
-.quest-name { font-size: 16px; color: var(--text); line-height: 1.4; }
+.quest-name { font-size: 14px; color: var(--text); line-height: 1.4; font-weight: 500; }
 
 .quest-meta {
   display: flex;
@@ -746,22 +756,37 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .badge-rarity-normal    { background: rgba(96,165,250,.12);  color: var(--blue); border: 1px solid rgba(96,165,250,.3); }
 .badge-rarity-comun     { background: rgba(148,163,184,.08); color: var(--text3); border: 1px solid var(--border); }
 
-.deadline-badge { font-size: 12px; color: var(--text3); }
+.deadline-badge { font-size: 11px; color: var(--text3); }
 .deadline-badge.overdue { color: var(--red); font-weight: 600; }
 
-.xp-reward { font-size: 12px; color: var(--gold); font-weight: 500; }
+.xp-reward {
+  font-size: 11px;
+  color: #fbbf24;
+  font-weight: 600;
+  background: rgba(251,191,36,.08);
+  border: 1px solid rgba(251,191,36,.18);
+  border-radius: 20px;
+  padding: 1px 7px;
+}
 
-.quest-notes { font-size: 13px; color: var(--text2); margin-top: 5px; font-style: italic; line-height: 1.5; }
+.quest-notes { font-size: 12px; color: var(--text2); margin-top: 5px; font-style: italic; line-height: 1.5; }
 
-.quest-actions { display: flex; gap: 4px; }
+.quest-actions {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity .18s ease;
+}
+.quest-item:hover .quest-actions { opacity: 1; }
 
 .quest-action-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-xs);
-  border: 1px solid var(--border);
-  background: var(--glass);
-  color: var(--text2);
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 1px solid rgba(168,85,247,.1);
+  background: rgba(168,85,247,.06);
+  color: var(--text3);
   font-size: 12px;
   display: flex;
   align-items: center;
@@ -770,7 +795,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   transition: var(--transition-spring);
 }
 
-.quest-action-btn:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.12); box-shadow: 0 0 10px rgba(168,85,247,.3); }
+.quest-action-btn:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.15); box-shadow: 0 0 10px rgba(168,85,247,.3); }
 
 .empty-state {
   text-align: center;
@@ -1938,24 +1963,30 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .type-separator {
   font-family: var(--font-head);
   font-size: 10px;
-  color: var(--text3);
+  color: var(--text2);
   text-transform: uppercase;
-  letter-spacing: 2px;
-  padding: 10px 0 5px;
-  border-bottom: 1px solid var(--border);
-  margin: 6px 0 4px;
+  letter-spacing: 2.5px;
+  padding: 14px 0 7px;
+  margin: 4px 0 2px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+}
+.type-separator::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(168,85,247,.2), transparent);
 }
 .type-separator span {
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
+  background: rgba(168,85,247,.1);
+  border: 1px solid rgba(168,85,247,.2);
   border-radius: 20px;
-  padding: 1px 8px;
+  padding: 1px 9px;
   font-size: 9px;
   color: var(--text3);
 }
+.type-sep-done { opacity: .55; }
 
 /* ============================================================
    TAGS en quests
@@ -2246,21 +2277,10 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 /* ============================================================
    RARITY — fondos y glow
    ============================================================ */
-.quest-item[data-priority="mitico"] {
-  background: linear-gradient(135deg, rgba(239,68,68,.06), var(--card));
-  box-shadow: 0 0 0 1px rgba(239,68,68,.18), 0 2px 12px rgba(239,68,68,.08);
-}
-.quest-item[data-priority="legendario"] {
-  background: linear-gradient(135deg, rgba(245,158,11,.05), var(--card));
-  box-shadow: 0 0 0 1px rgba(245,158,11,.18);
-}
-.quest-item[data-priority="epico"] {
-  background: linear-gradient(135deg, rgba(168,85,247,.05), var(--card));
-  box-shadow: 0 0 0 1px rgba(168,85,247,.18);
-}
-/* legacy */
+/* Rarity overrides handled in main quest-item block above */
 .quest-item[data-priority="urgente"] {
-  background: linear-gradient(135deg, rgba(251,113,133,.04), var(--card));
+  background: linear-gradient(100deg, rgba(251,113,133,.08) 0%, var(--card) 55%);
+  border-color: rgba(251,113,133,.2);
 }
 
 /* ============================================================
