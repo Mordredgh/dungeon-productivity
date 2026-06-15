@@ -2292,10 +2292,10 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 /* ============================================================
    BOSS HP BAR
    ============================================================ */
-.boss-hp-wrap { display:flex; align-items:center; gap:8px; margin-top:4px; }
-.boss-hp-bar  { flex:1; height:8px; background:rgba(255,255,255,.1); border-radius:4px; overflow:hidden; }
-.boss-hp-fill { height:100%; border-radius:4px; transition:width .6s ease; }
-.boss-hp-text { font-size:11px; color:var(--text2); white-space:nowrap; }
+.boss-hp-wrap { display:flex; align-items:center; gap:10px; margin-top:6px; }
+.boss-hp-bar  { flex:1; height:14px; background:rgba(255,255,255,.15); border-radius:7px; overflow:hidden; border:1px solid rgba(255,255,255,.1); }
+.boss-hp-fill { height:100%; border-radius:7px; transition:width .6s ease; }
+.boss-hp-text { font-size:12px; color:var(--text); font-weight:700; white-space:nowrap; min-width:70px; text-align:right; }
 .boss-defeated { color:var(--gold); font-weight:700; font-size:13px; padding:4px 0; }
 
 /* ============================================================
