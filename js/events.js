@@ -181,6 +181,33 @@ function initPWA() {
   }
 }
 
+/* ── MOBILE ADD SHEET ──────────────────────────────────────── */
+function openMobileAdd() {
+  document.getElementById('mobileAddSheet').classList.add('open');
+  document.getElementById('mobileAddOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('mobileQName')?.focus(), 120);
+}
+function closeMobileAdd() {
+  document.getElementById('mobileAddSheet').classList.remove('open');
+  document.getElementById('mobileAddOverlay').classList.remove('open');
+}
+async function submitMobileAdd() {
+  const name = (document.getElementById('mobileQName')?.value || '').trim();
+  if (!name) { toast('⚠️', 'Escribe el nombre de la misión'); return; }
+  const type     = document.getElementById('mobileQType')?.value     || 'daily';
+  const priority = document.getElementById('mobileQPriority')?.value || 'normal';
+  await addQuest({ name, type, priority, done: false,
+    hero_id: hero.id, created_at: new Date().toISOString() });
+  document.getElementById('mobileQName').value = '';
+  closeMobileAdd();
+}
+/* Submit on Enter in the mobile name field */
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('mobileQName')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitMobileAdd();
+  });
+});
+
 /* ============================================================
    FEATURE 2: Auto-reset de misiones diarias
    ============================================================ */

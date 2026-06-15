@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0d0d1a"/>
+  <circle cx="256" cy="256" r="210" fill="none" stroke="#a855f7" stroke-width="3" opacity="0.25"/>
+  <defs>
+    <linearGradient id="blade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Shield outline -->
+  <path d="M176 148 L336 148 L336 252 Q336 330 256 374 Q176 330 176 252 Z"
+        fill="none" stroke="#a855f7" stroke-width="8" stroke-linejoin="round" opacity="0.5"/>
+  <!-- Sword blade -->
+  <rect x="244" y="108" width="24" height="218" rx="12" fill="url(#blade)" filter="url(#glow)"/>
+  <!-- Crossguard -->
+  <rect x="188" y="222" width="136" height="18" rx="9" fill="#22d3ee" filter="url(#glow)"/>
+  <!-- Handle -->
+  <rect x="249" y="326" width="14" height="70" rx="7" fill="#7c3aed"/>
+  <!-- Pommel -->
+  <circle cx="256" cy="408" r="14" fill="#a855f7" filter="url(#glow)"/>
+  <!-- Stars -->
+  <circle cx="152" cy="174" r="5" fill="#22d3ee" opacity="0.8"/>
+  <circle cx="364" cy="158" r="4" fill="#10b981" opacity="0.8"/>
+  <circle cx="376" cy="308" r="5" fill="#a855f7" opacity="0.8"/>
+  <circle cx="142" cy="310" r="3" fill="#22d3ee" opacity="0.6"/>
+</svg>

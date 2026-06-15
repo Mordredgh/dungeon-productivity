@@ -2,9 +2,14 @@
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#1a1a2e">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#a855f7">
 <meta name="description" content="Dungeon Productivity - Sistema D&D para conquistar tus metas">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dungeon">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="icon.svg">
 <title>⚔️ Dungeon Productivity</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -475,7 +480,29 @@
 </div>
 
 <!-- MOBILE FAB -->
-<button class="mobile-fab" id="mobileFab">+</button>
+<!-- Mobile Add Sheet -->
+<div class="mobile-add-overlay" id="mobileAddOverlay" onclick="closeMobileAdd()"></div>
+<div class="mobile-add-sheet" id="mobileAddSheet">
+  <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px"></div>
+  <div style="font-family:var(--font-head);font-size:16px;color:var(--text);margin-bottom:14px">⚔️ Nueva Misión</div>
+  <input class="form-input" id="mobileQName" type="text" placeholder="Nombre de la misión..." autocomplete="off">
+  <div class="form-row" style="margin-top:10px;gap:8px">
+    <select class="form-input" id="mobileQType">
+      <option value="daily" selected>🌅 Diaria</option>
+      <option value="side">🗡️ Secundaria</option>
+      <option value="main">⭐ Principal</option>
+      <option value="weekly">📅 Semanal</option>
+    </select>
+    <select class="form-input" id="mobileQPriority">
+      <option value="normal" selected>🔵 Normal</option>
+      <option value="epico">🟣 Épico</option>
+      <option value="legendario">🟡 Legendario</option>
+      <option value="mitico">💎 Mítico</option>
+    </select>
+  </div>
+  <button class="btn btn-primary" style="width:100%;margin-top:14px;padding:14px" onclick="submitMobileAdd()">⚔️ Agregar Misión</button>
+</div>
+<button class="mobile-fab" id="mobileFab" onclick="openMobileAdd()" aria-label="Nueva misión">+</button>
 
 <!-- MODALS -->
 

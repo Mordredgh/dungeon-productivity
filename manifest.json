@@ -4,15 +4,30 @@
   "description": "Sistema D&D para conquistar tus metas",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#04040e",
+  "background_color": "#0d0d1a",
   "theme_color": "#a855f7",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>",
+      "src": "icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nueva Misión",
+      "short_name": "Agregar",
+      "description": "Añadir una misión rápidamente",
+      "url": "/?action=add",
+      "icons": [{ "src": "icon.svg", "sizes": "any" }]
     }
   ]
 }
