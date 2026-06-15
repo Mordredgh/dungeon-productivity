@@ -487,22 +487,30 @@ function renderTypeDist() {
 
 
 function updateBossBanner() {
-  const banner = document.getElementById('bossBanner');
-  const urgent = quests.filter(q => !q.done && q.priority === 'urgente');
-  const mainP  = quests.filter(q => !q.done && q.type === 'main');
-  const boss   = urgent[0] || mainP[0];
-  if (boss) {
+  // Delegated to rpg.js — called after that script loads
+  if (typeof getBossState === 'function') {
+    const banner = document.getElementById('bossBanner');
+    if (!banner) return;
+    const state = getBossState();
     banner.style.display = 'flex';
-    document.getElementById('bossName').textContent = boss.name;
-    const meta = [];
-    if (boss.type) meta.push({ main:'⚔️ Épica', side:'🗡️ Encargo', daily:'🌅 Búsqueda', weekly:'📜 Crónica' }[boss.type] || boss.type);
-    if (boss.deadline) meta.push(formatRelativeDate(boss.deadline));
-    document.getElementById('bossMeta').textContent = meta.join(' · ');
-  } else {
-    banner.style.display = 'none';
+    if (state.defeated) {
+      banner.innerHTML = `<div class="boss-defeated">🏆 ¡${escHtml(state.name)} DERROTADO! Semana conquistada.</div>`;
+    } else {
+      const pct      = Math.round((state.hp / state.maxHp) * 100);
+      const hpColor  = pct > 60 ? 'var(--red)' : pct > 30 ? 'var(--gold)' : 'var(--green)';
+      banner.innerHTML = `
+        <div class="boss-icon">👹</div>
+        <div class="boss-info">
+          <div class="boss-label">⚔️ Jefe Semanal — ¡Atácalo completando misiones!</div>
+          <div class="boss-name">${escHtml(state.name)}</div>
+          <div class="boss-hp-wrap">
+            <div class="boss-hp-bar"><div class="boss-hp-fill" style="width:${pct}%;background:${hpColor}"></div></div>
+            <span class="boss-hp-text">${state.hp}/${state.maxHp} HP</span>
+          </div>
+        </div>`;
+    }
   }
-
-  // Weekly banner
+  // Weekly quests progress banner
   const weeklies    = quests.filter(q => q.type === 'weekly');
   const weeklyDone  = weeklies.filter(q => q.done).length;
   const weeklyTotal = weeklies.length;

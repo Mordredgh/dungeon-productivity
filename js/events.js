@@ -278,6 +278,14 @@ async function checkOverdueHP() {
   if (lastCheck === today) return;
   localStorage.setItem('dungeon-overdue-check', today);
   const penalty = Math.min(overdue.length * 3, 15);
+  // Eclipse weather: HP doesn't drop from overdue
+  const todayWeather = localStorage.getItem('dungeon-weather-' + today);
+  if (todayWeather === 'eclipse') { toast('🌑', 'Eclipse Arcano: HP protegida hoy.'); return; }
+  if (localStorage.getItem('dungeon-amulet')) {
+    localStorage.removeItem('dungeon-amulet');
+    toast('🧿', '¡Amuleto de Protección absorbió el daño de misiones vencidas!');
+    return;
+  }
   const newHp = Math.max(10, (hero.hp || 100) - penalty);
   if (newHp < (hero.hp || 100)) {
     await saveHero({ hp: newHp });

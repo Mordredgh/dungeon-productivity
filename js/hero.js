@@ -95,8 +95,13 @@ async function checkDailyStreak() {
 
   let newHp = hero.hp || 100;
   if (lastDay && lastDay !== yesterday) {
-    newHp = Math.max(10, newHp - 10);
-    toast('💔', 'Perdiste HP por días sin actividad.');
+    if (localStorage.getItem('dungeon-amulet')) {
+      localStorage.removeItem('dungeon-amulet');
+      toast('🧿', '¡Amuleto de Protección absorbió el daño del día sin actividad!');
+    } else {
+      newHp = Math.max(10, newHp - 10);
+      toast('💔', 'Perdiste HP por días sin actividad.');
+    }
   }
 
   await saveHero({ streak: newStreak, longest_streak: longest, last_active: new Date().toISOString(), hp: newHp });

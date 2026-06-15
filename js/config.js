@@ -46,12 +46,65 @@ const COMPLETIONS = [
 ];
 
 const RANDOM_EVENTS = [
-  { title: '⚡ ¡Tormenta Mágica!', text: 'Un hechizo errante activa 2x XP por 30 minutos.', bonus: 0, doubleXP: true },
-  { title: '🍀 ¡Día de Suerte!', text: 'El destino te favorece. +25 XP de bonus.', bonus: 25 },
-  { title: '🐉 ¡Dragón Dormido!', text: 'El dragón duerme. Momento ideal para completar misiones.', bonus: 0 },
-  { title: '⚔️ ¡Hora de Batalla!', text: '¡La guerra llama! Completa una misión principal ahora.', bonus: 0 },
-  { title: '🌟 ¡Lluvia de Estrellas!', text: 'Las estrellas guían tu camino. +15 XP bonus.', bonus: 15 },
-  { title: '🔮 ¡Visión del Oráculo!', text: 'El oráculo revela: completa 3 misiones hoy para poder extra.', bonus: 0 },
+  { id:'merchant',  icon:'🧙', title:'Mercader Misterioso',    desc:'Un anciano encapuchado te ofrece conocimiento antiguo a cambio de tu esfuerzo.',         choices:[{label:'Aceptar (+100 XP)',      effect:'xp100'},{label:'Declinar',effect:'none'}] },
+  { id:'treasure',  icon:'💰', title:'Tesoro Olvidado',         desc:'Entre las ruinas del castillo encuentras una bolsa de monedas de oro olvidada.',         choices:[{label:'Tomar el botín (+80🪙)', effect:'gold80'}] },
+  { id:'blessing',  icon:'✨', title:'Bendición del Gremio',    desc:'Los dioses sonríen sobre ti. Tu próxima misión valdrá el doble de XP y oro.',            choices:[{label:'Recibir la bendición',   effect:'doubleNext'}] },
+  { id:'riddle',    icon:'🔮', title:'La Esfinge Habla',        desc:'"Quien actúa sin dudar conquista sin parar." La esfinge aumenta tu racha misteriosamente.', choices:[{label:'Resolver acertijo (+1 día de racha)', effect:'streak1'}] },
+  { id:'tavern',    icon:'🍺', title:'Noche en la Taberna',     desc:'El posadero te invita. Descansas bien entre batallas y recuperas fuerzas.',              choices:[{label:'Descansar (+20 HP)',     effect:'hp20'}] },
+  { id:'dragon',    icon:'🐉', title:'Sombra del Dragón',       desc:'Un dragón negro sobrevuela el reino al amanecer. El Jefe Semanal absorbe su poder.',      choices:[{label:'Prepararse para la batalla', effect:'bossHP50'}] },
+  { id:'scroll',    icon:'📜', title:'Pergamino Antiguo',       desc:'Encuentras sabiduría perdida en la biblioteca del castillo. Las épicas brillan hoy.',     choices:[{label:'Estudiar el pergamino', effect:'mainBonus'}] },
+  { id:'curse',     icon:'💀', title:'Maldición de Medianoche', desc:'Una sombra oscura te marca. Debes completar 2 misiones antes del final del día.',        choices:[{label:'Aceptar el desafío',    effect:'curse'}] },
+  { id:'storm',     icon:'⚡', title:'¡Tormenta Arcana!',       desc:'Energía mágica colosal llena el aire. ¡El momento perfecto para actuar con fuerza!',     choices:[{label:'Canalizar la energía (2× XP 30min)', effect:'potion'}] },
+  { id:'spirit',    icon:'👻', title:'Espíritu del Héroe Caído', desc:'El fantasma de un héroe caído te ofrece guía. Revive una de tus misiones vencidas.',    choices:[{label:'Aceptar su guía',       effect:'revive'},{label:'Respetar y alejarse', effect:'none'}] },
+];
+
+const WEATHER_TYPES = {
+  clear:   { icon:'☀️',  name:'Día Despejado',   desc:'+10% XP todo el día',                           xpMult:1.1,  goldMult:1.0 },
+  fog:     { icon:'🌫️', name:'Niebla Arcana',    desc:'Sin cambios — el misterio envuelve el reino',   xpMult:1.0,  goldMult:1.0 },
+  storm:   { icon:'⛈️', name:'Gran Tormenta',    desc:'-10% XP pero el Jefe recibe daño doble',        xpMult:0.9,  goldMult:1.0 },
+  rainbow: { icon:'🌈',  name:'Arcoíris Mágico', desc:'+30% Oro en todas las misiones hoy',            xpMult:1.0,  goldMult:1.3 },
+  eclipse: { icon:'🌑',  name:'Eclipse Arcano',  desc:'HP no baja por misiones vencidas hoy',           xpMult:1.0,  goldMult:1.0 },
+};
+
+const CLASS_SKILLS = {
+  mago:     { name:'Transmutación',        icon:'🔮', desc:'La próxima misión side/daily da XP de Épica (100 XP base).' },
+  guerrero: { name:'Modo Berserker',       icon:'⚡', desc:'2× XP en todas las misiones durante 30 minutos.' },
+  clerigo:  { name:'Resurrección',         icon:'✝️', desc:'Restaura una misión vencida: vuelve a fecha de hoy sin penalización.' },
+  picaro:   { name:'Golpe en las Sombras', icon:'🗡️', desc:'Completa automáticamente tu daily más antigua pendiente.' },
+  arquero:  { name:'Lluvia de Flechas',    icon:'🏹', desc:'La próxima misión semanal da 3× XP.' },
+  fundador: { name:'Visión Estratégica',   icon:'🚀', desc:'+25% XP en las próximas 5 misiones completadas.' },
+};
+
+const FAMILIARS = {
+  mago:     { emoji:'🦉', name:'Búho Arcano'     },
+  guerrero: { emoji:'🐺', name:'Lobo de Batalla' },
+  clerigo:  { emoji:'🦊', name:'Zorro Sagrado'   },
+  picaro:   { emoji:'🐱', name:'Gato Sombra'     },
+  arquero:  { emoji:'🦅', name:'Águila Veloz'    },
+  fundador: { emoji:'🐉', name:'Dragón Joven'    },
+};
+
+const GOLD_TABLE = { main:50, side:20, daily:10, weekly:35 };
+
+const SHOP_ITEMS = [
+  { id:'potion',  name:'Poción de Concentración', icon:'⚗️', cost:80,  desc:'2× XP durante 30 minutos' },
+  { id:'scroll',  name:'Pergamino de Prórroga',   icon:'📜', cost:60,  desc:'Extiende el deadline de la misión más urgente 1 día' },
+  { id:'amulet',  name:'Amuleto de Protección',   icon:'🧿', cost:120, desc:'Bloquea la próxima pérdida de HP (1 uso)' },
+  { id:'xpstone', name:'Piedra de Sabiduría',     icon:'💠', cost:200, desc:'+150 XP instantáneos' },
+  { id:'revival', name:'Poción de Resurrección',  icon:'💊', cost:150, desc:'HP restaurada al máximo al instante' },
+];
+
+const BOSS_NAMES = [
+  'Dragón de la Procrastinación','Hidra del Caos','Liche del Tiempo Perdido',
+  'Gólem de las Deudas','Gorgona del Desenfoque','Fénix Oscuro del Agotamiento',
+  'Vampiro de la Energía','Troll de las Distracciones','Demonio de la Pereza',
+  'Espectro del Miedo al Fracaso',
+];
+
+const PROPHECY_TEMPLATES = [
+  (n, s) => `El Oráculo ve esta semana ${n} grandes batallas que definirán al campeón. Solo el héroe con racha de ${s} días o más recibirá la gloria eterna del gremio.`,
+  (n, s) => `Las estrellas revelan: ${n} épicas misiones aguardan al guerrero esta semana. Quien mantenga una racha de ${s} días conquistará poderes ocultos.`,
+  (n, s) => `La profecía habla: quien derrote al Jefe Semanal y complete ${n} misiones antes del domingo, recibirá el favor de los dioses por ${s} días más.`,
 ];
 
 const ACHIEVEMENT_DEFS = [

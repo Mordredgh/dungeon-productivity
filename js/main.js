@@ -21,6 +21,7 @@
   initParticles();
   checkConnection();
   setInterval(checkConnection, 5 * 60 * 1000);
+  initRPGSystems();
   checkDailySummary();
   checkWeeklyRetro();
   checkMorningBriefing();

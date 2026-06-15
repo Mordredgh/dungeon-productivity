@@ -28,8 +28,57 @@ async function completeQuest(id, el) {
   await db.from('dungeon_quests').update({ done: true, done_at: now }).eq('id', id);
   q.done = true; q.done_at = now;
 
-  const xpAmt = calcQuestXP(q);
+  let xpAmt = calcQuestXP(q);
+
+  // XP multipliers from RPG systems
+  const today = new Date().toISOString().split('T')[0];
+  const potionMult    = typeof getPotionMult    === 'function' ? getPotionMult()    : 1;
+  const berserkerExp  = parseInt(localStorage.getItem('dungeon-berserker-exp') || '0');
+  const berserkerMult = berserkerExp > Date.now() ? 2 : 1;
+  const weatherMult   = typeof getWeatherXPMult === 'function' ? getWeatherXPMult() : 1;
+  const famBonus      = typeof getFamiliarXPBonus === 'function' ? getFamiliarXPBonus() : 0;
+
+  // Transmutación (mago): next side/daily → 100 XP
+  if (localStorage.getItem('dungeon-transmute-next') && (q.type === 'side' || q.type === 'daily')) {
+    xpAmt = 100; localStorage.removeItem('dungeon-transmute-next');
+  }
+  // Lluvia de flechas (arquero): next weekly → 3×
+  if (localStorage.getItem('dungeon-arrow-rain') && q.type === 'weekly') {
+    xpAmt *= 3; localStorage.removeItem('dungeon-arrow-rain');
+  }
+  // Visión estratégica (fundador): next 5 quests → +25%
+  const stratCount = parseInt(localStorage.getItem('dungeon-strategic-count') || '0');
+  if (stratCount > 0) {
+    xpAmt = Math.round(xpAmt * 1.25);
+    localStorage.setItem('dungeon-strategic-count', stratCount - 1);
+  }
+  // Double-next event
+  if (localStorage.getItem('dungeon-double-next')) {
+    xpAmt *= 2; localStorage.removeItem('dungeon-double-next');
+  }
+  // Main bonus event (+20 XP for main quests today)
+  if (q.type === 'main' && localStorage.getItem('dungeon-main-bonus-' + today)) {
+    xpAmt += 20;
+  }
+  // Apply multipliers
+  xpAmt = Math.round(xpAmt * potionMult * berserkerMult * weatherMult) + famBonus;
+
   await addXP(xpAmt, q.type, el);
+
+  // Gold earned
+  const goldBase = GOLD_TABLE ? (GOLD_TABLE[q.type] || 10) : 10;
+  const goldMult = typeof getGoldMult === 'function' ? getGoldMult() : 1;
+  const goldAmt  = Math.round(goldBase * goldMult * (localStorage.getItem('dungeon-double-next-gold') ? 2 : 1));
+  localStorage.removeItem('dungeon-double-next-gold');
+  if (typeof addGold === 'function') addGold(goldAmt);
+
+  // Boss damage (non-daily quests hurt the boss more)
+  if (typeof damageBoss === 'function') {
+    damageBoss(q.type === 'main' ? 40 : q.type === 'weekly' ? 30 : 20);
+  }
+
+  // Familiar mood update
+  if (typeof renderFamiliar === 'function') setTimeout(renderFamiliar, 400);
 
   // HP recovery on quest completion (all classes)
   if (q.type === 'main') {
@@ -83,6 +132,7 @@ async function completeQuest(id, el) {
   renderHistory();
   renderStats();
   updateBossBanner();
+  if (typeof generateDiaryEntry === 'function') generateDiaryEntry();
 }
 
 async function undoComplete() {
