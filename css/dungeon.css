@@ -220,7 +220,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   white-space: nowrap;
 }
 .header-logo-img {
-  height: 28px;
+  height: 42px;
   width: auto;
   object-fit: contain;
   display: block;
@@ -2069,11 +2069,11 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   animation: welcome-logo-in .6s cubic-bezier(.34,1.56,.64,1);
 }
 .welcome-logo-img {
-  height: 120px;
+  height: 220px;
   width: auto;
   object-fit: contain;
   animation: welcome-logo-in .6s cubic-bezier(.34,1.56,.64,1);
-  filter: drop-shadow(0 0 32px rgba(137,180,250,.4));
+  filter: drop-shadow(0 0 40px rgba(137,180,250,.5));
 }
 @keyframes welcome-logo-in {
   from { opacity: 0; transform: translateY(20px) scale(.9); }
