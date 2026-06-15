@@ -2068,6 +2068,13 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   background-clip: text;
   animation: welcome-logo-in .6s cubic-bezier(.34,1.56,.64,1);
 }
+.welcome-logo-img {
+  height: 120px;
+  width: auto;
+  object-fit: contain;
+  animation: welcome-logo-in .6s cubic-bezier(.34,1.56,.64,1);
+  filter: drop-shadow(0 0 32px rgba(137,180,250,.4));
+}
 @keyframes welcome-logo-in {
   from { opacity: 0; transform: translateY(20px) scale(.9); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
