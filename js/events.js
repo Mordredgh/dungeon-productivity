@@ -362,13 +362,12 @@ function playLevelUpSound() {
    FEATURE 12: Timer persistente (localStorage)
    ============================================================ */
 function saveTimerState() {
-  if (!timer.running) return;
   localStorage.setItem('dungeon-timer', JSON.stringify({
     phase: timer.phase,
-    endsAt: Date.now() + timer.seconds * 1000,
+    endsAt: timer.running ? Date.now() + timer.seconds * 1000 : 0,
     duration: timer.duration,
     pomsDone: timer.pomsDone,
-    activeQuest: timer.activeQuest
+    activeQuest: timer.activeQuest || null
   }));
 }
 
@@ -377,21 +376,24 @@ function restoreTimerState() {
   if (!saved) return;
   try {
     const s = JSON.parse(saved);
-    const remaining = Math.floor((s.endsAt - Date.now()) / 1000);
-    if (remaining > 0 && remaining < s.duration * 60) {
+    // Siempre restaurar pomsDone para que los puntos sean correctos
+    if (s.pomsDone) {
+      timer.pomsDone = s.pomsDone;
+      updatePomDots();
+    }
+    const remaining = s.endsAt ? Math.floor((s.endsAt - Date.now()) / 1000) : 0;
+    if (remaining > 0 && remaining < (s.duration || 25) * 60) {
       timer.phase = s.phase;
       timer.seconds = remaining;
       timer.duration = s.duration || 25;
-      timer.pomsDone = s.pomsDone || 0;
       timer.activeQuest = s.activeQuest || null;
       document.querySelectorAll('.dur-btn').forEach(b => b.classList.toggle('active', +b.dataset.min === timer.duration));
       updateTimerUI();
-      document.getElementById('timerPhase').textContent = 'Pausado (tenías uno activo)';
+      document.getElementById('timerPhase').textContent = s.phase === 'break' ? '☕ Descanso (pausado)' : 'Pausado (tenías uno activo)';
       if (s.activeQuest) {
         const q = quests.find(x => x.id === s.activeQuest);
         if (q) document.getElementById('pomTaskLabel').textContent = `⚔️ ${q.name}`;
       }
-      updatePomDots();
       toast('⏱️', `Timer restaurado: ${Math.floor(remaining/60)}m restantes.`);
     }
   } catch {}

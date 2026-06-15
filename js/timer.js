@@ -50,6 +50,7 @@ function advancePhase() {
     sendNotif('⚡ ¡A trabajar!', 'Nuevo pomodoro comenzando.');
   }
   updateTimerUI();
+  saveTimerState();
 }
 
 function updateTimerUI() {
