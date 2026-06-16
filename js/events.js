@@ -1156,11 +1156,14 @@ function checkDailySummary() {
   const today = new Date().toISOString().split('T')[0];
   if (localStorage.getItem('dungeon-summary-shown') === today) return;
   localStorage.setItem('dungeon-summary-shown', today);
-  const done  = quests.filter(q => q.done && q.done_at && q.done_at.startsWith(today)).length;
+  const doneQ = quests.filter(q => q.done && q.done_at && q.done_at.startsWith(today));
   const poms  = pomodoros.filter(p => p.started_at && p.started_at.startsWith(today)).length;
-  const xp    = quests.filter(q => q.done && q.done_at && q.done_at.startsWith(today))
-                      .reduce((s, q) => s + (XP_TABLE[q.type] || 50), 0);
-  toast('📜', `Resumen del día: ${done} misiones · ${poms} pomodoros · +${xp} XP`);
+  const xp    = doneQ.reduce((s, q) => s + (XP_TABLE[q.type] || 50), 0);
+  const pending = quests.filter(q => !q.done).length;
+  toastAction('📜', `Resumen del día: ${doneQ.length} misiones · ${poms} pomodoros · +${xp} XP`, 'Resumen IA →', () => {
+    const names = doneQ.map(q => q.name).join(', ') || '(ninguna)';
+    _oracleAutoSend(`Genera mi resumen nocturno en 3-4 líneas: qué completé hoy (${doneQ.length} misiones: ${names}, ${poms} pomodoros, ${xp} XP), qué quedó pendiente (${pending} misiones), y termina con una frase motivacional corta basada en mi progreso real.`);
+  }, 12000);
 }
 
 /* ============================================================
