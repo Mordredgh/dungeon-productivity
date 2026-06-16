@@ -463,6 +463,7 @@ function renderStats() {
   renderHeroIndex();
   if (typeof renderReputation === 'function') renderReputation();
   renderMastery();
+  if (typeof renderPatterns === 'function') renderPatterns();
   renderXPChart();
   renderTypeDist();
   renderMissionsChart();

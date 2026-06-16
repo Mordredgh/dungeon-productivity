@@ -341,6 +341,14 @@
               <p id="prophecyVerdict" style="font-size:12px;color:var(--gold);margin-top:8px;font-style:italic"></p>
             </div>
 
+            <div class="stats-card" style="grid-column:1/-1">
+              <div class="stats-card-title" style="display:flex;justify-content:space-between;align-items:center">
+                <span>🧩 Análisis de Patrones (IA)</span>
+                <button class="btn btn-ghost" style="padding:4px 12px;font-size:11px" onclick="generatePatternAnalysis(true)">🔄 Actualizar</button>
+              </div>
+              <div id="patternsContent"></div>
+            </div>
+
             <div class="stats-card">
               <div class="stats-card-title">🏅 Top Búsquedas</div>
               <div id="topQuestsContent" style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text2)">
@@ -968,7 +976,7 @@
 <script src="js/timer.js?v=5"></script>
 <script src="js/inventory.js?v=5"></script>
 <script src="js/spells.js?v=5"></script>
-<script src="js/views.js?v=10"></script>
+<script src="js/views.js?v=11"></script>
 <script src="js/ui.js?v=8"></script>
 <script src="js/events.js?v=9"></script>
 <script src="js/shop.js?v=5"></script>
@@ -978,9 +986,10 @@
 <script src="js/weapons.js?v=6"></script>
 <script src="js/goals.js?v=1"></script>
 <script src="js/reputation.js?v=1"></script>
+<script src="js/patterns.js?v=1"></script>
 <script src="js/character.js?v=2"></script>
 <script src="js/spotify.js?v=1"></script>
 <script src="js/weather.js?v=2"></script>
-<script src="js/main.js?v=9"></script>
+<script src="js/main.js?v=10"></script>
 </body>
 </html>

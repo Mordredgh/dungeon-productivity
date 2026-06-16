@@ -31,6 +31,10 @@
   checkDeadlineAlerts();
   checkNightlyDiary();
   checkProphecyVerdict();
-  setInterval(() => { checkDailySummary(); checkWeeklyRetro(); checkDeadlineAlerts(); checkNightlyDiary(); checkProphecyVerdict(); }, 60 * 60 * 1000);
+  if (typeof checkWeeklyPatternAnalysis === 'function') checkWeeklyPatternAnalysis();
+  setInterval(() => {
+    checkDailySummary(); checkWeeklyRetro(); checkDeadlineAlerts(); checkNightlyDiary(); checkProphecyVerdict();
+    if (typeof checkWeeklyPatternAnalysis === 'function') checkWeeklyPatternAnalysis();
+  }, 60 * 60 * 1000);
   updateFocusTodayChip();
 })();
