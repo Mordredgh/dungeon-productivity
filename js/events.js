@@ -606,41 +606,6 @@ function renderHistory() {
 
 function resetHistoryPage() { historyPage = 1; }
 
-/* ============================================================
-   NUEVOS HECHIZOS
-   ============================================================ */
-SPELL_DEFS.push(
-  {
-    id: 'berserker', icon: '🔥', name: 'Modo Berserker',
-    desc: '2x XP por 25 min (CD 24h)',
-    cd: 24 * 3600 * 1000,
-    cast() {
-      xpMultiplier = 2; xpMultiplierEnd = Date.now() + 25 * 60 * 1000;
-      updateSpellBadge();
-      toast('🔥', '¡Modo Berserker! 2x XP por 25 minutos. ¡Arremete!');
-    }
-  },
-  {
-    id: 'healing', icon: '💚', name: 'Curación Mayor',
-    desc: 'Recupera 20 HP (CD 24h)',
-    cd: 24 * 3600 * 1000,
-    async cast() {
-      const newHp = Math.min((hero.hp || 0) + 20, hero.hp_max || 100);
-      await saveHero({ hp: newHp });
-      renderHeroUI();
-      toast('💚', `¡Curación Mayor! +20 HP recuperados. HP: ${newHp}/${hero.hp_max || 100}`);
-    }
-  },
-  {
-    id: 'steelmind', icon: '🧠', name: 'Mente de Acero',
-    desc: 'Próximo pomodoro da 2x XP (CD 12h)',
-    cd: 12 * 3600 * 1000,
-    cast() {
-      timer._nextPomDouble = true;
-      toast('🧠', '¡Mente de Acero! El próximo pomodoro dará 2x XP.');
-    }
-  }
-);
 
 /* ============================================================
    NUEVOS LOGROS
