@@ -52,23 +52,9 @@
       <div class="guild-name" id="guildNameDisplay"></div>
     </div>
     <div class="header-actions">
-      <div id="realWeatherChip" class="weather-chip" style="display:none" title="Clima"></div>
-      <button class="icon-btn" id="diaryBtn"  onclick="openDiary()" title="Diario">📖</button>
-      <button class="icon-btn" id="oracleBtn" title="Oráculo IA">🔮</button>
-      <button class="icon-btn" id="d20Btn"    title="Tirar D20">🎲</button>
-      <button class="icon-btn" id="focusBtn"  title="Modo Focus (F)">🎯</button>
-      <button class="icon-btn" id="helpBtn"   title="Atajos (?)">⌨️</button>
-      <div class="more-menu-wrap" id="moreMenuWrap">
-        <button class="icon-btn" id="moreBtn" title="Más opciones">⋯</button>
-        <div class="more-menu" id="moreMenu">
-          <button class="more-menu-item" onclick="openModal('quickNotesModal')">📝 Pergamino Rápido</button>
-          <button class="more-menu-item" id="bulkToggleBtn">☑️ Selección múltiple</button>
-          <button class="more-menu-item" id="compactToggle">⊟ Modo compacto</button>
-          <button class="more-menu-item" id="notifBtn">🔔 Notificaciones</button>
-          <button class="more-menu-item" id="importBtn">📥 Importar</button>
-          <button class="more-menu-item" id="exportBtn">📤 Exportar JSON</button>
-          <button class="more-menu-item" id="csvBtn">📊 Exportar CSV</button>
-        </div>
+      <div class="weather-wrap">
+        <div id="realWeatherChip" class="weather-chip" style="display:none" title="Clima"></div>
+        <div id="weatherDetailPanel" class="weather-detail-panel"></div>
       </div>
     </div>
     <div class="conn-dot" id="connDot" title="Conectando..."></div>
@@ -447,6 +433,27 @@
 
     <!-- RIGHT PANEL -->
     <aside class="right-panel">
+
+      <!-- HERRAMIENTAS -->
+      <div class="rpanel-toolbar">
+        <button class="icon-btn" id="diaryBtn"  onclick="openDiary()" title="Diario">📖</button>
+        <button class="icon-btn" id="oracleBtn" title="Oráculo IA">🔮</button>
+        <button class="icon-btn" id="d20Btn"    title="Tirar D20">🎲</button>
+        <button class="icon-btn" id="focusBtn"  title="Modo Focus (F)">🎯</button>
+        <button class="icon-btn" id="helpBtn"   title="Atajos (?)">⌨️</button>
+        <div class="more-menu-wrap" id="moreMenuWrap">
+          <button class="icon-btn" id="moreBtn" title="Más opciones">⋯</button>
+          <div class="more-menu" id="moreMenu">
+            <button class="more-menu-item" onclick="openModal('quickNotesModal')">📝 Pergamino Rápido</button>
+            <button class="more-menu-item" id="bulkToggleBtn">☑️ Selección múltiple</button>
+            <button class="more-menu-item" id="compactToggle">⊟ Modo compacto</button>
+            <button class="more-menu-item" id="notifBtn">🔔 Notificaciones</button>
+            <button class="more-menu-item" id="importBtn">📥 Importar</button>
+            <button class="more-menu-item" id="exportBtn">📤 Exportar JSON</button>
+            <button class="more-menu-item" id="csvBtn">📊 Exportar CSV</button>
+          </div>
+        </div>
+      </div>
 
       <!-- POMODORO / POSADA -->
       <div class="panel-section">
@@ -899,7 +906,7 @@
   </div>
 </div>
 
-<script src="js/config.js?v=7"></script>
+<script src="js/config.js?v=8"></script>
 <script src="js/state.js?v=6"></script>
 <script src="js/db.js?v=5"></script>
 <script src="js/hero.js?v=6"></script>
@@ -917,7 +924,7 @@
 <script src="js/weapons.js?v=5"></script>
 <script src="js/character.js?v=1"></script>
 <script src="js/spotify.js?v=1"></script>
-<script src="js/weather.js?v=1"></script>
+<script src="js/weather.js?v=2"></script>
 <script src="js/main.js?v=7"></script>
 </body>
 </html>

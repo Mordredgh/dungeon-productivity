@@ -1,5 +1,7 @@
 'use strict';
 
+let _weatherData = null;
+
 async function loadRealWeather() {
   const chip = document.getElementById('realWeatherChip');
   if (!chip) return;
@@ -22,12 +24,55 @@ async function loadRealWeather() {
   if (!coords) return;
 
   try {
-    const res  = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current=temperature_2m,weather_code`);
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}` +
+      `&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code` +
+      `&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
     const data = await res.json();
+    _weatherData = data;
     const temp = Math.round(data.current.temperature_2m);
     const icon = WEATHER_ICONS[data.current.weather_code] || '🌡️';
-    chip.textContent = `${icon} ${temp}°C`;
-    chip.title = `Clima actual: ${temp}°C`;
+    chip.innerHTML = `${icon} ${temp}°C`;
+    chip.title = '';
     chip.style.display = 'flex';
+    chip.onclick = toggleWeatherDetail;
+    renderWeatherDetail();
   } catch {}
 }
+
+function renderWeatherDetail() {
+  const panel = document.getElementById('weatherDetailPanel');
+  if (!panel || !_weatherData) return;
+  const c = _weatherData.current;
+  const d = _weatherData.daily;
+  const icon = WEATHER_ICONS[c.weather_code] || '🌡️';
+  const desc = WEATHER_DESC[c.weather_code] || 'Clima desconocido';
+  panel.innerHTML = `
+    <div class="weather-detail-head">
+      <span class="weather-detail-icon">${icon}</span>
+      <div>
+        <div class="weather-detail-temp">${Math.round(c.temperature_2m)}°C</div>
+        <div class="weather-detail-desc">${escHtml(desc)}</div>
+      </div>
+    </div>
+    <div class="weather-detail-grid">
+      <div class="weather-detail-item"><span>🌡️ Sensación</span><strong>${Math.round(c.apparent_temperature)}°C</strong></div>
+      <div class="weather-detail-item"><span>💧 Humedad</span><strong>${Math.round(c.relative_humidity_2m)}%</strong></div>
+      <div class="weather-detail-item"><span>💨 Viento</span><strong>${Math.round(c.wind_speed_10m)} km/h</strong></div>
+      ${d ? `<div class="weather-detail-item"><span>📈 Máx / Mín</span><strong>${Math.round(d.temperature_2m_max[0])}° / ${Math.round(d.temperature_2m_min[0])}°</strong></div>` : ''}
+    </div>`;
+}
+
+function toggleWeatherDetail(e) {
+  if (e) e.stopPropagation();
+  const panel = document.getElementById('weatherDetailPanel');
+  if (!panel) return;
+  panel.classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+  const panel = document.getElementById('weatherDetailPanel');
+  const chip  = document.getElementById('realWeatherChip');
+  if (panel && panel.classList.contains('open') && !panel.contains(e.target) && e.target !== chip) {
+    panel.classList.remove('open');
+  }
+});

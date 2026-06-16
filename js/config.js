@@ -16,6 +16,18 @@ const WEATHER_ICONS = {
   80:'🌦️',81:'🌧️',82:'⛈️',85:'🌨️',86:'❄️',
   95:'⛈️',96:'⛈️',99:'⛈️'
 };
+const WEATHER_DESC = {
+  0:'Cielo despejado',1:'Mayormente despejado',2:'Parcialmente nublado',3:'Nublado',
+  45:'Niebla',48:'Niebla helada',
+  51:'Llovizna ligera',53:'Llovizna moderada',55:'Llovizna intensa',
+  56:'Llovizna helada',57:'Llovizna helada intensa',
+  61:'Lluvia ligera',63:'Lluvia moderada',65:'Lluvia intensa',
+  66:'Lluvia helada',67:'Lluvia helada intensa',
+  71:'Nevada ligera',73:'Nevada moderada',75:'Nevada intensa',77:'Granizo fino',
+  80:'Chubascos ligeros',81:'Chubascos moderados',82:'Chubascos violentos',
+  85:'Chubascos de nieve ligeros',86:'Chubascos de nieve intensos',
+  95:'Tormenta eléctrica',96:'Tormenta con granizo ligero',99:'Tormenta con granizo intenso'
+};
 
 const TITLES = [
   'Aprendiz del Gremio','Escudero Inquieto','Explorador del Caos',
