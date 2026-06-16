@@ -86,13 +86,84 @@ const FAMILIARS = {
 
 const GOLD_TABLE = { main:50, side:20, daily:10, weekly:35 };
 
+const CDN = 'https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/';
+
+/* ── SHOP ────────────────────────────────────────────────── */
 const SHOP_ITEMS = [
-  { id:'potion',  name:'Poción de Concentración', icon:'⚗️', cost:80,  desc:'2× XP durante 30 minutos' },
-  { id:'scroll',  name:'Pergamino de Prórroga',   icon:'📜', cost:60,  desc:'Extiende el deadline de la misión más urgente 1 día' },
-  { id:'amulet',  name:'Amuleto de Protección',   icon:'🧿', cost:120, desc:'Bloquea la próxima pérdida de HP (1 uso)' },
-  { id:'xpstone', name:'Piedra de Sabiduría',     icon:'💠', cost:200, desc:'+150 XP instantáneos' },
-  { id:'revival', name:'Poción de Resurrección',  icon:'💊', cost:150, desc:'HP restaurada al máximo al instante' },
+  /* Consumibles */
+  { id:'potion',  name:'Poción de Concentración', icon:'⚗️', cost:80,  desc:'2× XP durante 30 minutos',                     category:'consumible' },
+  { id:'scroll',  name:'Pergamino de Prórroga',   icon:'📜', cost:60,  desc:'Extiende el deadline de la misión más urgente', category:'consumible' },
+  { id:'amulet',  name:'Amuleto de Protección',   icon:'🧿', cost:120, desc:'Bloquea la próxima pérdida de HP (1 uso)',      category:'consumible' },
+  { id:'xpstone', name:'Piedra de Sabiduría',     icon:'💠', cost:200, desc:'+150 XP instantáneos',                          category:'consumible' },
+  { id:'revival', name:'Poción de Resurrección',  icon:'💊', cost:150, desc:'HP restaurada al máximo al instante',           category:'consumible' },
+  /* Huevos de mascotas */
+  { id:'egg_zorro-naturaleza',  name:'Huevo Zorro',   img:'pet_egg_zorro-naturaleza.png',  cost:200, desc:'Eclosiona con pociones de Zorro',    category:'egg' },
+  { id:'egg_pantera-sombra',    name:'Huevo Pantera',  img:'pet_egg_pantera-sombra.png',    cost:300, desc:'Eclosiona con pociones de Pantera',  category:'egg' },
+  { id:'egg_lobo-tormenta',     name:'Huevo Lobo',     img:'pet_egg_lobo-tormenta.png',     cost:400, desc:'Eclosiona con pociones de Lobo',     category:'egg' },
+  { id:'egg_grifo',             name:'Huevo Grifo',    img:'pet_egg_grifo.png',             cost:500, desc:'Eclosiona con pociones de Grifo',    category:'egg' },
+  { id:'egg_dragon-fuego',      name:'Huevo Dragón',   img:'pet_egg_dragon-fuego.png',      cost:600, desc:'Eclosiona con pociones de Dragón',   category:'egg' },
+  { id:'egg_fenix-mitico',      name:'Huevo Fénix',    img:'pet_egg_fenix-mitico.png',      cost:800, desc:'Eclosiona con pociones de Fénix',    category:'egg' },
+  /* Fragmentos de hechizo (×5 por compra) */
+  { id:'frag_frenzy',        name:'Fragmento de Frenesí',       img:'spell_frenzy.png',        cost:30,  qty:5, desc:'×5 frags · necesitas 30 para lanzar Frenesí',      category:'fragment' },
+  { id:'frag_speed',         name:'Pluma de Velocidad',         img:'spell_speed.png',         cost:20,  qty:5, desc:'×5 frags · necesitas 20 para lanzar Velocidad',     category:'fragment' },
+  { id:'frag_berserker',     name:'Colmillo de Berserker',      img:'spell_berserker.png',     cost:25,  qty:5, desc:'×5 frags · necesitas 25 para lanzar Berserker',     category:'fragment' },
+  { id:'frag_shield',        name:'Fragmento de Escudo',        img:'spell_shield.png',        cost:15,  qty:5, desc:'×5 frags · necesitas 15 para lanzar Escudo Arcano', category:'fragment' },
+  { id:'frag_modo-berserker',name:'Esencia Berserker',          img:'spell_modo-berserker.png',cost:20,  qty:5, desc:'×5 frags · necesitas 20 para Modo Berserker',       category:'fragment' },
+  { id:'frag_healing',       name:'Hierba de Curación',         img:'spell_healing.png',       cost:10,  qty:5, desc:'×5 frags · necesitas 10 para Curación Mayor',       category:'fragment' },
+  { id:'frag_mente-acero',   name:'Cristal de Mente de Acero', img:'spell_mente-acero.png',   cost:25,  qty:5, desc:'×5 frags · necesitas 25 para Mente de Acero',       category:'fragment' },
+  /* Pociones de mascota (×1 por compra) */
+  { id:'pot_zorro-naturaleza', name:'Poción Zorro',   img:'pet_potion_zorro-naturaleza.png', cost:40,  desc:'Alimenta a tu Zorro Gigante',    category:'potion' },
+  { id:'pot_pantera-sombra',   name:'Poción Pantera', img:'pet_potion_pantera-sombra.png',   cost:55,  desc:'Alimenta a tu Pantera Sombra',   category:'potion' },
+  { id:'pot_lobo-tormenta',    name:'Poción Lobo',    img:'pet_potion_lobo-tormenta.png',    cost:70,  desc:'Alimenta a tu Lobo Tormenta',    category:'potion' },
+  { id:'pot_grifo',            name:'Poción Grifo',   img:'pet_potion_grifo.png',            cost:90,  desc:'Alimenta a tu Grifo',            category:'potion' },
+  { id:'pot_dragon-fuego',     name:'Poción Dragón',  img:'pet_potion_dragon-fuego.png',     cost:110, desc:'Alimenta a tu Dragón de Fuego',  category:'potion' },
+  { id:'pot_fenix-mitico',     name:'Poción Fénix',   img:'pet_potion_fenix-mitico.png',     cost:140, desc:'Alimenta a tu Fénix Mítico',     category:'potion' },
 ];
+
+/* ── MASCOTAS ────────────────────────────────────────────── */
+const PET_DEFS = [
+  { key:'zorro-naturaleza',  name:'Zorro Gigante',    icon:'🦊', rarity:'común',      eggCost:200, hatch:10, evolve:25 },
+  { key:'pantera-sombra',    name:'Pantera Sombra',   icon:'🐆', rarity:'poco común', eggCost:300, hatch:10, evolve:25 },
+  { key:'lobo-tormenta',     name:'Lobo Tormenta',    icon:'🐺', rarity:'raro',       eggCost:400, hatch:15, evolve:30 },
+  { key:'grifo',             name:'Grifo',            icon:'🦅', rarity:'épico',      eggCost:500, hatch:15, evolve:35 },
+  { key:'dragon-fuego',      name:'Dragón de Fuego',  icon:'🐉', rarity:'legendario', eggCost:600, hatch:20, evolve:40 },
+  { key:'fenix-mitico',      name:'Fénix Mítico',     icon:'🔥', rarity:'mítico',     eggCost:800, hatch:20, evolve:50 },
+];
+
+/* ── JEFES ───────────────────────────────────────────────── */
+const BOSS_DEFS = [
+  { key:'caballero-esqueleto', name:'Caballero Esqueleto',    rarity:'normal',     hp:100, seasonal:null },
+  { key:'demonio-sombras',     name:'Demonio de Sombras',     rarity:'legendario', hp:200, seasonal:null },
+  { key:'liche-ancestral',     name:'Liche Ancestral',        rarity:'mitico',     hp:350, seasonal:null },
+  { key:'halloween',           name:'Señor de las Sombras',   rarity:'mitico',     hp:500, seasonal:{ month:9,  dayStart:24, dayEnd:31 } },
+  { key:'navidad',             name:'Krampus Arcano',         rarity:'mitico',     hp:500, seasonal:{ month:11, dayStart:20, dayEnd:26 } },
+  { key:'anio-nuevo',          name:'Dragón del Tiempo',      rarity:'mitico',     hp:500, seasonal:{ month:11, dayStart:28, dayEnd:31 } },
+];
+
+/* ── DROPS AL COMPLETAR MISIÓN ──────────────────────────── */
+// chance: probabilidad de que caiga algo. min/max: cantidad de ítems.
+const DROP_TABLE = {
+  comun:      { chance:0.30, min:1, max:2  },
+  normal:     { chance:0.40, min:2, max:3  },
+  epico:      { chance:0.60, min:3, max:5  },
+  legendario: { chance:0.80, min:5, max:8  },
+  mitico:     { chance:1.00, min:8, max:15 },
+};
+// 60% fragmento de hechizo aleatorio · 40% poción de mascota aleatoria
+const SPELL_FRAGMENT_KEYS = ['frenzy','speed','berserker','shield','modo-berserker','healing','mente-acero'];
+const PET_POTION_KEYS     = ['zorro-naturaleza','pantera-sombra','lobo-tormenta','grifo','dragon-fuego','fenix-mitico'];
+
+/* ── HECHIZOS — coste en fragmentos ────────────────────────
+   (reemplaza el sistema de cooldown por tiempo)             */
+const SPELL_FRAG_COST = {
+  frenzy:         30,
+  speed:          20,
+  berserker:      25,
+  shield:         15,
+  'modo-berserker': 20,
+  healing:        10,
+  'mente-acero':  25,
+};
 
 const BOSS_NAMES = [
   'Dragón de la Procrastinación','Hidra del Caos','Liche del Tiempo Perdido',

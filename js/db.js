@@ -12,6 +12,7 @@ async function initDB() {
 
   if (!quests.length) showSkeleton();
   await Promise.all([loadHero(), loadQuests(), loadPomodoros()]);
+  await loadInventory();
   renderAll();
   scheduleRandomEvent();
   checkDailyStreak();

@@ -51,12 +51,11 @@ function sendNotif(title, body) {
   try { new Notification(title, { body }); } catch {}
 }
 
-/* SPELLS */
+/* SPELLS — sistema de fragmentos (no cooldown por tiempo) */
 const SPELL_DEFS = [
   {
     id: 'frenzy', icon: '⚡', name: 'Frenesí Arcano',
-    desc: 'Dobla XP por 1 hora', cd: 3 * 24 * 3600 * 1000,
-    color: '#a855f7',
+    desc: 'XP x2 durante 1 hora', color: '#a855f7',
     cast() {
       xpMultiplier = 2; xpMultiplierEnd = Date.now() + 3600000;
       toast('⚡', '¡Frenesí Arcano! XP x2 por 1 hora.');
@@ -64,48 +63,75 @@ const SPELL_DEFS = [
   },
   {
     id: 'speed', icon: '💨', name: 'Velocidad',
-    desc: 'Próximo pom: 10 min con XP completo', cd: 2 * 24 * 3600 * 1000,
-    color: '#22d3ee',
+    desc: 'Próximo pom: 10 min con XP completo', color: '#22d3ee',
     cast() {
       if (timer.running) { toast('⚠️', 'Pausa el pomodoro primero.'); return; }
       timer.duration = 10; timer.seconds = 600;
       document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
       updateTimerUI();
-      toast('💨', '¡Velocidad! Próximo pomodoro: 10 min con XP completo.');
+      toast('💨', '¡Velocidad! Próximo pom: 10 min con XP completo.');
     }
   },
   {
     id: 'berserker', icon: '🔥', name: 'Berserker',
-    desc: 'XP x1.5 durante 25 min de pom activo', cd: 24 * 3600 * 1000,
-    color: '#fb7185',
+    desc: 'XP x1.5 durante 25 min', color: '#fb7185',
     cast() {
       xpMultiplier = 1.5; xpMultiplierEnd = Date.now() + 25 * 60 * 1000;
-      toast('🔥', '¡Modo Berserker! XP x1.5 durante el próximo pomodoro.');
+      toast('🔥', '¡Berserker! XP x1.5 por 25 minutos.');
     }
   },
   {
     id: 'shield', icon: '🛡️', name: 'Escudo Arcano',
-    desc: 'Recupera 25 HP de forma instantánea', cd: 12 * 3600 * 1000,
-    color: '#4ade80',
+    desc: 'Recupera 25 HP al instante', color: '#4ade80',
     cast() {
       if (!hero) return;
       const newHp = Math.min(hero.hp_max || 100, (hero.hp || 0) + 25);
-      hero.hp = newHp;
-      saveHero({ hp: newHp });
-      renderHero();
-      toast('🛡️', `¡Escudo Arcano! +25 HP recuperado.`);
+      hero.hp = newHp; saveHero({ hp: newHp }); renderHero();
+      toast('🛡️', '¡Escudo Arcano! +25 HP recuperado.');
     }
-  }
+  },
+  {
+    id: 'modo-berserker', icon: '🧨', name: 'Modo Berserker',
+    desc: 'XP x2 en las próximas 3 misiones', color: '#f97316',
+    cast() {
+      xpMultiplier = 2; xpMultiplierEnd = Date.now() + 90 * 60 * 1000;
+      toast('🧨', '¡Modo Berserker! XP x2 en las próximas misiones.');
+    }
+  },
+  {
+    id: 'healing', icon: '🌿', name: 'Curación Mayor',
+    desc: 'Restaura 50 HP al instante', color: '#86efac',
+    cast() {
+      if (!hero) return;
+      const newHp = Math.min(hero.hp_max || 100, (hero.hp || 0) + 50);
+      hero.hp = newHp; saveHero({ hp: newHp }); renderHero();
+      toast('🌿', '¡Curación Mayor! +50 HP recuperado.');
+    }
+  },
+  {
+    id: 'mente-acero', icon: '🔷', name: 'Mente de Acero',
+    desc: '+200 XP instantáneos', color: '#60a5fa',
+    cast() {
+      if (!hero) return;
+      addXP(200, 'side', null);
+      toast('🔷', '¡Mente de Acero! +200 XP.');
+    }
+  },
 ];
 
-function castSpell(spellId) {
+async function castSpell(spellId) {
   const spell = SPELL_DEFS.find(s => s.id === spellId);
   if (!spell) return;
-  const lastCast = spellState[spellId] || 0;
-  if (Date.now() - lastCast < spell.cd) { toast('❌', `${spell.name} en cooldown.`); return; }
+  const cost = SPELL_FRAG_COST[spellId] || 10;
+  const have = getInvCount('spell_' + spellId);
+  if (have < cost) {
+    toast('❌', `Necesitas ${cost} fragmentos de ${spell.name} (tienes ${have}).`);
+    return;
+  }
+  const ok = await consumeInvItem('spell_' + spellId, cost);
+  if (!ok) { toast('❌', 'No se pudo consumir los fragmentos.'); return; }
   spell.cast();
-  spellState[spellId] = Date.now();
-  saveHero({ spells: JSON.stringify(spellState), spells_cast: (hero.spells_cast || 0) + 1 });
+  saveHero({ spells_cast: (hero.spells_cast || 0) + 1 });
   renderSpells();
   updateSpellBadge();
   checkAchievements();
@@ -114,18 +140,21 @@ function castSpell(spellId) {
 
 function renderSpells() {
   const el = document.getElementById('spellsList');
+  if (!el) return;
   el.innerHTML = `<div class="spell-orbs-grid">${SPELL_DEFS.map(s => {
-    const lastCast = spellState[s.id] || 0;
-    const elapsed = Date.now() - lastCast;
-    const onCD = elapsed < s.cd;
-    const cdLeft = onCD ? formatCDTime(s.cd - elapsed) : null;
-    const clr = s.color || '#a855f7';
-    return `<button class="spell-orb ${onCD ? 'cd' : ''}" onclick="castSpell('${s.id}')"
-        title="${escHtml(s.name)}: ${escHtml(s.desc)}"
+    const cost = SPELL_FRAG_COST[s.id] || 10;
+    const have = getInvCount('spell_' + s.id);
+    const ready = have >= cost;
+    const clr   = s.color || '#a855f7';
+    const imgUrl = CDN + 'dungeon/spell_' + s.id + '.png';
+    return `<button class="spell-orb ${ready ? '' : 'cd'}" onclick="castSpell('${s.id}')"
+        title="${escHtml(s.name)}: ${escHtml(s.desc)} | Coste: ${cost} frags"
         style="--spell-clr:${clr}">
-      <div class="spell-orb-icon">${s.icon}</div>
+      <img src="${imgUrl}" class="spell-orb-img" alt="${escHtml(s.name)}"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <div class="spell-orb-icon" style="display:none">${s.icon}</div>
       <div class="spell-orb-name">${escHtml(s.name)}</div>
-      ${onCD ? `<div class="spell-orb-cd">${cdLeft}</div>` : '<div class="spell-orb-ready">Listo</div>'}
+      <div class="spell-orb-frags ${ready ? 'spell-orb-ready' : 'spell-orb-cd'}">${have}/${cost}</div>
     </button>`;
   }).join('')}</div>`;
 }
