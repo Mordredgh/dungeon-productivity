@@ -14,6 +14,7 @@ async function initDB() {
   await Promise.all([loadHero(), loadQuests(), loadPomodoros()]);
   await loadInventory();
   await loadPets();
+  if (typeof loadWeapons === 'function') await loadWeapons();
   renderAll();
   scheduleRandomEvent();
   checkDailyStreak();

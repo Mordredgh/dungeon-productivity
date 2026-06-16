@@ -98,7 +98,7 @@
           <div class="sb-stat-val"><span id="statStreak">0</span>🔥</div>
           <div class="sb-stat-lbl">Racha</div>
         </div>
-        <div class="sb-stat-card" id="goldDisplay" onclick="openShop()" style="cursor:pointer" title="Tienda del Gremio">
+        <div class="sb-stat-card" id="goldDisplay" onclick="switchView('shop')" style="cursor:pointer" title="Tienda del Gremio">
           <div class="sb-stat-val gold-display">🪙 0</div>
           <div class="sb-stat-lbl">Oro</div>
         </div>
@@ -121,9 +121,12 @@
         <button class="sidebar-item"        data-view="achievements" onclick="switchView('achievements')"> <span class="si-icon">🏆</span><span class="si-label">Logros</span></button>
         <div class="sb-nav-label">Compañeros</div>
         <button class="sidebar-item"        data-view="pets"         onclick="switchView('pets')">         <span class="si-icon">🐾</span><span class="si-label">Mascotas</span></button>
+        <div class="sb-nav-label">Gremio</div>
+        <button class="sidebar-item"        data-view="shop"         onclick="switchView('shop')">         <span class="si-icon">🏪</span><span class="si-label">Tienda</span></button>
+        <button class="sidebar-item"        data-view="inventory"    onclick="switchView('inventory')">    <span class="si-icon">🎒</span><span class="si-label">Inventario</span></button>
+        <button class="sidebar-item"        data-view="smithy"       onclick="switchView('smithy')">       <span class="si-icon">⚒️</span><span class="si-label">Herrero</span></button>
         <div class="sb-nav-label">Archivo</div>
         <button class="sidebar-item"        data-view="history"      onclick="switchView('history')">      <span class="si-icon">📜</span><span class="si-label">Historial</span></button>
-        <button class="sidebar-item"        data-view="map"          onclick="switchView('map')">          <span class="si-icon">🗺️</span><span class="si-label">Mapa</span></button>
         <button class="sidebar-item"        data-view="calendar"     onclick="switchView('calendar')">     <span class="si-icon">📅</span><span class="si-label">Calendario</span></button>
       </div>
 
@@ -134,7 +137,7 @@
       <div class="sb-actions">
         <div class="sb-actions-label">Herramientas</div>
         <div class="sb-actions-grid">
-          <button class="sb-action-btn" id="shopBtn"   onclick="openShop()"  title="Tienda">🏪</button>
+          <button class="sb-action-btn" id="shopBtn"   onclick="switchView('shop')" title="Tienda">🏪</button>
           <button class="sb-action-btn" id="diaryBtn"  onclick="openDiary()" title="Diario">📖</button>
           <button class="sb-action-btn" id="oracleBtn" title="Oráculo IA">🔮</button>
           <button class="sb-action-btn" id="d20Btn"    title="Tirar D20">🎲</button>
@@ -172,7 +175,9 @@
         <button class="view-tab" data-view="stats">📊 Sala del Trono</button>
         <button class="view-tab" data-view="achievements">🏆 Logros</button>
         <button class="view-tab" data-view="history">📜 Historial</button>
-        <button class="view-tab" data-view="map">🗺️ Mapa</button>
+        <button class="view-tab" data-view="shop">🏪 Tienda</button>
+        <button class="view-tab" data-view="inventory">🎒 Inventario</button>
+        <button class="view-tab" data-view="smithy">⚒️ Herrero</button>
         <button class="view-tab" data-view="calendar">📅 Calendario</button>
         <button class="view-tab" data-view="pets">🐾 Mascotas</button>
       </div>
@@ -386,9 +391,29 @@
           </div>
         </div>
 
-        <!-- MAP VIEW -->
-        <div class="view" id="view-map">
-          <div id="mapContent" class="map-svg-wrap"></div>
+        <!-- SHOP VIEW -->
+        <div class="view" id="view-shop">
+          <div class="view-header">
+            <h2 class="view-title">🏪 Tienda del Gremio</h2>
+            <div class="gold-display" style="font-size:15px;font-weight:700;color:var(--gold)">🪙 0</div>
+          </div>
+          <div id="shopItems"></div>
+        </div>
+
+        <!-- INVENTORY VIEW -->
+        <div class="view" id="view-inventory">
+          <div class="view-header">
+            <h2 class="view-title">🎒 Inventario</h2>
+          </div>
+          <div id="inventoryView"></div>
+        </div>
+
+        <!-- SMITHY VIEW -->
+        <div class="view" id="view-smithy">
+          <div class="view-header">
+            <h2 class="view-title">⚒️ Herrero</h2>
+          </div>
+          <div id="smithyView"></div>
         </div>
 
         <!-- CALENDAR VIEW -->
@@ -406,7 +431,7 @@
         <div class="view" id="view-pets">
           <div class="view-header">
             <h2 class="view-title">🐾 Mascotas</h2>
-            <button class="btn btn-ghost" style="font-size:12px" onclick="openShop()">🏪 Tienda</button>
+            <button class="btn btn-ghost" style="font-size:12px" onclick="switchView('shop')">🏪 Tienda</button>
           </div>
           <div id="petsView"></div>
         </div>
@@ -855,17 +880,6 @@
   </div>
 </div>
 
-<!-- SHOP MODAL -->
-<div class="modal-overlay" id="shopModal">
-  <div class="modal" style="max-width:500px">
-    <div class="modal-header">
-      <div class="modal-title">🏪 Tienda del Gremio</div>
-      <div class="gold-display" style="font-size:15px;font-weight:700;color:var(--gold)">🪙 0</div>
-      <button class="modal-close" onclick="closeModal('shopModal')">✕</button>
-    </div>
-    <div id="shopItems" style="display:flex;flex-direction:column;gap:10px;padding:4px 0 8px"></div>
-  </div>
-</div>
 
 <!-- EVENT MODAL -->
 <div class="modal-overlay" id="eventModal">
@@ -936,21 +950,22 @@
   </div>
 </div>
 
-<script src="js/config.js?v=4"></script>
-<script src="js/state.js?v=4"></script>
-<script src="js/db.js?v=4"></script>
-<script src="js/hero.js?v=4"></script>
-<script src="js/quests.js?v=4"></script>
-<script src="js/timer.js?v=4"></script>
-<script src="js/inventory.js?v=4"></script>
-<script src="js/spells.js?v=4"></script>
-<script src="js/views.js?v=4"></script>
-<script src="js/ui.js?v=4"></script>
-<script src="js/events.js?v=4"></script>
-<script src="js/shop.js?v=4"></script>
-<script src="js/familiar.js?v=4"></script>
-<script src="js/rpg.js?v=4"></script>
-<script src="js/pets.js?v=4"></script>
-<script src="js/main.js?v=4"></script>
+<script src="js/config.js?v=5"></script>
+<script src="js/state.js?v=5"></script>
+<script src="js/db.js?v=5"></script>
+<script src="js/hero.js?v=5"></script>
+<script src="js/quests.js?v=5"></script>
+<script src="js/timer.js?v=5"></script>
+<script src="js/inventory.js?v=5"></script>
+<script src="js/spells.js?v=5"></script>
+<script src="js/views.js?v=5"></script>
+<script src="js/ui.js?v=5"></script>
+<script src="js/events.js?v=5"></script>
+<script src="js/shop.js?v=5"></script>
+<script src="js/familiar.js?v=5"></script>
+<script src="js/rpg.js?v=5"></script>
+<script src="js/pets.js?v=5"></script>
+<script src="js/weapons.js?v=5"></script>
+<script src="js/main.js?v=5"></script>
 </body>
 </html>

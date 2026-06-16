@@ -8,16 +8,20 @@ function addGold(n)   { setGold(getGold() + n); }
 function spendGold(n) { if (getGold() < n) { toast('💸', 'Oro insuficiente.'); return false; } addGold(-n); return true; }
 
 function renderGold() {
-  document.querySelectorAll('.gold-display').forEach(el => { el.textContent = `🪙 ${getGold()}`; });
+  const g = getGold();
+  document.querySelectorAll('.gold-display').forEach(el => { el.textContent = `🪙 ${g}`; });
+  const inv = document.getElementById('invGoldAmt');
+  if (inv) inv.textContent = g.toLocaleString();
 }
 
 let shopCategory = 'consumible';
 
-function openShop() {
-  shopCategory = 'consumible';
+function openShop() { switchView('shop'); }
+
+function renderShopView() {
+  shopCategory = shopCategory || 'consumible';
   renderShopItems();
   renderGold();
-  openModal('shopModal');
 }
 
 function renderShopItems() {
@@ -27,9 +31,10 @@ function renderShopItems() {
 
   const cats = [
     { id: 'consumible', label: '⚗️ Consumibles' },
-    { id: 'egg',        label: '🥚 Huevos' },
-    { id: 'fragment',   label: '✨ Fragmentos' },
-    { id: 'potion',     label: '🧪 Pociones' },
+    { id: 'armas',      label: '⚔️ Armas'       },
+    { id: 'egg',        label: '🥚 Huevos'       },
+    { id: 'fragment',   label: '✨ Fragmentos'   },
+    { id: 'potion',     label: '🧪 Pociones'     },
   ];
 
   const tabs = `<div class="shop-tabs">${cats.map(c =>
@@ -110,6 +115,13 @@ async function buyItem(id, cost) {
     const petKey = id.replace('pot_', '');
     await addInvItem('pet_potion_' + petKey, 'pet_potion', 1);
     toast('🧪', `+1 Poción de ${item.name}.`);
+
+  /* ── Armas ──────────────────────────────────────── */
+  } else if (id.startsWith('weapon_') && item.weaponKey) {
+    if (typeof addWeapon === 'function') {
+      await addWeapon(item.weaponKey, item.tier || 'comun');
+      toast(item.icon, `${item.name} obtenida. Ve al Inventario.`);
+    }
   }
 
   renderShopItems();

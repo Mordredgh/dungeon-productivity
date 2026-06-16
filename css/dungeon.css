@@ -3045,4 +3045,91 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   60%  { opacity: .8; }
   100% { transform: translateY(-160px) scale(0); opacity: 0; }
 }
+
+/* ── INVENTORY VIEW ─────────────────────────────────────── */
+.inv-gold-banner {
+  display: flex; align-items: center; gap: 14px;
+  background: linear-gradient(135deg, rgba(245,158,11,.15), rgba(245,158,11,.06));
+  border: 1px solid rgba(245,158,11,.35); border-radius: 16px;
+  padding: 18px 20px; margin-bottom: 20px;
+}
+.inv-gold-amt {
+  font-family: var(--font-head); font-size: 30px; font-weight: 800;
+  color: var(--gold); line-height: 1;
+}
+.inv-gold-lbl { font-size: 11px; color: var(--text3); letter-spacing: 1px; margin-top: 2px; }
+
+.inv-section { margin-bottom: 22px; }
+.inv-section-title {
+  font-family: var(--font-head); font-size: 13px; letter-spacing: 1.5px;
+  color: var(--text3); text-transform: uppercase; margin-bottom: 10px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--border);
+}
+.inv-weapons-list { display: flex; flex-direction: column; gap: 10px; }
+.inv-weapon-card {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,.03); border: 1px solid var(--wc, var(--border));
+  border-radius: 12px; padding: 12px 14px; transition: background .2s;
+}
+.inv-weapon-card.inv-weapon-equipped { background: color-mix(in srgb, var(--wc,#60a5fa) 8%, transparent); }
+.inv-weapon-img { width: 48px; height: 48px; object-fit: contain; border-radius: 8px; background: rgba(255,255,255,.04); flex-shrink:0; }
+.inv-weapon-emoji { width: 48px; height: 48px; font-size: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.inv-weapon-info { flex: 1; min-width: 0; }
+.inv-weapon-name { font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 4px; }
+.inv-weapon-stats { font-size: 11px; color: var(--text2); margin-top: 3px; }
+.inv-weapon-slot { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.inv-tier-badge {
+  display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .5px;
+  padding: 2px 7px; border-radius: 6px; border: 1px solid; margin-right: 4px;
+}
+.inv-eq-btn {
+  padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+  border: 1px solid var(--border); background: rgba(255,255,255,.06); color: var(--text2);
+  cursor: pointer; white-space: nowrap; transition: background .15s;
+}
+.inv-eq-btn:hover { background: rgba(255,255,255,.12); }
+.inv-eq-btn.inv-eq-active { background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.4); color: #f87171; }
+.inv-items-grid { display: flex; flex-direction: column; gap: 6px; }
+.inv-item-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border-radius: 10px;
+  background: rgba(255,255,255,.03); border: 1px solid var(--border);
+}
+.inv-item-img { width: 32px; height: 32px; object-fit: contain; border-radius: 6px; flex-shrink: 0; }
+.inv-item-name { flex: 1; font-size: 13px; color: var(--text); }
+.inv-item-qty { font-family: var(--font-head); font-size: 15px; color: var(--gold); font-weight: 700; }
+.inv-empty { font-size: 13px; color: var(--text3); padding: 10px 0; text-align: center; }
+
+/* ── SMITHY VIEW ─────────────────────────────────────────── */
+.smithy-header { margin-bottom: 20px; }
+.smithy-desc { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 12px; }
+.smithy-recipes { display: flex; flex-direction: column; gap: 10px; }
+.smithy-recipe {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border);
+  background: rgba(255,255,255,.03); transition: background .2s;
+}
+.smithy-recipe.smithy-ready { border-color: rgba(245,158,11,.4); background: rgba(245,158,11,.06); }
+.smithy-recipe.smithy-locked { opacity: .6; }
+.smithy-img { width: 48px; height: 48px; object-fit: contain; border-radius: 8px; flex-shrink: 0; background: rgba(255,255,255,.04); }
+.smithy-emoji { width: 48px; height: 48px; font-size: 26px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.smithy-info { flex: 1; min-width: 0; }
+.smithy-name { font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.smithy-req { font-size: 12px; display: flex; align-items: center; gap: 8px; margin-top: 3px; }
+.smithy-have { font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 5px; }
+.smithy-have-ok { background: rgba(34,197,94,.15); color: #4ade80; }
+.smithy-have-no { background: rgba(239,68,68,.12); color: #f87171; }
+.smithy-stats { font-size: 11px; color: var(--text2); margin-top: 4px; }
+.smithy-btn {
+  padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700;
+  font-family: var(--font-head); letter-spacing: .5px; cursor: pointer;
+  white-space: nowrap; transition: background .15s;
+  background: linear-gradient(135deg,#b45309,#d97706); color: #fff; border: none;
+}
+.smithy-btn:hover { background: linear-gradient(135deg,#d97706,#f59e0b); }
+.smithy-btn.smithy-btn-locked { background: rgba(255,255,255,.06); color: var(--text3); border: 1px solid var(--border); cursor: not-allowed; }
+
+/* ── SHOP VIEW ───────────────────────────────────────────── */
+#view-shop .shop-tabs { margin-bottom: 0; }
+#view-shop .shop-rows { max-height: none; }
 </style>

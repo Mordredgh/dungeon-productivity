@@ -88,6 +88,29 @@ const GOLD_TABLE = { main:50, side:20, daily:10, weekly:35 };
 
 const CDN = 'https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/';
 
+/* ── ARMAS ───────────────────────────────────────────────── */
+const WEAPON_DEFS = [
+  { key:'espada', name:'Espada',  icon:'⚔️', slot:'main_hand' },
+  { key:'hacha',  name:'Hacha',   icon:'🪓', slot:'main_hand' },
+  { key:'baculo', name:'Báculo',  icon:'🪄', slot:'main_hand' },
+  { key:'arco',   name:'Arco',    icon:'🏹', slot:'main_hand' },
+  { key:'daga',   name:'Daga',    icon:'🗡️', slot:'off_hand'  },
+  { key:'escudo', name:'Escudo',  icon:'🛡️', slot:'off_hand'  },
+];
+const WEAPON_TIERS = {
+  comun:      { label:'Común',      color:'#9ca3af', xpBonus:0,    goldBonus:0,    hpMax:0  },
+  raro:       { label:'Raro',       color:'#60a5fa', xpBonus:0.05, goldBonus:0.05, hpMax:5  },
+  epico:      { label:'Épico',      color:'#a855f7', xpBonus:0.10, goldBonus:0.10, hpMax:10 },
+  legendario: { label:'Legendario', color:'#f59e0b', xpBonus:0.20, goldBonus:0.15, hpMax:20 },
+  mitico:     { label:'Mítico',     color:'#ef4444', xpBonus:0.35, goldBonus:0.25, hpMax:35 },
+};
+const CRAFT_RECIPES = {
+  raro:       { from:'comun',      count:5 },
+  epico:      { from:'raro',       count:3 },
+  legendario: { from:'epico',      count:3 },
+  mitico:     { from:'legendario', count:3 },
+};
+
 /* ── SHOP ────────────────────────────────────────────────── */
 const SHOP_ITEMS = [
   /* Consumibles */
@@ -111,6 +134,13 @@ const SHOP_ITEMS = [
   { id:'frag_modo-berserker',name:'Esencia Berserker',          img:'spell_modo-berserker.png',cost:20,  qty:5, desc:'×5 frags · necesitas 20 para Modo Berserker',       category:'fragment' },
   { id:'frag_healing',       name:'Hierba de Curación',         img:'spell_healing.png',       cost:10,  qty:5, desc:'×5 frags · necesitas 10 para Curación Mayor',       category:'fragment' },
   { id:'frag_mente-acero',   name:'Cristal de Mente de Acero', img:'spell_mente-acero.png',   cost:25,  qty:5, desc:'×5 frags · necesitas 25 para Mente de Acero',       category:'fragment' },
+  /* Armas (comunes) */
+  { id:'weapon_espada', name:'Espada Común',  icon:'⚔️', cost:50,  desc:'Arma · mano principal · forjable a Rara (×5)',   category:'armas', weaponKey:'espada', tier:'comun' },
+  { id:'weapon_hacha',  name:'Hacha Común',   icon:'🪓', cost:50,  desc:'Arma · mano principal · forjable a Rara (×5)',   category:'armas', weaponKey:'hacha',  tier:'comun' },
+  { id:'weapon_baculo', name:'Báculo Común',  icon:'🪄', cost:50,  desc:'Arma · mano principal · forjable a Rara (×5)',   category:'armas', weaponKey:'baculo', tier:'comun' },
+  { id:'weapon_arco',   name:'Arco Común',    icon:'🏹', cost:50,  desc:'Arma · mano principal · forjable a Rara (×5)',   category:'armas', weaponKey:'arco',   tier:'comun' },
+  { id:'weapon_daga',   name:'Daga Común',    icon:'🗡️', cost:40,  desc:'Arma · mano secundaria · forjable a Rara (×5)', category:'armas', weaponKey:'daga',   tier:'comun' },
+  { id:'weapon_escudo', name:'Escudo Común',  icon:'🛡️', cost:40,  desc:'Arma · mano secundaria · forjable a Rara (×5)', category:'armas', weaponKey:'escudo', tier:'comun' },
   /* Pociones de mascota (×1 por compra) */
   { id:'pot_zorro-naturaleza', name:'Poción Zorro',   img:'pet_potion_zorro-naturaleza.png', cost:40,  desc:'Alimenta a tu Zorro Gigante',    category:'potion' },
   { id:'pot_pantera-sombra',   name:'Poción Pantera', img:'pet_potion_pantera-sombra.png',   cost:55,  desc:'Alimenta a tu Pantera Sombra',   category:'potion' },

@@ -178,9 +178,11 @@ function switchView(v) {
   if (v === 'stats')        renderStats();
   if (v === 'achievements') renderAchievements();
   if (v === 'history')      { historyPage = 1; renderHistory(); }
-  if (v === 'map')          renderMapView();
   if (v === 'calendar')     renderCalendar();
   if (v === 'pets')         renderPets();
+  if (v === 'shop')         renderShopView();
+  if (v === 'inventory')    { if (typeof renderInventory==='function') renderInventory(); }
+  if (v === 'smithy')       { if (typeof renderSmithy==='function')    renderSmithy();    }
 }
 
 function toggleCompact() {
