@@ -442,9 +442,27 @@ function renderHeroIndex() {
     </div>`;
 }
 
+function renderMastery() {
+  const el = document.getElementById('masteryContent');
+  if (!el) return;
+  const typeInfo = { main:'⚔️ Épicas', side:'🗡️ Encargos', daily:'🌅 Búsquedas', weekly:'📜 Crónicas' };
+  el.innerHTML = Object.entries(typeInfo).map(([type, label]) => {
+    const count   = quests.filter(q => q.done && q.type === type).length;
+    const lvl     = Math.floor(count / 10) + 1;
+    const pct     = Math.round((count % 10) * 10);
+    return `
+      <div class="hero-index-row" style="margin-bottom:6px">
+        <span style="width:90px">${label}</span>
+        <div class="hero-index-bar-bg"><div class="hero-index-bar-fill" style="width:${pct}%"></div></div>
+        <span style="font-size:10px;color:var(--text2);white-space:nowrap">Nv.${lvl} · ${count}</span>
+      </div>`;
+  }).join('');
+}
+
 function renderStats() {
   renderHeroIndex();
   if (typeof renderReputation === 'function') renderReputation();
+  renderMastery();
   renderXPChart();
   renderTypeDist();
   renderMissionsChart();
