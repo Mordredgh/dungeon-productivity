@@ -400,7 +400,50 @@ function renderMissionsChart() {
     </div>`).join('')}</div>`;
 }
 
+function calcHeroIndex() {
+  if (!hero) return { total: 0, streakScore: 0, activityScore: 0, healthScore: 0, pomScore: 0, achScore: 0 };
+  const last7 = new Date(Date.now() - 6 * 86400000); last7.setHours(0, 0, 0, 0);
+  const done7 = quests.filter(q => q.done && q.done_at && new Date(q.done_at) >= last7).length;
+  const poms7 = pomodoros.filter(p => p.started_at && new Date(p.started_at) >= last7).length;
+  const streakScore   = Math.min((hero.streak || 0) / 30, 1) * 100;
+  const activityScore = Math.min(done7 / 10, 1) * 100;
+  const healthScore   = ((hero.hp || 0) / (hero.hp_max || 100)) * 100;
+  const pomScore      = Math.min(poms7 / 10, 1) * 100;
+  let unlocked = []; try { unlocked = JSON.parse(hero.achievements || '[]'); } catch {}
+  const achScore = ACHIEVEMENT_DEFS.length ? (unlocked.length / ACHIEVEMENT_DEFS.length) * 100 : 0;
+  const total = Math.round(streakScore * 0.25 + activityScore * 0.25 + healthScore * 0.2 + pomScore * 0.15 + achScore * 0.15);
+  return { total, streakScore, activityScore, healthScore, pomScore, achScore };
+}
+
+function renderHeroIndex() {
+  const el = document.getElementById('heroIndexContent');
+  if (!el || !hero) return;
+  const idx   = calcHeroIndex();
+  const color = idx.total >= 75 ? 'var(--green)' : idx.total >= 50 ? 'var(--gold)' : idx.total >= 25 ? 'var(--orange)' : 'var(--red)';
+  const label = idx.total >= 75 ? 'Imparable' : idx.total >= 50 ? 'En forma' : idx.total >= 25 ? 'Flaqueando' : 'En crisis';
+  const rows  = [
+    ['🔥 Racha', idx.streakScore], ['⚔️ Actividad (7d)', idx.activityScore],
+    ['❤️ Salud', idx.healthScore], ['🍅 Pomodoro (7d)', idx.pomScore], ['🏆 Logros', idx.achScore]
+  ];
+  el.innerHTML = `
+    <div class="hero-index-head">
+      <div class="hero-index-num" style="color:${color}">${idx.total}</div>
+      <div>
+        <div class="hero-index-label" style="color:${color}">${label}</div>
+        <div class="hero-index-sub">Tu score general · mantenlo alto</div>
+      </div>
+    </div>
+    <div class="hero-index-bars">
+      ${rows.map(([lbl, val]) => `
+        <div class="hero-index-row">
+          <span>${lbl}</span>
+          <div class="hero-index-bar-bg"><div class="hero-index-bar-fill" style="width:${Math.round(val)}%"></div></div>
+        </div>`).join('')}
+    </div>`;
+}
+
 function renderStats() {
+  renderHeroIndex();
   renderXPChart();
   renderTypeDist();
   renderMissionsChart();
