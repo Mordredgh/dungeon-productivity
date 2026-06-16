@@ -24,6 +24,7 @@ function openEditQuest(id) {
   document.getElementById('editQRepeat').value     = q.repeat_days || '';
   document.getElementById('editQStartDate').value  = q.quest_start_date || '';
   document.getElementById('editQDependsOn').value  = q.depends_on || '';
+  if (typeof populateGoalSelect === 'function') populateGoalSelect(q.goal_id || '');
   openModal('editQuestModal');
 }
 
@@ -162,6 +163,7 @@ function switchView(v) {
   if (v === 'inventory')    { if (typeof renderInventory==='function') renderInventory(); }
   if (v === 'smithy')       { if (typeof renderSmithy==='function')    renderSmithy();    }
   if (v === 'character')    { if (typeof renderCharacterSheet==='function') renderCharacterSheet(); }
+  if (v === 'goals')        { if (typeof renderGoals==='function') renderGoals(); }
 }
 
 function toggleCompact() {

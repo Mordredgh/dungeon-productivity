@@ -28,3 +28,4 @@ let pomGoal = parseInt(localStorage.getItem('dungeon-pom-goal') || '8');
 let autoBreak = localStorage.getItem('dungeon-auto-break') !== 'false';
 let spotifyAccessToken = null;
 let spotifyTokenExpiry = 0;
+let goals = [];

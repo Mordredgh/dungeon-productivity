@@ -76,15 +76,18 @@ document.getElementById('saveQuestBtn').addEventListener('click', () => {
   const repeat  = document.getElementById('editQRepeat').value.trim();
   const startDate = document.getElementById('editQStartDate').value;
   const deps    = document.getElementById('editQDependsOn').value.trim();
+  const goalId  = document.getElementById('editQGoal').value || null;
   // Save quest metadata to Supabase
   db.from('dungeon_quests').update({
     tags: tags || '', est_time: estTime || '',
     repeat_days: parseInt(repeat) || 0,
     quest_start_date: startDate || null,
     depends_on: deps || null,
+    goal_id: goalId,
   }).eq('id', id).then(() => {});
   const _qm = quests.find(x => x.id === id);
-  if (_qm) { _qm.tags = tags || ''; _qm.est_time = estTime || ''; _qm.repeat_days = parseInt(repeat)||0; _qm.quest_start_date = startDate||null; _qm.depends_on = deps||null; }
+  if (_qm) { _qm.tags = tags || ''; _qm.est_time = estTime || ''; _qm.repeat_days = parseInt(repeat)||0; _qm.quest_start_date = startDate||null; _qm.depends_on = deps||null; _qm.goal_id = goalId; }
+  if (typeof renderGoals === 'function' && document.getElementById('view-goals')?.classList.contains('active')) renderGoals();
   updateQuest(id, {
     name:     document.getElementById('editQName').value.trim(),
     type:     document.getElementById('editQType').value,
@@ -301,7 +304,7 @@ function renderHeatmap() {
   const monthsEl = document.getElementById('heatmapMonths');
   if (!gridEl) return;
 
-  const days = 90;
+  const days = 365;
   const xpByDay = {};
   quests.forEach(q => {
     if (q.done && q.done_at) {

@@ -142,6 +142,7 @@
         <div class="sb-nav-label">Aventura</div>
         <button class="sidebar-item active" data-view="quests"       onclick="switchView('quests')">       <span class="si-icon">⚔️</span><span class="si-label">Misiones</span></button>
         <button class="sidebar-item"        data-view="kanban"       onclick="switchView('kanban')">       <span class="si-icon">📋</span><span class="si-label">Kanban</span></button>
+        <button class="sidebar-item"        data-view="goals"        onclick="switchView('goals')">        <span class="si-icon">🎯</span><span class="si-label">Metas</span></button>
         <button class="sidebar-item"        data-view="stats"        onclick="switchView('stats')">        <span class="si-icon">📊</span><span class="si-label">Sala del Trono</span></button>
         <button class="sidebar-item"        data-view="achievements" onclick="switchView('achievements')"> <span class="si-icon">🏆</span><span class="si-label">Logros</span></button>
         <div class="sb-nav-label">Compañeros</div>
@@ -283,6 +284,15 @@
           </div>
         </div>
 
+        <!-- GOALS VIEW -->
+        <div class="view" id="view-goals">
+          <div class="view-header">
+            <h2 class="view-title">🎯 Metas a Largo Plazo</h2>
+            <button class="btn btn-primary" onclick="openGoalModal()">➕ Nueva Meta</button>
+          </div>
+          <div id="goalsContent"></div>
+        </div>
+
         <!-- STATS VIEW -->
         <div class="view" id="view-stats">
           <div class="stats-grid">
@@ -353,7 +363,7 @@
             </div>
 
             <div class="stats-card" style="grid-column:1/-1">
-              <div class="stats-card-title">📅 Actividad — últimos 90 días</div>
+              <div class="stats-card-title">📅 Mapa de Calor Anual</div>
               <div class="heatmap-months" id="heatmapMonths"></div>
               <div class="heatmap-grid" id="heatmapGrid"></div>
               <div class="heatmap-legend">
@@ -664,12 +674,45 @@
         <label class="form-label">🔒 Requiere completar primero</label>
         <input class="form-input" id="editQDependsOn" type="text" placeholder="Nombre exacto de otra misión">
       </div>
+      <div class="form-group">
+        <label class="form-label">🎯 Vincular a Meta</label>
+        <select class="form-input" id="editQGoal">
+          <option value="">Sin meta</option>
+        </select>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('editQuestModal')">Cancelar</button>
       <button class="btn btn-ghost" id="duplicateQuestBtn" title="Duplicar misión">📋 Duplicar</button>
       <button class="btn btn-danger" id="deleteQuestBtn">Eliminar</button>
       <button class="btn btn-primary" id="saveQuestBtn">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Goal Edit -->
+<div class="modal-overlay" id="goalModal">
+  <div class="modal">
+    <div class="modal-title">🎯 Meta</div>
+    <div class="modal-body">
+      <input type="hidden" id="editGoalId">
+      <div class="form-group">
+        <label class="form-label">Nombre de la meta</label>
+        <input class="form-input" id="editGoalName" type="text" placeholder="Ej: Lanzar Maneki Store v2">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fecha objetivo</label>
+        <input class="form-input" id="editGoalDate" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notas</label>
+        <textarea class="form-input" id="editGoalNotes" rows="3" placeholder="Contexto u objetivos clave"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('goalModal')">Cancelar</button>
+      <button class="btn btn-danger" id="deleteGoalBtn" style="display:none">Eliminar</button>
+      <button class="btn btn-primary" id="saveGoalBtn">Guardar</button>
     </div>
   </div>
 </div>
@@ -909,21 +952,22 @@
 </div>
 
 <script src="js/config.js?v=8"></script>
-<script src="js/state.js?v=6"></script>
-<script src="js/db.js?v=5"></script>
+<script src="js/state.js?v=7"></script>
+<script src="js/db.js?v=6"></script>
 <script src="js/hero.js?v=6"></script>
 <script src="js/quests.js?v=5"></script>
 <script src="js/timer.js?v=5"></script>
 <script src="js/inventory.js?v=5"></script>
 <script src="js/spells.js?v=5"></script>
 <script src="js/views.js?v=8"></script>
-<script src="js/ui.js?v=7"></script>
-<script src="js/events.js?v=8"></script>
+<script src="js/ui.js?v=8"></script>
+<script src="js/events.js?v=9"></script>
 <script src="js/shop.js?v=5"></script>
 <script src="js/familiar.js?v=5"></script>
 <script src="js/rpg.js?v=6"></script>
 <script src="js/pets.js?v=7"></script>
 <script src="js/weapons.js?v=6"></script>
+<script src="js/goals.js?v=1"></script>
 <script src="js/character.js?v=2"></script>
 <script src="js/spotify.js?v=1"></script>
 <script src="js/weather.js?v=2"></script>
