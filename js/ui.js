@@ -173,7 +173,8 @@ function switchView(v) {
   document.querySelectorAll('.view').forEach(el => {
     const active = el.id === `view-${v}`;
     el.classList.toggle('active', active);
-    if (active) el.style.setProperty('--view-bg-url', `url(${CDN}dungeon/fondo_${v === 'quests' ? 'taberna' : v}.png)`);
+    const FONDO = { quests:'taberna', shop:'tienda', inventory:'inventario', smithy:'herrero' };
+    if (active) el.style.setProperty('--view-bg-url', `url(${CDN}dungeon/fondo_${FONDO[v] || v}.png)`);
   });
   if (v === 'stats')        renderStats();
   if (v === 'achievements') renderAchievements();
