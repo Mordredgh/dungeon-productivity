@@ -71,42 +71,69 @@ function spellFragLabel(spellKey) {
   return labels[spellKey] || spellKey;
 }
 
-async function grantLoot(loots, goldAmt) {
+async function grantLoot(loots, goldAmt, xpAmt, questName, questType) {
   if (!loots) return;
   const items = Array.isArray(loots) ? loots : [loots];
-  for (const loot of items) await addInvItem(loot.key, loot.type, loot.qty);
-  showLootPopup(items, goldAmt || 0);
+  showRewardModal(questName, questType, xpAmt || 0, goldAmt || 0, items);
+  await Promise.all(items.map(l => addInvItem(l.key, l.type, l.qty)));
   if (typeof renderSpells === 'function') renderSpells();
 }
 
-function showLootPopup(items, goldAmt) {
-  const old = document.getElementById('lootPopup');
-  if (old) old.remove();
+function showRewardModal(questName, questType, xpAmt, goldAmt, items) {
+  const typeLabels = { main:'⭐ Principal', side:'🗡️ Secundaria', daily:'🌅 Diaria', weekly:'📅 Semanal' };
+  document.getElementById('rmQuestName').textContent = questName || 'Misión Completada';
+  document.getElementById('rmQuestType').textContent = typeLabels[questType] || questType || '';
 
-  const goldRow = goldAmt > 0 ? `
-    <div class="loot-popup-row">
-      <span class="loot-popup-gold-icon">🪙</span>
-      <div class="loot-popup-name">Oro</div>
-      <div class="loot-popup-qty">+${goldAmt}</div>
-    </div>` : '';
-
-  const rows = items.map(loot => {
+  const delay = 0.6;
+  document.getElementById('rmItemRows').innerHTML = items.map((loot, i) => {
     const imgUrl = CDN + 'dungeon/' + loot.key + '.png';
     return `
-      <div class="loot-popup-row">
-        <img src="${imgUrl}" class="loot-popup-img" alt="" onerror="this.style.display='none'">
-        <div class="loot-popup-name">${escHtml(loot.display)}</div>
-        <div class="loot-popup-qty">+${loot.qty}</div>
+      <div class="rm-reward-row" style="animation-delay:${delay + i * 0.18}s">
+        <img src="${imgUrl}" class="rm-item-img" alt=""
+             onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+        <span class="rm-icon" style="display:none">🎁</span>
+        <div class="rm-label">${escHtml(loot.display)}</div>
+        <div class="rm-qty-wrap"><span class="rm-qty" data-target="${loot.qty}">0</span></div>
       </div>`;
   }).join('');
 
-  const div = document.createElement('div');
-  div.id = 'lootPopup';
-  div.className = 'loot-popup';
-  div.innerHTML = `
-    <div class="loot-popup-title">🎁 ¡Botín obtenido!</div>
-    ${goldRow}${rows}`;
-  document.body.appendChild(div);
-  setTimeout(() => div.classList.add('visible'), 30);
-  setTimeout(() => { div.classList.remove('visible'); setTimeout(() => div.remove(), 400); }, 4000);
+  document.getElementById('rmXpAmt').dataset.target   = xpAmt;
+  document.getElementById('rmXpAmt').textContent      = '0';
+  document.getElementById('rmGoldAmt').dataset.target = goldAmt;
+  document.getElementById('rmGoldAmt').textContent    = '0';
+
+  openModal('rewardModal');
+
+  setTimeout(() => {
+    document.querySelectorAll('#rewardModal [data-target]').forEach(el => {
+      _rmCountUp(el, parseInt(el.dataset.target) || 0, 750);
+    });
+    _rmSpawnSparkles();
+  }, 350);
+}
+
+function _rmCountUp(el, target, ms) {
+  const start = Date.now();
+  const tick = () => {
+    const p = Math.min((Date.now() - start) / ms, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(eased * target);
+    if (p < 1) requestAnimationFrame(tick);
+    else el.textContent = target;
+  };
+  requestAnimationFrame(tick);
+}
+
+function _rmSpawnSparkles() {
+  const modal = document.querySelector('.reward-modal');
+  if (!modal) return;
+  for (let i = 0; i < 14; i++) {
+    const s = document.createElement('div');
+    s.className = 'rm-sparkle';
+    const size = 3 + Math.random() * 4;
+    s.style.cssText = `left:${5 + Math.random() * 90}%;width:${size}px;height:${size}px;` +
+      `animation-delay:${Math.random() * 1}s;animation-duration:${0.9 + Math.random() * 0.8}s`;
+    modal.appendChild(s);
+    setTimeout(() => s.remove(), 2200);
+  }
 }

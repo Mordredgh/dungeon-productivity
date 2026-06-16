@@ -909,6 +909,33 @@
   </div>
 </div>
 
+<!-- REWARD MODAL -->
+<div class="modal-overlay" id="rewardModal">
+  <div class="reward-modal">
+    <div class="rm-shimmer"></div>
+    <div class="rm-header">
+      <div class="rm-victory">⚔️ ¡MISIÓN COMPLETADA!</div>
+      <div class="rm-quest-name" id="rmQuestName"></div>
+      <span class="rm-quest-type" id="rmQuestType"></span>
+    </div>
+    <div class="rm-divider">RECOMPENSAS</div>
+    <div class="rm-rewards">
+      <div class="rm-reward-row" style="animation-delay:.25s">
+        <span class="rm-icon">✨</span>
+        <div class="rm-label">Experiencia</div>
+        <div class="rm-qty-wrap"><span class="rm-qty" id="rmXpAmt">0</span><span class="rm-unit">XP</span></div>
+      </div>
+      <div class="rm-reward-row" style="animation-delay:.42s">
+        <span class="rm-icon">🪙</span>
+        <div class="rm-label">Oro</div>
+        <div class="rm-qty-wrap"><span class="rm-qty" id="rmGoldAmt">0</span></div>
+      </div>
+      <div id="rmItemRows"></div>
+    </div>
+    <button class="btn btn-primary rm-continue" onclick="closeModal('rewardModal')">⚔️ Continuar</button>
+  </div>
+</div>
+
 <script src="js/config.js?v=4"></script>
 <script src="js/state.js?v=4"></script>
 <script src="js/db.js?v=4"></script>

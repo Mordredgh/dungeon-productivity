@@ -2938,4 +2938,111 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   border-radius: 6px; font-size: 10px; color: var(--accent);
   line-height: 1.3;
 }
+
+/* ── REWARD MODAL ─────────────────────────────────────────── */
+#rewardModal { backdrop-filter: blur(6px); background: rgba(0,0,0,.75); }
+
+.reward-modal {
+  position: relative;
+  background: linear-gradient(160deg, #180e2a 0%, #0d0d1a 55%, #1a0a08 100%);
+  border: 1.5px solid var(--accent);
+  border-radius: 20px;
+  padding: 28px 24px 24px;
+  max-width: 400px;
+  width: 92%;
+  overflow: hidden;
+  animation: rmIn .5s cubic-bezier(.34,1.56,.64,1) both;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 0 50px rgba(138,43,226,.35), 0 24px 60px rgba(0,0,0,.8);
+}
+@keyframes rmIn {
+  from { transform: scale(.55) translateY(48px); opacity: 0; }
+  to   { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+
+/* shimmer sweep */
+.rm-shimmer {
+  position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background: linear-gradient(110deg, transparent 35%, rgba(255,220,120,.10) 50%, transparent 65%);
+  animation: rmShimmer 1.4s ease .15s forwards;
+}
+@keyframes rmShimmer {
+  from { transform: translateX(-110%); }
+  to   { transform: translateX(200%); }
+}
+
+/* header */
+.rm-header { text-align: center; margin-bottom: 22px; position: relative; z-index: 2; }
+.rm-victory {
+  font-family: var(--font-head); font-size: 20px; font-weight: 900;
+  letter-spacing: 2px; color: var(--gold);
+  animation: rmGlow 2s ease-in-out infinite alternate;
+}
+@keyframes rmGlow {
+  from { text-shadow: 0 0 8px rgba(255,215,0,.4), 0 0 16px rgba(255,215,0,.15); }
+  to   { text-shadow: 0 0 18px rgba(255,215,0,.9), 0 0 36px rgba(255,215,0,.5), 0 0 60px rgba(255,215,0,.2); }
+}
+.rm-quest-name {
+  font-size: 13px; color: var(--text); font-weight: 600;
+  margin-top: 8px; opacity: .9;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+}
+.rm-quest-type {
+  display: inline-block; margin-top: 6px; padding: 2px 12px;
+  border-radius: 20px; font-size: 11px; font-weight: 700;
+  background: var(--accent); color: #fff; letter-spacing: .5px;
+}
+
+/* divider */
+.rm-divider {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 9px; font-weight: 700; letter-spacing: 3px;
+  color: var(--text3); margin-bottom: 12px; position: relative; z-index: 2;
+}
+.rm-divider::before, .rm-divider::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+
+/* reward rows */
+.rm-rewards { display: flex; flex-direction: column; gap: 6px; margin-bottom: 22px; position: relative; z-index: 2; }
+
+.rm-reward-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: 12px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  opacity: 0; transform: translateX(-18px);
+  animation: rmRowIn .38s ease forwards;
+}
+@keyframes rmRowIn { to { opacity: 1; transform: translateX(0); } }
+
+.rm-icon { font-size: 28px; width: 36px; text-align: center; flex-shrink: 0; }
+.rm-item-img { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; border-radius: 8px; background: rgba(255,255,255,.05); }
+.rm-label   { flex: 1; font-size: 13px; color: var(--text); font-weight: 500; }
+.rm-qty-wrap { display: flex; align-items: baseline; gap: 4px; }
+.rm-qty {
+  font-family: var(--font-head); font-size: 24px; font-weight: 800;
+  color: var(--gold); min-width: 36px; text-align: right; line-height: 1;
+}
+.rm-unit { font-size: 10px; color: var(--text3); font-weight: 700; letter-spacing: 1px; }
+
+/* continue button */
+.rm-continue {
+  width: 100%; padding: 14px; font-size: 14px;
+  font-family: var(--font-head); letter-spacing: 1.5px;
+  border-radius: 12px; position: relative; z-index: 2;
+}
+
+/* sparkle particles */
+.rm-sparkle {
+  position: absolute; bottom: 10px; border-radius: 50%;
+  background: var(--gold); pointer-events: none; z-index: 0;
+  box-shadow: 0 0 6px var(--gold), 0 0 12px rgba(255,215,0,.4);
+  animation: rmSparkleUp linear forwards;
+}
+@keyframes rmSparkleUp {
+  0%   { transform: translateY(0)     scale(1); opacity: 1; }
+  60%  { opacity: .8; }
+  100% { transform: translateY(-160px) scale(0); opacity: 0; }
+}
 </style>

@@ -150,13 +150,13 @@ async function completeQuest(id, el) {
   });
   setTimeout(() => { if (div.parentNode) div.remove(); }, 5000);
 
-  // Loot drop — aparece 1.2s después del toast de completada
+  // Reward modal — aparece 700ms después del toast de completada
   if (typeof rollLoot === 'function') {
-    const _goldForLoot = goldAmt;
+    const _gold = goldAmt, _xp = xpAmt, _name = q.name, _type = q.type;
     setTimeout(async () => {
       const loots = rollLoot(q.priority || 'normal');
-      await grantLoot(loots, _goldForLoot);
-    }, 1200);
+      await grantLoot(loots, _gold, _xp, _name, _type);
+    }, 700);
   }
 
   checkAchievements();
