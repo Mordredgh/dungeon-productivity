@@ -29,4 +29,3 @@ let autoBreak = localStorage.getItem('dungeon-auto-break') !== 'false';
 let spotifyAccessToken = null;
 let spotifyTokenExpiry = 0;
 let goals = [];
-let runes = [];
