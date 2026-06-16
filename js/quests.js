@@ -84,6 +84,11 @@ async function completeQuest(id, el) {
     }
   }
 
+  // Reputación por área (tags) — bonus de XP si superaste el umbral
+  if (typeof getReputationBonus === 'function') {
+    xpAmt = Math.round(xpAmt * (1 + getReputationBonus(q.tags)));
+  }
+
   await addXP(xpAmt, q.type, el);
 
   // Gold earned

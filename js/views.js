@@ -444,6 +444,7 @@ function renderHeroIndex() {
 
 function renderStats() {
   renderHeroIndex();
+  if (typeof renderReputation === 'function') renderReputation();
   renderXPChart();
   renderTypeDist();
   renderMissionsChart();
