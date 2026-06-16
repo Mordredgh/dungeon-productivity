@@ -48,7 +48,8 @@ async function consumeInvItem(key, qty) {
 /* ── Drop de botín al completar misión ─────────────────── */
 function rollLoot(priority) {
   const table   = DROP_TABLE[priority] || DROP_TABLE.normal;
-  const fragQty = Math.floor(Math.random() * (table.max - table.min + 1)) + table.min;
+  const lckBonus = Math.floor((hero?.lck || 0) / 5);
+  const fragQty = Math.floor(Math.random() * (table.max - table.min + 1)) + table.min + lckBonus;
   const potQty  = Math.max(1, Math.ceil(fragQty / 2));
 
   const fragKey = SPELL_FRAGMENT_KEYS[Math.floor(Math.random() * SPELL_FRAGMENT_KEYS.length)];

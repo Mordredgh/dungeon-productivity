@@ -3277,6 +3277,24 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .char-inv-mini { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; }
 
+.char-attr-grid { display: flex; flex-direction: column; gap: 6px; }
+.char-attr-row {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(137,180,250,.05); border: 1px solid rgba(137,180,250,.1);
+  border-radius: 10px; padding: 8px 12px;
+}
+.char-attr-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.char-attr-label { font-size: 12px; font-weight: 600; color: var(--text); }
+.char-attr-effect { font-size: 10px; color: var(--text3); }
+.char-attr-val { font-family: var(--font-head); font-size: 16px; font-weight: 700; color: var(--accent); min-width: 22px; text-align: center; }
+.char-attr-btn {
+  width: 26px; height: 26px; border-radius: 8px; border: none; cursor: pointer;
+  background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; font-weight: 700; font-size: 15px;
+  display: flex; align-items: center; justify-content: center; transition: var(--transition);
+}
+.char-attr-btn:hover:not(:disabled) { filter: brightness(1.15); }
+.char-attr-btn:disabled { opacity: .3; cursor: not-allowed; }
+
 /* ── ANIMACIONES ─────────────────────────────────────────── */
 @keyframes animFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 .anim-float { animation: animFloat 3s ease-in-out infinite; }

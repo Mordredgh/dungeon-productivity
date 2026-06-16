@@ -133,7 +133,9 @@ function getPotionMult() {
 }
 function getGoldMult() {
   const w = localStorage.getItem('dungeon-weather-' + new Date().toISOString().split('T')[0]);
-  return w ? (WEATHER_TYPES[w]?.goldMult || 1) : 1;
+  const weatherMult = w ? (WEATHER_TYPES[w]?.goldMult || 1) : 1;
+  const agiMult = 1 + ((hero?.agi || 0) * 0.01);
+  return weatherMult * agiMult;
 }
 function getWeatherXPMult() {
   const w = localStorage.getItem('dungeon-weather-' + new Date().toISOString().split('T')[0]);

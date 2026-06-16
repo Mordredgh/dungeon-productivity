@@ -9,6 +9,35 @@ const RACE_LABELS = {
   humano: 'Humano', elfo: 'Elfo', enano: 'Enano', orco: 'Orco'
 };
 
+function _charAttrRowHtml(key, label, effect) {
+  const val = hero[key] || 0;
+  const canAdd = (hero.attr_points || 0) > 0;
+  return `
+    <div class="char-attr-row">
+      <div class="char-attr-info">
+        <span class="char-attr-label">${label}</span>
+        <span class="char-attr-effect">${effect}</span>
+      </div>
+      <span class="char-attr-val">${val}</span>
+      <button class="char-attr-btn" ${canAdd ? '' : 'disabled'} onclick="assignAttrPoint('${key}')">+</button>
+    </div>`;
+}
+
+async function assignAttrPoint(key) {
+  if (!hero || !(hero.attr_points > 0)) return;
+  hero[key] = (hero[key] || 0) + 1;
+  hero.attr_points -= 1;
+  const patch = { [key]: hero[key], attr_points: hero.attr_points };
+  if (key === 'con') {
+    hero.hp_max = (hero.hp_max || 100) + 2;
+    hero.hp = Math.min((hero.hp || 0) + 2, hero.hp_max);
+    patch.hp_max = hero.hp_max; patch.hp = hero.hp;
+  }
+  await saveHero(patch);
+  renderHeroUI();
+  renderCharacterSheet();
+}
+
 function _charPortraitHtml() {
   const cls = hero.hero_class || 'guerrero';
   const race = heroRace || hero.race || 'humano';
@@ -136,6 +165,20 @@ function renderCharacterSheet() {
       </div>
 
       <div>
+        <div class="char-section">
+          <div class="char-section-title" style="display:flex;justify-content:space-between;align-items:center">
+            <span>📊 Atributos</span>
+            <span style="color:var(--gold);font-size:11px">${hero.attr_points || 0} punto${(hero.attr_points||0)===1?'':'s'} disponible${(hero.attr_points||0)===1?'':'s'}</span>
+          </div>
+          <div class="char-attr-grid">
+            ${_charAttrRowHtml('str',  '💪 Fuerza',    '+1% XP en Épicas')}
+            ${_charAttrRowHtml('intel','🧠 Intelecto', '+1% XP en Encargos/Búsquedas')}
+            ${_charAttrRowHtml('agi',  '🏃 Agilidad',  '+1% Oro')}
+            ${_charAttrRowHtml('con',  '❤️ Constitución', '+2 HP máx')}
+            ${_charAttrRowHtml('lck',  '🍀 Suerte',    '+1 botín cada 5 puntos')}
+          </div>
+        </div>
+
         <div class="char-section">
           <div class="char-section-title">⚔️ Equipamiento</div>
           <div class="char-equip-grid">

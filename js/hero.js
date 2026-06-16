@@ -67,6 +67,10 @@ function classXPBonus(type) {
   else if (cls === 'fundador') bonus = 1.05;
   const race = heroRace || 'humano';
   if (race === 'humano') bonus *= 1.1;
+  if (hero) {
+    if (type === 'main' && hero.str)   bonus *= 1 + hero.str * 0.01;
+    if ((type === 'side' || type === 'daily') && hero.intel) bonus *= 1 + hero.intel * 0.01;
+  }
   return bonus;
 }
 
@@ -82,6 +86,9 @@ async function addXP(amount, type, sourceEl) {
   if (sourceEl) spawnParticle(`+${finalXP} XP`, sourceEl);
 
   if (newLevel > prevLevel) {
+    const gainedPoints = newLevel - prevLevel;
+    hero.attr_points = (hero.attr_points || 0) + gainedPoints;
+    saveHero({ attr_points: hero.attr_points });
     showLevelUp(newLevel);
     checkAchievements();
     if (webhookUrl) {
