@@ -2416,23 +2416,9 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 /* ── Sidebar collapse ─────────────────────────────────── */
 .main { position:relative; }
 .right-panel { transition:width .25s, min-width .25s, padding .25s; }
-.sidebar-toggle-btn {
-  position:absolute; top:50%; right:320px; transform:translateY(-50%);
-  width:16px; height:44px; background:var(--card); border:1px solid var(--border);
-  border-right:none; border-radius:6px 0 0 6px; cursor:pointer;
-  font-size:9px; color:var(--text2); display:flex; align-items:center;
-  justify-content:center; z-index:20; padding:0; line-height:1;
-}
-.sidebar-toggle-btn:hover { background:var(--bg3); color:var(--accent); }
+.sidebar-toggle-btn { display:none; }
 .sidebar-collapsed .right-panel { width:0 !important; min-width:0 !important; padding:0 !important; overflow:hidden !important; }
-.sidebar-collapsed .sidebar-toggle-btn { right:0; }
-#sidebarReopenBtn {
-  position:fixed; bottom:80px; right:10px; z-index:200;
-  background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm);
-  padding:6px 12px; cursor:pointer; font-size:12px; color:var(--text1);
-  box-shadow:var(--shadow);
-}
-#sidebarReopenBtn:hover { border-color:var(--accent); }
+#sidebarReopenBtn { display:none !important; }
 
 /* ── Contrato de Gremio ───────────────────────────────── */
 .contrato-banner {
