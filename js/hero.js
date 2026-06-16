@@ -96,11 +96,11 @@ async function addXP(amount, type, sourceEl) {
 /* STREAK */
 async function checkDailyStreak() {
   if (!hero) return;
-  const today = new Date().toDateString();
-  const lastDay = hero.last_active ? new Date(hero.last_active).toDateString() : null;
+  const today = new Date().toISOString().split('T')[0];
+  const lastDay = hero.last_active_date || null;
   if (lastDay === today) return;
 
-  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
   let newStreak = lastDay === yesterday ? (hero.streak || 0) + 1 : 1;
   const longest = Math.max(newStreak, hero.longest_streak || 0);
 
@@ -115,7 +115,7 @@ async function checkDailyStreak() {
     }
   }
 
-  await saveHero({ streak: newStreak, longest_streak: longest, last_active: new Date().toISOString(), hp: newHp });
+  await saveHero({ streak: newStreak, longest_streak: longest, last_active_date: today, hp: newHp });
   renderHeroUI();
   checkAchievements();
 }
