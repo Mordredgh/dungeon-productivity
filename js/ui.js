@@ -172,6 +172,7 @@ async function doImport() {
 const CHAR_HUB_TABS = { 'skill-tree':'skills', 'runes':'runes', 'bestiary':'bestiary', 'smithy':'smithy' };
 
 function switchView(v) {
+  if (v === 'oracle') { if (typeof openOracle === 'function') openOracle(); return; }
   // Redirect hub sub-views to character view with the right tab
   if (CHAR_HUB_TABS[v]) { switchCharTab(CHAR_HUB_TABS[v]); v = 'character'; }
   document.querySelectorAll('.view-tab, .sidebar-item').forEach(t => t.classList.toggle('active', t.dataset.view === v));

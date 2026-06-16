@@ -11,7 +11,7 @@ const DUNGEON_ROOMS = [
   { id:'biblioteca', level:3,  icon:'📚', name:'Biblioteca del Conocimiento', desc:'Pergaminos milenarios guardan hechizos olvidados. El conocimiento es poder.',                          color:'#7c3aed', link:'spells' },
   { id:'establo',    level:4,  icon:'🐾', name:'Establo de Mascotas',    desc:'Criaturas mágicas descansan aquí. Incuba huevos y entrena compañeros de batalla.',                          color:'#15803d', link:'pets' },
   { id:'salon',      level:5,  icon:'📊', name:'Sala del Trono',         desc:'Las estadísticas de tus conquistas adornan estas paredes. El poder de los datos.',                          color:'#1d4ed8', link:'stats' },
-  { id:'oraculo',    level:6,  icon:'🔮', name:'Torre del Oráculo',      desc:'El espíritu de OpenClaw habita esta torre. Sus visiones guían al héroe en la oscuridad.',                   color:'#6d28d9', link:null },
+  { id:'oraculo',    level:6,  icon:'🔮', name:'Torre del Oráculo',      desc:'El espíritu de OpenClaw habita esta torre. Sus visiones guían al héroe en la oscuridad.',                   color:'#6d28d9', link:'oracle' },
   { id:'tesoreria',  level:7,  icon:'💰', name:'Tesorería Real',         desc:'Oro, gemas y reliquias. La riqueza de un héroe se mide por lo que ha ganado en batalla.',                   color:'#b45309', link:'shop' },
   { id:'sala_jefe',  level:8,  icon:'👹', name:'Sala del Jefe Semanal',  desc:'Aquí se libran las batallas más épicas. El jefe semanal espera para ser derrotado.',                       color:'#991b1b', link:null },
   { id:'cripta',     level:9,  icon:'💀', name:'Cripta del Olvido',      desc:'Las misiones completadas yacen aquí como trofeos. Historia de un héroe que no se rindió.',                  color:'#374151', link:'history' },
