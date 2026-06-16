@@ -1,5 +1,15 @@
-﻿/* BOOT */
+/* BOOT */
 (async () => {
+  // db ya existe (creado en db.js al cargar el script)
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) {
+    document.getElementById('loginOverlay').style.display = 'flex';
+    return; // bootApp() se llama desde auth.js cuando el login es exitoso
+  }
+  await bootApp();
+})();
+
+async function bootApp() {
   const savedTheme = localStorage.getItem('dungeon-theme');
   if (savedTheme) document.documentElement.dataset.theme = savedTheme;
   updateTimerUI();
@@ -46,4 +56,4 @@
     if (typeof checkWeeklyPatternAnalysis === 'function') checkWeeklyPatternAnalysis();
   }, 60 * 60 * 1000);
   updateFocusTodayChip();
-})();
+}

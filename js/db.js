@@ -1,6 +1,8 @@
-﻿/* SUPABASE */
+﻿/* SUPABASE — cliente creado al cargar el script para que auth.js lo use antes de initDB() */
+db = supabase.createClient(SUPA_URL, SUPA_KEY);
+
 async function initDB() {
-  db = supabase.createClient(SUPA_URL, SUPA_KEY);
+  // db ya creado arriba
 
   // Show cached data instantly while Supabase loads
   try {

@@ -110,9 +110,9 @@ const GOLD_TABLE = { main:50, side:20, daily:10, weekly:35 };
 const CDN = 'https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/';
 
 /* ── GOOGLE OAUTH2 (mismo client ID para Fit + Calendar) ──── */
-const GOOGLE_CLIENT_ID     = '631929698326-s30ji937vmgri0spmpup3t21tfje35ci.apps.googleusercontent.com';
-const GOOGLE_CLIENT_SECRET = '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';
-const GOOGLE_REDIRECT_URI  = 'https://dungeon.mordredgh.com/';
+const GOOGLE_CLIENT_ID    = '631929698326-s30ji937vmgri0spmpup3t21tfje35ci.apps.googleusercontent.com';
+const GOOGLE_REDIRECT_URI = 'https://dungeon.mordredgh.com/';
+// GOOGLE_CLIENT_SECRET removido del frontend — ahora vive en la Edge Function google-oauth
 
 /* ── ARMAS ───────────────────────────────────────────────── */
 const WEAPON_DEFS = [

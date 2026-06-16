@@ -28,12 +28,13 @@ async function handleGoogleCalCallback() {
   if (!verifier) return;
   localStorage.removeItem('cal-pkce-v');
 
-  const body = new URLSearchParams({
-    code, client_id: GOOGLE_CLIENT_ID, client_secret: GOOGLE_CLIENT_SECRET,
-    redirect_uri: GOOGLE_REDIRECT_URI, grant_type: 'authorization_code',
-    code_verifier: verifier,
+  const { data: { session } } = await db.auth.getSession();
+  const authToken = session?.access_token || SUPA_KEY;
+  const resp = await fetch(`${SUPA_URL}/functions/v1/google-oauth`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+    body: JSON.stringify({ action: 'exchange', code, redirect_uri: GOOGLE_REDIRECT_URI, code_verifier: verifier }),
   });
-  const resp = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', body });
   if (!resp.ok) { toast('⚠️', 'Error al conectar Google Calendar.'); return; }
   const t = await resp.json();
   _calToken = t.access_token;
@@ -50,11 +51,13 @@ async function handleGoogleCalCallback() {
 async function _calEnsureToken() {
   if (_calToken && Date.now() < (hero?.cal_token_expiry || 0) - 60000) return _calToken;
   if (!hero?.cal_refresh_token) return hero?.cal_access_token || null;
-  const body = new URLSearchParams({
-    client_id: GOOGLE_CLIENT_ID, client_secret: GOOGLE_CLIENT_SECRET,
-    grant_type: 'refresh_token', refresh_token: hero.cal_refresh_token,
+  const { data: { session } } = await db.auth.getSession();
+  const authToken = session?.access_token || SUPA_KEY;
+  const resp = await fetch(`${SUPA_URL}/functions/v1/google-oauth`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+    body: JSON.stringify({ action: 'refresh', refresh_token: hero.cal_refresh_token }),
   });
-  const resp = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', body });
   if (!resp.ok) return null;
   const t = await resp.json();
   _calToken = t.access_token;

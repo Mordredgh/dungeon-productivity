@@ -66,9 +66,11 @@ async function isPushSubscribed() {
 async function dungeonPush(title, body, url = '/') {
   if (!hero) return;
   try {
+    const { data: { session } } = await db.auth.getSession();
+    const token = session?.access_token || SUPA_KEY;
     await fetch(`${SUPA_URL}/functions/v1/send-push`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPA_KEY}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ hero_id: hero.hero_id, title, body, url }),
     });
   } catch(e) { console.warn('dungeonPush:', e); }
