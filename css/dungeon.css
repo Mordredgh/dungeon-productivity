@@ -3170,6 +3170,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 .inv-eq-btn:hover { background: rgba(255,255,255,.12); }
 .inv-eq-btn.inv-eq-active { background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.4); color: #f87171; }
+.inv-eq-btn:disabled { opacity: .5; cursor: not-allowed; }
+.inv-weapon-card.inv-weapon-forging { opacity: .75; }
 .inv-items-grid { display: flex; flex-direction: column; gap: 6px; }
 .inv-item-row {
   display: flex; align-items: center; gap: 10px;

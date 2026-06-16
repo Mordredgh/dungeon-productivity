@@ -131,6 +131,10 @@ const CRAFT_RECIPES = {
   legendario: { from:'epico',      count:3 },
   mitico:     { from:'legendario', count:3 },
 };
+const FORGE_COOLDOWN_MS = {
+  legendario: 24 * 3600 * 1000,
+  mitico:     3 * 24 * 3600 * 1000,
+};
 
 /* ── SHOP ────────────────────────────────────────────────── */
 const SHOP_ITEMS = [

@@ -18,22 +18,26 @@ function getWeaponGoldBonus() {
     .reduce((sum, w) => sum + (WEAPON_TIERS[w.tier]?.goldBonus || 0), 0);
 }
 
-async function addWeapon(weaponKey, tier) {
+async function addWeapon(weaponKey, tier, readyAt) {
   const def     = WEAPON_DEFS.find(d => d.key === weaponKey);
   const tierDef = WEAPON_TIERS[tier];
   if (!def || !tierDef) return null;
   const name = `${def.name} ${tierDef.label}`;
   const { data } = await db.from('dungeon_weapons').insert({
     hero_id: hero.id, weapon_key: weaponKey, tier, name,
-    is_equipped: false, obtained_at: new Date().toISOString()
+    is_equipped: false, obtained_at: new Date().toISOString(),
+    ready_at: readyAt || null
   }).select().single();
   if (data) weapons.push(data);
   return data;
 }
 
+function isForging(w) { return w.ready_at && new Date(w.ready_at) > new Date(); }
+
 async function equipWeapon(id) {
   const w = weapons.find(x => x.id === id);
   if (!w) return;
+  if (isForging(w)) { toast('⏳', 'Esta arma todavía se está forjando.'); return; }
   const def = WEAPON_DEFS.find(d => d.key === w.weapon_key);
   const slot = def?.slot || 'main_hand';
   const current = weapons.find(x => x.is_equipped && x.slot === slot && x.id !== id);
@@ -59,7 +63,7 @@ async function unequipWeapon(id) {
 async function craftWeapon(weaponKey, targetTier) {
   const recipe = CRAFT_RECIPES[targetTier];
   if (!recipe) return;
-  const sources = weapons.filter(w => w.weapon_key === weaponKey && w.tier === recipe.from && !w.is_equipped);
+  const sources = weapons.filter(w => w.weapon_key === weaponKey && w.tier === recipe.from && !w.is_equipped && !isForging(w));
   if (sources.length < recipe.count) {
     const def = WEAPON_DEFS.find(d => d.key === weaponKey);
     toast('⚒️', `Necesitas ${recipe.count}× ${def?.name} ${WEAPON_TIERS[recipe.from]?.label}.`);
@@ -69,8 +73,13 @@ async function craftWeapon(weaponKey, targetTier) {
   const { error } = await db.from('dungeon_weapons').delete().in('id', toDelete);
   if (error) { toast('❌', 'Error al forjar.'); return; }
   weapons = weapons.filter(w => !toDelete.includes(w.id));
-  const newW = await addWeapon(weaponKey, targetTier);
-  if (newW) toast('⚒️', `¡${newW.name} forjada! ${WEAPON_TIERS[targetTier]?.xpBonus ? `+${Math.round(WEAPON_TIERS[targetTier].xpBonus*100)}% XP` : ''}`);
+  const cooldownMs = FORGE_COOLDOWN_MS[targetTier];
+  const readyAt = cooldownMs ? new Date(Date.now() + cooldownMs).toISOString() : null;
+  const newW = await addWeapon(weaponKey, targetTier, readyAt);
+  if (newW) {
+    if (readyAt) toast('⏳', `${newW.name} en forja. Estará lista en ${cooldownMs >= 86400000 * 2 ? '3 días' : '24 horas'}.`);
+    else toast('⚒️', `¡${newW.name} forjada! ${WEAPON_TIERS[targetTier]?.xpBonus ? `+${Math.round(WEAPON_TIERS[targetTier].xpBonus*100)}% XP` : ''}`);
+  }
   renderInventory(); renderSmithy();
 }
 
@@ -88,29 +97,36 @@ function renderInventory() {
   const equipped   = weapons.filter(w => w.is_equipped);
   const bag        = weapons.filter(w => !w.is_equipped);
 
+  const forgingLabel = w => {
+    const ms = new Date(w.ready_at) - new Date();
+    const h  = Math.ceil(ms / 3600000);
+    return h > 24 ? `⏳ Listo en ${Math.ceil(h / 24)}d` : `⏳ Listo en ${h}h`;
+  };
+
   const weaponCard = w => {
     const def  = WEAPON_DEFS.find(d => d.key === w.weapon_key) || { icon:'⚔️' };
     const tier = WEAPON_TIERS[w.tier] || { color:'#9ca3af', label:w.tier };
     const img  = CDN + 'dungeon/weapon_' + w.weapon_key + '_' + w.tier + '.png';
+    const forging = isForging(w);
     const stats = [
       tier.xpBonus  ? `✨ +${Math.round(tier.xpBonus*100)}% XP`   : '',
       tier.goldBonus? `🪙 +${Math.round(tier.goldBonus*100)}% Oro` : '',
     ].filter(Boolean).join(' · ');
-    const glow = (w.tier === 'legendario' || w.tier === 'mitico') ? 'anim-pulse-glow' : '';
+    const glow = !forging && (w.tier === 'legendario' || w.tier === 'mitico') ? 'anim-pulse-glow' : '';
     return `
-      <div class="inv-weapon-card ${w.is_equipped ? 'inv-weapon-equipped' : ''} ${glow}" style="--wc:${tier.color}">
-        <img src="${img}" class="inv-weapon-img" alt="${escHtml(w.name)}"
+      <div class="inv-weapon-card ${w.is_equipped ? 'inv-weapon-equipped' : ''} ${forging ? 'inv-weapon-forging' : ''} ${glow}" style="--wc:${tier.color}">
+        <img src="${img}" class="inv-weapon-img" alt="${escHtml(w.name)}" style="${forging ? 'opacity:.4;filter:grayscale(1)' : ''}"
              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <div class="inv-weapon-emoji" style="display:none">${def.icon}</div>
         <div class="inv-weapon-info">
           <div class="inv-weapon-name">${escHtml(w.name)}</div>
           <span class="inv-tier-badge" style="color:${tier.color};border-color:${tier.color}40;background:${tier.color}18">${tier.label}</span>
-          ${stats ? `<div class="inv-weapon-stats">${stats}</div>` : ''}
+          ${forging ? `<div class="inv-weapon-stats" style="color:var(--gold)">${forgingLabel(w)}</div>` : stats ? `<div class="inv-weapon-stats">${stats}</div>` : ''}
           ${w.slot ? `<div class="inv-weapon-slot">${w.slot==='main_hand'?'⚔️ Mano principal':'🛡️ Mano secundaria'}</div>` : ''}
         </div>
-        <button class="inv-eq-btn ${w.is_equipped?'inv-eq-active':''}"
+        <button class="inv-eq-btn ${w.is_equipped?'inv-eq-active':''}" ${forging ? 'disabled' : ''}
           onclick="${w.is_equipped?`unequipWeapon('${w.id}')`:`equipWeapon('${w.id}')`}">
-          ${w.is_equipped?'Desequipar':'Equipar'}
+          ${forging ? '⏳' : w.is_equipped?'Desequipar':'Equipar'}
         </button>
       </div>`;
   };
@@ -183,7 +199,7 @@ function renderSmithy() {
   if (!el) return;
 
   const byKeyTier = {};
-  weapons.filter(w => !w.is_equipped).forEach(w => {
+  weapons.filter(w => !w.is_equipped && !isForging(w)).forEach(w => {
     const k = w.weapon_key + '|' + w.tier;
     byKeyTier[k] = (byKeyTier[k] || 0) + 1;
   });
