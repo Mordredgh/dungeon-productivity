@@ -10,6 +10,17 @@ async function loadPets() {
 
 function _petDef(key) { return PET_DEFS.find(p => p.key === key); }
 
+function getPetEffect(type) {
+  const active = pets.find(p => p.is_active);
+  if (!active || active.stage === 'egg') return 0;
+  const ab = PET_ABILITIES?.[active.pet_key]?.[active.stage];
+  if (!ab) return 0;
+  if (ab.type === type) return ab.val;
+  if (type === 'main_hp'   && ab.type === 'main_hp_shield') return ab.val;
+  if (type === 'no_hp_loss' && ab.type === 'main_hp_shield') return 1;
+  return 0;
+}
+
 async function hatchEgg(petKey) {
   const def = _petDef(petKey);
   if (!def) return;
@@ -111,6 +122,7 @@ function renderActivePet() {
       <div class="active-pet-panel-info">
         <div class="active-pet-panel-name">${escHtml(def.name)}</div>
         <div class="active-pet-panel-rarity">${def.rarity}</div>
+        ${(() => { const ab = PET_ABILITIES?.[active.pet_key]?.[active.stage]; return ab ? `<div class="pet-ability-tag">${ab.icon} ${escHtml(ab.desc)}</div>` : ''; })()}
         ${!isMount ? `
         <div class="pet-evo-wrap" style="margin-top:6px">
           <div class="pet-evo-bar"><div class="pet-evo-fill" style="width:${fedPct}%"></div></div>
@@ -187,6 +199,7 @@ function renderPets() {
           </div>
           <div class="pet-card-name">${escHtml(def.name)}</div>
           <div class="pet-card-rarity">${isMount ? '🌟 Montura' : '🐣 Bebé'}</div>
+          ${(() => { const ab = PET_ABILITIES?.[def.key]?.[pet.stage]; return ab ? `<div class="pet-ability-tag" style="font-size:9px">${ab.icon} ${escHtml(ab.desc)}</div>` : ''; })()}
           ${!isMount ? `
           <div class="pet-evo-wrap">
             <div class="pet-evo-bar"><div class="pet-evo-fill" style="width:${fedPct}%"></div></div>

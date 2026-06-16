@@ -36,7 +36,7 @@ async function completeQuest(id, el) {
   const berserkerExp  = parseInt(localStorage.getItem('dungeon-berserker-exp') || '0');
   const berserkerMult = berserkerExp > Date.now() ? 2 : 1;
   const weatherMult   = typeof getWeatherXPMult === 'function' ? getWeatherXPMult() : 1;
-  const famBonus      = typeof getFamiliarXPBonus === 'function' ? getFamiliarXPBonus() : 0;
+  // famBonus removed — habilidades de mascota reemplazan al familiar
 
   // Transmutación (mago): next side/daily → 100 XP
   if (localStorage.getItem('dungeon-transmute-next') && (q.type === 'side' || q.type === 'daily')) {
@@ -61,7 +61,28 @@ async function completeQuest(id, el) {
     xpAmt += 20;
   }
   // Apply multipliers
-  xpAmt = Math.round(xpAmt * potionMult * berserkerMult * weatherMult) + famBonus;
+  xpAmt = Math.round(xpAmt * potionMult * berserkerMult * weatherMult);
+
+  // Habilidades de mascota activa
+  if (typeof getPetEffect === 'function') {
+    if (q.type === 'daily') xpAmt += getPetEffect('daily_xp') || 0;
+    const allMult = getPetEffect('all_xp');
+    if (allMult) {
+      xpAmt = Math.round(xpAmt * (1 + allMult));
+    } else {
+      const epicMult = getPetEffect('epic_xp');
+      if (epicMult && (q.priority === 'epico' || q.priority === 'legendario' || q.priority === 'mitico')) {
+        xpAmt = Math.round(xpAmt * (1 + epicMult));
+      }
+    }
+    if (q.type === 'side') {
+      const sideCrit = getPetEffect('side_crit');
+      if (sideCrit && Math.random() < sideCrit) {
+        xpAmt *= 2;
+        toast('🌑', '¡Golpe Crítico de Pantera! 2× XP');
+      }
+    }
+  }
 
   await addXP(xpAmt, q.type, el);
 
@@ -82,10 +103,13 @@ async function completeQuest(id, el) {
 
   // HP recovery on quest completion (all classes)
   if (q.type === 'main') {
-    const newHp = Math.min((hero.hp || 100) + 25, hero.hp_max || 100);
+    const petHpBonus = typeof getPetEffect === 'function' ? (getPetEffect('main_hp') || 0) : 0;
+    const hpGain = 25 + petHpBonus;
+    const newHp = Math.min((hero.hp || 100) + hpGain, hero.hp_max || 100);
     hero.hp = newHp;
     await saveHero({ hp: newHp });
-    setTimeout(() => toast('💚', `¡Misión Principal! +25 HP`), 600);
+    const hpMsg = petHpBonus ? `¡Misión Principal! +${hpGain} HP (🐾 +${petHpBonus})` : `¡Misión Principal! +25 HP`;
+    setTimeout(() => toast('💚', hpMsg), 600);
   } else if (q.type === 'daily') {
     const todayDailies = quests.filter(x => x.type === 'daily' && x.id !== id);
     const allDone = todayDailies.length > 0 && todayDailies.every(x => x.done);

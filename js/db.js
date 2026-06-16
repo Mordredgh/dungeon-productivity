@@ -31,7 +31,8 @@ async function savePom() {
   const rec = { hero_id: hero.id, duration: timer.duration, completed: true, started_at: new Date().toISOString() };
   const { data } = await db.from('dungeon_pomodoros').insert(rec).select().single();
   pomodoros.unshift(data);
-  const xpAmt = doubleXP ? POM_XP * 2 : POM_XP;
+  const petPomBonus = typeof getPetEffect === 'function' ? (getPetEffect('pom_xp') || 0) : 0;
+  const xpAmt = (doubleXP ? POM_XP * 2 : POM_XP) + petPomBonus;
   await addXP(xpAmt, 'pom', null);
   if (doubleXP) toast('🧠', `¡Mente de Acero! +${xpAmt} XP del pomodoro.`);
   const patch = { pomodoros_done: (hero.pomodoros_done || 0) + 1 };

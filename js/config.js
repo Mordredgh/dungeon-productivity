@@ -165,6 +165,34 @@ const SPELL_FRAG_COST = {
   'mente-acero':  25,
 };
 
+/* ── HABILIDADES DE MASCOTA ──────────────────────────────── */
+const PET_ABILITIES = {
+  'zorro-naturaleza': {
+    baby:  { icon:'🌿', desc:'+5 XP por misión diaria',               type:'daily_xp',       val:5    },
+    mount: { icon:'🌿', desc:'+10 XP por diaria · drop rate +10%',    type:'daily_xp',       val:10   },
+  },
+  'pantera-sombra': {
+    baby:  { icon:'🌑', desc:'20% chance de 2× XP en secundarias',    type:'side_crit',      val:0.20 },
+    mount: { icon:'🌑', desc:'35% chance de 2× XP en secundarias',    type:'side_crit',      val:0.35 },
+  },
+  'lobo-tormenta': {
+    baby:  { icon:'⚡', desc:'+25% daño al jefe semanal',              type:'boss_dmg',       val:1.25 },
+    mount: { icon:'⚡', desc:'+50% daño al jefe semanal',              type:'boss_dmg',       val:1.50 },
+  },
+  'grifo': {
+    baby:  { icon:'🍅', desc:'+15 XP por pomodoro completado',         type:'pom_xp',         val:15   },
+    mount: { icon:'🍅', desc:'+30 XP por pomodoro completado',         type:'pom_xp',         val:30   },
+  },
+  'dragon-fuego': {
+    baby:  { icon:'🔥', desc:'+20% XP en misiones épicas y superiores',type:'epic_xp',        val:0.20 },
+    mount: { icon:'🔥', desc:'+35% XP en TODAS las misiones',          type:'all_xp',         val:0.35 },
+  },
+  'fenix-mitico': {
+    baby:  { icon:'✨', desc:'+5 HP al completar misión principal',     type:'main_hp',        val:5    },
+    mount: { icon:'✨', desc:'+10 HP principal · HP inmune a vencidas', type:'main_hp_shield', val:10   },
+  },
+};
+
 const BOSS_NAMES = [
   'Dragón de la Procrastinación','Hidra del Caos','Liche del Tiempo Perdido',
   'Gólem de las Deudas','Gorgona del Desenfoque','Fénix Oscuro del Agotamiento',

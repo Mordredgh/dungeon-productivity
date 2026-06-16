@@ -88,7 +88,8 @@ function damageBoss(dmg) {
   const state = getBossState();
   if (state.defeated) return;
   const weather = getTodayWeather();
-  const finalDmg = weather === 'storm' ? dmg * 2 : dmg;
+  const bossMult = typeof getPetEffect === 'function' ? (getPetEffect('boss_dmg') || 1) : 1;
+  const finalDmg = (weather === 'storm' ? dmg * 2 : dmg) * bossMult;
   state.hp = Math.max(0, state.hp - finalDmg);
   if (state.hp === 0 && !state.defeated) {
     state.defeated = true;
