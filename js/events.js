@@ -279,7 +279,8 @@ async function checkOverdueHP() {
   const lastCheck = localStorage.getItem('dungeon-overdue-check');
   if (lastCheck === today) return;
   localStorage.setItem('dungeon-overdue-check', today);
-  const penalty = Math.min(overdue.length * 3, 15);
+  let penalty = Math.min(overdue.length * 3, 15);
+  if (hero.nightmare_mode) penalty *= 2;
   // Eclipse weather: HP doesn't drop from overdue
   const todayWeather = localStorage.getItem('dungeon-weather-' + today);
   if (todayWeather === 'eclipse') { toast('🌑', 'Eclipse Arcano: HP protegida hoy.'); return; }

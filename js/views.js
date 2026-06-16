@@ -278,6 +278,9 @@ function renderQuestItem(q) {
   const repeatHtml    = repeat    ? `<span class="repeat-badge">🔄 c/${repeat}d</span>` : '';
   const scheduledHtml = isScheduled ? `<span class="scheduled-badge">📅 desde ${startDate}</span>` : '';
   const lockHtml      = isLocked  ? `<span class="locked-badge">🔒 Req: ${escHtml(depName)}</span>` : '';
+  const wagerHtml      = q.wager && !q.wager.resolved ? `<span class="wager-badge">🪙 ${q.wager.gold} en juego</span>` : '';
+  const isDoubleNada    = hero && hero.doublenada_quest_id === q.id;
+  const doubleNadaHtml  = isDoubleNada ? `<span class="wager-badge">🎲 Doble o Nada activo</span>` : '';
 
   const isPinned = !!q.is_pinned;
   return `<div class="quest-item ${q.done ? 'done' : ''} ${isLocked ? 'quest-locked' : ''} ${isOverdue ? 'quest-overdue' : ''} ${isPinned ? 'pinned' : ''}" data-type="${q.type}" data-priority="${q.priority || 'normal'}" data-qid="${q.id}"
@@ -301,6 +304,8 @@ function renderQuestItem(q) {
         ${repeatHtml}
         ${scheduledHtml}
         ${lockHtml}
+        ${wagerHtml}
+        ${doubleNadaHtml}
         ${tagsHtml}
         ${!q.done ? `<select style="font-size:10px;padding:1px 4px;height:18px" onchange="setQuestDifficulty('${q.id}',this.value)" onclick="event.stopPropagation()">
           <option value="easy" ${diff==='easy'?'selected':''}>Fácil</option>
@@ -315,6 +320,8 @@ function renderQuestItem(q) {
       ${!q.done ? `<button class="quest-action-btn" onclick="setActiveQuest('${q.id}')" title="Vincular a pomodoro">🍅</button>` : ''}
       ${!q.done ? `<button class="quest-action-btn" onclick="event.stopPropagation();togglePin('${q.id}')" title="${isPinned ? 'Desanclar' : 'Anclar'}">📌</button>` : ''}
       ${!q.done ? `<button class="quest-action-btn" onclick="event.stopPropagation();oracleQuestAdvice('${q.id}')" title="Pedir consejo al Oráculo">🔮</button>` : ''}
+      ${!q.done && !q.wager ? `<button class="quest-action-btn" onclick="event.stopPropagation();openWagerModal('${q.id}')" title="Apostar oro a esta misión">🪙</button>` : ''}
+      ${!q.done && q.est_time && !isDoubleNada && (!hero || hero.doublenada_date !== new Date().toISOString().split('T')[0]) ? `<button class="quest-action-btn" onclick="event.stopPropagation();activateDoubleOrNothing('${q.id}')" title="Doble o Nada (1/día)">🎲</button>` : ''}
       <button class="quest-action-btn" onclick="openEditQuest('${q.id}')" title="Editar">✏️</button>
     </div>
   </div>`;

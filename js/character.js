@@ -192,6 +192,10 @@ function renderCharacterSheet() {
             <label class="form-label">Webhook al subir de nivel (URL)</label>
             <input class="form-input" id="charEditWebhook" type="url" placeholder="https://n8n.tudominio.com/webhook/..." value="${escHtml(webhookUrl || '')}">
           </div>
+          <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer;margin-bottom:14px">
+            <input type="checkbox" id="charEditNightmare" ${hero.nightmare_mode ? 'checked' : ''}>
+            🔥 Modo Pesadilla — fallar una Daily duele el doble, pero XP y oro también son el doble
+          </label>
           <button class="btn btn-primary" onclick="saveCharacterSheet()">Guardar cambios</button>
         </div>
       </div>
@@ -219,8 +223,9 @@ async function saveCharacterSheet() {
   heroRace   = document.getElementById('charEditRace').value;
   guildName  = document.getElementById('charEditGuild').value.trim();
   webhookUrl = document.getElementById('charEditWebhook').value.trim();
+  const nightmareMode = document.getElementById('charEditNightmare').checked;
   const hpMaxBonus = heroRace === 'enano' ? 110 : 100;
-  await saveHero({ name, hero_class: cls, race: heroRace, hp_max: hpMaxBonus, guild_name: guildName, webhook_url: webhookUrl });
+  await saveHero({ name, hero_class: cls, race: heroRace, hp_max: hpMaxBonus, guild_name: guildName, webhook_url: webhookUrl, nightmare_mode: nightmareMode });
   renderHeroUI();
   toast('🧙', 'Perfil actualizado.');
 }

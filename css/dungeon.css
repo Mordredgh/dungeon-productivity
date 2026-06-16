@@ -3337,3 +3337,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .pattern-line { font-size: 13px; color: var(--text2); padding: 6px 0; border-bottom: 1px solid var(--border); }
 .pattern-line:last-child { border-bottom: none; }
+
+.wager-badge {
+  font-size: 10px; padding: 2px 7px; border-radius: 6px; font-weight: 700;
+  background: rgba(245,158,11,.15); border: 1px solid rgba(245,158,11,.35); color: var(--gold);
+}

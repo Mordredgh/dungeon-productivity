@@ -89,13 +89,24 @@ async function completeQuest(id, el) {
     xpAmt = Math.round(xpAmt * (1 + getReputationBonus(q.tags)));
   }
 
+  // Doble o Nada — multiplica (o anula) XP y oro de esta misión
+  const doubleNadaMult = typeof resolveDoubleOrNothing === 'function' ? resolveDoubleOrNothing(q) : 1;
+  xpAmt = Math.round(xpAmt * doubleNadaMult);
+
+  // Modo Pesadilla — doble XP y oro
+  if (hero && hero.nightmare_mode) xpAmt *= 2;
+
   await addXP(xpAmt, q.type, el);
 
   // Gold earned
   const goldBase = GOLD_TABLE ? (GOLD_TABLE[q.type] || 10) : 10;
   const goldMult = typeof getGoldMult === 'function' ? getGoldMult() : 1;
-  const goldAmt  = Math.round(goldBase * goldMult);
+  let goldAmt  = Math.round(goldBase * goldMult * doubleNadaMult);
+  if (hero && hero.nightmare_mode) goldAmt *= 2;
   if (typeof addGold === 'function') addGold(goldAmt);
+
+  // Apuesta del Dungeon — si ganaste a tiempo, recuperas el doble
+  if (typeof resolveWagerWin === 'function') resolveWagerWin(q);
 
   // Boss damage (non-daily quests hurt the boss more)
   if (typeof damageBoss === 'function') {

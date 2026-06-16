@@ -13,6 +13,7 @@
   await resetDailyQuests();
   await resetRepeatQuests();
   await checkOverdueHP();
+  if (typeof checkWagerExpiry === 'function') await checkWagerExpiry();
   updatePomGoalUI();
   restoreTimerState();
   checkStreakDanger();
