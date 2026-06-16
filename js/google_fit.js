@@ -1,128 +1,118 @@
 'use strict';
 
-/* ── GOOGLE FIT INTEGRATION ──────────────────────────────────
-   Flujo implícito (response_type=token) — sin client_secret.
-   Token válido 1 hora; el usuario reconecta cuando expira.
-   ─────────────────────────────────────────────────────────── */
-
 const GOOGLE_FIT_SCOPES = 'https://www.googleapis.com/auth/fitness.activity.read';
 
 let fitSteps  = 0;
 let fitSynced = false;
 let _fitToken = null;
 
-function connectGoogleFit() {
+function _gRandStr(len) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+  return Array.from(crypto.getRandomValues(new Uint8Array(len)), b => chars[b % chars.length]).join('');
+}
+async function _gChallenge(v) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
+  return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+
+async function connectGoogleFit() {
+  const verifier  = _gRandStr(64);
+  const challenge = await _gChallenge(verifier);
+  localStorage.setItem('fit-pkce-v', verifier);
   const params = new URLSearchParams({
-    client_id:     GOOGLE_CLIENT_ID,
-    redirect_uri:  GOOGLE_REDIRECT_URI,
-    response_type: 'token',
-    scope:         GOOGLE_FIT_SCOPES,
-    state:         'fit',
+    client_id: GOOGLE_CLIENT_ID, redirect_uri: GOOGLE_REDIRECT_URI,
+    response_type: 'code', scope: GOOGLE_FIT_SCOPES,
+    code_challenge: challenge, code_challenge_method: 'S256',
+    access_type: 'offline', prompt: 'consent', state: 'fit',
   });
   window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
 }
 
 async function handleGoogleFitCallback() {
-  /* El token llega en el hash: #access_token=xxx&state=fit&expires_in=3600 */
-  const hash  = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-  const token = hash.get('access_token');
-  const state = hash.get('state');
-  if (!token || state !== 'fit') return;
-
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if (!code || params.get('state') !== 'fit') return;
   history.replaceState({}, '', window.location.pathname);
 
-  const expiry = Date.now() + parseInt(hash.get('expires_in') || '3600') * 1000;
-  _fitToken = token;
-  await saveHero({ fit_access_token: token, fit_token_expiry: expiry });
+  const verifier = localStorage.getItem('fit-pkce-v');
+  if (!verifier) return;
+  localStorage.removeItem('fit-pkce-v');
+
+  const body = new URLSearchParams({
+    code, client_id: GOOGLE_CLIENT_ID, client_secret: GOOGLE_CLIENT_SECRET,
+    redirect_uri: GOOGLE_REDIRECT_URI, grant_type: 'authorization_code',
+    code_verifier: verifier,
+  });
+  const resp = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', body });
+  if (!resp.ok) { toast('⚠️', 'Error al conectar Google Fit.'); return; }
+  const t = await resp.json();
+  _fitToken = t.access_token;
+  await saveHero({
+    fit_access_token:  t.access_token,
+    fit_refresh_token: t.refresh_token || hero.fit_refresh_token,
+    fit_token_expiry:  Date.now() + (t.expires_in || 3600) * 1000,
+  });
   toast('💪', '¡Google Fit conectado!');
   await syncGoogleFitSteps();
   renderFitWidget();
 }
 
-function _fitGetToken() {
-  if (_fitToken) return _fitToken;
-  if (hero?.fit_access_token && Date.now() < (hero.fit_token_expiry || 0)) {
-    _fitToken = hero.fit_access_token;
-    return _fitToken;
-  }
-  return null;
+async function _fitEnsureToken() {
+  if (_fitToken && Date.now() < (hero?.fit_token_expiry || 0) - 60000) return _fitToken;
+  if (!hero?.fit_refresh_token) return hero?.fit_access_token || null;
+  const body = new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID, client_secret: GOOGLE_CLIENT_SECRET,
+    grant_type: 'refresh_token', refresh_token: hero.fit_refresh_token,
+  });
+  const resp = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', body });
+  if (!resp.ok) return null;
+  const t = await resp.json();
+  _fitToken = t.access_token;
+  await saveHero({ fit_access_token: t.access_token, fit_token_expiry: Date.now() + (t.expires_in || 3600) * 1000 });
+  return _fitToken;
 }
 
 async function syncGoogleFitSteps() {
-  const token = _fitGetToken();
+  const token = await _fitEnsureToken();
   if (!token) return;
-
-  const today    = new Date().toISOString().split('T')[0];
-  const lastSync = localStorage.getItem('fit-sync-date');
-  if (lastSync === today && fitSynced) return;
-
-  const startMs = new Date(today + 'T00:00:00').getTime();
-  const endMs   = Date.now();
+  const today = new Date().toISOString().split('T')[0];
+  if (localStorage.getItem('fit-sync-date') === today && fitSynced) return;
 
   try {
-    const body = {
-      aggregateBy: [{ dataTypeName: 'com.google.step_count.delta' }],
-      bucketByTime: { durationMillis: endMs - startMs },
-      startTimeMillis: startMs,
-      endTimeMillis: endMs,
-    };
+    const startMs = new Date(today + 'T00:00:00').getTime();
     const resp = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate', {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        aggregateBy: [{ dataTypeName: 'com.google.step_count.delta' }],
+        bucketByTime: { durationMillis: Date.now() - startMs },
+        startTimeMillis: startMs, endTimeMillis: Date.now(),
+      }),
     });
-
-    if (resp.status === 401) {
-      /* Token expirado — limpiar y pedir reconexión */
-      _fitToken = null;
-      await saveHero({ fit_access_token: null, fit_token_expiry: 0 });
-      renderFitWidget();
-      return;
-    }
     if (!resp.ok) return;
-
     const data = await resp.json();
     fitSteps = 0;
     data.bucket?.forEach(b => b.dataset?.forEach(ds => ds.point?.forEach(p =>
-      p.value?.forEach(v => { fitSteps += v.intVal || 0; })
-    )));
-
+      p.value?.forEach(v => { fitSteps += v.intVal || 0; }))));
     localStorage.setItem('fit-sync-date', today);
     fitSynced = true;
     await _applyFitXP(today);
     renderFitWidget();
-  } catch (e) {
-    console.warn('Google Fit sync error:', e);
-  }
+  } catch(e) { console.warn('Fit sync:', e); }
 }
 
 async function _applyFitXP(today) {
-  const key = 'fit-xp-date';
-  if (localStorage.getItem(key) === today) return;
-  localStorage.setItem(key, today);
-
-  let bonus = 0;
-  if      (fitSteps >= 10000) bonus = 80;
-  else if (fitSteps >= 7500)  bonus = 50;
-  else if (fitSteps >= 5000)  bonus = 30;
-  else if (fitSteps >= 2500)  bonus = 15;
-
-  if (bonus > 0) {
-    await addXP(bonus, 'side', null);
-    toast('💪', `¡${fitSteps.toLocaleString()} pasos hoy! +${bonus} XP`);
-  }
+  if (localStorage.getItem('fit-xp-date') === today) return;
+  localStorage.setItem('fit-xp-date', today);
+  const bonus = fitSteps >= 10000 ? 80 : fitSteps >= 7500 ? 50 : fitSteps >= 5000 ? 30 : fitSteps >= 2500 ? 15 : 0;
+  if (bonus > 0) { await addXP(bonus, 'side', null); toast('💪', `¡${fitSteps.toLocaleString()} pasos! +${bonus} XP`); }
 }
 
 function renderFitWidget() {
   const el = document.getElementById('fitWidgetContent');
   if (!el) return;
-
-  const token     = _fitGetToken();
-  const connected = !!token;
-  const today     = new Date().toISOString().split('T')[0];
-  const synced    = localStorage.getItem('fit-sync-date') === today;
-  const pct       = connected ? Math.min(100, Math.round((fitSteps / 10000) * 100)) : 0;
-
+  const connected = !!(hero?.fit_refresh_token || hero?.fit_access_token);
+  const pct = Math.min(100, Math.round((fitSteps / 10000) * 100));
   if (!connected) {
     el.innerHTML = `
       <div class="integration-connect">
@@ -133,23 +123,18 @@ function renderFitWidget() {
       </div>`;
     return;
   }
-
+  const today  = new Date().toISOString().split('T')[0];
+  const synced = localStorage.getItem('fit-sync-date') === today;
   el.innerHTML = `
     <div class="fit-connected">
       <div class="fit-steps-num">${synced ? fitSteps.toLocaleString() : '—'}</div>
       <div class="fit-steps-label">pasos hoy</div>
-      <div class="fit-bar-wrap">
-        <div class="fit-bar-fill" style="width:${pct}%"></div>
-        <span class="fit-bar-goal">10k</span>
-      </div>
+      <div class="fit-bar-wrap"><div class="fit-bar-fill" style="width:${pct}%"></div><span class="fit-bar-goal">10k</span></div>
       <div class="fit-milestones">
-        ${[2500,5000,7500,10000].map(n=>`
-          <span class="fit-ms ${fitSteps>=n?'fit-ms-done':''}">
-            +${n>=10000?80:n>=7500?50:n>=5000?30:15}XP
-          </span>`).join('')}
+        ${[2500,5000,7500,10000].map(n=>`<span class="fit-ms ${fitSteps>=n?'fit-ms-done':''}">${n>=10000?'+80':n>=7500?'+50':n>=5000?'+30':'+15'} XP</span>`).join('')}
       </div>
       <div style="display:flex;gap:8px;margin-top:10px;justify-content:center">
-        <button class="btn btn-ghost" style="font-size:11px;padding:3px 10px" onclick="syncGoogleFitSteps()">🔄 Sincronizar</button>
+        <button class="btn btn-ghost" style="font-size:11px;padding:3px 10px" onclick="syncGoogleFitSteps()">🔄 Sync</button>
         <button class="btn btn-ghost" style="font-size:11px;padding:3px 10px;color:var(--red)" onclick="disconnectGoogleFit()">Desconectar</button>
       </div>
     </div>`;
@@ -157,6 +142,6 @@ function renderFitWidget() {
 
 async function disconnectGoogleFit() {
   _fitToken = null;
-  await saveHero({ fit_access_token: null, fit_token_expiry: 0 });
+  await saveHero({ fit_access_token: null, fit_refresh_token: null, fit_token_expiry: 0 });
   renderFitWidget();
 }
