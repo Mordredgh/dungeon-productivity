@@ -1740,8 +1740,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   .header-actions { margin-left: auto; gap: 2px; flex-shrink: 0; }
   .icon-btn { width: 32px !important; height: 32px !important; font-size: 15px !important; }
   /* Hide non-essential buttons */
-  #ambientBtn, #musicBtn, #d20Btn, #focusBtn, #helpBtn,
-  #ambientVolume, #musicVolume, #themeBtn { display: none !important; }
+  #d20Btn, #focusBtn, #helpBtn { display: none !important; }
   /* XP bar — full width second row */
   .xp-bar-wrap {
     order: 10; flex: 0 0 100%; max-width: 100%;

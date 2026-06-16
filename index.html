@@ -137,14 +137,10 @@
       <div class="sb-actions">
         <div class="sb-actions-label">Herramientas</div>
         <div class="sb-actions-grid">
-          <button class="sb-action-btn" id="shopBtn"   onclick="switchView('shop')" title="Tienda">🏪</button>
           <button class="sb-action-btn" id="diaryBtn"  onclick="openDiary()" title="Diario">📖</button>
           <button class="sb-action-btn" id="oracleBtn" title="Oráculo IA">🔮</button>
           <button class="sb-action-btn" id="d20Btn"    title="Tirar D20">🎲</button>
-          <button class="sb-action-btn" id="ambientBtn" title="Sonido ambiental">🌧️</button>
-          <button class="sb-action-btn" id="musicBtn"  title="Música lofi">🎵</button>
           <button class="sb-action-btn" id="focusBtn"  title="Modo Focus (F)">🎯</button>
-          <button class="sb-action-btn" id="themeBtn"  title="Cambiar tema (T)">🎨</button>
           <button class="sb-action-btn" id="helpBtn"   title="Atajos (?)">⌨️</button>
           <div class="more-menu-wrap sb-more" id="moreMenuWrap">
             <button class="sb-action-btn" id="moreBtn" title="Más opciones">⋯</button>
@@ -159,9 +155,6 @@
             </div>
           </div>
         </div>
-        <!-- sliders ocultos — JS los activa -->
-        <input type="range" id="ambientVolume" class="vol-slider" min="0" max="100" value="30" style="display:none">
-        <input type="range" id="musicVolume"   class="vol-slider" min="0" max="100" value="25" style="display:none">
       </div>
 
     </nav>
@@ -747,7 +740,6 @@
       <div class="shortcut-row"><kbd>Espacio</kbd><span>Start / Pause Pomodoro</span></div>
       <div class="shortcut-row"><kbd>N</kbd><span>Nueva misión (enfocar campo)</span></div>
       <div class="shortcut-row"><kbd>R</kbd><span>Reiniciar timer</span></div>
-      <div class="shortcut-row"><kbd>T</kbd><span>Cambiar tema</span></div>
       <div class="shortcut-row"><kbd>C</kbd><span>Modo compacto</span></div>
       <div class="shortcut-row"><kbd>F</kbd><span>Modo Focus</span></div>
       <div class="shortcut-row"><kbd>S</kbd><span>Colapsar / abrir panel</span></div>
@@ -947,16 +939,16 @@
 </div>
 
 <script src="js/config.js?v=5"></script>
-<script src="js/state.js?v=5"></script>
+<script src="js/state.js?v=6"></script>
 <script src="js/db.js?v=5"></script>
 <script src="js/hero.js?v=5"></script>
 <script src="js/quests.js?v=5"></script>
 <script src="js/timer.js?v=5"></script>
 <script src="js/inventory.js?v=5"></script>
 <script src="js/spells.js?v=5"></script>
-<script src="js/views.js?v=5"></script>
-<script src="js/ui.js?v=5"></script>
-<script src="js/events.js?v=5"></script>
+<script src="js/views.js?v=6"></script>
+<script src="js/ui.js?v=6"></script>
+<script src="js/events.js?v=6"></script>
 <script src="js/shop.js?v=5"></script>
 <script src="js/familiar.js?v=5"></script>
 <script src="js/rpg.js?v=6"></script>

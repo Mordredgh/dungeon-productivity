@@ -122,15 +122,6 @@ function escHtml(str) {
   return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/* THEME */
-function cycleTheme() {
-  const cur  = document.documentElement.dataset.theme || 'dark';
-  const next = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
-  document.documentElement.dataset.theme = next;
-  localStorage.setItem('dungeon-theme', next);
-  toast('🎨', `Tema: ${THEME_NAMES[next] || next}`);
-}
-
 /* AVATAR */
 function renderAvatarGrid() {
   const el = document.getElementById('avatarGrid');
@@ -200,7 +191,6 @@ document.addEventListener('keydown', e => {
   if (e.key === ' ') { e.preventDefault(); startTimer(); }
   if (key === 'N') { e.preventDefault(); document.getElementById('qName').focus(); }
   if (key === 'R') resetTimer();
-  if (key === 'T') cycleTheme();
   if (key === 'C') toggleCompact();
   if (key === 'F') toggleFocusMode();
   if (key === 'S') toggleSidebar();

@@ -15,7 +15,6 @@ let dateFilter = 'all';
 let historyTypeFilter = 'all';
 let pendingDeleteId = null;
 let lastCompletedUndo = null;
-let musicAudio = null;
 let heroRace = 'humano';   // populated from hero after loadHero()
 let guildName = '';
 let webhookUrl = '';
@@ -27,6 +26,3 @@ let sidebarCollapsed = false;
 let breakDuration = parseInt(localStorage.getItem('dungeon-break-dur') || '5');
 let pomGoal = parseInt(localStorage.getItem('dungeon-pom-goal') || '8');
 let autoBreak = localStorage.getItem('dungeon-auto-break') !== 'false';
-let ambientNode = null;
-let ambientGainNode = null;
-let ambientType = null;

@@ -59,7 +59,6 @@ document.querySelectorAll('.dur-btn').forEach(btn => {
   btn.addEventListener('click', () => setTimerDuration(+btn.dataset.min));
 });
 
-document.getElementById('themeBtn').addEventListener('click', cycleTheme);
 document.getElementById('compactToggle').addEventListener('click', toggleCompact);
 document.getElementById('exportBtn').addEventListener('click', exportData);
 document.getElementById('importBtn').addEventListener('click', () => openModal('importModal'));
@@ -825,31 +824,6 @@ function updatePomGoalUI() {
 }
 
 /* ============================================================
-   MUSIC TOGGLE
-   ============================================================ */
-function toggleMusic() {
-  const btn = document.getElementById('musicBtn');
-  const vol = document.getElementById('musicVolume');
-  if (musicAudio) {
-    musicAudio.pause(); musicAudio = null;
-    btn.style.color = '';
-    if (vol) vol.style.display = 'none';
-    toast('🎵', 'Música detenida.');
-  } else {
-    musicAudio = new Audio('https://radio.plaza.one/ogg');
-    musicAudio.volume = (vol ? vol.value : 25) / 100;
-    musicAudio.play().then(() => {
-      btn.style.color = 'var(--green)';
-      if (vol) vol.style.display = 'inline-block';
-      toast('🎵', 'Música lofi activada. ¡A trabajar, héroe!');
-    }).catch(() => {
-      musicAudio = null;
-      toast('⚠️', 'No se pudo cargar la radio. Verifica tu conexión.');
-    });
-  }
-}
-
-/* ============================================================
    MAP VIEW — Mapa del Dungeon SVG
    ============================================================ */
 function renderMapView() {
@@ -949,7 +923,6 @@ async function checkConnection() {
    EVENT LISTENERS — nuevos botones
    ============================================================ */
 document.getElementById('d20Btn').addEventListener('click', rollD20);
-document.getElementById('musicBtn').addEventListener('click', toggleMusic);
 document.getElementById('csvBtn').addEventListener('click', exportCSV);
 document.getElementById('mobileFab').addEventListener('click', () => {
   switchView('quests');
@@ -1123,10 +1096,6 @@ ACHIEVEMENT_DEFS.push(
 
 document.getElementById('doImportCsvBtn').addEventListener('click', doImportCSV);
 
-document.getElementById('musicVolume').addEventListener('input', function() {
-  if (musicAudio) musicAudio.volume = this.value / 100;
-});
-
 document.getElementById('breakDurSelect').addEventListener('change', function() {
   breakDuration = parseInt(this.value);
   localStorage.setItem('dungeon-break-dur', breakDuration);
@@ -1140,95 +1109,6 @@ document.getElementById('pomGoalInput').addEventListener('change', function() {
 });
 
 document.getElementById('helpBtn').addEventListener('click', () => openModal('shortcutsModal'));
-
-/* ============================================================
-   SONIDO AMBIENTAL (Web Audio API)
-   ============================================================ */
-function _createWhiteNoise(ctx, dest) {
-  const bufSize = ctx.sampleRate * 2;
-  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i = 0; i < bufSize; i++) d[i] = Math.random() * 2 - 1;
-  const src = ctx.createBufferSource();
-  src.buffer = buf; src.loop = true;
-  const filter = ctx.createBiquadFilter();
-  filter.type = 'bandpass'; filter.frequency.value = 400; filter.Q.value = 0.5;
-  src.connect(filter); filter.connect(dest);
-  src.start(); return src;
-}
-
-function _createFire(ctx, dest) {
-  const bufSize = ctx.sampleRate * 2;
-  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i = 0; i < bufSize; i++) d[i] = Math.random() * 2 - 1;
-  const src = ctx.createBufferSource();
-  src.buffer = buf; src.loop = true;
-  const filter = ctx.createBiquadFilter();
-  filter.type = 'lowpass'; filter.frequency.value = 200; filter.Q.value = 1;
-  src.connect(filter); filter.connect(dest);
-  src.start(); return src;
-}
-
-function _createForest(ctx, dest) {
-  const bufSize = ctx.sampleRate * 2;
-  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i = 0; i < bufSize; i++) d[i] = Math.random() * 2 - 1;
-  const src = ctx.createBufferSource();
-  src.buffer = buf; src.loop = true;
-  const filter = ctx.createBiquadFilter();
-  filter.type = 'bandpass'; filter.frequency.value = 800; filter.Q.value = 0.3;
-  src.connect(filter); filter.connect(dest);
-  src.start(); return src;
-}
-
-function startAmbient(type) {
-  stopAmbient();
-  const ctx = getAudioCtx();
-  ambientGainNode = ctx.createGain();
-  const vol = parseInt(localStorage.getItem('dungeon-ambient-vol') || '30') / 100;
-  ambientGainNode.gain.value = vol;
-  ambientGainNode.connect(ctx.destination);
-  const volSlider = document.getElementById('ambientVolume');
-  if (volSlider) { volSlider.value = vol * 100; volSlider.style.display = 'inline-block'; }
-  if (type === 'rain')        ambientNode = _createWhiteNoise(ctx, ambientGainNode);
-  else if (type === 'fire')   ambientNode = _createFire(ctx, ambientGainNode);
-  else if (type === 'forest') ambientNode = _createForest(ctx, ambientGainNode);
-  ambientType = type;
-  localStorage.setItem('dungeon-ambient', type);
-  const icons = { rain: '🌧️', fire: '🔥', forest: '🌿' };
-  const btn = document.getElementById('ambientBtn');
-  if (btn) { btn.style.color = 'var(--blue)'; btn.title = `Ambiental: ${type}`; btn.textContent = icons[type] || '🌧️'; }
-  const labels = { rain: 'Lluvia activada', fire: 'Fuego activado', forest: 'Bosque activado' };
-  toast(icons[type] || '🎵', labels[type] || 'Ambiental activado');
-}
-
-function stopAmbient() {
-  if (ambientNode) { try { ambientNode.stop(); } catch {} ambientNode = null; }
-  if (ambientGainNode) { try { ambientGainNode.disconnect(); } catch {} ambientGainNode = null; }
-  ambientType = null;
-  localStorage.removeItem('dungeon-ambient');
-  const btn = document.getElementById('ambientBtn');
-  if (btn) { btn.style.color = ''; btn.title = 'Sonido ambiental'; btn.textContent = '🌧️'; }
-  const volSlider = document.getElementById('ambientVolume');
-  if (volSlider) volSlider.style.display = 'none';
-}
-
-function cycleAmbient() {
-  const cycle = [null, 'rain', 'fire', 'forest'];
-  const next  = cycle[(cycle.indexOf(ambientType) + 1) % cycle.length];
-  const btn   = document.getElementById('ambientBtn');
-  if (!next) { stopAmbient(); toast('🔇', 'Ambiental desactivado.'); if (btn) btn.textContent = '🌧️'; }
-  else startAmbient(next);
-}
-
-document.getElementById('ambientBtn').addEventListener('click', cycleAmbient);
-
-document.getElementById('ambientVolume').addEventListener('input', function() {
-  if (ambientGainNode) ambientGainNode.gain.value = this.value / 100;
-  localStorage.setItem('dungeon-ambient-vol', this.value);
-});
 
 /* More menu toggle */
 document.getElementById('moreBtn').addEventListener('click', e => {
