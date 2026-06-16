@@ -123,11 +123,13 @@ function renderActivePet() {
     section.querySelector('.panel-title').textContent = `🐾 Mascota — ${stageLabel}`;
     panel.innerHTML = `
       <div class="pet-rpanel" style="--pet-fondo:url('${fondoUrl}')">
-        <div class="pet-rpanel-bg"></div>
-        <div class="pet-rpanel-body">
+        <div class="pet-rpanel-imgwrap">
+          <div class="pet-rpanel-bg"></div>
           <img src="${CDN}dungeon/pet_${stage}_${active.pet_key}.png" class="pet-rpanel-img" alt=""
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="pet-rpanel-emoji" style="display:none">${def.icon}</div>
+        </div>
+        <div class="pet-rpanel-body">
           <div class="pet-rpanel-info">
             <div class="pet-rpanel-name">${escHtml(def.name)}</div>
             <div class="pet-rpanel-rarity">${def.rarity}</div>
@@ -163,11 +165,13 @@ function renderActivePet() {
     section.querySelector('.panel-title').textContent = '🥚 Mascota — Huevo';
     panel.innerHTML = `
       <div class="pet-rpanel" style="--pet-fondo:url('${fondoUrl}')">
-        <div class="pet-rpanel-bg"></div>
-        <div class="pet-rpanel-body">
+        <div class="pet-rpanel-imgwrap">
+          <div class="pet-rpanel-bg"></div>
           <img src="${CDN}dungeon/pet_egg_${petKey}.png" class="pet-rpanel-img" alt=""
-               onerror="this.style.display:'none';this.nextElementSibling.style.display='flex'">
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="pet-rpanel-emoji" style="display:none">${eDef?.icon||'🥚'}</div>
+        </div>
+        <div class="pet-rpanel-body">
           <div class="pet-rpanel-info">
             <div class="pet-rpanel-name">${escHtml(eDef?.name||'Huevo')}</div>
             <div class="pet-rpanel-rarity">${eDef?.rarity||''}</div>
@@ -175,8 +179,6 @@ function renderActivePet() {
             <button class="pet-power-btn ${powered?'pet-power-used':''}" onclick="activatePetPower()" ${powered?'disabled':''}>
               ${powered ? '⏳ Poder usado hoy' : `${ab?.icon||'🥚'} Activar Poder`}
             </button>
-            <button class="pet-action-btn" style="margin-top:2px;font-size:10px"
-              onclick="switchView('pets')">🐾 Ir a Mascotas</button>
           </div>
         </div>
       </div>`;

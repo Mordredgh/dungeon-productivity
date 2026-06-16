@@ -165,13 +165,7 @@ function markSkillUsed() {
 function renderClassSkillBtn() {
   const el = document.getElementById('classSkillBtn');
   if (!el || !hero) return;
-  const skill = CLASS_SKILLS[hero.hero_class];
-  if (!skill) { el.style.display = 'none'; return; }
-  const used = getSkillUsed();
-  el.style.display = '';
-  el.innerHTML = `${skill.icon} ${skill.name}${used ? ' <span style="opacity:.5;font-size:11px">(mañana)</span>' : ''}`;
-  el.disabled = used;
-  el.title = skill.desc + (used ? ' — Disponible mañana.' : '');
+  el.style.display = 'none';
 }
 async function useClassSkill() {
   if (!hero || getSkillUsed()) { toast('⏳', 'Habilidad en cooldown. Disponible mañana.'); return; }
