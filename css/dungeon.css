@@ -533,6 +533,41 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .sb-more { position: relative; }
 .more-menu-up { bottom: calc(100% + 6px) !important; top: auto !important; left: 0 !important; right: auto !important; }
 
+/* ── WEATHER CHIP (header) ───────────────────────────────── */
+.weather-chip {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 13px; padding: 5px 10px; border-radius: 8px;
+  background: rgba(137,180,250,.07); border: 1px solid rgba(137,180,250,.12);
+  color: var(--text2); white-space: nowrap;
+}
+
+/* ── SPOTIFY PLAYER (sidebar) ────────────────────────────── */
+.spotify-player { display: flex; flex-direction: column; gap: 8px; }
+.spotify-connect-btn {
+  width: 100%; padding: 10px; border-radius: 10px; border: none;
+  background: linear-gradient(135deg, #1db954, #169c46); color: #fff;
+  font-weight: 700; font-size: 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: var(--transition);
+}
+.spotify-connect-btn:hover { filter: brightness(1.1); }
+.spotify-track {
+  font-size: 11px; color: var(--text2); text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.spotify-controls { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.spotify-btn {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: rgba(137,180,250,.07); border: 1px solid rgba(137,180,250,.1);
+  color: var(--text2); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 13px; transition: var(--transition);
+}
+.spotify-btn:hover { background: rgba(137,180,250,.16); color: var(--accent); }
+.spotify-btn.spotify-play {
+  width: 36px; height: 36px; font-size: 15px; border: none; color: #fff;
+  background: linear-gradient(135deg, #1db954, #169c46);
+}
+
 /* Keep .view-tab for mobile bottom nav */
 .view-tab {
   padding: 8px 18px;

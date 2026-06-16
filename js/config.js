@@ -3,6 +3,20 @@
 const SUPA_URL = 'https://stdedxhxxoyostymldqn.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0ZGVkeGh4eG95b3N0eW1sZHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MTQ2NTMsImV4cCI6MjA4ODQ5MDY1M30.OUhqeeqjlQa6ufECPzOJqZ-gQB93pg8nu0g1j4lEXyI';
 
+const SPOTIFY_CLIENT_ID    = '27360e70ab9d41f18aeeaab7a640eb9b';
+const SPOTIFY_REDIRECT_URI = 'https://dungeon.mordredgh.com/';
+const SPOTIFY_PLAYLIST_URI = 'spotify:playlist:6zCID88oNjNv9zx6puDHKj';
+const SPOTIFY_SCOPES       = 'user-read-playback-state user-modify-playback-state user-read-currently-playing';
+
+const WEATHER_ICONS = {
+  0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',
+  51:'🌦️',53:'🌦️',55:'🌦️',56:'🌧️',57:'🌧️',
+  61:'🌧️',63:'🌧️',65:'🌧️',66:'🌧️',67:'🌧️',
+  71:'🌨️',73:'🌨️',75:'❄️',77:'❄️',
+  80:'🌦️',81:'🌧️',82:'⛈️',85:'🌨️',86:'❄️',
+  95:'⛈️',96:'⛈️',99:'⛈️'
+};
+
 const TITLES = [
   'Aprendiz del Gremio','Escudero Inquieto','Explorador del Caos',
   'Guerrero del Enfoque','Cazador de Metas','Mago del Tiempo',

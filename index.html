@@ -51,6 +51,26 @@
       <img src="https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-text.png" class="header-logo-img" alt="Arcanum">
       <div class="guild-name" id="guildNameDisplay"></div>
     </div>
+    <div class="header-actions">
+      <div id="realWeatherChip" class="weather-chip" style="display:none" title="Clima"></div>
+      <button class="icon-btn" id="diaryBtn"  onclick="openDiary()" title="Diario">📖</button>
+      <button class="icon-btn" id="oracleBtn" title="Oráculo IA">🔮</button>
+      <button class="icon-btn" id="d20Btn"    title="Tirar D20">🎲</button>
+      <button class="icon-btn" id="focusBtn"  title="Modo Focus (F)">🎯</button>
+      <button class="icon-btn" id="helpBtn"   title="Atajos (?)">⌨️</button>
+      <div class="more-menu-wrap" id="moreMenuWrap">
+        <button class="icon-btn" id="moreBtn" title="Más opciones">⋯</button>
+        <div class="more-menu" id="moreMenu">
+          <button class="more-menu-item" onclick="openModal('quickNotesModal')">📝 Pergamino Rápido</button>
+          <button class="more-menu-item" id="bulkToggleBtn">☑️ Selección múltiple</button>
+          <button class="more-menu-item" id="compactToggle">⊟ Modo compacto</button>
+          <button class="more-menu-item" id="notifBtn">🔔 Notificaciones</button>
+          <button class="more-menu-item" id="importBtn">📥 Importar</button>
+          <button class="more-menu-item" id="exportBtn">📤 Exportar JSON</button>
+          <button class="more-menu-item" id="csvBtn">📊 Exportar CSV</button>
+        </div>
+      </div>
+    </div>
     <div class="conn-dot" id="connDot" title="Conectando..."></div>
     <div id="spellActiveBadge" style="display:none" class="spell-active-badge">⚡ x2 XP</div>
   </header>
@@ -133,28 +153,10 @@
       <!-- MASCOTA ACTIVA -->
       <div id="activePetDisplay" style="display:none" class="active-pet-display"></div>
 
-      <!-- ACCIONES — fondo del sidebar -->
+      <!-- SPOTIFY -->
       <div class="sb-actions">
-        <div class="sb-actions-label">Herramientas</div>
-        <div class="sb-actions-grid">
-          <button class="sb-action-btn" id="diaryBtn"  onclick="openDiary()" title="Diario">📖</button>
-          <button class="sb-action-btn" id="oracleBtn" title="Oráculo IA">🔮</button>
-          <button class="sb-action-btn" id="d20Btn"    title="Tirar D20">🎲</button>
-          <button class="sb-action-btn" id="focusBtn"  title="Modo Focus (F)">🎯</button>
-          <button class="sb-action-btn" id="helpBtn"   title="Atajos (?)">⌨️</button>
-          <div class="more-menu-wrap sb-more" id="moreMenuWrap">
-            <button class="sb-action-btn" id="moreBtn" title="Más opciones">⋯</button>
-            <div class="more-menu more-menu-up" id="moreMenu">
-              <button class="more-menu-item" onclick="openModal('quickNotesModal')">📝 Pergamino Rápido</button>
-              <button class="more-menu-item" id="bulkToggleBtn">☑️ Selección múltiple</button>
-              <button class="more-menu-item" id="compactToggle">⊟ Modo compacto</button>
-              <button class="more-menu-item" id="notifBtn">🔔 Notificaciones</button>
-              <button class="more-menu-item" id="importBtn">📥 Importar</button>
-              <button class="more-menu-item" id="exportBtn">📤 Exportar JSON</button>
-              <button class="more-menu-item" id="csvBtn">📊 Exportar CSV</button>
-            </div>
-          </div>
-        </div>
+        <div class="sb-actions-label">🎵 Spotify</div>
+        <div id="spotifyPlayer" class="spotify-player"></div>
       </div>
 
     </nav>
@@ -938,7 +940,7 @@
   </div>
 </div>
 
-<script src="js/config.js?v=5"></script>
+<script src="js/config.js?v=6"></script>
 <script src="js/state.js?v=6"></script>
 <script src="js/db.js?v=5"></script>
 <script src="js/hero.js?v=5"></script>
@@ -954,6 +956,8 @@
 <script src="js/rpg.js?v=6"></script>
 <script src="js/pets.js?v=6"></script>
 <script src="js/weapons.js?v=5"></script>
-<script src="js/main.js?v=5"></script>
+<script src="js/spotify.js?v=1"></script>
+<script src="js/weather.js?v=1"></script>
+<script src="js/main.js?v=6"></script>
 </body>
 </html>
