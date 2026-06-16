@@ -338,6 +338,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .stat-chip span { color: var(--gold); font-weight: 600; }
 
 .header-actions { display: flex; gap: 2px; align-items: center; }
+.header-tools { display: flex; gap: 2px; align-items: center; margin-left: auto; }
 
 .icon-btn {
   width: 32px;
@@ -1770,8 +1771,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   .avatar-level-badge { width: 16px; height: 16px; font-size: 8px; top: -4px; right: -4px; }
   .hero-name  { font-size: 13px; }
   .hero-title { font-size: 10px; }
-  /* Push actions to right */
-  .header-actions { margin-left: auto; gap: 2px; flex-shrink: 0; }
+  .header-tools { flex-shrink: 0; }
   .icon-btn { width: 32px !important; height: 32px !important; font-size: 15px !important; }
   /* Hide non-essential buttons */
   #d20Btn, #focusBtn, #helpBtn { display: none !important; }
@@ -2706,6 +2706,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   .view-tab { white-space:nowrap; flex-shrink:0; }
   .header-actions { overflow-x:auto; flex-wrap:nowrap; scrollbar-width:none; }
   .header-actions::-webkit-scrollbar { display:none; }
+  .header-tools { overflow-x:auto; flex-wrap:nowrap; scrollbar-width:none; }
+  .header-tools::-webkit-scrollbar { display:none; }
 }
 
 @media (max-width: 600px) {
