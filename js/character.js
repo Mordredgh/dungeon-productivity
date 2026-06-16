@@ -161,6 +161,7 @@ function renderCharacterSheet() {
             <div class="char-stat-card"><div class="char-stat-val">🏆 ${hero.longest_streak||0}</div><div class="char-stat-lbl">Mejor racha</div></div>
             <div class="char-stat-card"><div class="char-stat-val">✅ ${hero.quests_done||0}</div><div class="char-stat-lbl">Misiones</div></div>
           </div>
+          <div id="heroScoreWidget" class="hero-score-widget"></div>
         </div>
       </div>
 
@@ -246,6 +247,7 @@ function renderCharacterSheet() {
 
   document.getElementById('charEditClass').value = cls;
   document.getElementById('charEditRace').value  = race;
+  if (typeof renderHeroScoreWidget === 'function') renderHeroScoreWidget();
 }
 
 function _charPreviewPortrait() {

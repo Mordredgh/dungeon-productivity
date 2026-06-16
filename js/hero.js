@@ -100,6 +100,7 @@ async function addXP(amount, type, sourceEl) {
     saveHero({ attr_points: hero.attr_points });
     showLevelUp(newLevel);
     checkAchievements();
+    if (typeof dungeonPush === 'function') dungeonPush('⭐ ¡Subiste de nivel!', `${hero.name} alcanzó el nivel ${newLevel}. El dungeon tiembla.`);
     if (webhookUrl) {
       fetch(webhookUrl, { method: 'POST', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ hero: hero.name, newLevel, oldLevel: prevLevel, timestamp: new Date().toISOString() })

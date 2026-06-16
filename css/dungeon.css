@@ -3560,3 +3560,17 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .char-tab-panel        { display: none; }
 .char-tab-panel.active { display: block; }
+
+
+/* ── ÍNDICE DEL HÉROE ───────────────────────────────────────── */
+.hero-score-widget { display:flex; flex-direction:column; align-items:center; gap:6px; padding:14px 0 4px; }
+.hs-wrap   { position:relative; width:80px; height:80px; }
+.hs-ring   { width:80px; height:80px; transform:rotate(-90deg); }
+.hs-ring-bg   { fill:none; stroke:rgba(255,255,255,.07); stroke-width:8; }
+.hs-ring-fill { fill:none; stroke-width:8; stroke-linecap:round; transition:stroke-dasharray .5s; }
+.hs-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.hs-num    { font-size:20px; font-weight:700; color:var(--text); line-height:1; }
+.hs-icon   { font-size:12px; line-height:1; }
+.hs-label  { font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; }
+.hs-breakdown { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+.hs-breakdown span { font-size:10px; color:var(--text2); background:rgba(255,255,255,.05); border-radius:6px; padding:2px 7px; }

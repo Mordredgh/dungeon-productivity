@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v30';
+﻿const CACHE = 'dungeon-v32';
 const ASSETS = [
   '/',
   '/index.html',
@@ -34,6 +34,8 @@ const ASSETS = [
   '/js/runes.js',
   '/js/google_fit.js',
   '/js/google_cal.js',
+  '/js/hero_score.js',
+  '/js/push.js',
   '/js/main.js',
 ];
 
@@ -48,6 +50,30 @@ self.addEventListener('activate', e => {
     caches.keys().then(keys =>
       Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('push', e => {
+  const data = e.data?.json() || {};
+  e.waitUntil(
+    self.registration.showNotification(data.title || 'Arcanum', {
+      body:    data.body  || '',
+      icon:    'https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png',
+      badge:   'https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png',
+      vibrate: [200, 100, 200],
+      data:    { url: data.url || '/' },
+    })
+  );
+});
+
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(
+    clients.matchAll({ type:'window', includeUncontrolled:true }).then(list => {
+      const existing = list.find(c => c.url.includes(self.location.origin));
+      if (existing) { existing.focus(); existing.navigate(e.notification.data?.url || '/'); }
+      else clients.openWindow(e.notification.data?.url || '/');
+    })
   );
 });
 

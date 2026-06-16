@@ -6,6 +6,7 @@
   document.getElementById('timerPhase').textContent = 'Listo';
   if (Notification.permission === 'granted') notifEnabled = true;
   await initDB();
+  if (typeof initPush === 'function') initPush();
   await handleSpotifyCallback();
   renderSpotifyWidget();
   loadRealWeather();

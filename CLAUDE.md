@@ -19,10 +19,20 @@ Backend: Supabase Aglaya (mismo proyecto que otros apps de Gerardo)
 
 ## Orden de carga de scripts (index.html)
 ```
-config.js → state.js → db.js → hero.js → quests.js → timer.js →
-spells.js → views.js → ui.js → events.js → shop.js → familiar.js → rpg.js → main.js
+config.js → state.js → db.js → hero.js → quests.js → timer.js → inventory.js →
+spells.js → views.js → ui.js → events.js → shop.js → familiar.js → rpg.js →
+pets.js → weapons.js → goals.js → reputation.js → patterns.js → mechanics.js →
+character.js → spotify.js → weather.js → dungeon_clock.js → skill_tree.js →
+bestiary.js → dungeon_grows.js → runes.js → google_fit.js → google_cal.js →
+hero_score.js → push.js → main.js
 ```
 Agregar archivos nuevos ANTES de main.js.
+
+---
+
+## Service Worker
+Cache actual: `dungeon-v32`  
+Bumpar versión en `sw.js` siempre que se agregue o modifique JS/CSS.
 
 ---
 
@@ -30,10 +40,11 @@ Agregar archivos nuevos ANTES de main.js.
 - `dungeon_heroes` — héroe principal del usuario
 - `dungeon_quests` — misiones (main/side/daily/weekly)
 - `dungeon_pomodoros` — sesiones de pomodoro
+- `dungeon_push_subscriptions` — suscripciones Web Push (hero_id UNIQUE)
 
 ### Columnas dungeon_heroes relevantes
-`id, hero_id, name, class, race, avatar, level, xp, xp_total, hp, hp_max,
-quests_done, main_done, streak, best_streak, gold (localStorage), created_at`
+`id, hero_id, name, hero_class, race, avatar, level, xp, xp_total, hp, hp_max,
+quests_done, main_done, streak, longest_streak, gold (localStorage), created_at`
 
 ### Persistencia
 - Gold: `localStorage('dungeon-gold')`
@@ -53,6 +64,37 @@ quests_done, main_done, streak, best_streak, gold (localStorage), created_at`
 - `saveHero(patch)` → `db.from('dungeon_heroes').update(patch).eq('id', hero.id)`
 - Subtasks se guardan con `db.from('dungeon_quests').update({ notes }).eq('id', q.id)` (NO upsert)
 - `escHtml(str)` disponible globalmente para sanitizar output
+- `switchView(v)` — maneja Character Hub tabs; si v es 'oracle' llama openOracle() y retorna
+
+---
+
+## Push Notifications (Web Push + VAPID)
+- VAPID pública: `BEaYhse8leKsQniLSS9AiCNG3lt4Xz7H_swtNZAHKaJ_rUbIQTHt28pJBqv15yue4MRStrzB3yAa82jg2DoKGNU`
+- Edge Function: `send-push` (Supabase Aglaya, verify_jwt:false)
+- Suscripciones en `dungeon_push_subscriptions` (hero_id, subscription jsonb)
+- `dungeonPush(title, body, url?)` — dispara push real via Edge Function
+- Se llama en: subir de nivel (hero.js), racha en peligro (events.js)
+- `initPush()` — auto-suscribe si el permiso ya está concedido; llamado en main.js boot
+
+---
+
+## Character Hub
+- Acceso: clic en avatar/imagen del héroe → activa view `character`
+- Tab bar (`#charHubTabs`) vive FUERA de `.views` (como sibling en `.content-area`)
+  → evita que `overflow-y:auto` del `.view` oculte la barra
+- Tabs: 🛡️ Personaje (sheet) | 🌳 Habilidades (skills) | 💎 Runas (runes) | 📖 Bestiario (bestiary) | ⚒️ Herrero (smithy)
+- `switchCharTab(tab)` en ui.js — activa tab y llama render correspondiente
+- Las vistas antiguas de skills/runes/bestiary/smithy están dentro de `view-character` como `.char-tab-panel`
+- NO hay vistas standalone para esas secciones (se eliminaron del HTML)
+
+---
+
+## Índice del Héroe
+- Archivo: `js/hero_score.js`
+- Score 0-100 compuesto: Racha(25) + Nivel(20) + HP(15) + Misiones hoy(20) + Actividad 7d(20)
+- Tiers: Legendario(90+👑) | Épico(70+💜) | Raro(50+💙) | Normal(30+💚) | Común(0+🩶)
+- Widget: `#heroScoreWidget` div en la portrait card de la hoja de personaje
+- `renderHeroScoreWidget()` se llama al final de `renderCharacterSheet()`
 
 ---
 
@@ -74,86 +116,50 @@ Bosses:    boss_[slug].png               (ej: boss_halloween.png)
 
 ---
 
-## Roadmap de features (en orden de prioridad)
+## Status de Features (actualizado 2026-06-16)
 
-### 🔴 P1 — Sistema de Drops al completar misiones
-Drop rates por rareza de misión:
-- Común 10% / Normal 20% / Épico 40% / Legendario 60% / Mítico 90%
+### ✅ Completadas
+- Misiones (main/side/daily/weekly) con rareza y XP
+- Pomodoro timer + vinculación a misión
+- Sistema de nivel y XP con bonos por clase/raza/runas
+- Racha diaria con daño por inactividad y Amuleto de Protección
+- Logros y achievements
+- Inventario + Tienda (Herrería)
+- Mascotas e incubación de huevos
+- Árbol de Habilidades con bonos activos
+- Runas con efectos pasivos
+- Bestiario con tracking de monstruos derrotados
+- Oracle (chat con Gemini)
+- Integración Google Fit (pasos)
+- Integración Google Calendar
+- Spotify widget
+- Clima en tiempo real
+- Reloj del dungeon (con hora y fase del día)
+- Mi Dungeon (mapa de salas con links)
+- Goals (metas con progreso)
+- Reputación de gremio
+- Patrones de actividad
+- Sistema de mecánicas (eventos, crafteo, apuestas, etc.)
+- Character Hub (tabs: Personaje / Habilidades / Runas / Bestiario / Herrero)
+- Índice del Héroe 0-100 con SVG ring y tiers
+- Push Notifications reales (Web Push + VAPID + Edge Function)
 
-Ítems posibles (probabilidad dentro del drop):
-- Huevo de Fuego 20%, Sombra 20%, Luz 15%, Naturaleza 15%, Tormenta 10%, Mítico 5%
-- Poción de Fuego 5%, Sombra 5%, Mítica 2%
-- Fragmento de Gema 1%, Pergamino 1%, Polvo Arcano 1%
+### 🔴 Pendientes (prioridad)
+- Crafteo con cooldown real (Item 14 del audit)
+- Drops al completar misiones (P1)
+- Hábitos bidireccionales +/- (P3)
 
-UI: popup animado "¡Botín obtenido! 🎁 [ítem]" aparece 1s después de completar misión,
-dura 3s con fade out. Nueva sección "🎒 Mochila" con ítems agrupados por tipo.
+### 🎨 Pendientes (esperando arte de Gerardo)
+- Sala Personal (habitación del héroe con decoraciones)
+- Jardín de Mascotas (vista especial)
+- Clases Secretas (contenido desbloqueado)
 
-Tabla Supabase nueva: `dungeon_inventory` (hero_id, item_key, item_name, item_type, quantity)
-
-### 🔴 P2 — Sistema de Mascotas
-Mecánica: Huevo + Poción → Incubar → Mascota con nivel 1-5 → Nivel 5 = Montura
-
-- Mascotas en Establo (grid con nivel y barra XP)
-- Mascota activa visible en panel del héroe (64x64px)
-- Montura activa visible debajo del avatar (96x96px)
-- Alimentar con Materiales del inventario sube XP de mascota
-
-Tablas nuevas: `dungeon_pets` (hero_id, pet_key, name, level, xp, is_active, is_mount)
-
-### 🔴 P3 — Hábitos bidireccionales +/-
-Nuevo tipo de tarea radicalmente diferente a Misiones:
-- Botón ✅ (+): +5 XP +2 monedas
-- Botón ❌ (-): -5 HP
-- Sin fecha límite, sin "completado permanente"
-- Reseteo visual diario (contador vuelve a 0), guarda historial
-- Color del hábito: verde si + > -, rojo si - > +, gris si igual
-- Nueva pestaña "⚡ Hábitos" en navegación principal
-
-Tablas nuevas: `dungeon_habits` (hero_id, name, desc), `dungeon_habit_logs` (habit_id, date, pos_count, neg_count)
-
-### 🟡 P4 — Habilidades de Clase con Maná
-Nueva barra de Maná (azul, máx 100) en panel del héroe.
-
-Habilidades por clase:
-- Guerrero / Berserker: 30MP → 2x XP próximas 3 misiones / CD 24h
-- Mago / Visión Arcana: 20MP → Oráculo gratis / CD 12h
-- Pícaro / Paso en Sombras: 40MP → Una Daily fallida sin penalización / CD 48h
-- Clérigo / Sanación: 25MP → +30 HP / CD 6h
-- Arquero / Ojo de Águila: 30MP → +50% drop rate próximas 5 misiones / CD 24h
-- Fundador Caótico / Caos Total: 50MP → efecto aleatorio / CD 12h
-
-Maná recarga: +10 por Normal, +20 por Épica, +30 por Mítica completada.
-
-### 🟡 P5 — Equipamiento con Stats Funcionales
-5 slots: Arma, Pecho, Casco, Accesorio x2
-Stats posibles: +XP%, +Drop Rate%, +Max HP, +Maná/misión, +Monedas%
-
-Ítems iniciales:
-- Espada del Dungeon (Arma, +10% XP épicas, 150🪙)
-- Armadura de Placas (Pecho, +25 Max HP, 200🪙)
-- Anillo de XP (Accesorio, +5% XP global, 100🪙)
-- Capa de Sombras (Accesorio, +15% Drop Rate, 175🪙)
-- Amuleto de Racha (Accesorio, +10 Maná/misión, 125🪙)
-
-### 🟢 P6 — Avatar Visual con Capas (sprites por clase+raza)
-128x128px en panel del héroe, reemplaza emoji de clase.
-Regenerar al equipar armadura nueva.
-
-### 🟢 P7 — Retos de 30 Días (Oráculo)
-Gemini genera 30 misiones temáticas escaladas.
-Temas: Fitness / Creatividad / Estudio / Productividad / Custom.
-Al completar: recompensa única de equipo.
-
-### 🟢 P8 — Eventos Estacionales
-Halloween (Oct 31), Navidad (Dic 25), Año Nuevo (Ene 1), Aniversario (Jun 15).
-Boss especial por evento, drops exclusivos, anuncio 7 días antes.
-
----
-
-## Rediseño UI (en progreso)
-Objetivo: interfaz más premium y diferente a la actual.
-Inspiración: Habitica pero con identidad propia — oscuro, elegante, RPG moderno.
-Ver sección de trabajo activo para decisiones de diseño tomadas.
+### 📋 Backlog (baja prioridad)
+- Habilidades de Clase con Maná (P4)
+- Equipamiento con Stats Funcionales (P5)
+- Avatar Visual con Capas (P6)
+- Retos de 30 Días vía Oráculo (P7)
+- Eventos Estacionales (P8)
 
 ---
 

@@ -66,6 +66,7 @@ document.getElementById('doImportBtn').addEventListener('click', doImport);
 
 document.getElementById('notifBtn').addEventListener('click', async () => {
   await requestNotifPermission();
+  if (notifEnabled && typeof subscribeToPush === 'function') await subscribeToPush();
   toast('🔔', notifEnabled ? '¡Notificaciones activadas!' : 'Activa permisos en el navegador.');
 });
 
@@ -470,6 +471,9 @@ function checkStreakDanger() {
 function showStreakDanger() {
   if (document.getElementById('streakDangerBanner')) return;
   const today = new Date().toISOString().split('T')[0];
+  if (typeof dungeonPush === 'function') {
+    dungeonPush('🔥 ¡Racha en peligro!', `Tu racha de ${hero.streak} días termina hoy. Completa algo antes de medianoche.`);
+  }
   const div = document.createElement('div');
   div.id = 'streakDangerBanner';
   div.className = 'streak-danger';
