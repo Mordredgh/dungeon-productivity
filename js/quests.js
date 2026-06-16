@@ -153,8 +153,8 @@ async function completeQuest(id, el) {
   // Loot drop — aparece 1.2s después del toast de completada
   if (typeof rollLoot === 'function') {
     setTimeout(async () => {
-      const loot = rollLoot(q.priority || 'normal');
-      if (loot) await grantLoot(loot);
+      const loots = rollLoot(q.priority || 'normal');
+      await grantLoot(loots);
     }, 1200);
   }
 

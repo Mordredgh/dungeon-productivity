@@ -47,18 +47,18 @@ async function consumeInvItem(key, qty) {
 
 /* ── Drop de botín al completar misión ─────────────────── */
 function rollLoot(priority) {
-  const table = DROP_TABLE[priority] || DROP_TABLE.normal;
-  if (Math.random() > table.chance) return null;
-  const qty = Math.floor(Math.random() * (table.max - table.min + 1)) + table.min;
+  const table   = DROP_TABLE[priority] || DROP_TABLE.normal;
+  const fragQty = Math.floor(Math.random() * (table.max - table.min + 1)) + table.min;
+  const potQty  = Math.max(1, Math.ceil(fragQty / 2));
 
-  if (Math.random() < 0.6) {
-    const key = SPELL_FRAGMENT_KEYS[Math.floor(Math.random() * SPELL_FRAGMENT_KEYS.length)];
-    return { type: 'spell_fragment', key: 'spell_' + key, display: spellFragLabel(key), qty };
-  } else {
-    const key = PET_POTION_KEYS[Math.floor(Math.random() * PET_POTION_KEYS.length)];
-    const pet = PET_DEFS.find(p => p.key === key);
-    return { type: 'pet_potion', key: 'pet_potion_' + key, display: `Poción de ${pet?.name || key}`, qty };
-  }
+  const fragKey = SPELL_FRAGMENT_KEYS[Math.floor(Math.random() * SPELL_FRAGMENT_KEYS.length)];
+  const petKey  = PET_POTION_KEYS[Math.floor(Math.random() * PET_POTION_KEYS.length)];
+  const pet     = PET_DEFS.find(p => p.key === petKey);
+
+  return [
+    { type: 'spell_fragment', key: 'spell_' + fragKey,       display: spellFragLabel(fragKey),          qty: fragQty },
+    { type: 'pet_potion',     key: 'pet_potion_' + petKey,   display: `Poción de ${pet?.name || petKey}`, qty: potQty  },
+  ];
 }
 
 function spellFragLabel(spellKey) {
@@ -71,35 +71,35 @@ function spellFragLabel(spellKey) {
   return labels[spellKey] || spellKey;
 }
 
-async function grantLoot(loot) {
-  if (!loot) return;
-  await addInvItem(loot.key, loot.type, loot.qty);
-  showLootPopup(loot);
+async function grantLoot(loots) {
+  if (!loots) return;
+  const items = Array.isArray(loots) ? loots : [loots];
+  for (const loot of items) await addInvItem(loot.key, loot.type, loot.qty);
+  showLootPopup(items);
   if (typeof renderSpells === 'function') renderSpells();
 }
 
-function showLootPopup(loot) {
+function showLootPopup(items) {
   const old = document.getElementById('lootPopup');
   if (old) old.remove();
 
-  const imgKey = loot.type === 'spell_fragment'
-    ? loot.key.replace('spell_', 'spell_') + '.png'
-    : loot.key + '.png';
-  const imgUrl = CDN + 'dungeon/' + imgKey;
+  const rows = items.map(loot => {
+    const imgUrl = CDN + 'dungeon/' + loot.key + '.png';
+    return `
+      <div class="loot-popup-row">
+        <img src="${imgUrl}" class="loot-popup-img" alt="" onerror="this.style.display='none'">
+        <div class="loot-popup-name">${escHtml(loot.display)}</div>
+        <div class="loot-popup-qty">+${loot.qty}</div>
+      </div>`;
+  }).join('');
 
   const div = document.createElement('div');
   div.id = 'lootPopup';
   div.className = 'loot-popup';
   div.innerHTML = `
-    <div class="loot-popup-inner">
-      <img src="${imgUrl}" class="loot-popup-img" alt="" onerror="this.style.display='none'">
-      <div>
-        <div class="loot-popup-title">¡Botín obtenido!</div>
-        <div class="loot-popup-name">${escHtml(loot.display)}</div>
-        <div class="loot-popup-qty">+${loot.qty}</div>
-      </div>
-    </div>`;
+    <div class="loot-popup-title">🎁 ¡Botín obtenido!</div>
+    ${rows}`;
   document.body.appendChild(div);
   setTimeout(() => div.classList.add('visible'), 30);
-  setTimeout(() => { div.classList.remove('visible'); setTimeout(() => div.remove(), 400); }, 3500);
+  setTimeout(() => { div.classList.remove('visible'); setTimeout(() => div.remove(), 400); }, 4000);
 }

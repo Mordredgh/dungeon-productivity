@@ -173,7 +173,7 @@ function switchView(v) {
   document.querySelectorAll('.view').forEach(el => {
     const active = el.id === `view-${v}`;
     el.classList.toggle('active', active);
-    if (active) el.style.setProperty('--view-bg-url', `url(${CDN}dungeon/fondo_${v}.png)`);
+    if (active) el.style.setProperty('--view-bg-url', `url(${CDN}dungeon/fondo_${v === 'quests' ? 'taberna' : v}.png)`);
   });
   if (v === 'stats')        renderStats();
   if (v === 'achievements') renderAchievements();
