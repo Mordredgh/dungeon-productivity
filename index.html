@@ -151,13 +151,8 @@
         <div class="sb-nav-label">Gremio</div>
         <button class="sidebar-item"        data-view="shop"         onclick="switchView('shop')">         <span class="si-icon">🏪</span><span class="si-label">Tienda</span></button>
         <button class="sidebar-item"        data-view="inventory"    onclick="switchView('inventory')">    <span class="si-icon">🎒</span><span class="si-label">Inventario</span></button>
-        <button class="sidebar-item"        data-view="smithy"       onclick="switchView('smithy')">       <span class="si-icon">⚒️</span><span class="si-label">Herrero</span></button>
-        <div class="sb-nav-label">Héroe</div>
-        <button class="sidebar-item" data-view="skill-tree"    onclick="switchView('skill-tree')">    <span class="si-icon">🌳</span><span class="si-label">Habilidades</span></button>
-        <button class="sidebar-item" data-view="runes"         onclick="switchView('runes')">         <span class="si-icon">💎</span><span class="si-label">Runas</span></button>
         <div class="sb-nav-label">Dungeon</div>
         <button class="sidebar-item" data-view="dungeon-grows" onclick="switchView('dungeon-grows')"> <span class="si-icon">🏰</span><span class="si-label">Mi Dungeon</span></button>
-        <button class="sidebar-item" data-view="bestiary"      onclick="switchView('bestiary')">      <span class="si-icon">📖</span><span class="si-label">Bestiario</span></button>
         <button class="sidebar-item" data-view="integrations"  onclick="switchView('integrations')">  <span class="si-icon">🔗</span><span class="si-label">Integraciones</span></button>
         <div class="sb-nav-label">Archivo</div>
         <button class="sidebar-item"        data-view="history"      onclick="switchView('history')">      <span class="si-icon">📜</span><span class="si-label">Historial</span></button>
@@ -460,36 +455,12 @@
           <div id="smithyView"></div>
         </div>
 
-        <!-- SKILL TREE VIEW -->
-        <div class="view" id="view-skill-tree">
-          <div class="view-header">
-            <h2 class="view-title">🌳 Árbol de Habilidades</h2>
-          </div>
-          <div id="skillTreeContent"></div>
-        </div>
-
-        <!-- RUNES VIEW -->
-        <div class="view" id="view-runes">
-          <div class="view-header">
-            <h2 class="view-title">💎 Runas</h2>
-          </div>
-          <div id="runePanelContent"></div>
-        </div>
-
         <!-- DUNGEON GROWS VIEW -->
         <div class="view" id="view-dungeon-grows">
           <div class="view-header">
             <h2 class="view-title">🏰 Mi Dungeon</h2>
           </div>
           <div id="dungeonGrowsContent"></div>
-        </div>
-
-        <!-- BESTIARY VIEW -->
-        <div class="view" id="view-bestiary">
-          <div class="view-header">
-            <h2 class="view-title">📖 Bestiario</h2>
-          </div>
-          <div id="bestiaryContent"></div>
         </div>
 
         <!-- INTEGRATIONS VIEW -->
@@ -507,13 +478,30 @@
           </div>
         </div>
 
-        <!-- CHARACTER SHEET (acceso solo desde el avatar, sin botón en el sidebar) -->
+        <!-- CHARACTER HUB — acceso desde el avatar -->
         <div class="view" id="view-character">
-          <div class="view-header">
-            <h2 class="view-title">🛡️ Hoja de Personaje</h2>
-            <button class="btn btn-ghost" onclick="switchView('quests')">← Volver</button>
+          <nav class="char-hub-tabs">
+            <button class="char-tab active" data-ctab="sheet"    onclick="switchCharTab('sheet')">🛡️ Personaje</button>
+            <button class="char-tab"        data-ctab="skills"   onclick="switchCharTab('skills')">🌳 Habilidades</button>
+            <button class="char-tab"        data-ctab="runes"    onclick="switchCharTab('runes')">💎 Runas</button>
+            <button class="char-tab"        data-ctab="bestiary" onclick="switchCharTab('bestiary')">📖 Bestiario</button>
+            <button class="char-tab"        data-ctab="smithy"   onclick="switchCharTab('smithy')">⚒️ Herrero</button>
+          </nav>
+          <div class="char-tab-panel active" id="ctab-sheet">
+            <div id="characterSheet"></div>
           </div>
-          <div id="characterSheet"></div>
+          <div class="char-tab-panel" id="ctab-skills">
+            <div id="skillTreeContent"></div>
+          </div>
+          <div class="char-tab-panel" id="ctab-runes">
+            <div id="runePanelContent"></div>
+          </div>
+          <div class="char-tab-panel" id="ctab-bestiary">
+            <div id="bestiaryContent"></div>
+          </div>
+          <div class="char-tab-panel" id="ctab-smithy">
+            <div id="smithyView"></div>
+          </div>
         </div>
 
         <!-- CALENDAR VIEW -->

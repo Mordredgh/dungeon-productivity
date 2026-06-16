@@ -169,12 +169,16 @@ async function doImport() {
 }
 
 /* VIEW NAV */
+const CHAR_HUB_TABS = { 'skill-tree':'skills', 'runes':'runes', 'bestiary':'bestiary', 'smithy':'smithy' };
+
 function switchView(v) {
+  // Redirect hub sub-views to character view with the right tab
+  if (CHAR_HUB_TABS[v]) { switchCharTab(CHAR_HUB_TABS[v]); v = 'character'; }
   document.querySelectorAll('.view-tab, .sidebar-item').forEach(t => t.classList.toggle('active', t.dataset.view === v));
   document.querySelectorAll('.view').forEach(el => {
     const active = el.id === `view-${v}`;
     el.classList.toggle('active', active);
-    const FONDO = { quests:'taberna', shop:'tienda', inventory:'inventario', smithy:'herrero' };
+    const FONDO = { quests:'taberna', shop:'tienda', inventory:'inventario', character:'herrero' };
     if (active) el.style.setProperty('--view-bg-url', `url(${CDN}dungeon/fondo_${FONDO[v] || v}.png)`);
   });
   if (v === 'stats')        renderStats();
@@ -184,14 +188,26 @@ function switchView(v) {
   if (v === 'pets')         renderPets();
   if (v === 'shop')         renderShopView();
   if (v === 'inventory')    { if (typeof renderInventory==='function') renderInventory(); }
-  if (v === 'smithy')       { if (typeof renderSmithy==='function')    renderSmithy();    }
   if (v === 'character')    { if (typeof renderCharacterSheet==='function') renderCharacterSheet(); }
   if (v === 'goals')        { if (typeof renderGoals==='function')        renderGoals(); }
-  if (v === 'skill-tree')   { if (typeof renderSkillTree==='function')    renderSkillTree(); }
-  if (v === 'bestiary')     { if (typeof renderBestiary==='function')     renderBestiary(); }
   if (v === 'dungeon-grows'){ if (typeof renderDungeonGrows==='function') renderDungeonGrows(); }
-  if (v === 'runes')        { if (typeof renderRunePanel==='function')    renderRunePanel(); }
   if (v === 'integrations') { renderIntegrations(); }
+}
+
+function switchCharTab(tab) {
+  // If character view isn't active yet, activate it first
+  if (!document.getElementById('view-character')?.classList.contains('active')) {
+    document.querySelectorAll('.view-tab, .sidebar-item').forEach(t => t.classList.toggle('active', t.dataset.view === 'character'));
+    document.querySelectorAll('.view').forEach(el => el.classList.toggle('active', el.id === 'view-character'));
+  }
+  document.querySelectorAll('.char-tab').forEach(t => t.classList.toggle('active', t.dataset.ctab === tab));
+  document.querySelectorAll('.char-tab-panel').forEach(p => p.classList.toggle('active', p.id === `ctab-${tab}`));
+  // Render the appropriate content
+  if (tab === 'sheet')    { if (typeof renderCharacterSheet==='function') renderCharacterSheet(); }
+  if (tab === 'skills')   { if (typeof renderSkillTree==='function')      renderSkillTree(); }
+  if (tab === 'runes')    { if (typeof renderRunePanel==='function')      renderRunePanel(); }
+  if (tab === 'bestiary') { if (typeof renderBestiary==='function')       renderBestiary(); }
+  if (tab === 'smithy')   { if (typeof renderSmithy==='function')         renderSmithy(); }
 }
 
 function renderIntegrations() {
