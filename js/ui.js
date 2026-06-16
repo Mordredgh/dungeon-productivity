@@ -181,6 +181,8 @@ function switchView(v) {
     const FONDO = { quests:'taberna', shop:'tienda', inventory:'inventario', character:'herrero' };
     if (active) el.style.setProperty('--view-bg-url', `url(${CDN}dungeon/fondo_${FONDO[v] || v}.png)`);
   });
+  const charHub = document.getElementById('charHubTabs');
+  if (charHub) charHub.style.display = v === 'character' ? 'flex' : 'none';
   if (v === 'stats')        renderStats();
   if (v === 'achievements') renderAchievements();
   if (v === 'history')      { historyPage = 1; renderHistory(); }

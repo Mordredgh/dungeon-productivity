@@ -186,6 +186,15 @@
         <button class="view-tab" data-view="pets">🐾 Mascotas</button>
       </div>
 
+      <!-- CHARACTER HUB TAB BAR — fuera del .view para evitar conflictos de padding/z-index -->
+      <nav class="char-hub-tabs" id="charHubTabs" style="display:none">
+        <button class="char-tab active" data-ctab="sheet"    onclick="switchCharTab('sheet')">🛡️ Personaje</button>
+        <button class="char-tab"        data-ctab="skills"   onclick="switchCharTab('skills')">🌳 Habilidades</button>
+        <button class="char-tab"        data-ctab="runes"    onclick="switchCharTab('runes')">💎 Runas</button>
+        <button class="char-tab"        data-ctab="bestiary" onclick="switchCharTab('bestiary')">📖 Bestiario</button>
+        <button class="char-tab"        data-ctab="smithy"   onclick="switchCharTab('smithy')">⚒️ Herrero</button>
+      </nav>
+
       <div class="views">
 
         <!-- QUESTS VIEW -->
@@ -480,13 +489,6 @@
 
         <!-- CHARACTER HUB — acceso desde el avatar -->
         <div class="view" id="view-character">
-          <nav class="char-hub-tabs">
-            <button class="char-tab active" data-ctab="sheet"    onclick="switchCharTab('sheet')">🛡️ Personaje</button>
-            <button class="char-tab"        data-ctab="skills"   onclick="switchCharTab('skills')">🌳 Habilidades</button>
-            <button class="char-tab"        data-ctab="runes"    onclick="switchCharTab('runes')">💎 Runas</button>
-            <button class="char-tab"        data-ctab="bestiary" onclick="switchCharTab('bestiary')">📖 Bestiario</button>
-            <button class="char-tab"        data-ctab="smithy"   onclick="switchCharTab('smithy')">⚒️ Herrero</button>
-          </nav>
           <div class="char-tab-panel active" id="ctab-sheet">
             <div id="characterSheet"></div>
           </div>
