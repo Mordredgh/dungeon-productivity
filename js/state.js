@@ -30,6 +30,3 @@ let spotifyAccessToken = null;
 let spotifyTokenExpiry = 0;
 let goals = [];
 let runes = [];
-let fitSteps = 0;
-let fitSynced = false;
-let calPreviewEvents = [];
