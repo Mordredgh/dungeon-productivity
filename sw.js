@@ -1,4 +1,4 @@
-const CACHE = 'dungeon-v1';
+const CACHE = 'dungeon-v5';
 const ASSETS = [
   '/',
   '/index.html',
@@ -10,10 +10,15 @@ const ASSETS = [
   '/js/hero.js',
   '/js/quests.js',
   '/js/timer.js',
+  '/js/inventory.js',
   '/js/spells.js',
   '/js/views.js',
   '/js/ui.js',
   '/js/events.js',
+  '/js/shop.js',
+  '/js/familiar.js',
+  '/js/rpg.js',
+  '/js/pets.js',
   '/js/main.js',
 ];
 
@@ -32,10 +37,15 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Only cache GET requests to same origin
   if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) return;
-  // Never cache Supabase calls
   if (e.request.url.includes('supabase.co')) return;
+  // HTML: network-first para siempre tener la versión más reciente
+  if (e.request.headers.get('accept')?.includes('text/html')) {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match(e.request))
+    );
+    return;
+  }
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );
