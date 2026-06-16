@@ -339,11 +339,6 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .header-actions { display: flex; gap: 2px; align-items: center; }
 
-.rpanel-toolbar {
-  display: flex; gap: 4px; align-items: center; justify-content: flex-end;
-  padding: 10px 14px; border-bottom: 1px solid var(--border);
-}
-
 .icon-btn {
   width: 32px;
   height: 32px;
