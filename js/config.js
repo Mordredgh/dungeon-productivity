@@ -198,28 +198,34 @@ const SPELL_FRAG_COST = {
 /* ── HABILIDADES DE MASCOTA ──────────────────────────────── */
 const PET_ABILITIES = {
   'zorro-naturaleza': {
-    baby:  { icon:'🌿', desc:'+5 XP por misión diaria',               type:'daily_xp',       val:5    },
-    mount: { icon:'🌿', desc:'+10 XP por diaria · drop rate +10%',    type:'daily_xp',       val:10   },
+    egg:   { icon:'🌱', desc:'Bendición silvestre: +20 XP ahora (1/día)',          type:'act_xp',      val:20  },
+    baby:  { icon:'🌿', desc:'+5 XP por misión diaria (pasivo)',                   type:'daily_xp',    val:5   },
+    mount: { icon:'🌿', desc:'+10 XP por diaria · Activo: +40 XP (1/día)',         type:'daily_xp',    val:10  },
   },
   'pantera-sombra': {
-    baby:  { icon:'🌑', desc:'20% chance de 2× XP en secundarias',    type:'side_crit',      val:0.20 },
-    mount: { icon:'🌑', desc:'35% chance de 2× XP en secundarias',    type:'side_crit',      val:0.35 },
+    egg:   { icon:'🌑', desc:'Instinto oscuro: próxima misión 2× XP (1/día)',      type:'act_double',  val:1   },
+    baby:  { icon:'🌑', desc:'20% chance de 2× XP en secundarias (pasivo)',        type:'side_crit',   val:0.20},
+    mount: { icon:'🌑', desc:'35% chance 2× · Activo: doble próxima misión (1/día)',type:'side_crit',  val:0.35},
   },
   'lobo-tormenta': {
-    baby:  { icon:'⚡', desc:'+25% daño al jefe semanal',              type:'boss_dmg',       val:1.25 },
-    mount: { icon:'⚡', desc:'+50% daño al jefe semanal',              type:'boss_dmg',       val:1.50 },
+    egg:   { icon:'⚡', desc:'Aullido: inflige 20 de daño al jefe ahora (1/día)',  type:'act_boss',    val:20  },
+    baby:  { icon:'⚡', desc:'+25% daño al jefe semanal (pasivo)',                 type:'boss_dmg',    val:1.25},
+    mount: { icon:'⚡', desc:'+50% daño · Activo: -50 HP al jefe ahora (1/día)',   type:'boss_dmg',    val:1.50},
   },
   'grifo': {
-    baby:  { icon:'🍅', desc:'+15 XP por pomodoro completado',         type:'pom_xp',         val:15   },
-    mount: { icon:'🍅', desc:'+30 XP por pomodoro completado',         type:'pom_xp',         val:30   },
+    egg:   { icon:'🦅', desc:'Vuelo ascendente: +25 XP ahora (1/día)',             type:'act_xp',      val:25  },
+    baby:  { icon:'🍅', desc:'+15 XP por pomodoro completado (pasivo)',             type:'pom_xp',      val:15  },
+    mount: { icon:'🍅', desc:'+30 XP pom · Activo: +50 XP ahora (1/día)',          type:'pom_xp',      val:30  },
   },
   'dragon-fuego': {
-    baby:  { icon:'🔥', desc:'+20% XP en misiones épicas y superiores',type:'epic_xp',        val:0.20 },
-    mount: { icon:'🔥', desc:'+35% XP en TODAS las misiones',          type:'all_xp',         val:0.35 },
+    egg:   { icon:'🔥', desc:'Aliento primigenio: +30 XP ahora (1/día)',           type:'act_xp',      val:30  },
+    baby:  { icon:'🔥', desc:'+20% XP en misiones épicas y superiores (pasivo)',   type:'epic_xp',     val:0.20},
+    mount: { icon:'🔥', desc:'+35% XP global · Activo: 2× XP 30 min (1/día)',      type:'all_xp',      val:0.35},
   },
   'fenix-mitico': {
-    baby:  { icon:'✨', desc:'+5 HP al completar misión principal',     type:'main_hp',        val:5    },
-    mount: { icon:'✨', desc:'+10 HP principal · HP inmune a vencidas', type:'main_hp_shield', val:10   },
+    egg:   { icon:'✨', desc:'Ceniza sagrada: +15 HP ahora (1/día)',               type:'act_hp',      val:15  },
+    baby:  { icon:'✨', desc:'+5 HP al completar misión principal (pasivo)',        type:'main_hp',     val:5   },
+    mount: { icon:'✨', desc:'+10 HP principal · Activo: HP al máximo (1/día)',     type:'main_hp_shield',val:10},
   },
 };
 

@@ -3046,6 +3046,48 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   100% { transform: translateY(-160px) scale(0); opacity: 0; }
 }
 
+/* ── PET RIGHT PANEL ─────────────────────────────────────── */
+.pet-rpanel {
+  border-radius: 14px; overflow: hidden; position: relative;
+  border: 1px solid var(--border);
+}
+.pet-rpanel-bg {
+  position: absolute; inset: 0;
+  background: var(--pet-fondo) center/cover no-repeat;
+  opacity: .35; pointer-events: none;
+}
+.pet-rpanel-body {
+  position: relative; z-index: 1;
+  display: flex; gap: 10px; padding: 12px;
+  background: linear-gradient(to bottom, rgba(0,0,0,.15), rgba(0,0,0,.55));
+}
+.pet-rpanel-img {
+  width: 64px; height: 64px; object-fit: contain; border-radius: 10px;
+  background: rgba(255,255,255,.06); flex-shrink: 0;
+}
+.pet-rpanel-emoji {
+  width: 64px; height: 64px; font-size: 36px; display: none;
+  align-items: center; justify-content: center; flex-shrink: 0;
+}
+.pet-rpanel-info { flex: 1; min-width: 0; }
+.pet-rpanel-name {
+  font-family: var(--font-head); font-size: 13px; font-weight: 700;
+  color: #fff; letter-spacing: .5px;
+}
+.pet-rpanel-rarity { font-size: 10px; color: var(--gold); margin-bottom: 2px; }
+
+.pet-power-btn {
+  display: block; width: 100%; margin-top: 6px;
+  padding: 7px 10px; border-radius: 9px; font-size: 11px;
+  font-family: var(--font-head); font-weight: 700; letter-spacing: .5px;
+  cursor: pointer; border: none; transition: opacity .15s;
+  background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff;
+}
+.pet-power-btn:hover:not(:disabled) { opacity: .85; }
+.pet-power-btn.pet-power-used {
+  background: rgba(255,255,255,.07); color: var(--text3); cursor: not-allowed;
+}
+
 /* ── INVENTORY VIEW ─────────────────────────────────────── */
 .inv-gold-banner {
   display: flex; align-items: center; gap: 14px;
