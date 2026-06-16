@@ -90,13 +90,9 @@ document.getElementById('saveProfileBtn').addEventListener('click', async () => 
   heroRace   = document.getElementById('editHeroRace').value;
   guildName  = document.getElementById('editGuildName').value.trim();
   webhookUrl = document.getElementById('editWebhookUrl').value.trim();
-  localStorage.setItem('dungeon-race',    heroRace);
-  localStorage.setItem('dungeon-guild',   guildName);
-  localStorage.setItem('dungeon-webhook', webhookUrl);
-
   // Enano race: +10 HP max
   const hpMaxBonus = heroRace === 'enano' ? 110 : 100;
-  await saveHero({ name, hero_class: cls, race: heroRace, avatar, hp_max: hpMaxBonus });
+  await saveHero({ name, hero_class: cls, race: heroRace, avatar, hp_max: hpMaxBonus, guild_name: guildName, webhook_url: webhookUrl });
   closeModal('profileModal');
   renderHeroUI();
   toast('🧙', 'Perfil actualizado.');
@@ -109,11 +105,15 @@ document.getElementById('saveQuestBtn').addEventListener('click', () => {
   const repeat  = document.getElementById('editQRepeat').value.trim();
   const startDate = document.getElementById('editQStartDate').value;
   const deps    = document.getElementById('editQDependsOn').value.trim();
-  if (tags)      localStorage.setItem('dungeon-tags-'   + id, tags);      else localStorage.removeItem('dungeon-tags-'   + id);
-  if (estTime)   localStorage.setItem('dungeon-esttime-'+ id, estTime);   else localStorage.removeItem('dungeon-esttime-'+ id);
-  if (repeat)    localStorage.setItem('dungeon-repeat-' + id, repeat);    else localStorage.removeItem('dungeon-repeat-' + id);
-  if (startDate) localStorage.setItem('dungeon-start-'  + id, startDate); else localStorage.removeItem('dungeon-start-'  + id);
-  if (deps)      localStorage.setItem('dungeon-deps-'   + id, deps);      else localStorage.removeItem('dungeon-deps-'   + id);
+  // Save quest metadata to Supabase
+  db.from('dungeon_quests').update({
+    tags: tags || '', est_time: estTime || '',
+    repeat_days: parseInt(repeat) || 0,
+    quest_start_date: startDate || null,
+    depends_on: deps || null,
+  }).eq('id', id).then(() => {});
+  const _qm = quests.find(x => x.id === id);
+  if (_qm) { _qm.tags = tags || ''; _qm.est_time = estTime || ''; _qm.repeat_days = parseInt(repeat)||0; _qm.quest_start_date = startDate||null; _qm.depends_on = deps||null; }
   updateQuest(id, {
     name:     document.getElementById('editQName').value.trim(),
     type:     document.getElementById('editQType').value,
@@ -791,11 +791,11 @@ document.getElementById('cmdkInput').addEventListener('input', function() {
 async function resetRepeatQuests() {
   const today = new Date().toISOString().split('T')[0];
   const lastCheck = localStorage.getItem('dungeon-repeat-check');
-  if (lastCheck === today) return;
+  if (lastCheck === today) return;  // this flag is ephemeral/daily — OK in localStorage
   localStorage.setItem('dungeon-repeat-check', today);
   let count = 0;
   for (const q of quests) {
-    const repeat = parseInt(localStorage.getItem('dungeon-repeat-' + q.id));
+    const repeat = q.repeat_days || 0;
     if (!repeat || !q.done || !q.done_at) continue;
     const daysSince = Math.floor((Date.now() - new Date(q.done_at).getTime()) / 86400000);
     if (daysSince >= repeat) {
@@ -1285,8 +1285,12 @@ document.querySelectorAll('.date-filter-btn').forEach(btn => {
 (function initQuickNotes() {
   const area = document.getElementById('quickNotesArea');
   if (!area) return;
-  area.value = localStorage.getItem('dungeon-quick-notes') || '';
-  area.addEventListener('input', () => localStorage.setItem('dungeon-quick-notes', area.value));
+  area.value = hero ? (hero.quick_notes || '') : '';
+  let _notesTimer;
+  area.addEventListener('input', () => {
+    clearTimeout(_notesTimer);
+    _notesTimer = setTimeout(() => { if (hero) { hero.quick_notes = area.value; saveHero({ quick_notes: area.value }); } }, 800);
+  });
 })();
 
 /* ============================================================
@@ -1307,10 +1311,13 @@ function checkDailySummary() {
 /* ============================================================
    PIN QUEST
    ============================================================ */
-function togglePin(id) {
-  const key = 'dungeon-pin-' + id;
-  if (localStorage.getItem(key)) { localStorage.removeItem(key); toast('📌', 'Misión desanclada.'); }
-  else { localStorage.setItem(key, '1'); toast('📌', 'Misión anclada al inicio.'); }
+async function togglePin(id) {
+  const q = quests.find(x => x.id === id);
+  if (!q) return;
+  const pinned = !q.is_pinned;
+  await db.from('dungeon_quests').update({ is_pinned: pinned }).eq('id', id);
+  q.is_pinned = pinned;
+  toast('📌', pinned ? 'Misión anclada al inicio.' : 'Misión desanclada.');
   renderQuestList();
 }
 

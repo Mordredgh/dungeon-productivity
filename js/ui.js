@@ -19,11 +19,11 @@ function openEditQuest(id) {
   document.getElementById('editQPriority').value   = validRarities.includes(q.priority) ? q.priority : 'normal';
   document.getElementById('editQDeadline').value   = q.deadline || '';
   document.getElementById('editQNotes').value      = q.notes || '';
-  document.getElementById('editQTags').value       = localStorage.getItem('dungeon-tags-' + id) || '';
-  document.getElementById('editQEstTime').value    = localStorage.getItem('dungeon-esttime-' + id) || '';
-  document.getElementById('editQRepeat').value     = localStorage.getItem('dungeon-repeat-' + id) || '';
-  document.getElementById('editQStartDate').value  = localStorage.getItem('dungeon-start-' + id) || '';
-  document.getElementById('editQDependsOn').value  = localStorage.getItem('dungeon-deps-' + id) || '';
+  document.getElementById('editQTags').value       = q.tags || '';
+  document.getElementById('editQEstTime').value    = q.est_time || '';
+  document.getElementById('editQRepeat').value     = q.repeat_days || '';
+  document.getElementById('editQStartDate').value  = q.quest_start_date || '';
+  document.getElementById('editQDependsOn').value  = q.depends_on || '';
   openModal('editQuestModal');
 }
 

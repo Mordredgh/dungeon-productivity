@@ -119,7 +119,7 @@ function renderQuestList() {
     else if (activeFilter !== 'all' && q.type !== activeFilter) return false;
     if (search && !q.name.toLowerCase().includes(search)) return false;
     if (tagFilter) {
-      const tags = (localStorage.getItem('dungeon-tags-' + q.id) || '').toLowerCase();
+      const tags = (q.tags || '').toLowerCase();
       if (!tags.includes(tagFilter.toLowerCase())) return false;
     }
     if (dateFilter === 'today'   && !(q.deadline === today)) return false;
@@ -156,8 +156,8 @@ function renderQuestList() {
   });
 
   const allPending = filtered.filter(q => !q.done);
-  const pinned  = allPending.filter(q => localStorage.getItem('dungeon-pin-' + q.id));
-  const pending = allPending.filter(q => !localStorage.getItem('dungeon-pin-' + q.id));
+  const pinned  = allPending.filter(q => q.is_pinned);
+  const pending = allPending.filter(q => !q.is_pinned);
   const done    = filtered.filter(q => q.done);
 
   if (!allPending.length && !done.length) {
@@ -267,12 +267,12 @@ function renderQuestItem(q) {
     }
   }
 
-  // Tags & estimated time from localStorage
-  const tags    = (localStorage.getItem('dungeon-tags-' + q.id) || '').trim();
-  const estTime = localStorage.getItem('dungeon-esttime-' + q.id);
-  const repeat  = localStorage.getItem('dungeon-repeat-' + q.id);
-  const startDate = localStorage.getItem('dungeon-start-' + q.id);
-  const depName = localStorage.getItem('dungeon-deps-' + q.id);
+  // Tags & estimated time from quest record
+  const tags    = (q.tags || '').trim();
+  const estTime = q.est_time || '';
+  const repeat  = q.repeat_days || 0;
+  const startDate = q.quest_start_date || '';
+  const depName = q.depends_on || '';
   const todayStr = new Date().toISOString().split('T')[0];
   const isScheduled = startDate && startDate > todayStr;
   const isLocked    = depName && !quests.find(x => x.name === depName && x.done);
@@ -284,7 +284,7 @@ function renderQuestItem(q) {
   const scheduledHtml = isScheduled ? `<span class="scheduled-badge">📅 desde ${startDate}</span>` : '';
   const lockHtml      = isLocked  ? `<span class="locked-badge">🔒 Req: ${escHtml(depName)}</span>` : '';
 
-  const isPinned = !!localStorage.getItem('dungeon-pin-' + q.id);
+  const isPinned = !!q.is_pinned;
   return `<div class="quest-item ${q.done ? 'done' : ''} ${isLocked ? 'quest-locked' : ''} ${isOverdue ? 'quest-overdue' : ''} ${isPinned ? 'pinned' : ''}" data-type="${q.type}" data-priority="${q.priority || 'normal'}" data-qid="${q.id}"
     draggable="true"
     ondragstart="draggedQuestId='${q.id}';event.dataTransfer.effectAllowed='move';this.classList.add('dragging')"

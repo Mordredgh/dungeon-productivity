@@ -51,9 +51,11 @@ function _bossWeekKey() {
   return `dungeon-boss-${d.getFullYear()}-${week}`;
 }
 function getBossState() {
-  const key    = _bossWeekKey();
-  const stored = localStorage.getItem(key);
-  if (stored) return JSON.parse(stored);
+  const week = _bossWeekKey();
+  if (hero && hero.boss_state) {
+    const s = typeof hero.boss_state === 'string' ? JSON.parse(hero.boss_state) : hero.boss_state;
+    if (s.week === week) return s;
+  }
 
   // Seasonal boss check
   const now   = new Date();
@@ -78,11 +80,14 @@ function getBossState() {
     bossMaxHp = Math.min(Math.max(pending.length * 20, 60), 400);
   }
 
-  const state = { hp: bossMaxHp, maxHp: bossMaxHp, name: boss.name, bossKey: boss.key, defeated: false };
-  localStorage.setItem(key, JSON.stringify(state));
+  const state = { hp: bossMaxHp, maxHp: bossMaxHp, name: boss.name, bossKey: boss.key, defeated: false, week: _bossWeekKey() };
+  saveBossState(state);
   return state;
 }
-function saveBossState(s) { localStorage.setItem(_bossWeekKey(), JSON.stringify(s)); }
+function saveBossState(s) {
+  const state = { ...s, week: _bossWeekKey() };
+  if (hero) { hero.boss_state = state; saveHero({ boss_state: state }); }
+}
 
 function damageBoss(dmg) {
   const state = getBossState();
@@ -131,13 +136,13 @@ async function resolveEvent(evId, effect) {
   const today = new Date().toISOString().split('T')[0];
   if (effect === 'xp100')     { await addXP(100, 'main', null); toast('⚡', '+100 XP del mercader.'); }
   if (effect === 'gold80')    { addGold(80); toast('💰', '+80🪙 encontrados.'); }
-  if (effect === 'doubleNext'){ localStorage.setItem('dungeon-double-next', '1'); toast('✨', '¡Próxima misión con 2× XP y oro!'); }
+  if (effect === 'doubleNext') { if (hero) { hero.double_next = true; saveHero({ double_next: true }); } toast('✨', '¡Próxima misión con 2× XP!'); }
   if (effect === 'streak1')   { const ns = (hero.streak||0)+1; await saveHero({streak:ns}); hero.streak=ns; renderHeroUI(); toast('🔮', '+1 día de racha mística.'); }
   if (effect === 'hp20')      { const h = Math.min((hero.hp||100)+20, hero.hp_max||100); hero.hp=h; await saveHero({hp:h}); renderHeroUI(); toast('🍺', '+20 HP en la taberna.'); }
   if (effect === 'bossHP50')  { const s=getBossState(); s.hp=Math.min(s.hp+50,s.maxHp); saveBossState(s); updateBossBanner(); toast('🐉', '¡El Jefe absorbe poder dracónico! +50 HP de boss.'); }
-  if (effect === 'mainBonus') { localStorage.setItem('dungeon-main-bonus-'+today, '20'); toast('📜', 'Las misiones principales dan +20 XP hoy.'); }
-  if (effect === 'curse')     { localStorage.setItem('dungeon-curse-'+today, '2'); toast('💀', '¡Maldición activa! Completa 2 misiones o pierdes HP.'); }
-  if (effect === 'potion')    { localStorage.setItem('dungeon-potion-exp', Date.now()+30*60*1000); toast('⚡', '¡2× XP por 30 minutos!'); }
+  if (effect === 'mainBonus') { if (hero) { hero.main_bonus_date = today; saveHero({ main_bonus_date: today }); } toast('📜', 'Las misiones principales dan +20 XP hoy.'); }
+  if (effect === 'curse')     { if (hero) { hero.curse_date = today; saveHero({ curse_date: today }); } toast('💀', '¡Maldición activa! Completa 2 misiones o pierdes HP.'); }
+  if (effect === 'potion')    { const _e = Date.now()+30*60*1000; if (hero) { hero.potion_exp = _e; saveHero({ potion_exp: _e }); } toast('⚡', '¡2× XP por 30 minutos!'); }
   if (effect === 'revive')    {
     const overdue = quests.filter(q=>!q.done&&q.deadline&&q.deadline<today);
     if (overdue.length) {
@@ -151,10 +156,11 @@ async function resolveEvent(evId, effect) {
 
 /* ── CLASS SKILLS ─────────────────────────────────────────── */
 function getSkillUsed() {
-  return localStorage.getItem('dungeon-skill-' + new Date().toISOString().split('T')[0]) === '1';
+  return hero && hero.skill_date === new Date().toISOString().split('T')[0];
 }
 function markSkillUsed() {
-  localStorage.setItem('dungeon-skill-' + new Date().toISOString().split('T')[0], '1');
+  const d = new Date().toISOString().split('T')[0];
+  if (hero) { hero.skill_date = d; saveHero({ skill_date: d }); }
 }
 function renderClassSkillBtn() {
   const el = document.getElementById('classSkillBtn');
@@ -173,10 +179,11 @@ async function useClassSkill() {
   markSkillUsed();
   renderClassSkillBtn();
   if (cls === 'mago') {
-    localStorage.setItem('dungeon-transmute-next', '1');
+    if (hero) { hero.transmute_next = true; saveHero({ transmute_next: true }); }
     toast('🔮', 'Transmutación lista: próxima side/daily da XP de épica.');
   } else if (cls === 'guerrero') {
-    localStorage.setItem('dungeon-berserker-exp', Date.now() + 30*60*1000);
+    const _be = Date.now() + 30*60*1000;
+    if (hero) { hero.berserker_exp = _be; saveHero({ berserker_exp: _be }); }
     toast('⚡', '¡Berserker activado! 2× XP por 30 minutos.');
   } else if (cls === 'clerigo') {
     const today   = new Date().toISOString().split('T')[0];
@@ -192,10 +199,10 @@ async function useClassSkill() {
     await completeQuest(daily.id, null);
     toast('🗡️', `¡Golpe en las Sombras! "${daily.name}" completada.`);
   } else if (cls === 'arquero') {
-    localStorage.setItem('dungeon-arrow-rain', '1');
+    if (hero) { hero.arrow_rain = true; saveHero({ arrow_rain: true }); }
     toast('🏹', 'Lluvia de Flechas lista: próxima semanal da 3× XP.');
   } else if (cls === 'fundador') {
-    localStorage.setItem('dungeon-strategic-count', '5');
+    if (hero) { hero.strategic_count = 5; saveHero({ strategic_count: 5 }); }
     toast('🚀', 'Visión Estratégica: +25% XP en las próximas 5 misiones.');
   }
 }
@@ -204,7 +211,7 @@ async function useClassSkill() {
 function generateDiaryEntry() {
   if (!hero) return;
   const today = new Date().toISOString().split('T')[0];
-  if (localStorage.getItem('dungeon-diary-' + today)) return;
+  if (hero && hero.diary_date === today) return;
   const done = quests.filter(q => q.done && q.done_at?.startsWith(today));
   if (!done.length) return;
   const xpEarned  = done.reduce((s, q) => s + (XP_TABLE[q.type] || 25), 0);
@@ -217,16 +224,15 @@ function generateDiaryEntry() {
     `${today} — Quedará escrito en los anales: el nivel ${hero.level} ${hero.hero_class || 'héroe'} conocido como ${hero.name} completó ${done.length} misión${done.length > 1 ? 'es' : ''} con honor. Su determinación inspira a todo el gremio. XP ganados: ${xpEarned}.`,
   ];
   const entry = templates[Math.floor(Math.random() * templates.length)];
-  const diary = JSON.parse(localStorage.getItem('dungeon-diary') || '[]');
+  const diary = Array.isArray(hero?.diary) ? hero.diary : [];
   diary.unshift({ date: today, text: entry, xp: xpEarned, count: done.length });
   if (diary.length > 60) diary.pop();
-  localStorage.setItem('dungeon-diary', JSON.stringify(diary));
-  localStorage.setItem('dungeon-diary-' + today, '1');
+  if (hero) { hero.diary = diary; hero.diary_date = today; saveHero({ diary, diary_date: today }); }
 }
 function renderDiary() {
   const el = document.getElementById('diaryContent');
   if (!el) return;
-  const diary = JSON.parse(localStorage.getItem('dungeon-diary') || '[]');
+  const diary = hero && Array.isArray(hero.diary) ? hero.diary : [];
   if (!diary.length) {
     el.innerHTML = '<div class="empty-state" style="padding:24px"><div class="empty-state-icon">📖</div><p>El diario está vacío. Completa misiones para que el escribano registre tus hazañas.</p></div>';
     return;
@@ -246,19 +252,26 @@ function _weekNum() {
 }
 function getProphecyKey() { return `dungeon-prophecy-${new Date().getFullYear()}-${_weekNum()}`; }
 function checkAndGenerateProphecy() {
-  const key = getProphecyKey();
-  if (localStorage.getItem(key) || !hero || !quests.length) return;
+  if (!hero || !quests.length) return;
+  const week = getProphecyKey();
+  let existing = null;
+  if (hero.prophecy) { try { const p = JSON.parse(hero.prophecy); if (p.week === week) existing = p.text; } catch {} }
+  if (existing) return;
   const mains  = Math.max(quests.filter(q => !q.done && q.type === 'main').length, 1);
   const streak = Math.max((hero.streak || 0) + 3, 3);
   const tmpl   = PROPHECY_TEMPLATES[_weekNum() % PROPHECY_TEMPLATES.length];
-  localStorage.setItem(key, tmpl(mains, streak));
+  const text   = tmpl(mains, streak);
+  hero.prophecy = JSON.stringify({ week, text });
+  saveHero({ prophecy: hero.prophecy });
   renderProphecy();
 }
 function renderProphecy() {
   const el = document.getElementById('prophecyText');
-  if (!el) return;
-  const text = localStorage.getItem(getProphecyKey());
-  if (text) { el.textContent = text; el.closest('.prophecy-section')?.classList.remove('hidden'); }
+  if (!el || !hero || !hero.prophecy) return;
+  try {
+    const p = JSON.parse(hero.prophecy);
+    if (p.week === getProphecyKey()) { el.textContent = p.text; el.closest('.prophecy-section')?.classList.remove('hidden'); }
+  } catch {}
 }
 
 /* ── INIT (called from main.js) ───────────────────────────── */

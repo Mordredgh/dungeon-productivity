@@ -12,6 +12,17 @@ async function loadHero() {
     hero = nh;
   }
   deriveHero();
+  // Init global state from hero record
+  heroRace   = hero.race        || 'humano';
+  guildName  = hero.guild_name  || '';
+  webhookUrl = hero.webhook_url || '';
+  // One-time gold migration from localStorage
+  const _localGold = parseInt(localStorage.getItem('dungeon-gold') || '0');
+  if (_localGold > 0 && !(hero.gold > 0)) {
+    hero.gold = _localGold;
+    saveHero({ gold: _localGold });
+  }
+  localStorage.removeItem('dungeon-gold');
   try { localStorage.setItem('dungeon-cache-hero', JSON.stringify(hero)); } catch {}
 }
 
@@ -95,8 +106,8 @@ async function checkDailyStreak() {
 
   let newHp = hero.hp || 100;
   if (lastDay && lastDay !== yesterday) {
-    if (localStorage.getItem('dungeon-amulet')) {
-      localStorage.removeItem('dungeon-amulet');
+    if (hero.amulet) {
+      hero.amulet = false; saveHero({ amulet: false });
       toast('🧿', '¡Amuleto de Protección absorbió el daño del día sin actividad!');
     } else {
       newHp = Math.max(10, newHp - 10);
