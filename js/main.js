@@ -29,6 +29,7 @@
   checkWeeklyRetro();
   checkMorningBriefing();
   checkDeadlineAlerts();
-  setInterval(() => { checkDailySummary(); checkWeeklyRetro(); checkDeadlineAlerts(); }, 60 * 60 * 1000);
+  checkNightlyDiary();
+  setInterval(() => { checkDailySummary(); checkWeeklyRetro(); checkDeadlineAlerts(); checkNightlyDiary(); }, 60 * 60 * 1000);
   updateFocusTodayChip();
 })();

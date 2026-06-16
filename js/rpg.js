@@ -237,7 +237,46 @@ function renderDiary() {
       <div class="diary-text">${escHtml(e.text)}</div>
     </div>`).join('');
 }
-function openDiary() { generateDiaryEntry(); renderDiary(); openModal('diaryModal'); }
+async function generateDiaryEntryAI() {
+  if (!hero) return;
+  const today = new Date().toISOString().split('T')[0];
+  if (hero.diary_date === today) return;
+  const done = quests.filter(q => q.done && q.done_at?.startsWith(today));
+  if (!done.length) return;
+  const xpEarned = done.reduce((s, q) => s + (XP_TABLE[q.type] || 25), 0);
+  const names    = done.map(q => q.name).join(', ');
+  const title    = TITLES[Math.min((hero._level || hero.level || 1) - 1, TITLES.length - 1)];
+  const prompt = `Escribe una entrada de diario corta (máximo 4 líneas) en primera persona, en voz del héroe "${hero.name}" (${title}, clase ${hero.hero_class || 'aventurero'}), narrando su día como una crónica de fantasía medieval.
+Misiones completadas hoy: ${names}.
+XP ganado: ${xpEarned}. Racha actual: ${hero.streak || 0} días.
+Tono épico pero breve. Responde solo con el texto de la entrada, sin encabezados ni markdown.`;
+
+  let text = '';
+  try {
+    const r = await fetch('/openclaw/send', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: prompt })
+    });
+    const data = await r.json();
+    text = (data.reply || '').trim();
+  } catch {}
+
+  if (!text) { generateDiaryEntry(); return; }
+
+  const diary = Array.isArray(hero.diary) ? hero.diary : [];
+  diary.unshift({ date: today, text, xp: xpEarned, count: done.length });
+  if (diary.length > 60) diary.pop();
+  hero.diary = diary; hero.diary_date = today;
+  await saveHero({ diary, diary_date: today });
+  renderDiary();
+}
+
+function checkNightlyDiary() {
+  if (!hero || new Date().getHours() < 21) return;
+  generateDiaryEntryAI();
+}
+
+function openDiary() { renderDiary(); openModal('diaryModal'); checkNightlyDiary(); }
 
 /* ── PROPHECY ─────────────────────────────────────────────── */
 function _weekNum() {
