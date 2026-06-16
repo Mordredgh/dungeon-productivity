@@ -119,11 +119,16 @@
         <button class="sidebar-item"        data-view="kanban"       onclick="switchView('kanban')">       <span class="si-icon">📋</span><span class="si-label">Kanban</span></button>
         <button class="sidebar-item"        data-view="stats"        onclick="switchView('stats')">        <span class="si-icon">📊</span><span class="si-label">Sala del Trono</span></button>
         <button class="sidebar-item"        data-view="achievements" onclick="switchView('achievements')"> <span class="si-icon">🏆</span><span class="si-label">Logros</span></button>
+        <div class="sb-nav-label">Compañeros</div>
+        <button class="sidebar-item"        data-view="pets"         onclick="switchView('pets')">         <span class="si-icon">🐾</span><span class="si-label">Mascotas</span></button>
         <div class="sb-nav-label">Archivo</div>
         <button class="sidebar-item"        data-view="history"      onclick="switchView('history')">      <span class="si-icon">📜</span><span class="si-label">Historial</span></button>
         <button class="sidebar-item"        data-view="map"          onclick="switchView('map')">          <span class="si-icon">🗺️</span><span class="si-label">Mapa</span></button>
         <button class="sidebar-item"        data-view="calendar"     onclick="switchView('calendar')">     <span class="si-icon">📅</span><span class="si-label">Calendario</span></button>
       </div>
+
+      <!-- MASCOTA ACTIVA -->
+      <div id="activePetDisplay" style="display:none" class="active-pet-display"></div>
 
       <!-- ACCIONES — fondo del sidebar -->
       <div class="sb-actions">
@@ -169,6 +174,7 @@
         <button class="view-tab" data-view="history">📜 Historial</button>
         <button class="view-tab" data-view="map">🗺️ Mapa</button>
         <button class="view-tab" data-view="calendar">📅 Calendario</button>
+        <button class="view-tab" data-view="pets">🐾 Mascotas</button>
       </div>
 
       <div class="views">
@@ -177,7 +183,7 @@
         <div class="view active" id="view-quests">
 
           <div class="boss-banner" id="bossBanner" style="display:none">
-            <div class="boss-icon">👹</div>
+            <div class="boss-icon-wrap"><div class="boss-icon">👹</div></div>
             <div class="boss-info">
               <div class="boss-label">⚠️ Misión Épica — ¡Ataca primero!</div>
               <div class="boss-name" id="bossName">—</div>
@@ -394,6 +400,15 @@
           </div>
           <div class="cal-grid" id="calGrid"></div>
           <div class="cal-detail" id="calDetail"></div>
+        </div>
+
+        <!-- PETS VIEW -->
+        <div class="view" id="view-pets">
+          <div class="view-header">
+            <h2 class="view-title">🐾 Mascotas</h2>
+            <button class="btn btn-ghost" style="font-size:12px" onclick="openShop()">🏪 Tienda</button>
+          </div>
+          <div id="petsView"></div>
         </div>
 
       </div>
@@ -903,6 +918,7 @@
 <script src="js/shop.js"></script>
 <script src="js/familiar.js"></script>
 <script src="js/rpg.js"></script>
+<script src="js/pets.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

@@ -170,12 +170,17 @@ async function doImport() {
 /* VIEW NAV */
 function switchView(v) {
   document.querySelectorAll('.view-tab, .sidebar-item').forEach(t => t.classList.toggle('active', t.dataset.view === v));
-  document.querySelectorAll('.view').forEach(el => el.classList.toggle('active', el.id === `view-${v}`));
+  document.querySelectorAll('.view').forEach(el => {
+    const active = el.id === `view-${v}`;
+    el.classList.toggle('active', active);
+    if (active) el.style.setProperty('--view-bg-url', `url(${CDN}dungeon/fondo_${v}.png)`);
+  });
   if (v === 'stats')        renderStats();
   if (v === 'achievements') renderAchievements();
   if (v === 'history')      { historyPage = 1; renderHistory(); }
   if (v === 'map')          renderMapView();
   if (v === 'calendar')     renderCalendar();
+  if (v === 'pets')         renderPets();
 }
 
 function toggleCompact() {

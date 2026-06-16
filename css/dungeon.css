@@ -2778,4 +2778,108 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
    PROPHECY
    ============================================================ */
 .prophecy-text { font-size:12px; color:var(--text2); font-style:italic; line-height:1.55; margin:0; }
+
+/* ============================================================
+   BOSS IMAGE
+   ============================================================ */
+.boss-icon-wrap { flex-shrink:0; width:52px; height:52px; display:flex; align-items:center; justify-content:center; }
+.boss-img { width:52px; height:52px; object-fit:contain; border-radius:8px; }
+
+/* ============================================================
+   HERO AVATAR IMAGE
+   ============================================================ */
+.hero-avatar-img {
+  width:100%; height:100%; object-fit:cover;
+  border-radius:50%; display:block;
+}
+.hero-avatar-emoji { font-size:22px; line-height:1; }
+
+/* ============================================================
+   VIEW BACKGROUNDS
+   ============================================================ */
+.view { position:relative; }
+.view.active::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background: var(--view-bg-url, none) center / cover no-repeat;
+  opacity:.07;
+  pointer-events:none;
+  z-index:0;
+}
+.view > * { position:relative; z-index:1; }
+
+/* ============================================================
+   ACTIVE PET DISPLAY (sidebar)
+   ============================================================ */
+.active-pet-display {
+  display:flex; align-items:center; gap:8px;
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--radius-sm); padding:8px 10px;
+  margin:6px 12px 0;
+}
+.active-pet-img { width:36px; height:36px; object-fit:contain; border-radius:6px; flex-shrink:0; }
+.active-pet-info { display:flex; flex-direction:column; min-width:0; }
+.active-pet-name { font-size:11px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.active-pet-stage { font-size:10px; margin-top:1px; }
+.stage-mount { color:var(--gold); }
+.stage-baby  { color:var(--green); }
+
+/* ============================================================
+   PETS VIEW
+   ============================================================ */
+.pets-section-title {
+  font-family:var(--font-head); font-size:13px; font-weight:600;
+  color:var(--accent); letter-spacing:.5px; margin-bottom:12px;
+}
+.pets-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(148px, 1fr));
+  gap:14px;
+}
+.pet-card {
+  background:var(--card2); border:1px solid var(--border);
+  border-radius:var(--radius); padding:14px 12px;
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  transition:var(--transition);
+}
+.pet-card:hover { border-color:var(--accent); box-shadow:var(--glow); }
+.pet-card-active { border-color:var(--accent2) !important; box-shadow:var(--glow2) !important; }
+.pet-card-visual {
+  position:relative; width:80px; height:80px;
+  display:flex; align-items:center; justify-content:center;
+}
+.pet-card-img  { width:80px; height:80px; object-fit:contain; }
+.pet-card-emoji { font-size:44px; line-height:1; }
+.pet-qty-badge {
+  position:absolute; top:-4px; right:-4px;
+  background:var(--accent); color:#fff; font-size:10px; font-weight:700;
+  border-radius:8px; padding:1px 6px;
+}
+.pet-mount-crown { position:absolute; top:-6px; right:-6px; font-size:16px; }
+.pet-card-name  { font-size:12px; font-weight:700; color:var(--text); text-align:center; }
+.pet-card-rarity { font-size:10px; color:var(--text2); text-transform:capitalize; }
+.pet-card-meta  { font-size:10px; color:var(--text3); text-align:center; line-height:1.4; }
+.pet-evo-wrap   { width:100%; display:flex; align-items:center; gap:6px; }
+.pet-evo-bar    { flex:1; height:6px; background:var(--bg4); border-radius:3px; overflow:hidden; }
+.pet-evo-fill   { height:100%; background:linear-gradient(90deg, var(--accent), var(--accent2)); border-radius:3px; transition:width .4s; }
+.pet-evo-label  { font-size:9px; color:var(--text3); white-space:nowrap; }
+.pet-action-btn {
+  width:100%; background:var(--accent); color:#fff; border:none;
+  border-radius:var(--radius-xs); padding:6px 8px; font-size:11px;
+  font-weight:600; cursor:pointer; transition:opacity .2s;
+}
+.pet-action-btn:hover:not(:disabled) { opacity:.8; }
+.pet-btn-disabled { background:var(--bg4) !important; color:var(--text3) !important; cursor:not-allowed !important; }
+.pet-btn-active   { background:var(--accent2) !important; }
+.pets-empty {
+  text-align:center; padding:48px 20px;
+  color:var(--text2);
+}
+
+@media (max-width:480px) {
+  .pets-grid { grid-template-columns: repeat(2, 1fr); }
+  .boss-img  { width:36px; height:36px; }
+  .boss-icon-wrap { width:36px; height:36px; }
+}
 </style>

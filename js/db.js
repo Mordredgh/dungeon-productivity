@@ -13,6 +13,7 @@ async function initDB() {
   if (!quests.length) showSkeleton();
   await Promise.all([loadHero(), loadQuests(), loadPomodoros()]);
   await loadInventory();
+  await loadPets();
   renderAll();
   scheduleRandomEvent();
   checkDailyStreak();

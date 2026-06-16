@@ -54,12 +54,31 @@ function getBossState() {
   const key    = _bossWeekKey();
   const stored = localStorage.getItem(key);
   if (stored) return JSON.parse(stored);
-  const pending = quests.filter(q => !q.done && q.type !== 'daily');
-  const maxHp   = Math.min(Math.max(pending.length * 20, 60), 400);
-  const d       = new Date();
-  const jan1    = new Date(d.getFullYear(), 0, 1);
-  const week    = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
-  const state   = { hp: maxHp, maxHp, name: BOSS_NAMES[week % BOSS_NAMES.length], defeated: false };
+
+  // Seasonal boss check
+  const now   = new Date();
+  const month = now.getMonth();
+  const day   = now.getDate();
+  const seasonal = BOSS_DEFS.find(b => b.seasonal &&
+    b.seasonal.month === month &&
+    day >= b.seasonal.dayStart &&
+    day <= b.seasonal.dayEnd);
+
+  let boss, bossMaxHp;
+  if (seasonal) {
+    boss = seasonal;
+    bossMaxHp = boss.hp;
+  } else {
+    const pending      = quests.filter(q => !q.done && q.type !== 'daily');
+    const regularBosses = BOSS_DEFS.filter(b => !b.seasonal);
+    const d    = new Date();
+    const jan1 = new Date(d.getFullYear(), 0, 1);
+    const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+    boss = regularBosses[week % regularBosses.length];
+    bossMaxHp = Math.min(Math.max(pending.length * 20, 60), 400);
+  }
+
+  const state = { hp: bossMaxHp, maxHp: bossMaxHp, name: boss.name, bossKey: boss.key, defeated: false };
   localStorage.setItem(key, JSON.stringify(state));
   return state;
 }

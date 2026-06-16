@@ -10,6 +10,7 @@ function renderAll() {
   renderHistory();
   renderStats();
   updateBossBanner();
+  if (typeof renderActivePet === 'function') renderActivePet();
 }
 
 function renderHeroUI() {
@@ -19,8 +20,29 @@ function renderHeroUI() {
   const lvlBadge  = document.getElementById('avatarLevelBadge');
   const lvl = hero._level || 1;
 
-  // Avatar + level badge (preserve badge child)
-  avatarBtn.childNodes[0].textContent = hero.avatar || '🧙';
+  // Avatar image (CDN) with emoji fallback
+  const cls  = hero.hero_class || 'guerrero';
+  const race = hero.race || 'humano';
+  const avatarImgUrl = `${CDN}dungeon/avatar_${cls}_${race}.png`;
+  let avatarVisual = avatarBtn.querySelector('.hero-avatar-img, .hero-avatar-emoji');
+  const needRebuild = !avatarVisual || avatarVisual.dataset.cls !== cls || avatarVisual.dataset.race !== race;
+  if (needRebuild) {
+    const img = Object.assign(document.createElement('img'), {
+      className: 'hero-avatar-img', src: avatarImgUrl, alt: hero.avatar || '🧙'
+    });
+    img.dataset.cls = cls; img.dataset.race = race;
+    img.onerror = function() {
+      const sp = Object.assign(document.createElement('span'), {
+        className: 'hero-avatar-emoji', textContent: hero.avatar || '🧙'
+      });
+      sp.dataset.cls = cls; sp.dataset.race = race;
+      this.replaceWith(sp);
+    };
+    const old = avatarBtn.querySelector('.hero-avatar-img, .hero-avatar-emoji') || avatarBtn.firstChild;
+    if (old) avatarBtn.replaceChild(img, old); else avatarBtn.insertBefore(img, avatarBtn.firstChild);
+  } else if (avatarVisual.classList.contains('hero-avatar-emoji')) {
+    avatarVisual.textContent = hero.avatar || '🧙';
+  }
   if (lvlBadge) lvlBadge.textContent = lvl;
 
   // Avatar ring by class
@@ -506,8 +528,13 @@ function updateBossBanner() {
     } else {
       const pct      = Math.round((state.hp / state.maxHp) * 100);
       const hpColor  = pct > 60 ? '#fb7185' : pct > 30 ? '#facc15' : '#4ade80';
+      const bossImgHtml = state.bossKey
+        ? `<img src="${CDN}dungeon/boss_${state.bossKey}.png" class="boss-img" alt="${escHtml(state.name)}"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+           <div class="boss-icon" style="display:none">👹</div>`
+        : `<div class="boss-icon">👹</div>`;
       banner.innerHTML = `
-        <div class="boss-icon">👹</div>
+        <div class="boss-icon-wrap">${bossImgHtml}</div>
         <div class="boss-info" style="flex:1;min-width:0">
           <div class="boss-label">⚔️ Jefe Semanal — ¡Atácalo completando misiones!</div>
           <div class="boss-name">${escHtml(state.name)}</div>
