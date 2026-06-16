@@ -1284,7 +1284,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .loot-popup-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gold); font-weight: 600; margin-bottom: 8px; }
 .loot-popup-row   { display: flex; align-items: center; gap: 10px; padding: 4px 0; }
 .loot-popup-row + .loot-popup-row { border-top: 1px solid var(--border); }
-.loot-popup-img   { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
+.loot-popup-img        { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
+.loot-popup-gold-icon  { width: 36px; height: 36px; font-size: 24px; line-height: 36px; text-align: center; flex-shrink: 0; }
 .loot-popup-name  { font-size: 12px; font-weight: 600; color: var(--text); flex: 1; }
 .loot-popup-qty   { font-size: 16px; font-weight: 800; color: var(--accent); font-family: var(--font-head); }
 

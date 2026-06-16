@@ -71,17 +71,24 @@ function spellFragLabel(spellKey) {
   return labels[spellKey] || spellKey;
 }
 
-async function grantLoot(loots) {
+async function grantLoot(loots, goldAmt) {
   if (!loots) return;
   const items = Array.isArray(loots) ? loots : [loots];
   for (const loot of items) await addInvItem(loot.key, loot.type, loot.qty);
-  showLootPopup(items);
+  showLootPopup(items, goldAmt || 0);
   if (typeof renderSpells === 'function') renderSpells();
 }
 
-function showLootPopup(items) {
+function showLootPopup(items, goldAmt) {
   const old = document.getElementById('lootPopup');
   if (old) old.remove();
+
+  const goldRow = goldAmt > 0 ? `
+    <div class="loot-popup-row">
+      <span class="loot-popup-gold-icon">🪙</span>
+      <div class="loot-popup-name">Oro</div>
+      <div class="loot-popup-qty">+${goldAmt}</div>
+    </div>` : '';
 
   const rows = items.map(loot => {
     const imgUrl = CDN + 'dungeon/' + loot.key + '.png';
@@ -98,7 +105,7 @@ function showLootPopup(items) {
   div.className = 'loot-popup';
   div.innerHTML = `
     <div class="loot-popup-title">🎁 ¡Botín obtenido!</div>
-    ${rows}`;
+    ${goldRow}${rows}`;
   document.body.appendChild(div);
   setTimeout(() => div.classList.add('visible'), 30);
   setTimeout(() => { div.classList.remove('visible'); setTimeout(() => div.remove(), 400); }, 4000);
