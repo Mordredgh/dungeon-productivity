@@ -109,6 +109,10 @@ const GOLD_TABLE = { main:50, side:20, daily:10, weekly:35 };
 
 const CDN = 'https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/';
 
+/* ── GOOGLE OAUTH2 (mismo client ID para Fit + Calendar) ──── */
+const GOOGLE_CLIENT_ID   = 'TU_GOOGLE_CLIENT_ID';   // → Google Cloud Console
+const GOOGLE_REDIRECT_URI = 'https://dungeon.mordredgh.com/';
+
 /* ── ARMAS ───────────────────────────────────────────────── */
 const WEAPON_DEFS = [
   { key:'espada', name:'Espada',  icon:'⚔️', slot:'main_hand' },

@@ -102,6 +102,29 @@ function spawnParticle(text, sourceEl) {
   setTimeout(() => el.remove(), 900);
 }
 
+function spawnHPParticle(amount, el) {
+  const heal = amount > 0;
+  const div  = document.createElement('div');
+  div.className = `particle particle-hp ${heal ? 'particle-heal' : 'particle-dmg'}`;
+  div.textContent = (heal ? '+' : '') + amount + ' HP';
+  const rect = el ? el.getBoundingClientRect() : { left: window.innerWidth/2, top: window.innerHeight/2 };
+  div.style.left = (rect.left + 10) + 'px';
+  div.style.top  = rect.top + 'px';
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 950);
+}
+
+function spawnGoldParticle(amount, el) {
+  const div = document.createElement('div');
+  div.className = 'particle particle-gold';
+  div.textContent = '+' + amount + ' 🪙';
+  const rect = el ? el.getBoundingClientRect() : { left: window.innerWidth/2, top: window.innerHeight/2 };
+  div.style.left = (rect.left + 10) + 'px';
+  div.style.top  = rect.top + 'px';
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 950);
+}
+
 function spawnLevelUpParticles() {
   const emojis = ['⭐','✨','🌟','💫','🎉','🏆'];
   for (let i = 0; i < 12; i++) {
@@ -163,7 +186,17 @@ function switchView(v) {
   if (v === 'inventory')    { if (typeof renderInventory==='function') renderInventory(); }
   if (v === 'smithy')       { if (typeof renderSmithy==='function')    renderSmithy();    }
   if (v === 'character')    { if (typeof renderCharacterSheet==='function') renderCharacterSheet(); }
-  if (v === 'goals')        { if (typeof renderGoals==='function') renderGoals(); }
+  if (v === 'goals')        { if (typeof renderGoals==='function')        renderGoals(); }
+  if (v === 'skill-tree')   { if (typeof renderSkillTree==='function')    renderSkillTree(); }
+  if (v === 'bestiary')     { if (typeof renderBestiary==='function')     renderBestiary(); }
+  if (v === 'dungeon-grows'){ if (typeof renderDungeonGrows==='function') renderDungeonGrows(); }
+  if (v === 'runes')        { if (typeof renderRunePanel==='function')    renderRunePanel(); }
+  if (v === 'integrations') { renderIntegrations(); }
+}
+
+function renderIntegrations() {
+  if (typeof renderFitWidget  === 'function') renderFitWidget();
+  if (typeof renderCalendarWidget === 'function') renderCalendarWidget();
 }
 
 function toggleCompact() {

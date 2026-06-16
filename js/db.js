@@ -15,7 +15,8 @@ async function initDB() {
   await loadInventory();
   await loadPets();
   if (typeof loadWeapons === 'function') await loadWeapons();
-  if (typeof loadGoals === 'function') await loadGoals();
+  if (typeof loadGoals  === 'function') await loadGoals();
+  if (typeof loadRunes  === 'function') await loadRunes();
   renderAll();
   scheduleRandomEvent();
   checkDailyStreak();

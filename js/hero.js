@@ -24,6 +24,12 @@ async function loadHero() {
   }
   localStorage.removeItem('dungeon-gold');
   try { localStorage.setItem('dungeon-cache-hero', JSON.stringify(hero)); } catch {}
+  applyClassTheme();
+}
+
+function applyClassTheme() {
+  if (!hero) return;
+  document.documentElement.dataset.heroClass = hero.hero_class || 'guerrero';
 }
 
 function deriveHero() {
@@ -76,7 +82,10 @@ function classXPBonus(type) {
 
 async function addXP(amount, type, sourceEl) {
   if (xpMultiplierEnd && Date.now() > xpMultiplierEnd) { xpMultiplier = 1; xpMultiplierEnd = 0; }
-  let finalXP = Math.round(amount * classXPBonus(type || 'side') * xpMultiplier);
+  const todMult   = typeof getTODBonus  === 'function' ? getTODBonus().xpMult : 1;
+  const skillMult = typeof getSkillTreeXPBonus === 'function' ? (1 + getSkillTreeXPBonus(type || 'side')) : 1;
+  const runeMult  = typeof getRuneBonus === 'function' ? (1 + getRuneBonus('all_xp')) : 1;
+  let finalXP = Math.round(amount * classXPBonus(type || 'side') * xpMultiplier * todMult * skillMult * runeMult);
 
   const prevLevel = calcLevel(hero.xp_total || 0);
   const newTotal = (hero.xp_total || 0) + finalXP;
@@ -118,6 +127,10 @@ async function checkDailyStreak() {
       toast('🧿', '¡Amuleto de Protección absorbió el daño del día sin actividad!');
     } else {
       newHp = Math.max(10, newHp - 10);
+      if (typeof spawnHPParticle === 'function') {
+        const el = document.getElementById('heroHp');
+        spawnHPParticle(-10, el);
+      }
       toast('💔', 'Perdiste HP por días sin actividad.');
     }
   }

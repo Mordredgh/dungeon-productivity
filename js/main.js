@@ -9,6 +9,11 @@
   await handleSpotifyCallback();
   renderSpotifyWidget();
   loadRealWeather();
+  updateDungeonClock();
+  setInterval(updateDungeonClock, 60 * 1000);
+  if (typeof handleGoogleFitCallback  === 'function') await handleGoogleFitCallback();
+  if (typeof handleGoogleCalCallback  === 'function') await handleGoogleCalCallback();
+  if (typeof syncGoogleFitSteps       === 'function') syncGoogleFitSteps();
   await migrateRarity();
   await resetDailyQuests();
   await resetRepeatQuests();

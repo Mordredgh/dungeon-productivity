@@ -56,6 +56,7 @@
         <div id="realWeatherChip" class="weather-chip" style="display:none" title="Clima"></div>
         <div id="weatherDetailPanel" class="weather-detail-panel"></div>
       </div>
+      <div id="dungeonClockChip" title="Hora del Dungeon"></div>
     </div>
     <div class="header-tools">
       <button class="icon-btn" id="diaryBtn"  onclick="openDiary()" title="Diario">📖</button>
@@ -151,6 +152,13 @@
         <button class="sidebar-item"        data-view="shop"         onclick="switchView('shop')">         <span class="si-icon">🏪</span><span class="si-label">Tienda</span></button>
         <button class="sidebar-item"        data-view="inventory"    onclick="switchView('inventory')">    <span class="si-icon">🎒</span><span class="si-label">Inventario</span></button>
         <button class="sidebar-item"        data-view="smithy"       onclick="switchView('smithy')">       <span class="si-icon">⚒️</span><span class="si-label">Herrero</span></button>
+        <div class="sb-nav-label">Héroe</div>
+        <button class="sidebar-item" data-view="skill-tree"    onclick="switchView('skill-tree')">    <span class="si-icon">🌳</span><span class="si-label">Habilidades</span></button>
+        <button class="sidebar-item" data-view="runes"         onclick="switchView('runes')">         <span class="si-icon">💎</span><span class="si-label">Runas</span></button>
+        <div class="sb-nav-label">Dungeon</div>
+        <button class="sidebar-item" data-view="dungeon-grows" onclick="switchView('dungeon-grows')"> <span class="si-icon">🏰</span><span class="si-label">Mi Dungeon</span></button>
+        <button class="sidebar-item" data-view="bestiary"      onclick="switchView('bestiary')">      <span class="si-icon">📖</span><span class="si-label">Bestiario</span></button>
+        <button class="sidebar-item" data-view="integrations"  onclick="switchView('integrations')">  <span class="si-icon">🔗</span><span class="si-label">Integraciones</span></button>
         <div class="sb-nav-label">Archivo</div>
         <button class="sidebar-item"        data-view="history"      onclick="switchView('history')">      <span class="si-icon">📜</span><span class="si-label">Historial</span></button>
         <button class="sidebar-item"        data-view="calendar"     onclick="switchView('calendar')">     <span class="si-icon">📅</span><span class="si-label">Calendario</span></button>
@@ -450,6 +458,53 @@
             <h2 class="view-title">⚒️ Herrero</h2>
           </div>
           <div id="smithyView"></div>
+        </div>
+
+        <!-- SKILL TREE VIEW -->
+        <div class="view" id="view-skill-tree">
+          <div class="view-header">
+            <h2 class="view-title">🌳 Árbol de Habilidades</h2>
+          </div>
+          <div id="skillTreeContent"></div>
+        </div>
+
+        <!-- RUNES VIEW -->
+        <div class="view" id="view-runes">
+          <div class="view-header">
+            <h2 class="view-title">💎 Runas</h2>
+          </div>
+          <div id="runePanelContent"></div>
+        </div>
+
+        <!-- DUNGEON GROWS VIEW -->
+        <div class="view" id="view-dungeon-grows">
+          <div class="view-header">
+            <h2 class="view-title">🏰 Mi Dungeon</h2>
+          </div>
+          <div id="dungeonGrowsContent"></div>
+        </div>
+
+        <!-- BESTIARY VIEW -->
+        <div class="view" id="view-bestiary">
+          <div class="view-header">
+            <h2 class="view-title">📖 Bestiario</h2>
+          </div>
+          <div id="bestiaryContent"></div>
+        </div>
+
+        <!-- INTEGRATIONS VIEW -->
+        <div class="view" id="view-integrations">
+          <div class="view-header">
+            <h2 class="view-title">🔗 Integraciones</h2>
+          </div>
+          <div class="integrations-grid">
+            <div class="integration-card">
+              <div id="fitWidgetContent"></div>
+            </div>
+            <div class="integration-card">
+              <div id="calWidgetContent"></div>
+            </div>
+          </div>
         </div>
 
         <!-- CHARACTER SHEET (acceso solo desde el avatar, sin botón en el sidebar) -->
@@ -1017,6 +1072,13 @@
 <script src="js/character.js?v=4"></script>
 <script src="js/spotify.js?v=1"></script>
 <script src="js/weather.js?v=2"></script>
-<script src="js/main.js?v=11"></script>
+<script src="js/dungeon_clock.js?v=1"></script>
+<script src="js/skill_tree.js?v=1"></script>
+<script src="js/bestiary.js?v=1"></script>
+<script src="js/dungeon_grows.js?v=1"></script>
+<script src="js/runes.js?v=1"></script>
+<script src="js/google_fit.js?v=1"></script>
+<script src="js/google_cal.js?v=1"></script>
+<script src="js/main.js?v=12"></script>
 </body>
 </html>

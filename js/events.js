@@ -674,11 +674,24 @@ function initParticles() {
     a: Math.random()
   }));
 
-  const theme = document.documentElement.dataset.theme || 'dark';
-  const color = theme === 'parchment' ? '184,134,11' : theme === 'cyber' ? '56,189,248' : '168,85,247';
+  const CLASS_COLORS = {
+    guerrero: '239,68,68',   mago:    '168,85,247',
+    picaro:   '34,197,94',   clerigo: '250,204,21',
+    arquero:  '74,222,128',  fundador:'56,189,248',
+  };
+
+  function getParticleColor() {
+    const cls   = document.documentElement.dataset.heroClass || '';
+    const theme = document.documentElement.dataset.theme || 'dark';
+    if (cls && CLASS_COLORS[cls]) return CLASS_COLORS[cls];
+    if (theme === 'parchment') return '184,134,11';
+    if (theme === 'cyber')     return '56,189,248';
+    return '168,85,247';
+  }
 
   function draw() {
     ctx.clearRect(0, 0, W, H);
+    const color = getParticleColor();
     particles.forEach(p => {
       p.x += p.vx; p.y += p.vy;
       p.a += 0.006;

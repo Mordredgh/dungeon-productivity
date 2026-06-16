@@ -101,9 +101,16 @@ async function completeQuest(id, el) {
   // Gold earned
   const goldBase = GOLD_TABLE ? (GOLD_TABLE[q.type] || 10) : 10;
   const goldMult = typeof getGoldMult === 'function' ? getGoldMult() : 1;
-  let goldAmt  = Math.round(goldBase * goldMult * doubleNadaMult);
+  const todGoldMult   = typeof getTODBonus === 'function' ? getTODBonus().goldMult : 1;
+  const skillGoldMult = typeof getSkillTreeGoldBonus === 'function' ? (1 + getSkillTreeGoldBonus()) : 1;
+  const runeGoldMult  = typeof getRuneBonus === 'function' ? (1 + getRuneBonus('gold')) : 1;
+  let goldAmt  = Math.round(goldBase * goldMult * doubleNadaMult * todGoldMult * skillGoldMult * runeGoldMult);
   if (hero && hero.nightmare_mode) goldAmt *= 2;
-  if (typeof addGold === 'function') addGold(goldAmt);
+  if (typeof addGold === 'function') {
+    addGold(goldAmt);
+    if (typeof spawnGoldParticle === 'function') spawnGoldParticle(goldAmt, el);
+  }
+  if (typeof tryRuneDrop === 'function') tryRuneDrop(q.priority || 'normal');
 
   // Apuesta del Dungeon — si ganaste a tiempo, recuperas el doble
   if (typeof resolveWagerWin === 'function') resolveWagerWin(q);
