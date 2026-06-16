@@ -83,7 +83,7 @@
 
       <!-- PERFIL DEL HÉROE -->
       <div class="sb-profile">
-        <button class="hero-avatar-btn" id="heroAvatarBtn" title="Editar perfil">🧙<span class="avatar-level-badge" id="avatarLevelBadge">1</span></button>
+        <button class="hero-avatar-btn" id="heroAvatarBtn" onclick="switchView('character')" title="Hoja de Personaje">🧙<span class="avatar-level-badge" id="avatarLevelBadge">1</span></button>
         <div class="hero-info">
           <div class="hero-name" id="heroName">Héroe</div>
           <div class="hero-title" id="heroTitle">Nivel 1 · Aprendiz</div>
@@ -411,6 +411,15 @@
           <div id="smithyView"></div>
         </div>
 
+        <!-- CHARACTER SHEET (acceso solo desde el avatar, sin botón en el sidebar) -->
+        <div class="view" id="view-character">
+          <div class="view-header">
+            <h2 class="view-title">🛡️ Hoja de Personaje</h2>
+            <button class="btn btn-ghost" onclick="switchView('quests')">← Volver</button>
+          </div>
+          <div id="characterSheet"></div>
+        </div>
+
         <!-- CALENDAR VIEW -->
         <div class="view" id="view-calendar">
           <div class="cal-nav">
@@ -656,56 +665,6 @@
   </div>
 </div>
 
-<!-- Profile Edit -->
-<div class="modal-overlay" id="profileModal">
-  <div class="modal">
-    <div class="modal-title">🧙 Editar Héroe</div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Nombre del héroe</label>
-        <input class="form-input" id="editHeroName" type="text">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Clase</label>
-          <select class="form-input" id="editHeroClass">
-            <option value="guerrero">⚔️ Guerrero (+10% XP épicas)</option>
-            <option value="mago">🧙 Mago (+10% todo XP)</option>
-            <option value="picaro">🗡️ Pícaro (+10% XP encargos)</option>
-            <option value="clerigo">✝️ Clérigo (HP con búsquedas)</option>
-            <option value="arquero">🏹 Arquero (+10% XP crónicas)</option>
-            <option value="fundador">🚀 Fundador Caótico</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Raza</label>
-          <select class="form-input" id="editHeroRace">
-            <option value="humano">🧑 Humano (+10% todo XP)</option>
-            <option value="elfo">🧝 Elfo (+5min focus)</option>
-            <option value="enano">⛏️ Enano (+10 HP máx)</option>
-            <option value="orco">💪 Orco (racha perdona 1 día)</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Nombre del Gremio</label>
-        <input class="form-input" id="editGuildName" type="text" placeholder="Ej: Gremio del Caos Productivo">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Webhook al subir de nivel (URL)</label>
-        <input class="form-input" id="editWebhookUrl" type="url" placeholder="https://n8n.tudominio.com/webhook/...">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Avatar</label>
-        <div class="avatar-grid" id="avatarGrid"></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('profileModal')">Cancelar</button>
-      <button class="btn btn-primary" id="saveProfileBtn">Guardar</button>
-    </div>
-  </div>
-</div>
 
 <!-- Import -->
 <div class="modal-overlay" id="importModal">
@@ -940,7 +899,7 @@
   </div>
 </div>
 
-<script src="js/config.js?v=6"></script>
+<script src="js/config.js?v=7"></script>
 <script src="js/state.js?v=6"></script>
 <script src="js/db.js?v=5"></script>
 <script src="js/hero.js?v=5"></script>
@@ -949,15 +908,16 @@
 <script src="js/inventory.js?v=5"></script>
 <script src="js/spells.js?v=5"></script>
 <script src="js/views.js?v=6"></script>
-<script src="js/ui.js?v=6"></script>
-<script src="js/events.js?v=6"></script>
+<script src="js/ui.js?v=7"></script>
+<script src="js/events.js?v=7"></script>
 <script src="js/shop.js?v=5"></script>
 <script src="js/familiar.js?v=5"></script>
 <script src="js/rpg.js?v=6"></script>
 <script src="js/pets.js?v=6"></script>
 <script src="js/weapons.js?v=5"></script>
+<script src="js/character.js?v=1"></script>
 <script src="js/spotify.js?v=1"></script>
 <script src="js/weather.js?v=1"></script>
-<script src="js/main.js?v=6"></script>
+<script src="js/main.js?v=7"></script>
 </body>
 </html>

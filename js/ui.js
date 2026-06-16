@@ -122,20 +122,6 @@ function escHtml(str) {
   return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/* AVATAR */
-function renderAvatarGrid() {
-  const el = document.getElementById('avatarGrid');
-  if (!el) return;
-  el.innerHTML = AVATARS.map(a =>
-    `<div class="avatar-opt ${hero && hero.avatar === a ? 'selected' : ''}" onclick="selectAvatar('${a}')">${a}</div>`
-  ).join('');
-}
-
-function selectAvatar(a) {
-  document.querySelectorAll('.avatar-opt').forEach(el => el.classList.toggle('selected', el.textContent === a));
-  if (hero) hero._pendingAvatar = a;
-}
-
 /* EXPORT / IMPORT */
 function exportData() {
   const data = { hero, quests, exported_at: new Date().toISOString() };
@@ -175,6 +161,7 @@ function switchView(v) {
   if (v === 'shop')         renderShopView();
   if (v === 'inventory')    { if (typeof renderInventory==='function') renderInventory(); }
   if (v === 'smithy')       { if (typeof renderSmithy==='function')    renderSmithy();    }
+  if (v === 'character')    { if (typeof renderCharacterSheet==='function') renderCharacterSheet(); }
 }
 
 function toggleCompact() {

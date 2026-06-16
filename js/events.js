@@ -69,34 +69,6 @@ document.getElementById('notifBtn').addEventListener('click', async () => {
   toast('🔔', notifEnabled ? '¡Notificaciones activadas!' : 'Activa permisos en el navegador.');
 });
 
-document.getElementById('heroAvatarBtn').addEventListener('click', () => {
-  if (!hero) return;
-  document.getElementById('editHeroName').value  = hero.name || '';
-  document.getElementById('editHeroClass').value = hero.hero_class || 'guerrero';
-  document.getElementById('editHeroRace').value  = heroRace;
-  document.getElementById('editGuildName').value = guildName;
-  document.getElementById('editWebhookUrl').value = webhookUrl;
-  renderAvatarGrid();
-  openModal('profileModal');
-});
-
-document.getElementById('saveProfileBtn').addEventListener('click', async () => {
-  const name = document.getElementById('editHeroName').value.trim();
-  const cls  = document.getElementById('editHeroClass').value;
-  const avatar = hero._pendingAvatar || hero.avatar || '🧙';
-  if (!name) return;
-
-  heroRace   = document.getElementById('editHeroRace').value;
-  guildName  = document.getElementById('editGuildName').value.trim();
-  webhookUrl = document.getElementById('editWebhookUrl').value.trim();
-  // Enano race: +10 HP max
-  const hpMaxBonus = heroRace === 'enano' ? 110 : 100;
-  await saveHero({ name, hero_class: cls, race: heroRace, avatar, hp_max: hpMaxBonus, guild_name: guildName, webhook_url: webhookUrl });
-  closeModal('profileModal');
-  renderHeroUI();
-  toast('🧙', 'Perfil actualizado.');
-});
-
 document.getElementById('saveQuestBtn').addEventListener('click', () => {
   const id      = document.getElementById('editQuestId').value;
   const tags    = document.getElementById('editQTags').value.trim();

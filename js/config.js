@@ -31,11 +31,6 @@ const LEVEL_SCALE = 1.5;
 const THEMES = ['dark', 'light', 'cyber', 'oled', 'parchment'];
 const THEME_NAMES = { dark: 'Oscuro', light: 'Claro', cyber: 'Cyber', oled: 'OLED', parchment: 'Pergamino' };
 
-const AVATARS = ['🧙','⚔️','🛡️','🏹','🗡️','🔮','🦅','🐉','💀','👑',
-                 '🦁','🐺','🦊','🐻','🧝','🧜','🤺','🥷','🧟','🧛',
-                 '🎯','🔥','⚡','💎','🌟','🌙','☀️','🌊','🌪️','🍀'];
-
-
 const COMPLETIONS = [
   '¡El enemigo ha caído! La mazmorra tiembla ante tu poder.',
   '¡Victoria épica! Los bardos cantarán tus hazañas esta noche.',
