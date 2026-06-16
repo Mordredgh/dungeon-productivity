@@ -96,7 +96,7 @@ document.getElementById('saveProfileBtn').addEventListener('click', async () => 
 
   // Enano race: +10 HP max
   const hpMaxBonus = heroRace === 'enano' ? 110 : 100;
-  await saveHero({ name, hero_class: cls, avatar, hp_max: hpMaxBonus });
+  await saveHero({ name, hero_class: cls, race: heroRace, avatar, hp_max: hpMaxBonus });
   closeModal('profileModal');
   renderHeroUI();
   toast('🧙', 'Perfil actualizado.');

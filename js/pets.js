@@ -66,21 +66,63 @@ async function setActivePet(petId) {
 }
 
 function renderActivePet() {
-  const el = document.getElementById('activePetDisplay');
-  if (!el) return;
   const active = pets.find(p => p.is_active);
-  if (!active) { el.style.display = 'none'; return; }
-  const def = _petDef(active.pet_key);
-  if (!def) { el.style.display = 'none'; return; }
-  const imgUrl = `${CDN}dungeon/pet_${active.stage}_${active.pet_key}.png`;
-  el.style.display = 'flex';
-  el.innerHTML = `
-    <img src="${imgUrl}" class="active-pet-img" alt="${escHtml(def.name)}"
-         onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
-    <span style="display:none;font-size:20px">${def.icon}</span>
-    <div class="active-pet-info">
-      <span class="active-pet-name">${escHtml(def.name)}</span>
-      <span class="active-pet-stage ${active.stage === 'mount' ? 'stage-mount' : 'stage-baby'}">${active.stage === 'mount' ? '🌟 Montura' : '🐣 Bebé'}</span>
+  const def    = active ? _petDef(active.pet_key) : null;
+
+  // Sidebar chip (left panel)
+  const chip = document.getElementById('activePetDisplay');
+  if (chip) {
+    if (!active || !def) { chip.style.display = 'none'; }
+    else {
+      const imgUrl = `${CDN}dungeon/pet_${active.stage}_${active.pet_key}.png`;
+      chip.style.display = 'flex';
+      chip.innerHTML = `
+        <img src="${imgUrl}" class="active-pet-img" alt="${escHtml(def.name)}"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+        <span style="display:none;font-size:20px">${def.icon}</span>
+        <div class="active-pet-info">
+          <span class="active-pet-name">${escHtml(def.name)}</span>
+          <span class="active-pet-stage ${active.stage === 'mount' ? 'stage-mount' : 'stage-baby'}">${active.stage === 'mount' ? '🌟 Montura' : '🐣 Bebé'}</span>
+        </div>`;
+    }
+  }
+
+  // Right panel section
+  const section = document.getElementById('activePetSection');
+  const panel   = document.getElementById('activePetPanel');
+  if (!section || !panel) return;
+  if (!active || !def) { section.style.display = 'none'; return; }
+
+  const imgUrl  = `${CDN}dungeon/pet_${active.stage}_${active.pet_key}.png`;
+  const isMount = active.stage === 'mount';
+  const fedPct  = isMount ? 100 : Math.min(100, Math.round(((active.potions_fed||0) / def.evolve) * 100));
+  const potions = typeof getInvCount === 'function' ? getInvCount('pet_potion_' + active.pet_key) : 0;
+
+  section.style.display = '';
+  // Update title icon based on stage
+  const titleEl = section.querySelector('.panel-title');
+  if (titleEl) titleEl.textContent = isMount ? '🌟 Montura Activa' : '🐣 Mascota Activa';
+
+  panel.innerHTML = `
+    <div class="active-pet-panel-inner">
+      <img src="${imgUrl}" class="active-pet-panel-img" alt="${escHtml(def.name)}"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="active-pet-panel-emoji" style="display:none">${def.icon}</div>
+      <div class="active-pet-panel-info">
+        <div class="active-pet-panel-name">${escHtml(def.name)}</div>
+        <div class="active-pet-panel-rarity">${def.rarity}</div>
+        ${!isMount ? `
+        <div class="pet-evo-wrap" style="margin-top:6px">
+          <div class="pet-evo-bar"><div class="pet-evo-fill" style="width:${fedPct}%"></div></div>
+          <span class="pet-evo-label">${active.potions_fed||0}/${def.evolve} evo</span>
+        </div>
+        <button class="pet-action-btn ${potions>0?'':'pet-btn-disabled'}" style="margin-top:6px"
+          onclick="feedPet('${active.id}')" ${potions>0?'':'disabled'}>
+          🧪 Alimentar (${potions})
+        </button>` : '<div style="font-size:11px;color:var(--gold);margin-top:4px">✨ Forma final desbloqueada</div>'}
+        <button class="pet-action-btn pet-btn-active" style="margin-top:4px"
+          onclick="setActivePet('')">🐾 Desactivar</button>
+      </div>
     </div>`;
 }
 

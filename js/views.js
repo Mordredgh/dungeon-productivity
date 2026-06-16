@@ -22,7 +22,7 @@ function renderHeroUI() {
 
   // Avatar image (CDN) with emoji fallback
   const cls  = hero.hero_class || 'guerrero';
-  const race = hero.race || 'humano';
+  const race = (typeof heroRace !== 'undefined' ? heroRace : null) || hero.race || 'humano';
   const avatarImgUrl = `${CDN}dungeon/avatar_${cls}_${race}.png`;
   let avatarVisual = avatarBtn.querySelector('.hero-avatar-img, .hero-avatar-emoji');
   const needRebuild = !avatarVisual || avatarVisual.dataset.cls !== cls || avatarVisual.dataset.race !== race;
