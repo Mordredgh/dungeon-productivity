@@ -30,6 +30,7 @@
   checkMorningBriefing();
   checkDeadlineAlerts();
   checkNightlyDiary();
-  setInterval(() => { checkDailySummary(); checkWeeklyRetro(); checkDeadlineAlerts(); checkNightlyDiary(); }, 60 * 60 * 1000);
+  checkProphecyVerdict();
+  setInterval(() => { checkDailySummary(); checkWeeklyRetro(); checkDeadlineAlerts(); checkNightlyDiary(); checkProphecyVerdict(); }, 60 * 60 * 1000);
   updateFocusTodayChip();
 })();

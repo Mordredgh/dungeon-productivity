@@ -299,12 +299,50 @@ function checkAndGenerateProphecy() {
   renderProphecy();
 }
 function renderProphecy() {
-  const el = document.getElementById('prophecyText');
+  const el  = document.getElementById('prophecyText');
+  const vEl = document.getElementById('prophecyVerdict');
   if (!el || !hero || !hero.prophecy) return;
   try {
     const p = JSON.parse(hero.prophecy);
-    if (p.week === getProphecyKey()) { el.textContent = p.text; el.closest('.prophecy-section')?.classList.remove('hidden'); }
+    if (p.week === getProphecyKey()) {
+      el.textContent = `"${p.text}"`;
+      if (vEl) vEl.textContent = p.verdict ? `⚖️ ${p.verdict}` : '';
+    }
   } catch {}
+}
+
+function checkProphecyVerdict() {
+  if (!hero || !hero.prophecy) return;
+  const now = new Date();
+  if (now.getDay() !== 0 || now.getHours() < 20) return;
+  let p; try { p = JSON.parse(hero.prophecy); } catch { return; }
+  if (p.week !== getProphecyKey() || p.verdict) return;
+  _evaluateProphecy(p);
+}
+
+async function _evaluateProphecy(p) {
+  const dates   = typeof _weekDates === 'function' ? _weekDates() : [];
+  const wQuests = quests.filter(q => q.done && q.done_at && dates.some(d => q.done_at.startsWith(d)));
+  const wXP     = wQuests.reduce((s, q) => s + (XP_TABLE[q.type] || 50), 0);
+  const prompt = `Esta fue la profecía de la semana: "${p.text}"
+Datos reales de la semana: ${wQuests.length} misiones completadas, ${wXP} XP ganado, racha actual de ${hero.streak || 0} días.
+¿Se cumplió la profecía? Responde en 1-2 frases breves, tono místico de oráculo, con un veredicto claro al inicio (Cumplida / Incumplida / Parcial).`;
+
+  let verdict = '';
+  try {
+    const r = await fetch('/openclaw/send', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: prompt })
+    });
+    const data = await r.json();
+    verdict = (data.reply || '').trim();
+  } catch {}
+  if (!verdict) return;
+
+  p.verdict = verdict;
+  hero.prophecy = JSON.stringify(p);
+  await saveHero({ prophecy: hero.prophecy });
+  renderProphecy();
 }
 
 /* ── INIT (called from main.js) ───────────────────────────── */
