@@ -96,8 +96,9 @@ function renderInventory() {
       tier.xpBonus  ? `✨ +${Math.round(tier.xpBonus*100)}% XP`   : '',
       tier.goldBonus? `🪙 +${Math.round(tier.goldBonus*100)}% Oro` : '',
     ].filter(Boolean).join(' · ');
+    const glow = (w.tier === 'legendario' || w.tier === 'mitico') ? 'anim-pulse-glow' : '';
     return `
-      <div class="inv-weapon-card ${w.is_equipped ? 'inv-weapon-equipped' : ''}" style="--wc:${tier.color}">
+      <div class="inv-weapon-card ${w.is_equipped ? 'inv-weapon-equipped' : ''} ${glow}" style="--wc:${tier.color}">
         <img src="${img}" class="inv-weapon-img" alt="${escHtml(w.name)}"
              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <div class="inv-weapon-emoji" style="display:none">${def.icon}</div>
@@ -205,9 +206,10 @@ function renderSmithy() {
         dstT.hpMax    ? `❤️ +${dstT.hpMax} HP máx`                   : '',
       ].filter(Boolean).join(' · ');
 
+      const glow = (canCraft && (targetTier === 'legendario' || targetTier === 'mitico')) ? 'anim-pulse-glow' : '';
       rows += `
         <div class="smithy-recipe ${canCraft?'smithy-ready':'smithy-locked'}">
-          <img src="${img}" class="smithy-img" alt=""
+          <img src="${img}" class="smithy-img ${glow}" style="--wc:${dstT.color}" alt=""
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="smithy-emoji" style="display:none">${def.icon}</div>
           <div class="smithy-info">

@@ -528,8 +528,9 @@ function updateBossBanner() {
                onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
            <div class="boss-icon" style="display:none">👹</div>`
         : `<div class="boss-icon">👹</div>`;
+      const lowHp = pct <= 30 ? 'anim-pulse-danger' : '';
       banner.innerHTML = `
-        <div class="boss-icon-wrap">${bossImgHtml}</div>
+        <div class="boss-icon-wrap ${lowHp}">${bossImgHtml}</div>
         <div class="boss-info" style="flex:1;min-width:0">
           <div class="boss-label">⚔️ Jefe Semanal — ¡Atácalo completando misiones!</div>
           <div class="boss-name">${escHtml(state.name)}</div>

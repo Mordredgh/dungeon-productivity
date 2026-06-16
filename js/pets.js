@@ -125,7 +125,7 @@ function renderActivePet() {
       <div class="pet-rpanel" style="--pet-fondo:url('${fondoUrl}')">
         <div class="pet-rpanel-imgwrap">
           <div class="pet-rpanel-bg"></div>
-          <img src="${CDN}dungeon/pet_${stage}_${active.pet_key}.png" class="pet-rpanel-img" alt=""
+          <img src="${CDN}dungeon/pet_${stage}_${active.pet_key}.png" class="pet-rpanel-img ${isMount?'anim-bounce':'anim-float'}" alt=""
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="pet-rpanel-emoji" style="display:none">${def.icon}</div>
         </div>
@@ -142,7 +142,7 @@ function renderActivePet() {
             <button class="pet-action-btn ${potions>0?'':'pet-btn-disabled'}" style="margin-top:4px"
               onclick="feedPet('${active.id}')" ${potions>0?'':'disabled'}>🧪 Alimentar (${potions})</button>
             ` : `<div style="font-size:10px;color:var(--gold);margin-top:2px">✨ Forma final</div>`}
-            <button class="pet-power-btn ${powered?'pet-power-used':''}" onclick="activatePetPower()" ${powered?'disabled':''}>
+            <button class="pet-power-btn ${powered?'pet-power-used':'anim-pulse-btn'}" onclick="activatePetPower()" ${powered?'disabled':''}>
               ${powered ? '⏳ Poder usado hoy' : `${ab?.icon||'⚡'} Activar Poder`}
             </button>
             <button class="pet-action-btn" style="margin-top:2px;font-size:10px;opacity:.7"
@@ -167,7 +167,7 @@ function renderActivePet() {
       <div class="pet-rpanel" style="--pet-fondo:url('${fondoUrl}')">
         <div class="pet-rpanel-imgwrap">
           <div class="pet-rpanel-bg"></div>
-          <img src="${CDN}dungeon/pet_egg_${petKey}.png" class="pet-rpanel-img" alt=""
+          <img src="${CDN}dungeon/pet_egg_${petKey}.png" class="pet-rpanel-img anim-shake" alt=""
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="pet-rpanel-emoji" style="display:none">${eDef?.icon||'🥚'}</div>
         </div>
@@ -176,7 +176,7 @@ function renderActivePet() {
             <div class="pet-rpanel-name">${escHtml(eDef?.name||'Huevo')}</div>
             <div class="pet-rpanel-rarity">${eDef?.rarity||''}</div>
             ${ab ? `<div class="pet-ability-tag" style="margin:4px 0">${ab.icon} ${escHtml(ab.desc)}</div>` : ''}
-            <button class="pet-power-btn ${powered?'pet-power-used':''}" onclick="activatePetPower()" ${powered?'disabled':''}>
+            <button class="pet-power-btn ${powered?'pet-power-used':'anim-pulse-btn'}" onclick="activatePetPower()" ${powered?'disabled':''}>
               ${powered ? '⏳ Poder usado hoy' : `${ab?.icon||'🥚'} Activar Poder`}
             </button>
           </div>

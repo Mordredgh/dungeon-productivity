@@ -32,8 +32,9 @@ function _charEquipSlotHtml(label, icon, weapon) {
   const def = WEAPON_DEFS.find(d => d.key === weapon.weapon_key) || { icon };
   const tier = WEAPON_TIERS[weapon.tier] || { color: '#9ca3af', label: weapon.tier };
   const img = `${CDN}dungeon/weapon_${weapon.weapon_key}_${weapon.tier}.png`;
+  const glow = (weapon.tier === 'legendario' || weapon.tier === 'mitico') ? 'anim-pulse-glow' : '';
   return `
-    <div class="char-slot" style="border-color:${tier.color}55" onclick="unequipWeapon('${weapon.id}')" title="Click para desequipar">
+    <div class="char-slot ${glow}" style="--wc:${tier.color};border-color:${tier.color}55" onclick="unequipWeapon('${weapon.id}')" title="Click para desequipar">
       <img src="${img}" class="char-slot-img" alt=""
            onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
       <span class="char-slot-icon" style="display:none">${def.icon}</span>
