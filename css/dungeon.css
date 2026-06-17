@@ -402,7 +402,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   gap: 5px;
   border-bottom: 1px solid rgba(137,180,250,.08);
   flex-shrink: 0;
-  background: linear-gradient(170deg, rgba(127,90,240,.16) 0%, transparent 68%);
+  background: var(--sb-tod-gradient, linear-gradient(170deg, rgba(127,90,240,.16) 0%, transparent 68%));
+  transition: background 3s ease;
 }
 
 .sb-avatar-ring {

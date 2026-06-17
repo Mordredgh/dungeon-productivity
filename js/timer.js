@@ -43,6 +43,7 @@ function advancePhase() {
     toast('🍅', isLong ? '¡4 pomodoros! Descanso largo 15 min.' : '¡Pomodoro listo! Descansa 5 min.');
     sendNotif('🍅 Pomodoro completado', isLong ? 'Descanso largo: 15 min' : 'Descanso: 5 min');
     if (typeof addMana === 'function') addMana(20);
+    if (Math.random() < 0.20 && typeof triggerRandomEvent === 'function') setTimeout(triggerRandomEvent, 1500);
     if (autoBreak) setTimeout(() => startTimer(), 700);
   } else {
     timer.phase = 'focus';

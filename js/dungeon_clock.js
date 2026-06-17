@@ -37,10 +37,28 @@ const _TOD_TINTS = {
   midnight:  'rgba(20,30,100,0.070)',
 };
 
+const _SB_TOD_GRADIENTS = {
+  dawn:      'linear-gradient(170deg, rgba(251,146,60,.20) 0%, transparent 68%)',
+  morning:   'linear-gradient(170deg, rgba(250,204,21,.16) 0%, transparent 68%)',
+  afternoon: 'linear-gradient(170deg, rgba(96,165,250,.12) 0%, transparent 68%)',
+  dusk:      'linear-gradient(170deg, rgba(249,115,22,.22) 0%, transparent 68%)',
+  evening:   'linear-gradient(170deg, rgba(127,90,240,.20) 0%, transparent 68%)',
+  midnight:  'linear-gradient(170deg, rgba(20,20,60,.50) 0%, rgba(127,90,240,.14) 68%)',
+};
+
+function applySidebarTOD(tod) {
+  document.documentElement.style.setProperty(
+    '--sb-tod-gradient',
+    _SB_TOD_GRADIENTS[tod] || _SB_TOD_GRADIENTS.evening
+  );
+}
+
 function updateDungeonClock() {
   const tod = getDungeonTOD();
   const def = TOD_DEFS[tod];
   document.documentElement.dataset.tod = tod;
+
+  applySidebarTOD(tod);
 
   // Ciclo Día/Noche — ambient tint overlay
   const overlay = document.getElementById('todOverlay');

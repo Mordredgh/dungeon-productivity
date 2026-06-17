@@ -36,7 +36,26 @@ const TITLES = [
   'Aprendiz del Gremio','Escudero Inquieto','Explorador del Caos',
   'Guerrero del Enfoque','Cazador de Metas','Mago del Tiempo',
   'Comandante del Gremio','Campeón Legendario','Guardián del Caos',
-  'Señor del Caos Productivo'
+  'Señor del Caos Productivo',
+  'Caballero del Foco','Maestro de Misiones','Archimago del Tiempo',
+  'Legado del Dungeon','Heraldo de la Productividad',
+  'Conquistador de Hábitos','Gran Maestro del Gremio',
+  'Señor de las Runas','Guardián del Umbral','Vanguardia Eterna',
+  'Leyenda del Dungeon','Arquitecto del Orden','Fénix del Enfoque',
+  'Portador del Caos Sagrado','Centinela Inmortal',
+  'Titán de la Voluntad','Oráculo del Dungeon',
+  'Caminante entre Mundos','Desterrador del Caos',
+  'Maestro del Tiempo Arcano',
+  'Señor de los Antiguos','Elegido del Destino',
+  'Destructor de Límites','Héroe de los Mil Mundos',
+  'Invocador del Poder Último','Archi-Maestro del Dungeon',
+  'Portador de la Llama Eterna','Juez del Destino',
+  'Custodio del Cosmos','Último Guardián',
+  'Leyenda Viviente','Señor del Caos Absoluto',
+  'Forjador de Reinos','Maestro Arcano Supremo',
+  'El que Trasciende','Señor de la Eternidad',
+  'Dios del Tiempo','El Invencible',
+  'Leyenda de las Leyendas','Señor del Dungeon Eterno',
 ];
 
 const XP_TABLE = { main: 100, side: 50, daily: 25, weekly: 75, habit: 20 };

@@ -1,5 +1,24 @@
 ﻿const RARITY_LABELS = { mitico:'Mítico', legendario:'Legendario', epico:'Épico', normal:'Normal', comun:'Común' };
 
+function getDynamicTitle(h) {
+  const lvl       = h._level || 1;
+  const prestige  = h.prestige || 0;
+  const streak    = h.streak || 0;
+  const qDone     = h.quests_done || 0;
+  const mainDone  = h.main_done || 0;
+  if (prestige >= 3) return '⭐⭐⭐ El Ascendido';
+  if (prestige >= 2) return '⭐⭐ El Renacido';
+  if (prestige >= 1) return '⭐ Ascendido del Dungeon';
+  if (streak >= 100) return 'El Imparable';
+  if (qDone  >= 500) return 'Legendario del Dungeon';
+  if (streak >= 60)  return 'El Constante';
+  if (mainDone >= 50) return 'Matador de Jefes';
+  if (lvl >= 45)     return 'Maestro Arcano';
+  if (streak >= 30)  return 'El Persistente';
+  if (mainDone >= 25) return 'Cazador de Dragones';
+  return TITLES[Math.min(lvl - 1, TITLES.length - 1)];
+}
+
 /* RENDER */
 function renderAll() {
   renderHeroUI();
@@ -48,7 +67,7 @@ function renderHeroUI() {
   avatarBtn.className = 'hero-avatar-btn avatar-class-' + (hero.hero_class || 'guerrero');
 
   document.getElementById('heroName').textContent = hero.name || 'Héroe';
-  const title = TITLES[Math.min(lvl - 1, TITLES.length - 1)];
+  const title = getDynamicTitle(hero);
   document.getElementById('heroTitle').textContent = `Nv.${lvl} · ${title}`;
   document.getElementById('statLevel').textContent = lvl;
   document.getElementById('statStreak').textContent = hero.streak || 0;
