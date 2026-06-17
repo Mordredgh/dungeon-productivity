@@ -33,7 +33,6 @@ const ASSETS = [
   '/js/dungeon_grows.js',
   '/js/runes.js',
   '/js/google_fit.js',
-  '/js/google_cal.js',
   '/js/hero_score.js',
   '/js/push.js',
   '/js/combos.js',
