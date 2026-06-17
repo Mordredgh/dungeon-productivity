@@ -4,19 +4,21 @@
    Proxy via Edge Function duolingo-proxy (Supabase Aglaya).
    Fetch diario de XP ganado → convierte a recompensas Arcanum.
    Ratio: 10 XP Duolingo = 1 XP Arcanum (máx 200 XP/día).
+   Todo persiste en dungeon_heroes (no localStorage).
    ─────────────────────────────────────────────────────────── */
 
-const DUOLINGO_XP_RATIO  = 0.1;  // Duolingo XP → Arcanum XP
-const DUOLINGO_MAX_XP    = 200;  // max diario en Arcanum
+const DUOLINGO_XP_RATIO  = 0.1;
+const DUOLINGO_MAX_XP    = 200;
 
-function getDuoUsername() {
-  return localStorage.getItem('dungeon-duolingo-user') || '';
+function _duoToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
-function setDuoUsername(u) {
-  localStorage.setItem('dungeon-duolingo-user', u.trim());
-}
-function getDuoLastSync() {
-  return localStorage.getItem('dungeon-duolingo-sync') || '';
+
+function getDuoUsername() { return hero?.duo_username || ''; }
+
+async function setDuoUsername(u) {
+  await saveHero({ duo_username: u.trim() });
 }
 
 async function syncDuolingo() {
@@ -26,8 +28,8 @@ async function syncDuolingo() {
     return;
   }
 
-  const today = new Date().toISOString().split('T')[0];
-  if (getDuoLastSync() === today) {
+  const today = _duoToday();
+  if (hero?.duo_sync_date === today) {
     toast('⏳', 'Ya sincronizaste Duolingo hoy.');
     return;
   }
@@ -50,21 +52,25 @@ async function syncDuolingo() {
     const arcXP  = Math.min(DUOLINGO_MAX_XP, Math.round(duoXP * DUOLINGO_XP_RATIO));
     const streak = data.streak || 0;
 
-    localStorage.setItem('dungeon-duolingo-sync', today);
-    localStorage.setItem('dungeon-duolingo-data', JSON.stringify({ duoXP, arcXP, streak, syncedAt: today }));
+    await saveHero({
+      duo_sync_date: today,
+      duo_today_xp:  duoXP,
+      duo_streak:    streak,
+    });
 
-    if (arcXP > 0) {
+    if (arcXP > 0 && hero?.duo_xp_date !== today) {
+      await saveHero({ duo_xp_date: today });
       await addXP(arcXP, 'side', null);
       toast('🦜', `Duolingo: ${duoXP} XP → +${arcXP} XP en Arcanum · Racha: ${streak}🔥`);
     } else {
-      toast('🦜', `Duolingo sincronizado · Sin XP hoy · Racha: ${streak}🔥`);
+      toast('🦜', `Duolingo sincronizado · ${duoXP > 0 ? duoXP + ' XP hoy' : 'Sin XP hoy'} · Racha: ${streak}🔥`);
     }
 
     renderDuolingoWidget();
   } catch (e) {
     toast('❌', `Error Duolingo: ${e.message}`);
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '🔄 Sincronizar'; }
+    if (btn) { btn.disabled = false; btn.textContent = '🔄 Sincronizar Duolingo'; }
   }
 }
 
@@ -73,9 +79,11 @@ function renderDuolingoWidget() {
   if (!el) return;
 
   const username = getDuoUsername();
-  const cached   = JSON.parse(localStorage.getItem('dungeon-duolingo-data') || 'null');
-  const today    = new Date().toISOString().split('T')[0];
-  const synced   = getDuoLastSync() === today;
+  const today    = _duoToday();
+  const synced   = hero?.duo_sync_date === today;
+  const duoXP    = hero?.duo_today_xp  || 0;
+  const arcXP    = Math.min(DUOLINGO_MAX_XP, Math.round(duoXP * DUOLINGO_XP_RATIO));
+  const streak   = hero?.duo_streak    || 0;
 
   el.innerHTML = `
     <div class="duo-widget">
@@ -87,13 +95,13 @@ function renderDuolingoWidget() {
       <div class="duo-field-row">
         <input class="form-input duo-input" id="duoUsernameInput" type="text"
           placeholder="Tu username de Duolingo" value="${escHtml(username)}">
-        <button class="btn btn-ghost" onclick="setDuoUsername(document.getElementById('duoUsernameInput').value);renderDuolingoWidget();toast('💾','Username guardado.')">Guardar</button>
+        <button class="btn btn-ghost" onclick="setDuoUsername(document.getElementById('duoUsernameInput').value).then(()=>{renderDuolingoWidget();toast('💾','Username guardado.')})">Guardar</button>
       </div>
-      ${cached ? `
+      ${synced ? `
         <div class="duo-stats">
-          <div class="duo-stat"><span class="duo-stat-val">${cached.duoXP}</span><span class="duo-stat-lbl">XP Duolingo hoy</span></div>
-          <div class="duo-stat"><span class="duo-stat-val" style="color:var(--accent)">${cached.arcXP}</span><span class="duo-stat-lbl">XP Arcanum</span></div>
-          <div class="duo-stat"><span class="duo-stat-val" style="color:var(--orange)">${cached.streak}🔥</span><span class="duo-stat-lbl">Racha</span></div>
+          <div class="duo-stat"><span class="duo-stat-val">${duoXP}</span><span class="duo-stat-lbl">XP Duolingo hoy</span></div>
+          <div class="duo-stat"><span class="duo-stat-val" style="color:var(--accent)">${arcXP}</span><span class="duo-stat-lbl">XP Arcanum</span></div>
+          <div class="duo-stat"><span class="duo-stat-val" style="color:var(--orange)">${streak}🔥</span><span class="duo-stat-lbl">Racha</span></div>
         </div>` : `<p style="font-size:12px;color:var(--text3);margin:8px 0">Sincroniza para ver tu progreso</p>`}
       <button class="btn btn-primary" id="duoSyncBtn" onclick="syncDuolingo()" style="width:100%;margin-top:8px"
         ${!username ? 'disabled' : ''}>🔄 Sincronizar Duolingo</button>
