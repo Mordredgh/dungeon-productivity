@@ -360,7 +360,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .main {
   display: grid;
-  grid-template-columns: 180px 1fr 290px;
+  grid-template-columns: 195px 1fr 290px;
   grid-template-rows: 1fr;
   gap: 0;
   height: calc(100vh - 48px);
@@ -415,9 +415,9 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 
 .sb-profile .hero-avatar-btn {
-  width: 80px !important;
-  height: 80px !important;
-  font-size: 42px !important;
+  width: 90px !important;
+  height: 90px !important;
+  font-size: 48px !important;
   border-radius: 50% !important;
   border: 3px solid #161b25 !important;
   background: var(--bg3) !important;
@@ -431,7 +431,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   text-align: center;
   text-transform: uppercase;
   color: var(--text);
-  max-width: 120px;
+  max-width: 170px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -441,7 +441,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   font-size: 10px;
   color: var(--accent);
   text-align: center;
-  max-width: 120px;
+  max-width: 170px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
