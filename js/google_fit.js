@@ -29,9 +29,8 @@ async function connectGoogleFit() {
 }
 
 async function handleGoogleFitCallback() {
-  const params = new URLSearchParams(window.location.search);
-  const code = params.get('code');
-  if (!code || params.get('state') !== 'fit') return;
+  const code = _oauthParams.get('code');
+  if (!code || _oauthParams.get('state') !== 'fit') return;
   history.replaceState({}, '', window.location.pathname);
 
   const verifier = localStorage.getItem('fit-pkce-v');

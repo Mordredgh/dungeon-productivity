@@ -19,9 +19,8 @@ async function connectGoogleCal() {
 }
 
 async function handleGoogleCalCallback() {
-  const params = new URLSearchParams(window.location.search);
-  const code = params.get('code');
-  if (!code || params.get('state') !== 'cal') return;
+  const code = _oauthParams.get('code');
+  if (!code || _oauthParams.get('state') !== 'cal') return;
   history.replaceState({}, '', window.location.pathname);
 
   const verifier = localStorage.getItem('cal-pkce-v');

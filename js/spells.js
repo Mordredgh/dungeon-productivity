@@ -186,14 +186,15 @@ function checkAchievements() {
 }
 
 const ACH_CATS = [
-  { name: '⚔️ Combate',    ids: ['first_quest','ten_quests','fifty_quests','centurion'] },
-  { name: '📈 Progresión', ids: ['first_level','level_five','level_ten','thousand_xp'] },
-  { name: '🍅 Pomodoro',   ids: ['first_pom','ten_poms','maratonista'] },
-  { name: '🔥 Rachas',     ids: ['streak_3','streak_7','streak_30','unstoppable','semana_perfecta'] },
-  { name: '⭐ Épicas',     ids: ['first_main','five_main','boss_slayer'] },
+  { name: '⚔️ Combate',    ids: ['first_quest','ten_quests','fifty_quests','centurion','quest_200','quest_500'] },
+  { name: '📈 Progresión', ids: ['first_level','level_five','level_ten','level_fifteen','level_twenty','thousand_xp','xp_5k','xp_25k'] },
+  { name: '🍅 Pomodoro',   ids: ['first_pom','ten_poms','pom_25','pom_50','pom_100','pom_250','maratonista'] },
+  { name: '🔥 Rachas',     ids: ['streak_3','streak_7','streak_14','streak_30','streak_60','streak_100','unstoppable','semana_perfecta'] },
+  { name: '⭐ Épicas',     ids: ['first_main','five_main','main_25','boss_slayer'] },
   { name: '✨ Magia',      ids: ['spell_cast','master_spell'] },
   { name: '❤️ Salud',      ids: ['full_hp','healer'] },
-  { name: '🌟 Especiales', ids: ['collector'] },
+  { name: '🪙 Oro',        ids: ['gold_500','gold_2000','gold_10k'] },
+  { name: '🌟 Especiales', ids: ['collector','daily_5','weekly_done','pom_streak_4','nightowl','earlybird'] },
 ];
 
 function renderAchievements() {

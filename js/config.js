@@ -1,5 +1,8 @@
 ﻿'use strict';
 
+// Capture OAuth callback params before Supabase auto-detects and clears ?code= from the URL
+const _oauthParams = new URLSearchParams(window.location.search);
+
 const SUPA_URL = 'https://stdedxhxxoyostymldqn.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0ZGVkeGh4eG95b3N0eW1sZHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MTQ2NTMsImV4cCI6MjA4ODQ5MDY1M30.OUhqeeqjlQa6ufECPzOJqZ-gQB93pg8nu0g1j4lEXyI';
 
@@ -273,20 +276,45 @@ const PROPHECY_TEMPLATES = [
 ];
 
 const ACHIEVEMENT_DEFS = [
-  { id: 'first_quest', icon: '🗡️', name: 'Primera Sangre', desc: 'Completa tu primera misión', cond: h => h._completed >= 1 },
-  { id: 'ten_quests', icon: '⚔️', name: 'Veterano', desc: 'Completa 10 misiones', cond: h => h._completed >= 10 },
-  { id: 'fifty_quests', icon: '🏆', name: 'Leyenda', desc: 'Completa 50 misiones', cond: h => h._completed >= 50 },
-  { id: 'first_level', icon: '⬆️', name: 'En Ascenso', desc: 'Alcanza nivel 2', cond: h => h._level >= 2 },
-  { id: 'level_five', icon: '🌟', name: 'Élite', desc: 'Alcanza nivel 5', cond: h => h._level >= 5 },
-  { id: 'level_ten', icon: '👑', name: 'Señor del Caos', desc: 'Alcanza nivel 10', cond: h => h._level >= 10 },
-  { id: 'first_pom', icon: '🍅', name: 'Primer Pomodoro', desc: 'Completa tu primer pomodoro', cond: h => h._pomodoros >= 1 },
-  { id: 'ten_poms', icon: '🍅🍅', name: 'Maestro del Tiempo', desc: 'Completa 10 pomodoros', cond: h => h._pomodoros >= 10 },
-  { id: 'streak_3', icon: '🔥', name: 'En Llamas', desc: 'Racha de 3 días', cond: h => (h.longest_streak || 0) >= 3 },
-  { id: 'streak_7', icon: '🔥🔥', name: 'Semana Épica', desc: 'Racha de 7 días', cond: h => (h.longest_streak || 0) >= 7 },
-  { id: 'streak_30', icon: '💎', name: 'Indestructible', desc: 'Racha de 30 días', cond: h => (h.longest_streak || 0) >= 30 },
-  { id: 'first_main', icon: '⭐', name: 'Misión Mayor', desc: 'Completa una misión principal', cond: h => (h._main_done || 0) >= 1 },
-  { id: 'five_main', icon: '⭐⭐', name: 'Héroe Principal', desc: 'Completa 5 misiones principales', cond: h => (h._main_done || 0) >= 5 },
-  { id: 'spell_cast', icon: '✨', name: 'Arcano', desc: 'Lanza tu primer hechizo', cond: h => (h._spells_cast || 0) >= 1 },
-  { id: 'thousand_xp', icon: '💰', name: 'Rico en Poder', desc: 'Acumula 1000 XP total', cond: h => (h.xp_total || 0) >= 1000 },
-  { id: 'full_hp', icon: '❤️', name: 'Inquebrantable', desc: 'Mantén HP al máximo', cond: h => (h.hp || 0) >= (h.hp_max || 100) },
+  // ── Combate ──
+  { id: 'first_quest',    icon: '🗡️',  name: 'Primera Sangre',    desc: 'Completa tu primera misión',      cond: h => h._completed >= 1 },
+  { id: 'ten_quests',     icon: '⚔️',  name: 'Veterano',          desc: 'Completa 10 misiones',            cond: h => h._completed >= 10 },
+  { id: 'fifty_quests',   icon: '🏆',  name: 'Leyenda',           desc: 'Completa 50 misiones',            cond: h => h._completed >= 50 },
+  { id: 'quest_200',      icon: '⚔️🔥', name: 'Dios de la Guerra', desc: 'Completa 200 misiones',          cond: h => h._completed >= 200 },
+  { id: 'quest_500',      icon: '💀',  name: 'Exterminador',      desc: 'Completa 500 misiones',           cond: h => h._completed >= 500 },
+  // ── Progresión ──
+  { id: 'first_level',    icon: '⬆️',  name: 'En Ascenso',        desc: 'Alcanza nivel 2',                 cond: h => h._level >= 2 },
+  { id: 'level_five',     icon: '🌟',  name: 'Élite',             desc: 'Alcanza nivel 5',                 cond: h => h._level >= 5 },
+  { id: 'level_ten',      icon: '👑',  name: 'Señor del Caos',    desc: 'Alcanza nivel 10',                cond: h => h._level >= 10 },
+  { id: 'level_fifteen',  icon: '🔮',  name: 'Archimago',         desc: 'Alcanza nivel 15',                cond: h => h._level >= 15 },
+  { id: 'level_twenty',   icon: '🌌',  name: 'Ascendido',         desc: 'Alcanza nivel 20',                cond: h => h._level >= 20 },
+  { id: 'thousand_xp',    icon: '💰',  name: 'Rico en Poder',     desc: 'Acumula 1000 XP total',           cond: h => (h.xp_total || 0) >= 1000 },
+  { id: 'xp_5k',          icon: '💎',  name: 'Tesoro Arcano',     desc: 'Acumula 5,000 XP total',          cond: h => (h.xp_total || 0) >= 5000 },
+  { id: 'xp_25k',         icon: '🌠',  name: 'Maestro del Poder', desc: 'Acumula 25,000 XP total',         cond: h => (h.xp_total || 0) >= 25000 },
+  // ── Pomodoro ──
+  { id: 'first_pom',      icon: '🍅',     name: 'Primer Pomodoro',    desc: 'Completa tu primer pomodoro',   cond: h => h._pomodoros >= 1 },
+  { id: 'ten_poms',       icon: '🍅🍅',   name: 'Maestro del Tiempo', desc: 'Completa 10 pomodoros',         cond: h => h._pomodoros >= 10 },
+  { id: 'pom_25',         icon: '⏱️',    name: 'Incansable',         desc: 'Completa 25 pomodoros',         cond: h => (h.pomodoros_done || 0) >= 25 },
+  { id: 'pom_50',         icon: '🕰️',    name: 'Cronista',           desc: 'Completa 50 pomodoros',         cond: h => (h.pomodoros_done || 0) >= 50 },
+  { id: 'pom_100',        icon: '⌛',    name: 'Señor del Tiempo',   desc: 'Completa 100 pomodoros',        cond: h => (h.pomodoros_done || 0) >= 100 },
+  { id: 'pom_250',        icon: '🌀',    name: 'Tiempo Infinito',    desc: 'Completa 250 pomodoros',        cond: h => (h.pomodoros_done || 0) >= 250 },
+  // ── Rachas ──
+  { id: 'streak_3',       icon: '🔥',    name: 'En Llamas',          desc: 'Racha de 3 días',               cond: h => (h.longest_streak || 0) >= 3 },
+  { id: 'streak_7',       icon: '🔥🔥',  name: 'Semana Épica',       desc: 'Racha de 7 días',               cond: h => (h.longest_streak || 0) >= 7 },
+  { id: 'streak_14',      icon: '🔥💫',  name: 'Fortuna Continua',   desc: 'Racha de 14 días',              cond: h => (h.longest_streak || 0) >= 14 },
+  { id: 'streak_30',      icon: '💎',    name: 'Indestructible',     desc: 'Racha de 30 días',              cond: h => (h.longest_streak || 0) >= 30 },
+  { id: 'streak_60',      icon: '🌙',    name: 'Monje del Dungeon',  desc: 'Racha de 60 días',              cond: h => (h.longest_streak || 0) >= 60 },
+  { id: 'streak_100',     icon: '☀️',   name: 'Eterno',             desc: 'Racha de 100 días',             cond: h => (h.longest_streak || 0) >= 100 },
+  // ── Épicas ──
+  { id: 'first_main',     icon: '⭐',    name: 'Misión Mayor',       desc: 'Completa una misión principal',  cond: h => (h._main_done || 0) >= 1 },
+  { id: 'five_main',      icon: '⭐⭐',  name: 'Héroe Principal',    desc: 'Completa 5 misiones principales', cond: h => (h._main_done || 0) >= 5 },
+  { id: 'main_25',        icon: '🗺️',   name: 'Conquistador',       desc: 'Completa 25 misiones principales', cond: h => (h._main_done || 0) >= 25 },
+  // ── Magia ──
+  { id: 'spell_cast',     icon: '✨',   name: 'Arcano',             desc: 'Lanza tu primer hechizo',        cond: h => (h._spells_cast || 0) >= 1 },
+  // ── Salud ──
+  { id: 'full_hp',        icon: '❤️',   name: 'Inquebrantable',     desc: 'Mantén HP al máximo',            cond: h => (h.hp || 0) >= (h.hp_max || 100) },
+  // ── Oro ──
+  { id: 'gold_500',       icon: '🪙',   name: 'Mercader',           desc: 'Acumula 500 de oro',             cond: h => (h.gold || 0) >= 500 },
+  { id: 'gold_2000',      icon: '💳',   name: 'Banquero del Gremio', desc: 'Acumula 2,000 de oro',          cond: h => (h.gold || 0) >= 2000 },
+  { id: 'gold_10k',       icon: '🤑',   name: 'Plutócrata',         desc: 'Acumula 10,000 de oro',          cond: h => (h.gold || 0) >= 10000 },
 ];

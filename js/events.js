@@ -590,16 +590,27 @@ function resetHistoryPage() { historyPage = 1; }
    NUEVOS LOGROS
    ============================================================ */
 ACHIEVEMENT_DEFS.push(
-  { id: 'centurion',    icon: '💯', name: 'Centurión',    desc: 'Completa 100 misiones',      cond: h => (h._completed||0) >= 100 },
-  { id: 'unstoppable',  icon: '⚡', name: 'Imparable',    desc: 'Racha actual de 7+ días',     cond: h => (h.streak||0) >= 7 },
-  { id: 'master_spell', icon: '🧙‍♂️', name: 'Archimago',   desc: 'Lanza 10 hechizos',          cond: h => (h._spells_cast||0) >= 10 },
-  { id: 'boss_slayer',  icon: '🐉', name: 'Matador de Jefes', desc: 'Completa 10 épicas',      cond: h => (h._main_done||0) >= 10 },
-  { id: 'healer',       icon: '💚', name: 'Inmortal',     desc: 'Mantén HP sobre 80%',         cond: h => (h.hp||0) / (h.hp_max||100) >= 0.8 },
-  { id: 'collector',    icon: '📚', name: 'Coleccionista', desc: '5+ misiones activas a la vez', cond: () => quests.filter(q=>!q.done).length >= 5 },
-  { id: 'maratonista',  icon: '🍅', name: 'Maratonista',  desc: '10 pomodoros en un día',        cond: h => {
+  { id: 'centurion',    icon: '💯',  name: 'Centurión',       desc: 'Completa 100 misiones',          cond: h => (h._completed||0) >= 100 },
+  { id: 'unstoppable',  icon: '⚡',  name: 'Imparable',       desc: 'Racha actual de 7+ días',         cond: h => (h.streak||0) >= 7 },
+  { id: 'master_spell', icon: '🧙',  name: 'Gran Archimago',  desc: 'Lanza 10 hechizos',               cond: h => (h._spells_cast||0) >= 10 },
+  { id: 'boss_slayer',  icon: '🐉',  name: 'Matador de Jefes',desc: 'Derrota al jefe semanal 10 veces', cond: h => (h._main_done||0) >= 10 },
+  { id: 'healer',       icon: '💚',  name: 'Inmortal',        desc: 'Mantén HP sobre 80%',             cond: h => (h.hp||0) / (h.hp_max||100) >= 0.8 },
+  { id: 'collector',    icon: '📚',  name: 'Coleccionista',   desc: '5+ misiones activas a la vez',    cond: () => quests.filter(q=>!q.done).length >= 5 },
+  { id: 'maratonista',  icon: '🍅',  name: 'Maratonista',     desc: '10 pomodoros en un día',          cond: h => {
     const today = new Date().toISOString().split('T')[0];
     return pomodoros.filter(p => p.started_at && p.started_at.startsWith(today)).length >= 10;
-  }}
+  }},
+  { id: 'daily_5',      icon: '📅',  name: 'Rutinario',       desc: 'Completa 5 búsquedas diarias en un día',
+    cond: () => {
+      const today = new Date().toISOString().split('T')[0];
+      return quests.filter(q => q.done && q.type === 'daily' && q.done_at?.startsWith(today)).length >= 5;
+    }},
+  { id: 'weekly_done',  icon: '📜',  name: 'Crónica Completa', desc: 'Completa una misión semanal',    cond: () => quests.some(q => q.done && q.type === 'weekly') },
+  { id: 'pom_streak_4', icon: '🍅⚡', name: 'Ciclo Perfecto',  desc: 'Completa un ciclo de 4 pomodoros', cond: h => (h.pomodoros_done||0) >= 4 },
+  { id: 'nightowl',     icon: '🦉',  name: 'Búho Nocturno',   desc: 'Completa una misión después de medianoche',
+    cond: () => quests.some(q => q.done && q.done_at && new Date(q.done_at).getHours() >= 0 && new Date(q.done_at).getHours() < 5) },
+  { id: 'earlybird',    icon: '🌅',  name: 'Madrugador',      desc: 'Completa una misión antes de las 7am',
+    cond: () => quests.some(q => q.done && q.done_at && new Date(q.done_at).getHours() < 7) },
 );
 
 /* ============================================================
