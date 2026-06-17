@@ -35,6 +35,7 @@ function renderShopItems() {
     { id: 'egg',        label: '🥚 Huevos'       },
     { id: 'fragment',   label: '✨ Fragmentos'   },
     { id: 'potion',     label: '🧪 Pociones'     },
+    { id: 'alimento',   label: '🍖 Alimento'     },
   ];
 
   const tabs = `<div class="shop-tabs">${cats.map(c =>
@@ -135,6 +136,12 @@ async function buyItem(id, cost) {
     const petKey = id.replace('pot_', '');
     await addInvItem('pet_potion_' + petKey, 'pet_potion', 1);
     toast('🧪', `+1 Poción de ${item.name}.`);
+
+  /* ── Alimento de mascota ────────────────────────── */
+  } else if (id.startsWith('food_')) {
+    const petKey = id.replace('food_', '');
+    await addInvItem('pet_food_' + petKey, 'pet_food', 1);
+    toast('🍖', `Alimento adquirido. Ve a Mascotas → montura para dárselo.`);
 
   /* ── Armas ──────────────────────────────────────── */
   } else if (id.startsWith('weapon_') && item.weaponKey) {

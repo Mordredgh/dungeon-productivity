@@ -185,16 +185,45 @@ const SHOP_ITEMS = [
   { id:'pot_grifo',            name:'Poción Grifo',   img:'pet_potion_grifo.png',            cost:90,  desc:'Alimenta a tu Grifo',            category:'potion' },
   { id:'pot_dragon-fuego',     name:'Poción Dragón',  img:'pet_potion_dragon-fuego.png',     cost:110, desc:'Alimenta a tu Dragón de Fuego',  category:'potion' },
   { id:'pot_fenix-mitico',     name:'Poción Fénix',   img:'pet_potion_fenix-mitico.png',     cost:140, desc:'Alimenta a tu Fénix Mítico',     category:'potion' },
+  /* Alimento especial — sube nivel de montura (1→50) */
+  { id:'food_zorro-naturaleza', name:'Baya Silvestre',    icon:'🫐', cost:50,  desc:'+50 XP al Zorro Gigante (requiere montura)',    category:'alimento' },
+  { id:'food_pantera-sombra',   name:'Carne Nocturna',    icon:'🥩', cost:65,  desc:'+60 XP a la Pantera Sombra (requiere montura)', category:'alimento' },
+  { id:'food_lobo-tormenta',    name:'Carne de Tormenta', icon:'🍖', cost:80,  desc:'+70 XP al Lobo Tormenta (requiere montura)',    category:'alimento' },
+  { id:'food_grifo',            name:'Presa Aérea',       icon:'🦤', cost:100, desc:'+85 XP al Grifo (requiere montura)',            category:'alimento' },
+  { id:'food_dragon-fuego',     name:'Brasa Volcánica',   icon:'🔥', cost:125, desc:'+100 XP al Dragón de Fuego (requiere montura)', category:'alimento' },
+  { id:'food_fenix-mitico',     name:'Llama Eterna',      icon:'✨', cost:160, desc:'+120 XP al Fénix Mítico (requiere montura)',    category:'alimento' },
 ];
 
 /* ── MASCOTAS ────────────────────────────────────────────── */
 const PET_DEFS = [
-  { key:'zorro-naturaleza',  name:'Zorro Gigante',    icon:'🦊', rarity:'común',      eggCost:200, hatch:10, evolve:25 },
-  { key:'pantera-sombra',    name:'Pantera Sombra',   icon:'🐆', rarity:'poco común', eggCost:300, hatch:10, evolve:25 },
-  { key:'lobo-tormenta',     name:'Lobo Tormenta',    icon:'🐺', rarity:'raro',       eggCost:400, hatch:15, evolve:30 },
-  { key:'grifo',             name:'Grifo',            icon:'🦅', rarity:'épico',      eggCost:500, hatch:15, evolve:35 },
-  { key:'dragon-fuego',      name:'Dragón de Fuego',  icon:'🐉', rarity:'legendario', eggCost:600, hatch:20, evolve:40 },
-  { key:'fenix-mitico',      name:'Fénix Mítico',     icon:'🔥', rarity:'mítico',     eggCost:800, hatch:20, evolve:50 },
+  // level_req: nivel del héroe para evolucionar bebé→montura
+  // food_xp: XP que da cada alimento especial
+  // base_stats: stats base de la montura en nivel 1  (atk=% XP, def=+HP máx, spd=% Oro, lck=% loot)
+  // stat_gain:  incremento por nivel (atk/spd/lck en %, def en HP flat)
+  { key:'zorro-naturaleza', name:'Zorro Gigante',   icon:'🦊', rarity:'común',      eggCost:200, hatch:10, evolve:25,
+    level_req:15, food_xp:50,
+    base_stats:{ atk:1,  def:2,  spd:1,  lck:1  },
+    stat_gain: { atk:.10, def:.20, spd:.10, lck:.10 } },
+  { key:'pantera-sombra',   name:'Pantera Sombra',  icon:'🐆', rarity:'poco común', eggCost:300, hatch:10, evolve:25,
+    level_req:15, food_xp:60,
+    base_stats:{ atk:1,  def:3,  spd:2,  lck:1  },
+    stat_gain: { atk:.10, def:.25, spd:.15, lck:.10 } },
+  { key:'lobo-tormenta',    name:'Lobo Tormenta',   icon:'🐺', rarity:'raro',       eggCost:400, hatch:15, evolve:30,
+    level_req:15, food_xp:70,
+    base_stats:{ atk:2,  def:5,  spd:2,  lck:2  },
+    stat_gain: { atk:.15, def:.30, spd:.15, lck:.15 } },
+  { key:'grifo',            name:'Grifo',           icon:'🦅', rarity:'épico',      eggCost:500, hatch:15, evolve:35,
+    level_req:15, food_xp:85,
+    base_stats:{ atk:3,  def:7,  spd:3,  lck:3  },
+    stat_gain: { atk:.25, def:.40, spd:.20, lck:.20 } },
+  { key:'dragon-fuego',     name:'Dragón de Fuego', icon:'🐉', rarity:'legendario', eggCost:600, hatch:20, evolve:40,
+    level_req:15, food_xp:100,
+    base_stats:{ atk:4,  def:10, spd:4,  lck:4  },
+    stat_gain: { atk:.35, def:.50, spd:.30, lck:.30 } },
+  { key:'fenix-mitico',     name:'Fénix Mítico',    icon:'🔥', rarity:'mítico',     eggCost:800, hatch:20, evolve:50,
+    level_req:15, food_xp:120,
+    base_stats:{ atk:6,  def:15, spd:5,  lck:6  },
+    stat_gain: { atk:.50, def:.60, spd:.40, lck:.50 } },
 ];
 
 /* ── JEFES ───────────────────────────────────────────────── */
