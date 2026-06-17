@@ -51,8 +51,21 @@ const _lvlCache = {};
 function calcLevel(totalXP) {
   if (_lvlCache[totalXP] !== undefined) return _lvlCache[totalXP];
   let lvl = 1;
-  while (lvl < 10 && totalXP >= xpForLevel(lvl)) lvl++;
-  return (_lvlCache[totalXP] = Math.min(lvl, 10));
+  while (lvl < 50 && totalXP >= xpForLevel(lvl)) lvl++;
+  return (_lvlCache[totalXP] = Math.min(lvl, 50));
+}
+
+function canPrestige() { return !!hero && (hero._level || 1) >= 50; }
+
+async function doPrestige() {
+  if (!canPrestige()) return;
+  const newPrestige = (hero.prestige || 0) + 1;
+  Object.keys(_lvlCache).forEach(k => delete _lvlCache[k]);
+  await saveHero({ prestige: newPrestige, xp_total: 0, level: 1 });
+  toast('⭐', `¡Ascensión ${newPrestige}! +${newPrestige * 5}% XP permanente. Nivel reiniciado.`);
+  spawnConfetti();
+  renderHeroUI();
+  if (typeof renderCharacterSheet === 'function') renderCharacterSheet();
 }
 
 function xpForLevel(lvl) {
@@ -76,6 +89,7 @@ function classXPBonus(type) {
   if (hero) {
     if (type === 'main' && hero.str)   bonus *= 1 + hero.str * 0.01;
     if ((type === 'side' || type === 'daily') && hero.intel) bonus *= 1 + hero.intel * 0.01;
+    if (hero.prestige) bonus *= 1 + hero.prestige * 0.05;
   }
   return bonus;
 }
@@ -99,7 +113,9 @@ async function addXP(amount, type, sourceEl) {
   if (newLevel > prevLevel) {
     const gainedPoints = newLevel - prevLevel;
     hero.attr_points = (hero.attr_points || 0) + gainedPoints;
-    saveHero({ attr_points: hero.attr_points });
+    const hist = JSON.parse(hero.level_history || '[]');
+    hist.push({ level: newLevel, date: new Date().toISOString().split('T')[0], xp_total: newTotal });
+    saveHero({ attr_points: hero.attr_points, level_history: JSON.stringify(hist) });
     showLevelUp(newLevel);
     checkAchievements();
     if (typeof dungeonPush === 'function') dungeonPush('⭐ ¡Subiste de nivel!', `${hero.name} alcanzó el nivel ${newLevel}. El dungeon tiembla.`);

@@ -752,11 +752,13 @@
 
 <!-- Level Up -->
 <div class="modal-overlay levelup-modal" id="levelupModal">
-  <div class="modal" style="text-align:center">
-    <div class="levelup-icon">🎉</div>
+  <div class="modal" style="text-align:center;position:relative;overflow:hidden">
+    <div class="levelup-stars" id="luStars"></div>
+    <div class="levelup-icon">⭐</div>
     <div class="levelup-level" id="luLevel">2</div>
     <div class="levelup-title" id="luTitle">Nuevo título</div>
     <p class="levelup-desc" id="luDesc">¡Has subido de nivel!</p>
+    <div class="levelup-perks" id="luPerks"></div>
     <div class="modal-footer" style="justify-content:center;margin-top:20px">
       <button class="btn btn-primary" onclick="closeModal('levelupModal')">¡A por más! ⚔️</button>
     </div>

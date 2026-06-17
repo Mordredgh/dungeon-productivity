@@ -242,6 +242,28 @@ function renderCharacterSheet() {
           </label>
           <button class="btn btn-primary" onclick="saveCharacterSheet()">Guardar cambios</button>
         </div>
+
+        ${(() => {
+          const hist = (() => { try { return JSON.parse(hero.level_history || '[]'); } catch { return []; } })();
+          const histRows = hist.length
+            ? [...hist].reverse().slice(0, 15).map(e =>
+                `<div class="char-hist-row"><span class="char-hist-lvl">Nivel ${e.level}</span><span class="char-hist-date">${e.date || ''}</span></div>`
+              ).join('')
+            : '<div style="color:var(--text3);font-size:12px">Sube de nivel para registrar el historial.</div>';
+          const prestigeBtn = canPrestige()
+            ? `<button class="btn btn-primary" style="margin-top:10px;background:linear-gradient(90deg,#f59e0b,#a855f7)" onclick="doPrestige()">⭐ Ascender — Reiniciar en Nivel 1 con +5% XP</button>`
+            : '';
+          const prestigeBadge = (hero.prestige || 0) > 0
+            ? `<div style="margin-bottom:8px;font-size:12px;color:var(--gold)">⭐ Ascensiones: ${hero.prestige} · Bonus XP: +${hero.prestige * 5}%</div>`
+            : '';
+          return `<div class="char-section">
+            <div class="char-section-title">📅 Historial de Niveles</div>
+            ${prestigeBadge}
+            <div class="char-hist-list">${histRows}</div>
+            ${prestigeBtn}
+          </div>`;
+        })()}
+
       </div>
     </div>`;
 

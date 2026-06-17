@@ -70,13 +70,46 @@ function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 function showLevelUp(lvl) {
+  const dynTitle = typeof getDynamicTitle === 'function' && hero ? getDynamicTitle(hero) : TITLES[Math.min(lvl - 1, TITLES.length - 1)];
   document.getElementById('luLevel').textContent = `Nivel ${lvl}`;
-  document.getElementById('luTitle').textContent = TITLES[Math.min(lvl - 1, TITLES.length - 1)];
-  document.getElementById('luDesc').textContent = `¡Has ascendido a ${TITLES[Math.min(lvl - 1, TITLES.length - 1)]}!`;
+  document.getElementById('luTitle').textContent = dynTitle;
+  document.getElementById('luDesc').textContent  = `¡Has ascendido a ${dynTitle}!`;
+
+  // Perks list
+  const perksEl = document.getElementById('luPerks');
+  if (perksEl) {
+    const perks = ['✨ +1 punto de atributo disponible'];
+    if (lvl % 10 === 0) perks.push(`🏆 ¡Hito alcanzado! Nivel ${lvl}`);
+    if (lvl === 50)     perks.push('⭐ ¡Nivel máximo! Ya puedes Ascender en tu hoja de personaje.');
+    if ((hero?.prestige || 0) > 0) perks.push(`⭐×${hero.prestige} Bonus de Ascensión activo: +${hero.prestige * 5}% XP`);
+    perksEl.innerHTML = perks.map((p, i) =>
+      `<div class="levelup-perk" style="animation-delay:${i * 0.12}s">${escHtml(p)}</div>`
+    ).join('');
+  }
+
+  // Floating stars
+  const starsEl = document.getElementById('luStars');
+  if (starsEl) {
+    starsEl.innerHTML = '';
+    const icons = ['⭐','✨','💫','🌟'];
+    for (let i = 0; i < 14; i++) {
+      const s = document.createElement('div');
+      s.className = 'levelup-star';
+      s.textContent = icons[i % 4];
+      s.style.cssText = `left:${(Math.random()*86+5).toFixed(1)}%;top:${(Math.random()*70+15).toFixed(1)}%;animation-delay:${(Math.random()*0.9).toFixed(2)}s;animation-duration:${(1.2+Math.random()*0.8).toFixed(2)}s`;
+      starsEl.appendChild(s);
+    }
+  }
+
   openModal('levelupModal');
   playLevelUpSound();
   spawnLevelUpParticles();
   spawnConfetti();
+  // Auto-cierre en 6s
+  setTimeout(() => {
+    const m = document.getElementById('levelupModal');
+    if (m && m.classList.contains('open')) closeModal('levelupModal');
+  }, 6000);
 }
 
 function toast(icon, msg, duration) {
