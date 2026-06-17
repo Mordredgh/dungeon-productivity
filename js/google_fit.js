@@ -2,9 +2,10 @@
 
 const GOOGLE_FIT_SCOPES = 'https://www.googleapis.com/auth/fitness.activity.read';
 
-let fitSteps  = 0;
-let fitSynced = false;
-let _fitToken = null;
+let fitSteps   = 0;
+let fitSynced  = false;
+let _fitToken  = null;
+let _fitSyncing = false;
 
 function _gRandStr(len) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
@@ -75,10 +76,15 @@ async function _fitEnsureToken() {
 }
 
 async function syncGoogleFitSteps() {
+  if (_fitSyncing) return;
   const token = await _fitEnsureToken();
-  if (!token) return;
+  if (!token) { toast('⚠️', 'Token de Google Fit expirado. Reconecta.'); renderFitWidget(); return; }
   const today = new Date().toISOString().split('T')[0];
   if (localStorage.getItem('fit-sync-date') === today && fitSynced) return;
+
+  _fitSyncing = true;
+  const btn = document.querySelector('#fitWidgetContent .btn-ghost');
+  if (btn) { btn.disabled = true; btn.textContent = '🔄 ...'; }
 
   try {
     const startMs = new Date(today + 'T00:00:00').getTime();
@@ -87,11 +93,21 @@ async function syncGoogleFitSteps() {
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         aggregateBy: [{ dataTypeName: 'com.google.step_count.delta' }],
-        bucketByTime: { durationMillis: Date.now() - startMs },
-        startTimeMillis: startMs, endTimeMillis: Date.now(),
+        bucketByTime: { durationMillis: 86400000 },
+        startTimeMillis: startMs, endTimeMillis: startMs + 86400000,
       }),
     });
-    if (!resp.ok) return;
+    if (!resp.ok) {
+      const errBody = await resp.text().catch(() => '');
+      console.error('Fit API error', resp.status, errBody);
+      if (resp.status === 401 || resp.status === 403) {
+        toast('🔑', `Google Fit: acceso denegado (${resp.status}). Reconecta.`);
+        await disconnectGoogleFit();
+      } else {
+        toast('⚠️', `Google Fit error ${resp.status}. Revisa la consola.`);
+      }
+      return;
+    }
     const data = await resp.json();
     fitSteps = 0;
     data.bucket?.forEach(b => b.dataset?.forEach(ds => ds.point?.forEach(p =>
@@ -100,7 +116,12 @@ async function syncGoogleFitSteps() {
     fitSynced = true;
     await _applyFitXP(today);
     renderFitWidget();
-  } catch(e) { console.warn('Fit sync:', e); }
+  } catch(e) {
+    console.error('Fit sync exception:', e);
+    toast('⚠️', 'Error de red al sincronizar Fit.');
+  } finally {
+    _fitSyncing = false;
+  }
 }
 
 async function _applyFitXP(today) {
