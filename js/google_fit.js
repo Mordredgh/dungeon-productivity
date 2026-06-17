@@ -80,7 +80,7 @@ async function syncGoogleFitSteps() {
   const token = await _fitEnsureToken();
   if (!token) { toast('⚠️', 'Token de Google Fit expirado. Reconecta.'); renderFitWidget(); return; }
   const today = new Date().toISOString().split('T')[0];
-  if (localStorage.getItem('fit-sync-date') === today && fitSynced) return;
+  if (localStorage.getItem('fit-sync-date') === today && fitSynced && fitSteps > 0) return;
 
   _fitSyncing = true;
   const btn = document.querySelector('#fitWidgetContent .btn-ghost');
@@ -92,7 +92,10 @@ async function syncGoogleFitSteps() {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        aggregateBy: [{ dataTypeName: 'com.google.step_count.delta' }],
+        aggregateBy: [{
+          dataTypeName: 'com.google.step_count.delta',
+          dataSourceId: 'derived:com.google.step_count.delta:com.google.android.gms:merge_step_deltas',
+        }],
         bucketByTime: { durationMillis: 86400000 },
         startTimeMillis: startMs, endTimeMillis: startMs + 86400000,
       }),
@@ -112,6 +115,7 @@ async function syncGoogleFitSteps() {
     fitSteps = 0;
     data.bucket?.forEach(b => b.dataset?.forEach(ds => ds.point?.forEach(p =>
       p.value?.forEach(v => { fitSteps += v.intVal || 0; }))));
+    console.log('Fit response buckets:', JSON.stringify(data.bucket?.length), 'steps:', fitSteps);
     localStorage.setItem('fit-sync-date', today);
     fitSynced = true;
     await _applyFitXP(today);
