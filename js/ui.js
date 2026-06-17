@@ -20,6 +20,14 @@ function openEditQuest(id) {
   document.getElementById('editQDeadline').value   = q.deadline || '';
   document.getElementById('editQNotes').value      = q.notes || '';
   document.getElementById('editQTags').value       = q.tags || '';
+  // Show reminder time field for habits
+  const habitReminderGroup = document.getElementById('habitReminderGroup');
+  const reminderInp = document.getElementById('editQReminderTime');
+  if (habitReminderGroup) habitReminderGroup.style.display = q.type === 'habit' ? '' : 'none';
+  if (reminderInp) {
+    const m = (q.tags || '').match(/reminder-(\d{1,2}:\d{2})/i);
+    reminderInp.value = m ? m[1].padStart(5, '0') : '';
+  }
   document.getElementById('editQEstTime').value    = q.est_time || '';
   document.getElementById('editQRepeat').value     = q.repeat_days || '';
   document.getElementById('editQStartDate').value  = q.quest_start_date || '';

@@ -56,9 +56,16 @@ async function bootApp() {
   checkNightlyDiary();
   checkProphecyVerdict();
   if (typeof checkWeeklyPatternAnalysis === 'function') checkWeeklyPatternAnalysis();
+  if (typeof checkHabitReminders   === 'function') checkHabitReminders();
+  if (typeof updateChallengeProgress === 'function') updateChallengeProgress();
   setInterval(() => {
     checkDailySummary(); checkWeeklyRetro(); checkDeadlineAlerts(); checkNightlyDiary(); checkProphecyVerdict();
     if (typeof checkWeeklyPatternAnalysis === 'function') checkWeeklyPatternAnalysis();
-  }, 60 * 60 * 1000);
+    if (typeof checkHabitReminders === 'function') checkHabitReminders();
+    if (typeof checkBossDeadline   === 'function') checkBossDeadline();
+  }, 60 * 1000); // every minute for habit reminders
+  setInterval(() => {
+    if (typeof updateChallengeProgress === 'function') updateChallengeProgress();
+  }, 15 * 60 * 1000);
   updateFocusTodayChip();
 }

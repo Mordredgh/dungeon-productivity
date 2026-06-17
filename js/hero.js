@@ -82,10 +82,11 @@ function classXPBonus(type) {
 
 async function addXP(amount, type, sourceEl) {
   if (xpMultiplierEnd && Date.now() > xpMultiplierEnd) { xpMultiplier = 1; xpMultiplierEnd = 0; }
-  const todMult   = typeof getTODBonus  === 'function' ? getTODBonus().xpMult : 1;
-  const skillMult = typeof getSkillTreeXPBonus === 'function' ? (1 + getSkillTreeXPBonus(type || 'side')) : 1;
-  const runeMult  = typeof getRuneBonus === 'function' ? (1 + getRuneBonus('all_xp')) : 1;
-  let finalXP = Math.round(amount * classXPBonus(type || 'side') * xpMultiplier * todMult * skillMult * runeMult);
+  const todMult    = typeof getTODBonus  === 'function' ? getTODBonus().xpMult : 1;
+  const skillMult  = typeof getSkillTreeXPBonus === 'function' ? (1 + getSkillTreeXPBonus(type || 'side')) : 1;
+  const runeMult   = typeof getRuneBonus === 'function' ? (1 + getRuneBonus('all_xp')) : 1;
+  const weaponMult = typeof getWeaponXPBonus === 'function' ? (1 + getWeaponXPBonus()) : 1;
+  let finalXP = Math.round(amount * classXPBonus(type || 'side') * xpMultiplier * todMult * skillMult * runeMult * weaponMult);
 
   const prevLevel = calcLevel(hero.xp_total || 0);
   const newTotal = (hero.xp_total || 0) + finalXP;

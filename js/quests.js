@@ -115,10 +115,12 @@ async function completeQuest(id, el) {
   // Gold earned
   const goldBase = GOLD_TABLE ? (GOLD_TABLE[q.type] || 10) : 10;
   const goldMult = typeof getGoldMult === 'function' ? getGoldMult() : 1;
-  const todGoldMult   = typeof getTODBonus === 'function' ? getTODBonus().goldMult : 1;
-  const skillGoldMult = typeof getSkillTreeGoldBonus === 'function' ? (1 + getSkillTreeGoldBonus()) : 1;
-  const runeGoldMult  = typeof getRuneBonus === 'function' ? (1 + getRuneBonus('gold')) : 1;
-  let goldAmt  = Math.round(goldBase * goldMult * doubleNadaMult * todGoldMult * skillGoldMult * runeGoldMult);
+  const todGoldMult    = typeof getTODBonus === 'function' ? getTODBonus().goldMult : 1;
+  const skillGoldMult  = typeof getSkillTreeGoldBonus === 'function' ? (1 + getSkillTreeGoldBonus()) : 1;
+  const runeGoldMult   = typeof getRuneBonus === 'function' ? (1 + getRuneBonus('gold')) : 1;
+  const weaponGoldMult = typeof getWeaponGoldBonus === 'function' ? (1 + getWeaponGoldBonus()) : 1;
+  const goldRushMult   = (hero && (hero.gold_rush_exp || 0) > Date.now()) ? 2 : 1;
+  let goldAmt  = Math.round(goldBase * goldMult * doubleNadaMult * todGoldMult * skillGoldMult * runeGoldMult * weaponGoldMult * goldRushMult);
   if (hero && hero.nightmare_mode) goldAmt *= 2;
   if (typeof addGold === 'function') {
     addGold(goldAmt);

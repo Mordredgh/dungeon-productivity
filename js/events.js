@@ -72,7 +72,15 @@ document.getElementById('notifBtn').addEventListener('click', async () => {
 
 document.getElementById('saveQuestBtn').addEventListener('click', () => {
   const id      = document.getElementById('editQuestId').value;
-  const tags    = document.getElementById('editQTags').value.trim();
+  let tags      = document.getElementById('editQTags').value.trim();
+  // Merge reminder time from dedicated field into tags
+  const reminderInp = document.getElementById('editQReminderTime');
+  if (reminderInp && reminderInp.value) {
+    tags = tags.replace(/reminder-\d{1,2}:\d{2}/gi, '').trim();
+    tags = (tags + ' reminder-' + reminderInp.value).trim();
+  } else if (reminderInp && !reminderInp.value) {
+    tags = tags.replace(/reminder-\d{1,2}:\d{2}/gi, '').trim();
+  }
   const estTime = document.getElementById('editQEstTime').value.trim();
   const repeat  = document.getElementById('editQRepeat').value.trim();
   const startDate = document.getElementById('editQStartDate').value;
@@ -250,6 +258,25 @@ function syncFocusUI() {
   const dots = document.querySelectorAll('#focusPomCount .pom-dot');
   const filled = timer.pomsDone % 4;
   dots.forEach((d, i) => d.classList.toggle('done', i < filled));
+
+  // XP earned today
+  const xpTodayEl = document.getElementById('focusXPToday');
+  if (xpTodayEl && hero) {
+    const today = new Date().toISOString().split('T')[0];
+    const xp = quests.filter(q => q.done && q.done_at && q.done_at.startsWith(today))
+               .reduce((s, q) => s + (XP_TABLE[q.type] || 50), 0);
+    xpTodayEl.textContent = `✨ ${xp} XP hoy`;
+  }
+  // Pom streak
+  const pomTotalEl = document.getElementById('focusPomTotal');
+  if (pomTotalEl) pomTotalEl.textContent = `🍅 ${timer.pomsDone} poms`;
+  // HP bar in focus
+  const focusHpFill = document.getElementById('focusHpFill');
+  if (focusHpFill && hero) {
+    const pct = Math.round((hero.hp || 100) / (hero.hp_max || 100) * 100);
+    focusHpFill.style.width = pct + '%';
+    focusHpFill.style.background = pct < 25 ? 'var(--red)' : pct < 50 ? 'var(--gold)' : 'var(--green)';
+  }
 }
 
 /* ============================================================

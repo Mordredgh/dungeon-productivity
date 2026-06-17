@@ -4186,3 +4186,93 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   100% { opacity:0; transform: translateY(-90px) scale(.9); }
 }
 .quick-create-input-big:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(137,180,250,.15); }
+
+
+/* ================================================================
+   v40 — Challenges, Focus improvements, Habits pom btn, Smithy
+   ================================================================ */
+
+/* ── Challenges ───────────────────────────────────────────────── */
+.ch-section-title {
+  font-size: 12px; font-weight: 700; color: var(--text2);
+  text-transform: uppercase; letter-spacing: .07em;
+  margin: 0 0 10px; padding: 0 2px;
+}
+.ch-card {
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 10px;
+  transition: var(--transition);
+}
+.ch-card.ch-done { border-color: var(--green); background: rgba(166,227,161,.06); }
+.ch-card.ch-available { opacity: .85; }
+.ch-header { display: flex; align-items: flex-start; gap: 12px; }
+.ch-icon { font-size: 24px; line-height: 1; flex-shrink: 0; }
+.ch-info { flex: 1; min-width: 0; }
+.ch-name { font-weight: 600; font-size: 14px; color: var(--text); }
+.ch-desc { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.ch-days { font-size: 11px; color: var(--text3); white-space: nowrap; }
+.ch-reward-badge {
+  font-size: 11px; color: var(--gold); font-weight: 600;
+  background: rgba(249,226,175,.12); border-radius: 6px; padding: 2px 8px;
+  white-space: nowrap;
+}
+.ch-progress-bar {
+  height: 6px; background: var(--bg4); border-radius: 3px;
+  margin: 10px 0 6px; overflow: hidden;
+}
+.ch-progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 3px; transition: width .4s ease;
+}
+.ch-footer { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ch-progress-text { font-size: 11px; color: var(--text2); flex: 1; }
+.ch-reward { font-size: 11px; color: var(--gold); }
+.ch-claim-btn { padding: 4px 12px !important; font-size: 12px !important; }
+.ch-abandon-btn { padding: 4px 8px !important; font-size: 12px !important; color: var(--text3) !important; }
+.ch-claimed { font-size: 11px; color: var(--green); }
+.ch-start-btn { width: 100%; margin-top: 10px; padding: 8px !important; font-size: 13px !important; }
+
+/* ── Focus overlay extras ─────────────────────────────────────── */
+.focus-stats-row {
+  display: flex; gap: 20px; justify-content: center;
+  margin-top: 8px;
+}
+.focus-hp-mini {
+  width: 180px; height: 4px; background: rgba(255,255,255,.15);
+  border-radius: 2px; margin: 6px auto 0; overflow: hidden;
+}
+.focus-hp-fill {
+  height: 100%; border-radius: 2px; transition: width .4s ease;
+}
+
+/* ── Habit pom button ─────────────────────────────────────────── */
+.habit-pom-btn {
+  background: transparent; border: 1px solid var(--border);
+  border-radius: var(--radius-xs); padding: 4px 8px; cursor: pointer;
+  font-size: 14px; color: var(--text2); transition: var(--transition);
+  line-height: 1;
+}
+.habit-pom-btn:hover { background: var(--bg4); color: var(--text); }
+.habit-reminder-badge {
+  font-size: 10px; color: var(--accent); background: rgba(137,180,250,.12);
+  border-radius: 4px; padding: 1px 6px; margin-left: 4px;
+}
+
+/* ── Smithy forging queue ─────────────────────────────────────── */
+.smithy-forging-queue {
+  background: rgba(249,226,175,.06); border: 1px solid rgba(249,226,175,.2);
+  border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px;
+}
+.smithy-forging-title {
+  font-size: 12px; font-weight: 700; color: var(--gold);
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px;
+}
+.smithy-forging-item {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 13px; padding: 4px 0;
+}
+.smithy-forging-name { font-weight: 600; }
+.smithy-forging-timer { font-size: 11px; color: var(--gold); }
+
+/* ── Habit reminder group in edit modal ──────────────────────── */
+#habitReminderGroup { animation: fadeIn .2s ease; }

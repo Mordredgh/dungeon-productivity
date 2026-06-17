@@ -97,6 +97,25 @@ async function buyItem(id, cost) {
     hero.hp = newHp; await saveHero({ hp: newHp }); renderHeroUI();
     toast('💊', '¡HP restaurada al máximo!');
 
+  /* ── Nuevos consumibles ───────────────────────────── */
+  } else if (id === 'hp_minor') {
+    const newHp = Math.min((hero.hp || 100) + 25, hero.hp_max || 100);
+    hero.hp = newHp; await saveHero({ hp: newHp }); renderHeroUI();
+    toast('🧪', '¡+25 HP recuperados!');
+
+  } else if (id === 'gold_rush') {
+    const exp = Date.now() + 3600000;
+    await saveHero({ gold_rush_exp: exp });
+    toast('💰', '¡2× Oro activo durante 1 hora!');
+
+  } else if (id === 'boss_shield') {
+    await saveHero({ boss_shield: true });
+    toast('🛡️', '¡Escudo Anti-Boss equipado! Bloquea la penalización semanal.');
+
+  } else if (id === 'xp_scroll_sm') {
+    await addXP(75, 'side', null);
+    toast('📜', '+75 XP del pergamino de poder.');
+
   /* ── Huevos de mascota ──────────────────────────── */
   } else if (id.startsWith('egg_')) {
     const petKey = id.replace('egg_', '');

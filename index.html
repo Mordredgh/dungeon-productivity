@@ -207,6 +207,7 @@
         <button class="sidebar-item" data-view="dungeon-grows" onclick="switchView('dungeon-grows')"> <span class="si-icon">🏰</span><span class="si-label">Mi Dungeon</span></button>
         <button class="sidebar-item active" data-view="quests"       onclick="switchView('quests')">       <span class="si-icon">⚔️</span><span class="si-label">Misiones</span></button>
         <button class="sidebar-item"        data-view="goals"        onclick="switchView('goals')">        <span class="si-icon">🎯</span><span class="si-label">Metas</span></button>
+        <button class="sidebar-item" onclick="openChallengesModal()"><span class="si-icon">🏆</span><span class="si-label">Retos 30d</span></button>
         <button class="sidebar-item"        data-view="stats"        onclick="switchView('stats')">        <span class="si-icon">📊</span><span class="si-label">Sala del Trono</span></button>
         <button class="sidebar-item"        data-view="achievements" onclick="switchView('achievements')"> <span class="si-icon">🏆</span><span class="si-label">Logros</span></button>
         <div class="sb-nav-label">Compañeros</div>
@@ -731,6 +732,9 @@
     <button class="mobile-more-item view-tab" data-view="goals" onclick="closeMobileMore();switchView('goals')">
       <span>🎯</span><span>Metas</span>
     </button>
+    <button class="mobile-more-item" onclick="closeMobileMore();openChallengesModal()">
+      <span>🏆</span><span>Retos</span>
+    </button>
   </div>
 </div>
 
@@ -800,8 +804,12 @@
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Tags (#trabajo #personal)</label>
-          <input class="form-input" id="editQTags" type="text" placeholder="#tag1 #tag2">
+          <label class="form-label">Tags (#trabajo) · Para hábitos: reminder-HH:MM</label>
+          <input class="form-input" id="editQTags" type="text" placeholder="#tag1 reminder-07:30">
+        </div>
+        <div class="form-group" id="habitReminderGroup" style="display:none">
+          <label class="form-label">🔔 Hora de recordatorio</label>
+          <input class="form-input" id="editQReminderTime" type="time" placeholder="07:30">
         </div>
         <div class="form-group">
           <label class="form-label">Tiempo estimado (min)</label>
@@ -1039,6 +1047,13 @@
     <div class="pom-dot"></div><div class="pom-dot"></div>
     <div class="pom-dot"></div><div class="pom-dot"></div>
   </div>
+  <div class="focus-stats-row">
+    <span id="focusXPToday" style="color:var(--accent);font-size:13px">✨ 0 XP hoy</span>
+    <span id="focusPomTotal" style="color:var(--text2);font-size:13px">🍅 0 poms</span>
+  </div>
+  <div class="focus-hp-mini">
+    <div class="focus-hp-fill" id="focusHpFill" style="width:100%;background:var(--green)"></div>
+  </div>
 </div>
 
 <!-- Weekly Retro Modal -->
@@ -1250,7 +1265,22 @@
 <script src="js/drops.js?v=1"></script>
 <script src="js/daily_goal.js?v=1"></script>
 <script src="js/weekly_summary.js?v=1"></script>
+<script src="js/challenges.js?v=1"></script>
 <script src="js/auth.js?v=1"></script>
 <script src="js/main.js?v=14"></script>
+
+<!-- Challenges Modal -->
+<div class="modal-overlay" id="challengesModal">
+  <div class="modal" style="max-width:520px;max-height:80vh;overflow-y:auto">
+    <div class="modal-header">
+      <div class="modal-title">🏆 Retos de 30 Días</div>
+      <button class="modal-close" onclick="closeModal('challengesModal')">&#x2715;</button>
+    </div>
+    <div id="challengesContent" style="padding:16px">
+      <div class="empty-state"><div class="empty-state-icon">⏳</div><p>Cargando retos...</p></div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

@@ -17,6 +17,10 @@ function getWeaponGoldBonus() {
   return weapons.filter(w => w.is_equipped)
     .reduce((sum, w) => sum + (WEAPON_TIERS[w.tier]?.goldBonus || 0), 0);
 }
+function getWeaponHPMaxBonus() {
+  return weapons.filter(w => w.is_equipped)
+    .reduce((sum, w) => sum + (WEAPON_TIERS[w.tier]?.hpMax || 0), 0);
+}
 
 async function addWeapon(weaponKey, tier, readyAt) {
   const def     = WEAPON_DEFS.find(d => d.key === weaponKey);
@@ -246,6 +250,24 @@ function renderSmithy() {
     });
   });
 
+  const forgingNow = weapons.filter(w => isForging(w));
+  let forgingHtml = '';
+  if (forgingNow.length) {
+    forgingHtml = `<div class="smithy-forging-queue">
+      <div class="smithy-forging-title">🔥 En la Forja (${forgingNow.length})</div>
+      ${forgingNow.map(w => {
+        const ms   = new Date(w.ready_at) - new Date();
+        const h    = Math.floor(ms / 3600000);
+        const m    = Math.floor((ms % 3600000) / 60000);
+        const tier = WEAPON_TIERS[w.tier] || {};
+        return `<div class="smithy-forging-item">
+          <span class="smithy-forging-name" style="color:${tier.color || 'var(--text2)'}">${escHtml(w.name)}</span>
+          <span class="smithy-forging-timer">${h > 0 ? h + 'h ' : ''}${m}m restantes</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
   const bagCount = weapons.filter(w => !w.is_equipped).length;
   el.innerHTML = `
     <div class="smithy-header">
@@ -255,6 +277,7 @@ function renderSmithy() {
         <button class="btn btn-ghost" style="padding:3px 10px;font-size:12px" onclick="switchView('shop')">Comprar en Tienda</button>
       </div>` : ''}
     </div>
+    ${forgingHtml}
     <div class="smithy-recipes">${rows}</div>
   `;
 }

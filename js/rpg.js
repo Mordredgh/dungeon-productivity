@@ -346,6 +346,34 @@ Datos reales de la semana: ${wQuests.length} misiones completadas, ${wXP} XP gan
 }
 
 /* ── INIT (called from main.js) ───────────────────────────── */
+
+/* ── BOSS WEEKLY PENALTY ──────────────────────────────── */
+function checkBossDeadline() {
+  if (!hero) return;
+  const now = new Date();
+  if (now.getDay() !== 0 || now.getHours() < 22) return;
+  const state = getBossState();
+  if (state.defeated) return;
+  const key = 'dungeon-boss-penalty-' + _bossWeekKey();
+  if (localStorage.getItem(key)) return;
+  localStorage.setItem(key, '1');
+
+  if (hero.boss_shield) {
+    hero.boss_shield = false; saveHero({ boss_shield: false });
+    toast('🛡️', 'Escudo Anti-Boss absorbio la penalizacion. ' + state.name + ' huye.');
+    if (typeof dungeonPush === 'function') dungeonPush('Escudo activado', state.name + ' fue bloqueado por tu escudo.');
+    return;
+  }
+  const hpLoss  = Math.max(5, Math.round((state.hp / state.maxHp) * 25));
+  const newHp   = Math.max(10, (hero.hp || 100) - hpLoss);
+  const goldLoss = Math.floor((hero.gold || 0) * 0.08);
+  hero.hp = newHp; saveHero({ hp: newHp });
+  if (goldLoss > 0 && typeof addGold === 'function') addGold(-goldLoss);
+  renderHeroUI();
+  toast('🐉', state.name + ' escapó esta semana! -' + hpLoss + ' HP' + (goldLoss ? ' · -' + goldLoss + '🪙' : ''));
+  if (typeof dungeonPush === 'function') dungeonPush('El Jefe escapó', state.name + ' sobrevivió. -' + hpLoss + ' HP.');
+}
+
 function initRPGSystems() {
   renderGold();
   renderWeather();
@@ -355,4 +383,5 @@ function initRPGSystems() {
   checkRandomEvent();
   checkAndGenerateProphecy();
   renderProphecy();
+  checkBossDeadline();
 }

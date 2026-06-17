@@ -4,6 +4,31 @@ Todas las fechas en formato YYYY-MM-DD (hora Monterrey, CDT = UTC-5).
 
 ---
 
+## [v40] — 2026-06-17
+
+### Agregado
+- **Equipamiento con stats funcionales** — Armas equipadas ahora aplican bonus de XP, Oro y HP máx en `hero.js`, `quests.js` y `views.js`
+- **Boss semanal con daño real** — `checkBossDeadline()` en `rpg.js`: domingos 10pm aplica -HP y -8% oro si el jefe no fue derrotado; protegible con Escudo Anti-Boss
+- **Tienda mejorada** — 4 nuevos consumibles: Poción Menor HP (+25 HP, 35g), Monedas del Mercader (2× oro 1h, 80g), Escudo Anti-Boss (150g), Pergamino de Poder (+75 XP, 70g)
+- **Notificaciones push para hábitos** — Campo "hora de recordatorio" en edición de hábitos (guardado como `reminder-HH:MM` en tags); `checkHabitReminders()` corre cada minuto
+- **Pomodoro vinculado a hábitos** — Botón 🍅 en cada ítem de hábito para vincular al timer activo
+- **Modo Focus mejorado** — Muestra XP ganado hoy, contador total de poms y mini-barra de HP en el overlay
+- **Retos de 30 Días** — `js/challenges.js` con 8 retos: El Mes del Guerrero, La Racha Eterna, El Maratonista del Tiempo, Héroe de Leyenda, Maestro de Hábitos, Tesoro de Poder, Cazador de Jefes, Rutinario Legendario. Persistido en `hero.challenges`. Modal accesible desde sidebar y Más sheet.
+- **Crafteo con cooldown real** — Sección "En la Forja" en el Herrero muestra armas en progreso con cuenta regresiva en tiempo real (horas/minutos)
+
+### Corregido
+- Swipe-to-complete ya estaba wired en `renderQuestList()`; confirmado correcto
+- Gold rush multiplier aplica 2× cuando `hero.gold_rush_exp > Date.now()`
+
+### Base de datos
+- Migración `add_v40_hero_fields`: columnas `boss_shield boolean`, `gold_rush_exp bigint`, `challenges text`
+
+### Cambiado
+- SW cache: `dungeon-v39` → `dungeon-v40`
+- `main.js`: interval de 60s para `checkHabitReminders()` + `checkBossDeadline()`; interval 15min para `updateChallengeProgress()`
+
+---
+
 ## [v39] — 2026-06-17
 
 ### Agregado
