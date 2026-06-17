@@ -81,7 +81,7 @@ async function syncGoogleFitSteps() {
   if (!token) { toast('⚠️', 'Token de Google Fit expirado. Reconecta.'); renderFitWidget(); return; }
   const _d = new Date();
   const today = `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;
-  if (localStorage.getItem('fit-sync-date') === today && fitSynced && fitSteps > 0) return;
+  if (hero?.fit_sync_date === today && fitSynced && fitSteps > 0) return;
 
   _fitSyncing = true;
   const btn = document.querySelector('#fitWidgetContent .btn-ghost');
@@ -115,9 +115,9 @@ async function syncGoogleFitSteps() {
     data.bucket?.forEach(b => b.dataset?.forEach(ds => ds.point?.forEach(p =>
       p.value?.forEach(v => { fitSteps += v.intVal || 0; }))));
     console.log('Fit steps:', fitSteps, '| bucket[0]:', JSON.stringify(data.bucket?.[0]));
-    localStorage.setItem('fit-sync-date', localToday);
+    await saveHero({ fit_sync_date: today });
     fitSynced = true;
-    await _applyFitXP(localToday);
+    await _applyFitXP(today);
     renderFitWidget();
   } catch(e) {
     console.error('Fit sync exception:', e);
@@ -128,8 +128,8 @@ async function syncGoogleFitSteps() {
 }
 
 async function _applyFitXP(today) {
-  if (localStorage.getItem('fit-xp-date') === today) return;
-  localStorage.setItem('fit-xp-date', today);
+  if (hero?.fit_xp_date === today) return;
+  await saveHero({ fit_xp_date: today });
   const bonus = fitSteps >= 10000 ? 80 : fitSteps >= 7500 ? 50 : fitSteps >= 5000 ? 30 : fitSteps >= 2500 ? 15 : 0;
   if (bonus > 0) { await addXP(bonus, 'side', null); toast('💪', `¡${fitSteps.toLocaleString()} pasos! +${bonus} XP`); }
 }
@@ -149,8 +149,9 @@ function renderFitWidget() {
       </div>`;
     return;
   }
-  const today  = new Date().toISOString().split('T')[0];
-  const synced = localStorage.getItem('fit-sync-date') === today;
+  const _rd = new Date();
+  const today  = `${_rd.getFullYear()}-${String(_rd.getMonth()+1).padStart(2,'0')}-${String(_rd.getDate()).padStart(2,'0')}`;
+  const synced = hero?.fit_sync_date === today;
   el.innerHTML = `
     <div class="fit-connected">
       <div class="fit-steps-num">${synced ? fitSteps.toLocaleString() : '—'}</div>
