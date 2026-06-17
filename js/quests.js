@@ -203,6 +203,16 @@ async function completeQuest(id, el) {
   _checkMissionShield(q.type);
 
   checkAchievements();
+
+  // Loot drop animation
+  if (typeof spawnLootDrop === 'function') {
+    spawnLootDrop(xpAmt, goldAmt, q.rarity || 'common');
+  }
+  // Daily goal tracking
+  if (typeof addDailyGoalXP === 'function') {
+    addDailyGoalXP(xpAmt);
+  }
+
   renderQuestList();
   renderKanban();
   renderHistory();

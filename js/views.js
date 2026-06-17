@@ -79,6 +79,18 @@ function renderHeroUI() {
   hpFill.style.width = hpPct + '%';
   hpFill.classList.toggle('hp-critical', hpPct < 25);
   hpFill.classList.toggle('hp-warning',  hpPct >= 25 && hpPct < 50);
+
+  // Actualizar mobile hero button en header
+  const mhbAvatar    = document.getElementById('mhbAvatar');
+  const mhbNavAvatar = document.getElementById('mhbNavAvatar');
+  const mhbName      = document.getElementById('mhbName');
+  const mhbHpFill    = document.getElementById('mhbHpFill');
+  const mhbLevel     = document.getElementById('mhbLevel');
+  if (mhbAvatar)    mhbAvatar.textContent    = hero.avatar || '🧙';
+  if (mhbNavAvatar) mhbNavAvatar.textContent = hero.avatar || '🧙';
+  if (mhbName)      mhbName.textContent      = hero.name   || 'Héroe';
+  if (mhbHpFill)    mhbHpFill.style.width    = hpPct + '%';
+  if (mhbLevel)     mhbLevel.textContent     = 'Nv ' + (hero.level || 1);
   // Modo Furia — HP < 20%
   document.body.classList.toggle('fury-mode', hpPct < 20);
 

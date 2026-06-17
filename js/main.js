@@ -50,7 +50,9 @@ async function bootApp() {
   checkDailySummary();
   checkWeeklyRetro();
   checkMorningBriefing();
-  if (typeof checkMorningReview === 'function') checkMorningReview();
+  if (typeof checkMorningReview    === 'function') checkMorningReview();
+  if (typeof renderDailyGoalBar    === 'function') renderDailyGoalBar();
+  if (typeof checkWeeklySummary    === 'function') checkWeeklySummary();
   checkDeadlineAlerts();
   checkNightlyDiary();
   checkProphecyVerdict();

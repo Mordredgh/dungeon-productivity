@@ -24,18 +24,33 @@
 
 <!-- LOGIN OVERLAY — visible cuando no hay sesión -->
 <div id="loginOverlay" class="login-overlay" style="display:none">
+  <div class="login-bg" aria-hidden="true">
+    <div class="login-orb lob-1"></div>
+    <div class="login-orb lob-2"></div>
+    <div class="login-orb lob-3"></div>
+  </div>
+  <div class="login-runes" aria-hidden="true">
+    <span class="lrune lr1">⚔️</span>
+    <span class="lrune lr2">🔮</span>
+    <span class="lrune lr3">💎</span>
+    <span class="lrune lr4">🌙</span>
+    <span class="lrune lr5">✨</span>
+    <span class="lrune lr6">🗡️</span>
+  </div>
   <div class="login-card">
-    <div class="login-logo-wrap">
+    <div class="login-emblem">
+      <div class="login-emblem-glow"></div>
       <img src="https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png"
            class="login-logo-img" alt="Arcanum"
            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <span class="login-logo-emoji" style="display:none">⚔️</span>
     </div>
-    <h1 class="login-title">Arcanum</h1>
+    <h1 class="login-title">ARCANUM</h1>
     <p class="login-subtitle">El Dungeon Productivo del Héroe</p>
+    <div class="login-sep"><span>Identificación del Héroe</span></div>
     <div class="login-field">
       <span class="login-field-icon">📧</span>
-      <input type="email" id="loginEmail" class="login-input" placeholder="tu@correo.com" autocomplete="email">
+      <input type="email" id="loginEmail" class="login-input" placeholder="correo@ejemplo.com" autocomplete="email">
     </div>
     <div class="login-field">
       <span class="login-field-icon">🔒</span>
@@ -43,8 +58,11 @@
       <button type="button" class="login-toggle-pw" onclick="toggleLoginPw()" id="loginPwToggle">👁️</button>
     </div>
     <p id="loginError" class="login-error"></p>
-    <button class="login-btn" id="loginBtn" onclick="doLogin()">⚔️ Entrar al Dungeon</button>
-    <div class="login-footer">Dungeon Productivity · Solo para el héroe autorizado</div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">
+      <span>⚔️ Entrar al Dungeon</span>
+      <div class="login-btn-shine"></div>
+    </button>
+    <div class="login-footer">Arcanum · Solo para el héroe autorizado</div>
   </div>
 </div>
 
@@ -82,6 +100,16 @@
     <div class="header-brand">
       <img src="https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-text.png" class="header-logo-img" alt="Arcanum">
       <div class="guild-name" id="guildNameDisplay"></div>
+      <button class="mobile-hero-btn" id="mobileHeroBtnHdr" onclick="switchView('character')">
+        <div class="mhb-avatar" id="mhbAvatar">🧙</div>
+        <div class="mhb-info">
+          <div class="mhb-name" id="mhbName">Héroe</div>
+          <div class="mhb-bars">
+            <div class="mhb-hp-wrap"><div class="mhb-hp-fill" id="mhbHpFill" style="width:100%"></div></div>
+          </div>
+        </div>
+        <div class="mhb-level" id="mhbLevel">1</div>
+      </button>
     </div>
     <div class="header-actions">
       <div class="weather-wrap">
@@ -188,7 +216,6 @@
         <button class="sidebar-item"        data-view="inventory"    onclick="switchView('inventory')">    <span class="si-icon">🎒</span><span class="si-label">Inventario</span></button>
         <div class="sb-nav-label">Archivo</div>
         <button class="sidebar-item"        data-view="history"      onclick="switchView('history')">      <span class="si-icon">📜</span><span class="si-label">Historial</span></button>
-        <button class="sidebar-item"        data-view="calendar"     onclick="switchView('calendar')">     <span class="si-icon">📅</span><span class="si-label">Calendario</span></button>
         <button class="sidebar-item" data-view="integrations"  onclick="switchView('integrations')">  <span class="si-icon">🔗</span><span class="si-label">Integraciones</span></button>
       </div>
 
@@ -217,7 +244,6 @@
         <button class="view-tab" data-view="shop">🏪<span class="tab-label"> Tienda</span></button>
         <button class="view-tab" data-view="inventory">🎒<span class="tab-label"> Inventario</span></button>
         <button class="view-tab" data-view="smithy">⚒️<span class="tab-label"> Herrero</span></button>
-        <button class="view-tab" data-view="calendar">📅<span class="tab-label"> Calendario</span></button>
         <button class="view-tab" data-view="pets">🐾<span class="tab-label"> Mascotas</span></button>
       </div>
 
@@ -254,6 +280,14 @@
               </div>
             </div>
             <div style="font-size:11px;color:var(--blue)" id="weeklyBannerMeta"></div>
+          </div>
+
+          <div id="dailyGoalBar" class="daily-goal-bar" style="display:none">
+            <div class="dgb-label">
+              <span>🎯 Meta diaria</span>
+              <span id="dgbText">0 / 300 XP</span>
+            </div>
+            <div class="dgb-track"><div class="dgb-fill" id="dgbFill" style="width:0%"></div></div>
           </div>
 
           <div class="daily-progress-wrap" id="dailyProgressWrap" style="display:none">
@@ -543,17 +577,6 @@
           </div>
         </div>
 
-        <!-- CALENDAR VIEW -->
-        <div class="view" id="view-calendar">
-          <div class="cal-nav">
-            <button class="btn btn-ghost" onclick="calPrev()">◀</button>
-            <div class="cal-month-title" id="calMonthTitle"></div>
-            <button class="btn btn-ghost" onclick="calNext()">▶</button>
-          </div>
-          <div class="cal-grid" id="calGrid"></div>
-          <div class="cal-detail" id="calDetail"></div>
-        </div>
-
         <!-- PETS VIEW -->
         <div class="view" id="view-pets">
           <div class="view-header">
@@ -693,9 +716,9 @@
     <span class="mobile-nav-icon">⚔️</span>
     <span class="mobile-nav-label">Misiones</span>
   </button>
-  <button class="mobile-nav-btn view-tab" data-view="kanban" onclick="switchView('kanban');closeMobileMore()">
-    <span class="mobile-nav-icon">📋</span>
-    <span class="mobile-nav-label">Kanban</span>
+  <button class="mobile-nav-btn view-tab" data-view="character" onclick="switchView('character');closeMobileMore()">
+    <span class="mobile-nav-icon" id="mhbNavAvatar">🧙</span>
+    <span class="mobile-nav-label">Héroe</span>
   </button>
   <button class="mobile-nav-btn view-tab" data-view="stats" onclick="switchView('stats');closeMobileMore()">
     <span class="mobile-nav-icon">📊</span>
@@ -726,11 +749,17 @@
     <button class="mobile-more-item view-tab" data-view="smithy" onclick="closeMobileMore();switchView('smithy')">
       <span>⚒️</span><span>Herrero</span>
     </button>
-    <button class="mobile-more-item view-tab" data-view="calendar" onclick="closeMobileMore();switchView('calendar')">
-      <span>📅</span><span>Calendario</span>
-    </button>
     <button class="mobile-more-item view-tab" data-view="pets" onclick="closeMobileMore();switchView('pets')">
       <span>🐾</span><span>Mascotas</span>
+    </button>
+    <button class="mobile-more-item view-tab" data-view="kanban" onclick="closeMobileMore();switchView('kanban')">
+      <span>📋</span><span>Kanban</span>
+    </button>
+    <button class="mobile-more-item view-tab" data-view="integrations" onclick="closeMobileMore();switchView('integrations')">
+      <span>🔗</span><span>Integrar</span>
+    </button>
+    <button class="mobile-more-item view-tab" data-view="goals" onclick="closeMobileMore();switchView('goals')">
+      <span>🎯</span><span>Metas</span>
     </button>
   </div>
 </div>
@@ -1199,6 +1228,20 @@
   </div>
 </div>
 
+<!-- Weekly Summary Modal -->
+<div class="modal-overlay" id="weeklySummaryModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title">📊 Resumen Semanal</div>
+    <div class="modal-body" id="weeklySummaryBody"></div>
+    <div class="modal-footer" style="justify-content:center">
+      <button class="btn btn-primary" onclick="closeModal('weeklySummaryModal')">¡A por esta semana! ⚔️</button>
+    </div>
+  </div>
+</div>
+
+<!-- Loot Drop Container -->
+<div id="lootDropContainer" style="position:fixed;inset:0;pointer-events:none;z-index:9000" aria-hidden="true"></div>
+
 <script src="js/config.js?v=9"></script>
 <script src="js/state.js?v=7"></script>
 <script src="js/db.js?v=6"></script>
@@ -1228,13 +1271,15 @@
 <script src="js/dungeon_grows.js?v=1"></script>
 <script src="js/runes.js?v=1"></script>
 <script src="js/google_fit.js?v=1"></script>
-<script src="js/google_cal.js?v=1"></script>
 <script src="js/hero_score.js?v=1"></script>
 <script src="js/push.js?v=1"></script>
 <script src="js/combos.js?v=1"></script>
 <script src="js/habits.js?v=1"></script>
 <script src="js/ruleta.js?v=1"></script>
 <script src="js/duolingo.js?v=1"></script>
+<script src="js/drops.js?v=1"></script>
+<script src="js/daily_goal.js?v=1"></script>
+<script src="js/weekly_summary.js?v=1"></script>
 <script src="js/auth.js?v=1"></script>
 <script src="js/main.js?v=14"></script>
 </body>

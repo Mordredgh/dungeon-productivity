@@ -3993,4 +3993,274 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   background: var(--bg3); color: var(--text); width: 100%;
   font-family: inherit; outline: none; transition: border-color .2s;
 }
+
+/* ============================================================
+   LOGIN PREMIUM REDESIGN
+   ============================================================ */
+.login-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  background: #04070f;
+  overflow: hidden;
+}
+.login-bg {
+  position: absolute; inset: 0; z-index: 0;
+}
+.login-orb {
+  position: absolute; border-radius: 50%; filter: blur(80px);
+  animation: loginOrbFloat 10s ease-in-out infinite alternate;
+}
+.lob-1 { width: 500px; height: 500px; left: -150px; top: -100px; background: rgba(137,180,250,.08); animation-delay: 0s; }
+.lob-2 { width: 400px; height: 400px; right: -120px; bottom: -80px; background: rgba(168,85,247,.07); animation-delay: -3s; }
+.lob-3 { width: 300px; height: 300px; left: 40%; top: 30%; background: rgba(94,234,212,.05); animation-delay: -6s; }
+@keyframes loginOrbFloat { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(30px,20px) scale(1.15); } }
+
+.login-runes {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+}
+.lrune {
+  position: absolute; font-size: 24px; opacity: 0;
+  animation: loginRuneFloat 8s ease-in-out infinite;
+  filter: grayscale(.3);
+}
+.lr1 { left:8%;  top:15%; animation-delay:0s;    animation-duration:9s;  }
+.lr2 { left:88%; top:25%; animation-delay:-2s;   animation-duration:11s; }
+.lr3 { left:15%; top:70%; animation-delay:-4s;   animation-duration:10s; }
+.lr4 { left:80%; top:65%; animation-delay:-1s;   animation-duration:8s;  }
+.lr5 { left:50%; top:10%; animation-delay:-5s;   animation-duration:12s; }
+.lr6 { left:40%; top:85%; animation-delay:-3.5s; animation-duration:9.5s;}
+@keyframes loginRuneFloat {
+  0%,100% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  20%,80% { opacity: .18; }
+  50% { transform: translateY(-25px) rotate(15deg); opacity: .22; }
+}
+
+.login-card {
+  position: relative; z-index: 1;
+  background: rgba(8,12,26,.92);
+  border-radius: 28px;
+  padding: 48px 40px 36px;
+  width: min(440px, calc(100vw - 32px));
+  box-shadow:
+    0 0 0 1px rgba(137,180,250,.12),
+    0 0 80px rgba(137,180,250,.06),
+    0 0 160px rgba(168,85,247,.04),
+    0 30px 80px rgba(0,0,0,.85);
+  text-align: center;
+  overflow: hidden;
+  backdrop-filter: blur(32px);
+  animation: loginCardIn .5s cubic-bezier(.22,.68,0,1.2) both;
+}
+@keyframes loginCardIn {
+  from { opacity: 0; transform: translateY(24px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.login-card::before {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(135deg,
+    rgba(137,180,250,.06) 0%,
+    transparent 40%,
+    rgba(168,85,247,.04) 100%);
+}
+
+.login-emblem {
+  position: relative;
+  width: 88px; height: 88px;
+  margin: 0 auto 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(137,180,250,.15), rgba(168,85,247,.15));
+  border: 1.5px solid rgba(137,180,250,.25);
+  display: flex; align-items: center; justify-content: center;
+  overflow: visible;
+}
+.login-emblem-glow {
+  position: absolute; inset: -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(137,180,250,.15) 0%, transparent 70%);
+  animation: loginEmblemPulse 3s ease-in-out infinite;
+}
+@keyframes loginEmblemPulse {
+  0%,100% { transform: scale(1); opacity: .7; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+.login-logo-img  { width: 52px; height: 52px; object-fit: contain; position: relative; z-index: 1; }
+.login-logo-emoji { font-size: 36px; line-height: 1; position: relative; z-index: 1; }
+
+.login-title {
+  font-family: var(--font-head); font-size: 32px; font-weight: 700;
+  color: var(--text); letter-spacing: .14em; margin: 0 0 6px;
+  background: linear-gradient(135deg, #e2e8f0 0%, var(--accent) 50%, #c4b5fd 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.login-subtitle {
+  font-size: 11px; color: var(--text2); letter-spacing: .08em;
+  text-transform: uppercase; margin: 0 0 28px;
+}
+.login-sep {
+  display: flex; align-items: center; gap: 12px;
+  margin: 0 0 20px; color: var(--text3); font-size: 11px; letter-spacing: .06em;
+}
+.login-sep::before, .login-sep::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(137,180,250,.15), transparent);
+}
+.login-field {
+  display: flex; align-items: center;
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(137,180,250,.12);
+  border-radius: 12px; margin-bottom: 12px;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+}
+.login-field:focus-within {
+  border-color: rgba(137,180,250,.4);
+  background: rgba(137,180,250,.05);
+  box-shadow: 0 0 0 3px rgba(137,180,250,.08), 0 2px 12px rgba(137,180,250,.1);
+}
+.login-field-icon { padding: 0 14px; font-size: 16px; flex-shrink: 0; opacity: .45; }
+.login-input {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--text); font-size: 14px; padding: 15px 0; font-family: inherit;
+}
+.login-input::placeholder { color: var(--text2); opacity: .5; }
+.login-toggle-pw {
+  background: transparent; border: none; cursor: pointer;
+  padding: 0 14px; font-size: 15px; opacity: .45; transition: opacity .2s;
+}
+.login-toggle-pw:hover { opacity: 1; }
+.login-error { font-size: 12px; color: #f38ba8; min-height: 18px; margin: -4px 0 10px; text-align: left; }
+.login-btn {
+  position: relative; overflow: hidden;
+  width: 100%; padding: 15px;
+  font-size: 15px; font-weight: 600; letter-spacing: .05em;
+  background: linear-gradient(135deg, #5b9cf6 0%, #7c3aed 100%);
+  border: none; border-radius: 12px; color: #fff; cursor: pointer;
+  transition: opacity .2s, transform .1s, box-shadow .2s;
+  box-shadow: 0 4px 24px rgba(91,156,246,.3), 0 1px 0 rgba(255,255,255,.1) inset;
+  font-family: inherit; margin-top: 4px;
+}
+.login-btn:hover:not(:disabled) {
+  box-shadow: 0 8px 32px rgba(91,156,246,.45);
+  transform: translateY(-1px);
+}
+.login-btn:active:not(:disabled) { transform: translateY(1px); }
+.login-btn:disabled { opacity: .55; cursor: not-allowed; }
+.login-btn-shine {
+  position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+  transform: skewX(-20deg);
+  animation: loginBtnShine 4s ease-in-out infinite;
+}
+@keyframes loginBtnShine {
+  0%,100% { left: -100%; }
+  60% { left: 150%; }
+}
+.login-footer {
+  margin-top: 20px; font-size: 11px; color: var(--text3);
+  letter-spacing: .04em;
+}
+.login-spinner {
+  display: inline-block; width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,.3); border-top-color: #fff;
+  border-radius: 50%; animation: spin .7s linear infinite;
+  vertical-align: middle; margin-right: 6px;
+}
+
+/* ============================================================
+   MOBILE HERO BUTTON (header, <=600px only)
+   ============================================================ */
+.mobile-hero-btn {
+  display: none;
+  align-items: center; gap: 10px;
+  background: rgba(137,180,250,.06);
+  border: 1px solid rgba(137,180,250,.14);
+  border-radius: 12px;
+  padding: 6px 10px 6px 6px;
+  cursor: pointer; color: var(--text);
+  transition: background .2s, border-color .2s;
+  text-align: left; min-width: 0;
+}
+.mobile-hero-btn:active { background: rgba(137,180,250,.12); }
+.mhb-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(137,180,250,.15), rgba(168,85,247,.15));
+  border: 1.5px solid rgba(137,180,250,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.mhb-info { min-width: 0; flex: 1; }
+.mhb-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mhb-bars { margin-top: 3px; }
+.mhb-hp-wrap { height: 3px; background: rgba(255,255,255,.1); border-radius: 2px; overflow: hidden; width: 80px; }
+.mhb-hp-fill { height: 100%; background: linear-gradient(90deg, #4ade80, #22d3ee); border-radius: 2px; transition: width .5s; }
+.mhb-level {
+  font-size: 11px; font-weight: 700; color: var(--accent);
+  background: rgba(137,180,250,.1); border-radius: 6px;
+  padding: 2px 6px; flex-shrink: 0; font-family: var(--font-head);
+}
+@media (max-width: 600px) {
+  .header-logo-img, .guild-name { display: none !important; }
+  .mobile-hero-btn { display: flex !important; }
+  .header-brand { flex: 1 !important; min-width: 0; }
+}
+
+/* ============================================================
+   DAILY GOAL BAR
+   ============================================================ */
+.daily-goal-bar {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(137,180,250,.1);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin: 8px 0;
+}
+.dgb-label {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--text2); margin-bottom: 5px;
+}
+.dgb-track {
+  height: 5px; background: rgba(255,255,255,.07);
+  border-radius: 3px; overflow: hidden;
+}
+.dgb-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #c4b5fd);
+  border-radius: 3px;
+  transition: width .6s cubic-bezier(.22,.68,0,1.2);
+}
+
+/* ============================================================
+   LOOT DROP ANIMATION
+   ============================================================ */
+.loot-drop {
+  position: absolute;
+  pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  animation: lootFloat 2.2s cubic-bezier(.22,.68,0,1) forwards;
+  z-index: 9001;
+}
+.loot-drop-icon {
+  font-size: 26px;
+  filter: drop-shadow(0 0 8px rgba(255,200,60,.6));
+}
+.loot-drop-label {
+  font-size: 11px; font-weight: 700;
+  color: #fbbf24;
+  background: rgba(0,0,0,.6);
+  border-radius: 6px; padding: 1px 6px;
+  white-space: nowrap;
+}
+.loot-drop-xp {
+  font-size: 18px; font-weight: 800;
+  font-family: var(--font-head);
+  color: #a5f3fc;
+  text-shadow: 0 0 12px rgba(165,243,252,.5);
+}
+@keyframes lootFloat {
+  0%   { opacity:0; transform: translateY(0) scale(.7); }
+  15%  { opacity:1; transform: translateY(-10px) scale(1.1); }
+  70%  { opacity:1; transform: translateY(-60px) scale(1); }
+  100% { opacity:0; transform: translateY(-90px) scale(.9); }
+}
 .quick-create-input-big:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(137,180,250,.15); }
