@@ -92,10 +92,7 @@ async function syncGoogleFitSteps() {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        aggregateBy: [{
-          dataTypeName: 'com.google.step_count.delta',
-          dataSourceId: 'derived:com.google.step_count.delta:com.google.android.gms:merge_step_deltas',
-        }],
+        aggregateBy: [{ dataTypeName: 'com.google.step_count.delta' }],
         bucketByTime: { durationMillis: 86400000 },
         startTimeMillis: startMs, endTimeMillis: startMs + 86400000,
       }),
@@ -115,7 +112,7 @@ async function syncGoogleFitSteps() {
     fitSteps = 0;
     data.bucket?.forEach(b => b.dataset?.forEach(ds => ds.point?.forEach(p =>
       p.value?.forEach(v => { fitSteps += v.intVal || 0; }))));
-    console.log('Fit response buckets:', JSON.stringify(data.bucket?.length), 'steps:', fitSteps);
+    console.log('Fit steps:', fitSteps, '| bucket[0]:', JSON.stringify(data.bucket?.[0]));
     localStorage.setItem('fit-sync-date', today);
     fitSynced = true;
     await _applyFitXP(today);
