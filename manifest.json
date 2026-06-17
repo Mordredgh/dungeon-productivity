@@ -10,6 +10,12 @@
   "icons": [
     {
       "src": "https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
