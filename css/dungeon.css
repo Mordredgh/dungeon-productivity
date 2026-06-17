@@ -1525,6 +1525,58 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   100% { opacity: 0; transform: translateY(-90px) scale(.3) rotate(30deg); }
 }
 
+/* ── Inventory Grid ─────────────────────────────────── */
+#inventoryView { padding: 4px 16px 20px; }
+.inv-summary { font-size: 12px; color: var(--text3); margin-bottom: 16px; }
+.inv-cat-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--text2); margin: 20px 0 8px; }
+.inv-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+
+.inv-slot {
+  background: rgba(137,180,250,.06);
+  border: 1px solid rgba(137,180,250,.13);
+  border-radius: 10px;
+  padding: 0;
+  cursor: pointer;
+  transition: transform .15s, border-color .15s, box-shadow .15s;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+.inv-slot:hover {
+  border-color: var(--inv-color, var(--accent));
+  background: rgba(127,90,240,.12);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.35), 0 0 12px var(--inv-color, var(--accent)), 0 0 0 1px var(--inv-color, var(--accent));
+}
+.inv-slot-inner {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 10px;
+}
+.inv-slot-img { width: 68%; height: 68%; object-fit: contain; }
+.inv-slot-emoji { font-size: 30px; display: flex; align-items: center; justify-content: center; width: 68%; height: 68%; }
+.inv-slot-qty {
+  position: absolute; bottom: 3px; right: 4px;
+  font-size: 10px; font-weight: 800; color: #fff;
+  background: rgba(0,0,0,.65); border-radius: 4px; padding: 1px 4px; line-height: 1.4;
+}
+.inv-slot-name {
+  font-size: 9px; color: var(--text3); text-align: center;
+  padding: 0 3px 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  width: 100%; box-sizing: border-box;
+}
+.inv-empty {
+  border: 1px dashed rgba(137,180,250,.08);
+  background: transparent;
+  pointer-events: none;
+  opacity: .3;
+}
+.inv-detail-img-wrap { margin: 0 auto 4px; width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; }
+
 /* Toast */
 .toast-container {
   position: fixed;

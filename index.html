@@ -1312,5 +1312,25 @@
   </div>
 </div>
 
+<!-- Inventory Item Detail -->
+<div class="modal-overlay" id="invDetailModal">
+  <div class="modal" style="max-width:320px">
+    <div class="modal-title" id="invDetailTitle">Item</div>
+    <div class="modal-body" style="text-align:center">
+      <div class="inv-detail-img-wrap">
+        <img id="invDetailImg" src="" alt="" style="width:80px;height:80px;object-fit:contain">
+        <div id="invDetailEmoji" style="font-size:64px;display:none;align-items:center;justify-content:center"></div>
+      </div>
+      <p id="invDetailDesc" style="color:var(--text2);font-size:13px;margin:10px 0 6px;text-align:left"></p>
+      <p id="invDetailQty"  style="color:var(--gold);font-size:13px;font-weight:700;margin:0 0 4px"></p>
+      <p id="invDetailCost" style="color:var(--text3);font-size:11px;margin:0"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('invDetailModal')">Cerrar</button>
+      <button class="btn btn-primary" id="invDetailUseBtn">Usar</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
