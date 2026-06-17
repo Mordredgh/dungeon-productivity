@@ -56,6 +56,7 @@ async function bootApp() {
   checkNightlyDiary();
   checkProphecyVerdict();
   if (typeof checkWeeklyPatternAnalysis === 'function') checkWeeklyPatternAnalysis();
+  if (typeof checkMonthlyReport         === 'function') checkMonthlyReport();
   if (typeof checkHabitReminders   === 'function') checkHabitReminders();
   if (typeof updateChallengeProgress === 'function') updateChallengeProgress();
   setInterval(() => {

@@ -58,6 +58,11 @@ async function completeHabitQuest(q) {
     hero.hp = newHp;
     await saveHero({ hp: newHp, quests_done: (hero.quests_done || 0) + 1 });
     if (typeof addMana === 'function') addMana(10);
+    // Track habit history
+    const hist = (() => { try { return JSON.parse(hero.habit_history || '{}'); } catch { return {}; } })();
+    const todayH = new Date().toISOString().split('T')[0];
+    if (!hist[q.id]) hist[q.id] = [];
+    if (!hist[q.id].includes(todayH)) { hist[q.id].push(todayH); saveHero({ habit_history: JSON.stringify(hist) }); }
     toast('✅', `Hábito cumplido · +${HABIT_XP} XP · +${HABIT_HP_POS} HP`);
   } else {
     const newHp = Math.max(10, (hero.hp || 100) - HABIT_HP_NEG);
@@ -70,6 +75,40 @@ async function completeHabitQuest(q) {
   renderQuestList();
   checkAchievements();
   if (typeof registerCombo === 'function' && !isNeg) registerCombo();
+}
+
+function renderHabitHeatmap(questId) {
+  const modal = document.getElementById('habitHeatmapModal');
+  if (!modal) return;
+  const hist  = (() => { try { return JSON.parse(hero.habit_history || '{}'); } catch { return {}; } })();
+  const dates = new Set(hist[questId] || []);
+  const quest = quests.find(q => q.id === questId);
+
+  document.getElementById('hhTitle').textContent = quest?.name || 'Hábito';
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr  = today.toISOString().split('T')[0];
+  const dowToday  = (today.getDay() + 6) % 7; // 0=Mon…6=Sun
+  const startDate = new Date(today.getTime() - (dowToday + 7 * 11) * 86400000);
+
+  const cells = [];
+  for (let i = 0; i < 84; i++) {
+    const d    = new Date(startDate.getTime() + i * 86400000);
+    const dStr = d.toISOString().split('T')[0];
+    cells.push({ str: dStr, done: dates.has(dStr), future: d > today, today: dStr === todayStr });
+  }
+
+  const grid = document.getElementById('hhGrid');
+  if (grid) grid.innerHTML = cells.map(c =>
+    `<div class="hh-cell ${c.future ? 'hh-future' : c.done ? 'hh-done' : 'hh-miss'} ${c.today ? 'hh-today' : ''}" title="${c.str}"></div>`
+  ).join('');
+
+  const completed = cells.filter(c => c.done && !c.future).length;
+  const total     = cells.filter(c => !c.future).length;
+  const pct       = total ? Math.round(completed / total * 100) : 0;
+  const el = document.getElementById('hhStats');
+  if (el) el.textContent = `✅ ${completed} de ${total} días · ${pct}% de cumplimiento`;
+  openModal('habitHeatmapModal');
 }
 
 function renderHabitItem(q) {
@@ -93,6 +132,7 @@ function renderHabitItem(q) {
       </div>
     </div>
     <div class="quest-actions">
+      ${!isNeg ? `<button class="habit-heat-btn" title="Ver historial" onclick="event.stopPropagation();renderHabitHeatmap('${q.id}')">📊</button>` : ''}
       <button class="habit-pom-btn" title="Vincular Pomodoro"
         onclick="event.stopPropagation();setActiveQuest('${q.id}')">🍅</button>
       ${!q.done

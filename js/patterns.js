@@ -68,6 +68,73 @@ function checkWeeklyPatternAnalysis() {
   generatePatternAnalysis(true);
 }
 
+/* ── REPORTE MENSUAL ─────────────────────────────────── */
+function _buildMonthlyPrompt() {
+  const now   = new Date();
+  const since = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const until = new Date(now.getFullYear(), now.getMonth(), 1);
+  const recent     = quests.filter(q => q.done && q.done_at && new Date(q.done_at) >= since && new Date(q.done_at) < until);
+  const recentPoms = pomodoros.filter(p => p.started_at && new Date(p.started_at) >= since && new Date(p.started_at) < until);
+  const pomMins    = recentPoms.reduce((s, p) => s + (p.duration_min || 25), 0);
+
+  let achDates = {};
+  try { achDates = JSON.parse(hero.achievement_dates || '{}'); } catch {}
+  const monthStr  = since.toISOString().slice(0, 7);
+  const newAchs   = Object.values(achDates).filter(d => d && d.startsWith(monthStr)).length;
+  const typeLines = Object.entries(recent.reduce((a, q) => { a[q.type] = (a[q.type] || 0) + 1; return a; }, {}))
+    .map(([t, c]) => `${t}:${c}`).join(', ') || '(sin datos)';
+
+  return `Eres un analista de productividad. Genera un reporte mensual motivador pero honesto en 4-5 puntos clave. Datos del mes pasado:
+- Misiones completadas: ${recent.length}
+- Pomodoros: ${recentPoms.length} (${(pomMins / 60).toFixed(1)} horas de foco)
+- Nivel actual: ${hero._level || 1}, Racha: ${hero.streak || 0} días
+- Logros nuevos este mes: ${newAchs}
+- Por tipo: ${typeLines}
+Responde directo, sin saludos, una línea por punto.`;
+}
+
+async function generateMonthlyReport(force) {
+  if (!hero) return;
+  const now      = new Date();
+  const monthKey = `${now.getFullYear()}-${String(now.getMonth()).padStart(2, '0')}`;
+  if (!force && hero.monthly_report_date === monthKey && hero.monthly_report_text) { renderMonthlyReport(); return; }
+
+  const el = document.getElementById('monthlyReportContent');
+  if (el) el.innerHTML = `<div style="color:var(--text3);font-size:12px">📊 Generando reporte mensual...</div>`;
+
+  let text = '';
+  try {
+    const r    = await fetch('/openclaw/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: _buildMonthlyPrompt() }) });
+    const data = await r.json();
+    text = (data.reply || '').trim();
+  } catch {}
+
+  if (!text) { if (el) el.innerHTML = `<div style="color:var(--text3);font-size:12px">⚠️ No se pudo generar el reporte.</div>`; return; }
+
+  hero.monthly_report_text = text; hero.monthly_report_date = monthKey;
+  await saveHero({ monthly_report_text: text, monthly_report_date: monthKey });
+  renderMonthlyReport();
+}
+
+function checkMonthlyReport() {
+  if (!hero || new Date().getDate() !== 1) return;
+  const now      = new Date();
+  const monthKey = `${now.getFullYear()}-${String(now.getMonth()).padStart(2, '0')}`;
+  if (hero.monthly_report_date !== monthKey) generateMonthlyReport();
+}
+
+function renderMonthlyReport() {
+  const el = document.getElementById('monthlyReportContent');
+  if (!el) return;
+  if (!hero?.monthly_report_text) {
+    el.innerHTML = `<div style="color:var(--text3);font-size:12px">Sin reporte todavía. Se genera el 1° de cada mes.</div>`;
+    return;
+  }
+  el.innerHTML = hero.monthly_report_text.split('\n').filter(Boolean).map(line =>
+    `<div class="pattern-line">📊 ${escHtml(line.replace(/^[-*•]\s*/, ''))}</div>`
+  ).join('');
+}
+
 function renderPatterns() {
   const el = document.getElementById('patternsContent');
   if (!el || !hero) return;

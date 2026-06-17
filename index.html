@@ -414,6 +414,14 @@
               <div id="patternsContent"></div>
             </div>
 
+            <div class="stats-card" style="grid-column:1/-1">
+              <div class="stats-card-title" style="display:flex;justify-content:space-between;align-items:center">
+                <span>📅 Reporte Mensual (IA)</span>
+                <button class="btn btn-ghost" style="padding:4px 12px;font-size:11px" onclick="generateMonthlyReport(true)">🔄 Generar</button>
+              </div>
+              <div id="monthlyReportContent"></div>
+            </div>
+
             <div class="stats-card">
               <div class="stats-card-title">🏅 Top Búsquedas</div>
               <div id="topQuestsContent" style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text2)">
@@ -1308,6 +1316,21 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('templatesModal')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Habit Heatmap -->
+<div class="modal-overlay" id="habitHeatmapModal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-title" id="hhTitle">Hábito</div>
+    <div class="modal-body">
+      <div class="hh-day-labels"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+      <div id="hhGrid" class="hh-grid"></div>
+      <div id="hhStats" style="font-size:12px;color:var(--text3);margin-top:10px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal('habitHeatmapModal')">Cerrar</button>
     </div>
   </div>
 </div>
