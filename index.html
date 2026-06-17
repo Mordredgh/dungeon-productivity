@@ -164,25 +164,25 @@
         <div class="hero-title" id="heroTitle">Nivel 1 · Aprendiz</div>
       </div>
 
-      <!-- BARRAS XP / HP -->
+      <!-- BARRAS XP / HP / MANÁ -->
       <div class="sb-bars">
         <div class="sb-bar-block">
           <div class="sb-bar-header">
-            <span class="sb-bar-lbl">XP</span>
+            <span class="sb-bar-lbl">✨</span>
             <span class="sb-bar-val" id="xpLabel">0/100</span>
           </div>
           <div class="xp-bar sb-bar"><div class="xp-bar-fill" id="xpBarFill" style="width:0%"></div></div>
         </div>
         <div class="sb-bar-block">
           <div class="sb-bar-header">
-            <span class="sb-bar-lbl">HP</span>
+            <span class="sb-bar-lbl">❤️</span>
             <span class="sb-bar-val" id="hpLabel">100/100</span>
           </div>
           <div class="hp-bar sb-bar"><div class="hp-bar-fill" id="hpBarFill" style="width:100%"></div></div>
         </div>
         <div class="sb-bar-block">
           <div class="sb-bar-header">
-            <span class="sb-bar-lbl">🔵 Maná</span>
+            <span class="sb-bar-lbl">🔵</span>
             <span class="sb-bar-val" id="manaLabel">0 / 100</span>
           </div>
           <div class="mana-bar sb-bar"><div class="mana-bar-fill" id="manaBarFill" style="width:0%"></div></div>
@@ -236,8 +236,10 @@
         <button class="sidebar-logout" onclick="doLogout()" title="Cerrar sesión">🚪</button>
       </div>
 
-      <!-- SPOTIFY — oculto en rail, accesible desde integraciones -->
-      <div id="spotifyPlayer" class="spotify-player" style="display:none"></div>
+      <!-- SPOTIFY -->
+      <div style="padding:0 8px 8px;flex-shrink:0">
+        <div id="spotifyPlayer" class="spotify-player"></div>
+      </div>
 
     </nav>
 
