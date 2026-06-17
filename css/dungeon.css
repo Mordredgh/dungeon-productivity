@@ -467,11 +467,11 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   border-bottom: 1px solid rgba(137,180,250,.08);
   flex-shrink: 0;
 }
-.sb-bar-block  { display: flex; align-items: center; gap: 5px; }
+.sb-bar-block  { display: flex; align-items: center; flex-wrap: wrap; gap: 0 5px; }
 .sb-bar-header { display: contents; }
-.sb-bar-lbl    { font-size: 12px; width: 14px; text-align: center; flex-shrink: 0; order: 1; }
-.sb-bars .sb-bar { flex: 1; height: 8px; border-radius: 4px; overflow: hidden; order: 2; }
-.sb-bar-val    { display: block; font-size: 9px; color: var(--text3); white-space: nowrap; flex-shrink: 0; order: 3; min-width: 48px; text-align: right; }
+.sb-bar-lbl    { font-size: 12px; width: 16px; text-align: center; flex-shrink: 0; order: 1; }
+.sb-bars .sb-bar { flex: 1; height: 8px; border-radius: 4px; overflow: hidden; order: 2; min-width: 0; }
+.sb-bar-val    { display: block; order: 3; width: 100%; font-size: 9px; color: var(--text3); padding-left: 21px; margin-top: 2px; white-space: nowrap; }
 
 /* Mini stat cards — 3 en fila con color */
 .sb-stats {
