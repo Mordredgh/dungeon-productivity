@@ -360,7 +360,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .main {
   display: grid;
-  grid-template-columns: 130px 1fr 290px;
+  grid-template-columns: 158px 1fr 290px;
   grid-template-rows: 1fr;
   gap: 0;
   height: calc(100vh - 48px);
