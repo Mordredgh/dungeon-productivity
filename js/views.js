@@ -4,7 +4,6 @@
 function renderAll() {
   renderHeroUI();
   renderQuestList();
-  renderKanban();
   renderSpells();
   renderAchievements();
   renderHistory();
@@ -389,29 +388,6 @@ function reorderQuest(targetId) {
   draggedQuestId = null;
 }
 
-function renderKanban() {
-  const pending = quests.filter(q => !q.done && q.type !== 'daily');
-  const inBattle = quests.filter(q => !q.done && q.type === 'daily');
-  const done = quests.filter(q => q.done).slice(0, 20);
-
-  const makeCard = q => `<div class="kanban-card" data-type="${q.type}" draggable="true"
-    ondragstart="draggedQuestId='${q.id}';event.dataTransfer.effectAllowed='move';this.classList.add('dragging')"
-    ondragend="this.classList.remove('dragging')">
-    <div class="kanban-card-name">${escHtml(q.name)}</div>
-    <div class="quest-meta">
-      <span class="badge badge-type-${q.type}">${q.type}</span>
-      <span class="xp-reward">+${calcQuestXP(q)} XP</span>
-    </div>
-  </div>`;
-
-  const noItems = '<div style="color:var(--text3);font-size:12px;padding:8px">Sin misiones</div>';
-  document.getElementById('k-pending').innerHTML = pending.length ? pending.map(makeCard).join('') : noItems;
-  document.getElementById('k-battle').innerHTML = inBattle.length ? inBattle.map(makeCard).join('') : noItems;
-  document.getElementById('k-done').innerHTML = done.length ? done.map(makeCard).join('') : noItems;
-  document.getElementById('k-pending-count').textContent = pending.length;
-  document.getElementById('k-battle-count').textContent = inBattle.length;
-  document.getElementById('k-done-count').textContent = done.length;
-}
 
 function renderMissionsChart() {
   const el = document.getElementById('missionsChart30');

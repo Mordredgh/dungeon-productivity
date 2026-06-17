@@ -9,7 +9,7 @@ async function initDB() {
     const ch = localStorage.getItem('dungeon-cache-hero');
     const cq = localStorage.getItem('dungeon-cache-quests');
     if (ch) { hero = JSON.parse(ch); deriveHero(); renderHeroUI(); }
-    if (cq) { quests = JSON.parse(cq); renderQuestList(); renderKanban(); }
+    if (cq) { quests = JSON.parse(cq); renderQuestList(); }
   } catch {}
 
   if (!quests.length) showSkeleton();

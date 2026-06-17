@@ -14,7 +14,6 @@ async function addQuest(q) {
   }
   quests.unshift(data);
   renderQuestList();
-  renderKanban();
   updateBossBanner();
   toast('⚔️', `Misión creada: ${q.name}`);
   showContratoEffect(q.name);
@@ -214,7 +213,6 @@ async function completeQuest(id, el) {
   }
 
   renderQuestList();
-  renderKanban();
   renderHistory();
   renderStats();
   updateBossBanner();
@@ -238,7 +236,7 @@ async function undoComplete() {
   await saveHero(patch);
   lastCompletedUndo = null;
   toast('↩️', 'Misión revertida');
-  renderQuestList(); renderKanban(); renderHeroUI(); renderStats(); updateBossBanner();
+  renderQuestList(); renderHeroUI(); renderStats(); updateBossBanner();
 }
 
 async function deleteQuest(id) {
@@ -246,7 +244,6 @@ async function deleteQuest(id) {
   quests = quests.filter(x => x.id !== id);
   closeModal('editQuestModal');
   renderQuestList();
-  renderKanban();
   updateBossBanner();
   toast('🗑️', 'Misión eliminada');
 }
@@ -257,7 +254,6 @@ async function updateQuest(id, patch) {
   if (q) Object.assign(q, patch);
   closeModal('editQuestModal');
   renderQuestList();
-  renderKanban();
   updateBossBanner();
   toast('✏️', 'Misión actualizada');
 }

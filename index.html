@@ -237,7 +237,6 @@
 
       <div class="view-tabs">
         <button class="view-tab active" data-view="quests">⚔️<span class="tab-label"> Misiones</span></button>
-        <button class="view-tab" data-view="kanban">📋<span class="tab-label"> Kanban</span></button>
         <button class="view-tab" data-view="stats">📊<span class="tab-label"> Trono</span></button>
         <button class="view-tab" data-view="achievements">🏆<span class="tab-label"> Logros</span></button>
         <button class="view-tab" data-view="history">📜<span class="tab-label"> Historial</span></button>
@@ -338,32 +337,6 @@
 
         </div>
 
-        <!-- KANBAN VIEW -->
-        <div class="view" id="view-kanban">
-          <div class="kanban-board">
-            <div class="kanban-col" data-col="pending">
-              <div class="kanban-col-header">
-                <span class="kanban-col-title">⏳ Pendiente</span>
-                <span class="kanban-col-count" id="k-pending-count">0</span>
-              </div>
-              <div class="kanban-cards" id="k-pending"></div>
-            </div>
-            <div class="kanban-col" data-col="battle">
-              <div class="kanban-col-header">
-                <span class="kanban-col-title">⚔️ En Batalla</span>
-                <span class="kanban-col-count" id="k-battle-count">0</span>
-              </div>
-              <div class="kanban-cards" id="k-battle"></div>
-            </div>
-            <div class="kanban-col" data-col="done">
-              <div class="kanban-col-header">
-                <span class="kanban-col-title">✅ Conquistado</span>
-                <span class="kanban-col-count" id="k-done-count">0</span>
-              </div>
-              <div class="kanban-cards" id="k-done"></div>
-            </div>
-          </div>
-        </div>
 
         <!-- GOALS VIEW -->
         <div class="view" id="view-goals">
@@ -751,9 +724,6 @@
     </button>
     <button class="mobile-more-item view-tab" data-view="pets" onclick="closeMobileMore();switchView('pets')">
       <span>🐾</span><span>Mascotas</span>
-    </button>
-    <button class="mobile-more-item view-tab" data-view="kanban" onclick="closeMobileMore();switchView('kanban')">
-      <span>📋</span><span>Kanban</span>
     </button>
     <button class="mobile-more-item view-tab" data-view="integrations" onclick="closeMobileMore();switchView('integrations')">
       <span>🔗</span><span>Integrar</span>

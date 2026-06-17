@@ -198,7 +198,7 @@ function switchView(v) {
   // Mobile nav: highlight "Más" button when active view isn't a primary tab
   const moreBtn = document.getElementById('mobileNavMoreBtn');
   if (moreBtn) {
-    const primaryViews = ['quests', 'kanban', 'stats'];
+    const primaryViews = ['quests', 'character', 'stats'];
     moreBtn.classList.toggle('mobile-nav-more-active', !primaryViews.includes(v));
   }
 }
@@ -254,7 +254,7 @@ document.addEventListener('keydown', e => {
   if (e.key === '?') { e.preventDefault(); openModal('shortcutsModal'); }
   if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
   if (key === '1') switchView('quests');
-  if (key === '2') switchView('kanban');
+  if (key === '2') switchView('character');
   if (key === '3') switchView('stats');
   if (key === '4') switchView('achievements');
   if (key === '5') switchView('history');

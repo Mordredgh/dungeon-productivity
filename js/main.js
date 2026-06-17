@@ -39,7 +39,6 @@ async function bootApp() {
   restoreTimerState();
   checkStreakDanger();
   initPWA();
-  initKanbanDrag();
   setInterval(renderSpells, 2 * 60 * 1000);
   setInterval(checkStreakDanger, 30 * 60 * 1000);
   showWelcomeScreen();

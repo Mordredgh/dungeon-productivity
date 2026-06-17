@@ -200,7 +200,6 @@ async function resetDailyQuests() {
   if (toReset.length) {
     toast('🌅', `${toReset.length} misiones diarias reseteadas para hoy.`);
     renderQuestList();
-    renderKanban();
   }
 }
 
@@ -497,45 +496,6 @@ function dismissStreakDanger() {
    Update renderQuestItem para subtareas y drag handle
    ============================================================ */
 
-/* ============================================================
-   FEATURE 3: Drag-and-drop Kanban — status change
-   ============================================================ */
-let draggedQuestId = null;
-
-function initKanbanDrag() {
-  document.querySelectorAll('.kanban-cards').forEach(col => {
-    col.addEventListener('dragover', e => {
-      e.preventDefault();
-      col.classList.add('drag-over');
-    });
-    col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
-    col.addEventListener('drop', async e => {
-      e.preventDefault();
-      col.classList.remove('drag-over');
-      if (!draggedQuestId) return;
-      const colId = col.id;
-      const q = quests.find(x => x.id === draggedQuestId);
-      if (!q) return;
-      if (colId === 'k-done' && !q.done) {
-        await completeQuest(q.id, null);
-      } else if (colId === 'k-battle' && q.type !== 'daily') {
-        await updateQuest(q.id, { type: 'daily' });
-        renderKanban();
-      } else if (colId === 'k-pending' && (q.done || q.type === 'daily')) {
-        if (q.done) {
-          await db.from('dungeon_quests').update({ done: false, done_at: null }).eq('id', q.id);
-          q.done = false; q.done_at = null;
-        }
-        if (q.type === 'daily') {
-          await db.from('dungeon_quests').update({ type: 'side' }).eq('id', q.id);
-          q.type = 'side';
-        }
-        renderQuestList(); renderKanban();
-      }
-      draggedQuestId = null;
-    });
-  });
-}
 
 /* ============================================================
    HISTORY con búsqueda y filtro de tipo
