@@ -1871,14 +1871,15 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   .stats-grid   { grid-template-columns: 1fr 1fr; }
   .achievements-grid { grid-template-columns: 1fr 1fr; }
 
-  /* ── BOTTOM NAV — emoji only, fits all 10 tabs ──────────── */
-  .tab-label { display: none !important; }
-  .view-tab {
-    min-width: 36px !important; max-width: 56px !important;
-    font-size: 20px !important;
-    padding: 8px 4px 6px !important;
-    line-height: 1 !important;
+  /* ── OLD TAB BAR — replaced by #mobileNav ───────────────── */
+  .view-tabs { display: none !important; }
+
+  /* ── MOBILE NAV BAR ──────────────────────────────────────── */
+  .mobile-nav {
+    display: flex !important;
   }
+  .content-area { padding-bottom: 72px !important; }
+  .mobile-fab   { bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important; }
 
   /* ── QUEST CARDS — compact meta row ─────────────────────── */
   .drag-handle { display: none !important; }
@@ -1918,6 +1919,131 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   .quest-actions { opacity: 1 !important; }
   .quest-action-btn { width: 28px !important; height: 28px !important; font-size: 13px !important; }
 }
+
+/* ============================================================
+   MOBILE NAV — premium 4-tab bar + Más sheet
+   ============================================================ */
+.mobile-nav {
+  display: none; /* shown via @media override */
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 60px;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  z-index: 90;
+  padding: 0 6px;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-shadow: 0 -4px 24px rgba(0,0,0,.35);
+  gap: 2px;
+  align-items: stretch;
+}
+
+.mobile-nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  border-radius: 12px;
+  transition: color .15s ease, background .15s ease;
+  padding: 6px 4px 5px;
+  position: relative;
+}
+.mobile-nav-btn.active,
+.mobile-nav-btn.mobile-nav-more-active {
+  color: var(--accent);
+}
+.mobile-nav-btn.active::before,
+.mobile-nav-btn.mobile-nav-more-active::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 50%; transform: translateX(-50%);
+  width: 28px; height: 32px;
+  background: rgba(137,180,250,.12);
+  border-radius: 10px;
+  z-index: -1;
+}
+.mobile-nav-icon { font-size: 22px; line-height: 1; position: relative; z-index: 1; }
+.mobile-nav-label {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: .2px;
+  font-family: var(--font-body);
+}
+
+/* ── MÁS OVERLAY ── */
+.mobile-nav-more-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 95;
+  backdrop-filter: blur(3px);
+}
+.mobile-nav-more-overlay.open { display: block; }
+
+/* ── MÁS SHEET ── */
+.mobile-nav-more-sheet {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--card);
+  border-radius: 24px 24px 0 0;
+  z-index: 96;
+  padding: 12px 16px calc(72px + env(safe-area-inset-bottom, 0px));
+  transform: translateY(100%);
+  transition: transform .28s cubic-bezier(.33,1,.68,1);
+  border-top: 1px solid var(--border2);
+  box-shadow: 0 -12px 48px rgba(0,0,0,.5);
+}
+.mobile-nav-more-sheet.open { transform: translateY(0); }
+
+.mobile-nav-more-handle {
+  width: 40px; height: 4px;
+  background: var(--border2);
+  border-radius: 2px;
+  margin: 0 auto 14px;
+}
+.mobile-nav-more-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin: 0 0 12px 2px;
+  font-family: var(--font-head);
+}
+.mobile-nav-more-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.mobile-more-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 8px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: var(--transition-spring);
+}
+.mobile-more-item:active { transform: scale(.94); }
+.mobile-more-item.active {
+  background: rgba(137,180,250,.12);
+  color: var(--accent);
+  border-color: rgba(137,180,250,.3);
+}
+.mobile-more-item > span:first-child { font-size: 26px; }
+.mobile-more-item > span:last-child  { font-size: 10px; font-weight: 600; font-family: var(--font-body); }
 
 /* ── MOBILE ADD SHEET (all sizes) ───────────────────────────── */
 .mobile-add-overlay {

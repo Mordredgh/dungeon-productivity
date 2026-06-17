@@ -195,6 +195,21 @@ function switchView(v) {
   if (v === 'goals')        { if (typeof renderGoals==='function')        renderGoals(); }
   if (v === 'dungeon-grows'){ if (typeof renderDungeonGrows==='function') renderDungeonGrows(); }
   if (v === 'integrations') { renderIntegrations(); }
+  // Mobile nav: highlight "Más" button when active view isn't a primary tab
+  const moreBtn = document.getElementById('mobileNavMoreBtn');
+  if (moreBtn) {
+    const primaryViews = ['quests', 'kanban', 'stats'];
+    moreBtn.classList.toggle('mobile-nav-more-active', !primaryViews.includes(v));
+  }
+}
+
+function openMobileMore() {
+  document.getElementById('mobileNavMoreOverlay')?.classList.add('open');
+  document.getElementById('mobileNavMoreSheet')?.classList.add('open');
+}
+function closeMobileMore() {
+  document.getElementById('mobileNavMoreOverlay')?.classList.remove('open');
+  document.getElementById('mobileNavMoreSheet')?.classList.remove('open');
 }
 
 function switchCharTab(tab) {

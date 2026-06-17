@@ -673,6 +673,54 @@
 </div>
 <button class="mobile-fab" id="mobileFab" onclick="openMobileAdd()" aria-label="Nueva misión">+</button>
 
+<!-- MOBILE NAV (≤600px) — 4 tabs + Más sheet -->
+<nav id="mobileNav" class="mobile-nav" aria-label="Navegación móvil">
+  <button class="mobile-nav-btn view-tab active" data-view="quests" onclick="switchView('quests');closeMobileMore()">
+    <span class="mobile-nav-icon">⚔️</span>
+    <span class="mobile-nav-label">Misiones</span>
+  </button>
+  <button class="mobile-nav-btn view-tab" data-view="kanban" onclick="switchView('kanban');closeMobileMore()">
+    <span class="mobile-nav-icon">📋</span>
+    <span class="mobile-nav-label">Kanban</span>
+  </button>
+  <button class="mobile-nav-btn view-tab" data-view="stats" onclick="switchView('stats');closeMobileMore()">
+    <span class="mobile-nav-icon">📊</span>
+    <span class="mobile-nav-label">Trono</span>
+  </button>
+  <button class="mobile-nav-btn" id="mobileNavMoreBtn" onclick="openMobileMore()">
+    <span class="mobile-nav-icon">⋯</span>
+    <span class="mobile-nav-label">Más</span>
+  </button>
+</nav>
+<div id="mobileNavMoreOverlay" class="mobile-nav-more-overlay" onclick="closeMobileMore()"></div>
+<div id="mobileNavMoreSheet" class="mobile-nav-more-sheet">
+  <div class="mobile-nav-more-handle"></div>
+  <p class="mobile-nav-more-title">Explorar</p>
+  <div class="mobile-nav-more-grid">
+    <button class="mobile-more-item view-tab" data-view="shop" onclick="closeMobileMore();switchView('shop')">
+      <span>🏪</span><span>Tienda</span>
+    </button>
+    <button class="mobile-more-item view-tab" data-view="inventory" onclick="closeMobileMore();switchView('inventory')">
+      <span>🎒</span><span>Inventario</span>
+    </button>
+    <button class="mobile-more-item view-tab" data-view="achievements" onclick="closeMobileMore();switchView('achievements')">
+      <span>🏆</span><span>Logros</span>
+    </button>
+    <button class="mobile-more-item view-tab" data-view="history" onclick="closeMobileMore();switchView('history')">
+      <span>📜</span><span>Historial</span>
+    </button>
+    <button class="mobile-more-item view-tab" data-view="smithy" onclick="closeMobileMore();switchView('smithy')">
+      <span>⚒️</span><span>Herrero</span>
+    </button>
+    <button class="mobile-more-item view-tab" data-view="calendar" onclick="closeMobileMore();switchView('calendar')">
+      <span>📅</span><span>Calendario</span>
+    </button>
+    <button class="mobile-more-item view-tab" data-view="pets" onclick="closeMobileMore();switchView('pets')">
+      <span>🐾</span><span>Mascotas</span>
+    </button>
+  </div>
+</div>
+
 <!-- MODALS -->
 
 <!-- Level Up -->
