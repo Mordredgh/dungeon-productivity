@@ -1,21 +1,23 @@
-# Dungeon Productivity — CLAUDE.md
+# Arcanum Dungeon Productivity — CLAUDE.md
+> Última actualización: 2026-06-17 · SW cache: `dungeon-v39`
 
 ## Proyecto
-PWA de productividad con temática D&D/RPG.  
-URL: https://dungeon.mordredgh.com  
-Repo: Mordredgh/dungeon-productivity  
-Deploy: Coolify (git push → auto-deploy)  
-Backend: Supabase Aglaya (mismo proyecto que otros apps de Gerardo)
+- **URL:** https://dungeon.mordredgh.com
+- **Repo:** Mordredgh/dungeon-productivity
+- **Deploy:** Coolify (git push → auto-deploy, ~1 min)
+- **Backend:** Supabase Aglaya (`stdedxhxxoyostymldqn.supabase.co`)
+- **Stack:** Vanilla JS · Sin bundler · Sin framework · CSS custom properties
+
+## Reglas críticas
+- **NUNCA** mencionar Electron, SQLite, ipcRenderer
+- **NUNCA** usar preview_* tools (es PWA web en Coolify, no hay servidor local)
+- **Siempre** bumpar `sw.js` cache version al modificar JS/CSS
+- **Siempre** hacer `git add -A && git commit && git push origin main` al terminar
+- **Siempre** anotar cambios en `CHANGELOG.md`
+- `saveHero({ campo })` para updates al héroe — nunca raw upsert
+- Subtasks en markdown dentro de `quest.notes` — nunca tabla separada
 
 ---
-
-## Stack
-- Vanilla JS (sin frameworks, sin bundler)
-- CSS custom properties con temas (dark, light, oled, nature, inferno, abyss)
-- Supabase JS client (CDN)
-- Fonts: Cinzel (headings) + Inter (body)
-- **NO Electron, NO SQLite, NO ipcRenderer**
-- **NO preview_* tools** — es PWA web en Coolify
 
 ## Orden de carga de scripts (index.html)
 ```
@@ -23,214 +25,270 @@ config.js → state.js → db.js → hero.js → quests.js → timer.js → inve
 spells.js → views.js → ui.js → events.js → shop.js → familiar.js → rpg.js →
 pets.js → weapons.js → goals.js → reputation.js → patterns.js → mechanics.js →
 character.js → spotify.js → weather.js → dungeon_clock.js → skill_tree.js →
-bestiary.js → dungeon_grows.js → runes.js → google_fit.js → google_cal.js →
-hero_score.js → push.js → combos.js → habits.js → ruleta.js → duolingo.js →
-auth.js → main.js
+bestiary.js → dungeon_grows.js → runes.js → google_fit.js → hero_score.js →
+push.js → combos.js → habits.js → ruleta.js → duolingo.js →
+drops.js → daily_goal.js → weekly_summary.js → auth.js → main.js
 ```
-Agregar archivos nuevos ANTES de main.js.
+Agregar archivos nuevos **ANTES de auth.js**.
 
 ---
 
-## Service Worker
-Cache actual: `dungeon-v38`  
-Bumpar versión en `sw.js` siempre que se agregue o modifique JS/CSS.
+## Mapa de archivos JS
+
+### Núcleo
+| Archivo | Propósito | Funciones clave |
+|---------|-----------|----------------|
+| `config.js` | Constantes globales | `SUPA_URL`, `SUPA_KEY`, `XP_TABLE`, `GOLD_TABLE`, `CLASS_SKILLS`, `SHOP_ITEMS`, `ACHIEVEMENT_DEFS`, `DROP_TABLE` |
+| `state.js` | Variables globales | `db`, `hero`, `quests`, `pomodoros`, `timer`, `goals`, `bulkMode`, `spotifyAccessToken`, `xpMultiplier` |
+| `db.js` | Supabase ops | `initDB()`, `loadHero()`, `loadQuests()`, `loadPomodoros()`, `savePom()`, `loadInventory()`, `loadPets()` |
+| `hero.js` | Progresión héroe | `loadHero()`, `deriveHero()`, `saveHero()`, `addXP()`, `addHP()`, `calcLevel()`, `checkDailyStreak()`, `xpForLevel()` |
+| `auth.js` | Login/logout | `doLogin()`, `doLogout()`, `toggleLoginPw()` |
+| `main.js` | Boot | `bootApp()` — inicializa todo en orden |
+
+### Misiones y Timer
+| Archivo | Propósito | Funciones clave |
+|---------|-----------|----------------|
+| `quests.js` | CRUD misiones + completar | `addQuest()`, `completeQuest()`, `undoComplete()`, `deleteQuest()`, `updateQuest()`, `_checkMissionShield()` |
+| `timer.js` | Pomodoro | `startTimer()`, `pauseTimer()`, `resetTimer()`, `tickTimer()`, `advancePhase()`, `updateTimerUI()` |
+| `habits.js` | Hábitos +/- | `completeHabitQuest()`, `isHabitNegative()`, `renderHabitItem()` |
+
+### Vistas y UI
+| Archivo | Propósito | Funciones clave |
+|---------|-----------|----------------|
+| `views.js` | Render principal | `renderAll()`, `renderHeroUI()`, `renderQuestList()`, `renderQuestItem()`, `renderStats()`, `updateBossBanner()`, `renderHabitItem()`, `renderPomHeatmap()` |
+| `ui.js` | Modales y navegación | `openModal()`, `closeModal()`, `toast()`, `switchView()`, `switchCharTab()`, `openEditQuest()`, `toggleCompact()` |
+| `events.js` | Manejadores de eventos | `resetDailyQuests()`, `checkMorningReview()`, `toggleNightmareMode()`, `renderNightmareModeBtn()`, `openQuickCreate()`, `parseQuickCreate()` |
+| `character.js` | Hoja de personaje | `renderCharacterSheet()`, `saveCharacterSheet()`, `assignAttrPoint()` |
+
+### Sistemas RPG
+| Archivo | Propósito | Funciones clave |
+|---------|-----------|----------------|
+| `rpg.js` | Skills, eventos, diario | `useClassSkill()`, `getBossState()`, `damageBoss()`, `checkRandomEvent()`, `generateDiaryEntry()`, `openDiary()` |
+| `inventory.js` | Items y drops | `loadInventory()`, `addInvItem()`, `consumeInvItem()`, `rollLoot()`, `grantLoot()`, `showRewardModal()` |
+| `shop.js` | Tienda y gold | `getGold()`, `addGold()`, `spendGold()`, `buyItem()`, `getPotionMult()` |
+| `spells.js` | Hechizos | `castSpell()`, `renderSpells()`, `checkAchievements()`, `renderAchievements()` |
+| `weapons.js` | Armas y forja | `loadWeapons()`, `equipWeapon()`, `craftWeapon()`, `renderSmithy()` |
+| `pets.js` | Mascotas | `loadPets()`, `hatchEgg()`, `feedPet()`, `setActivePet()`, `activatePetPower()`, `getPetEffect()` |
+| `runes.js` | Runas | `loadRunes()`, `tryRuneDrop()`, `socketRune()`, `getRuneBonus()` |
+| `skill_tree.js` | Árbol de habilidades | `hasSkill()`, `learnSkill()`, `getSkillTreeXPBonus()` |
+| `bestiary.js` | Bestiario | `getBestiary()`, `recordBossDefeat()`, `renderBestiary()` |
+| `reputation.js` | Reputación por tags | `calcReputationByTag()`, `getReputationBonus()` |
+| `mechanics.js` | Apuestas/Wagers | `openWagerModal()`, `confirmWager()`, `resolveWagerWin()` |
+| `patterns.js` | Análisis de patrones AI | `generatePatternAnalysis()`, `renderPatterns()` |
+| `combos.js` | Combo multiplier | `registerCombo()`, `getComboMult()`, `renderComboChip()` |
+| `ruleta.js` | Ruleta cada 3 días | `isRuletaAvailable()`, `openRuleta()`, `spinRuleta()`, `applyRuletaPrize()` |
+| `drops.js` | Animación loot drop | `spawnLootDrop(xpAmt, goldAmt, rarity, originEl?)` |
+| `daily_goal.js` | Meta diaria XP | `getDailyGoal()`, `getDailyGoalToday()`, `addDailyGoalXP()`, `renderDailyGoalBar()` |
+| `weekly_summary.js` | Resumen semanal lunes | `checkWeeklySummary()` |
+| `hero_score.js` | Índice héroe 0-100 | `calcHeroScore()`, `getHeroScoreTier()`, `renderHeroScoreWidget()` |
+
+### Integraciones
+| Archivo | Propósito | Funciones clave |
+|---------|-----------|----------------|
+| `google_fit.js` | Pasos diarios | `connectGoogleFit()`, `syncGoogleFitSteps()`, `renderFitWidget()`, `disconnectGoogleFit()` |
+| `duolingo.js` | Sync XP Duolingo | `syncDuolingo()`, `getDuoUsername()`, `setDuoUsername()`, `renderDuolingoWidget()` |
+| `spotify.js` | Now Playing | `connectSpotify()`, `spotifyToggle()`, `renderSpotifyWidget()` |
+| `weather.js` | Clima real | `loadRealWeather()`, `renderWeatherDetail()` |
+| `push.js` | Web Push | `initPush()`, `dungeonPush(title, body, url?)`, `isPushSubscribed()` |
+| `dungeon_clock.js` | Reloj + TOD bonuses | `getDungeonTOD()`, `getTODBonus()`, `updateDungeonClock()` |
+| `dungeon_grows.js` | Mapa dungeon | `renderDungeonGrows()` |
 
 ---
 
-## Tablas Supabase
-- `dungeon_heroes` — héroe principal del usuario
-- `dungeon_quests` — misiones (main/side/daily/weekly)
-- `dungeon_pomodoros` — sesiones de pomodoro
-- `dungeon_push_subscriptions` — suscripciones Web Push (hero_id UNIQUE)
+## Vistas (data-view)
+| View | Ruta | Descripción |
+|------|------|-------------|
+| `quests` | default | Lista de misiones |
+| `stats` | Sala del Trono | Analytics + heatmap |
+| `achievements` | — | Grid de logros |
+| `history` | — | Historial completadas |
+| `shop` | — | Tienda del gremio |
+| `inventory` | — | Inventario |
+| `pets` | — | Mascotas |
+| `goals` | — | Metas largas |
+| `integrations` | — | Fit + Duolingo + Spotify |
+| `dungeon-grows` | — | Mapa dungeon |
+| `character` | — | Character Hub (5 tabs) |
+| `smithy` | — | Herrero (tab dentro de character) |
 
-### Columnas dungeon_heroes relevantes
-`id, hero_id, name, hero_class, race, avatar, level, xp, xp_total, hp, hp_max,
-quests_done, main_done, streak, longest_streak, gold (localStorage), created_at`
-
-### Persistencia
-- Gold: `localStorage('dungeon-gold')`
-- Boss semanal: `localStorage('dungeon-boss-YYYY-WW')`
-- Subtasks: markdown en campo `notes` de dungeon_quests (`- [ ] item` / `- [x] item`)
-
----
-
-## Funciones globales críticas (NO redefinir)
-- `updateBossBanner()` — definida SOLO en views.js (maneja boss HP + weekly banner)
-- `renderMovimientos()` — nombre reservado
-- `_fechaLocal` — nombre reservado
-- El trío de selección de productos (ver memory feedback_funciones_globales.md)
-
-## Patrones importantes
-- `openModal(id)` → agrega clase `open` a elementos con clase `modal-overlay`
-- `saveHero(patch)` → `db.from('dungeon_heroes').update(patch).eq('id', hero.id)`
-- Subtasks se guardan con `db.from('dungeon_quests').update({ notes }).eq('id', q.id)` (NO upsert)
-- `escHtml(str)` disponible globalmente para sanitizar output
-- `switchView(v)` — maneja Character Hub tabs; si v es 'oracle' llama openOracle() y retorna
+**Eliminadas:** `kanban` (v39), `calendar` (v39)
 
 ---
 
-## Push Notifications (Web Push + VAPID)
-- VAPID pública: `BEaYhse8leKsQniLSS9AiCNG3lt4Xz7H_swtNZAHKaJ_rUbIQTHt28pJBqv15yue4MRStrzB3yAa82jg2DoKGNU`
-- Edge Function: `send-push` (Supabase Aglaya, verify_jwt:false)
-- Suscripciones en `dungeon_push_subscriptions` (hero_id, subscription jsonb)
-- `dungeonPush(title, body, url?)` — dispara push real via Edge Function
-- Se llama en: subir de nivel (hero.js), racha en peligro (events.js)
-- `initPush()` — auto-suscribe si el permiso ya está concedido; llamado en main.js boot
+## Tablas Supabase (Aglaya)
+
+### `dungeon_heroes` — columnas relevantes
+```
+Progresión:   level, xp, xp_total, hp, hp_max, quests_done, main_done
+Racha:        streak, longest_streak, last_active_date
+Recursos:     gold (también localStorage), skill_points, attr_points
+Atributos:    str, intel, dex, con, wis, cha
+Estado:       nightmare_mode, amulet, streak_shield, curse_date, main_bonus_date
+Skills clase: transmute_next, arrow_rain, strategic_count, berserker_exp, skill_date
+Buffs:        potion_exp, double_next
+Contenido:    diary, prophecy, skill_tree, bestiary, achievements, quick_notes
+Integración:  fit_access_token, fit_refresh_token, fit_token_expiry, fit_sync_date, fit_xp_date
+              duo_username, duo_sync_date, duo_xp_date, duo_today_xp, duo_streak
+              cal_access_token, cal_refresh_token, cal_token_expiry
+              spotify_refresh_token
+Meta diaria:  daily_goal, daily_goal_xp, daily_goal_date
+Perfil:       name, hero_class, race, avatar, guild_name, webhook_url
+```
+
+### Otras tablas
+- `dungeon_quests` — misiones (`depends_on`, `tags`, `type`, `notes` para subtasks)
+- `dungeon_pomodoros` — sesiones pom (`started_at`, `duration_min`, `quest_id`)
+- `dungeon_push_subscriptions` — Web Push (hero_id UNIQUE)
+- `dungeon_inventory` — items
+- `dungeon_pets` — mascotas
+- `dungeon_weapons` — armas
+- `dungeon_goals` — metas largas
+- `dungeon_runes` — runas
+
+---
+
+## Patrones y convenciones
+
+### Completar una misión (`completeQuest`)
+```
+addXP() aplica en cascada:
+  1. Clase bonus       → classXPBonus()
+  2. Raza bonus        → hero.race === 'humano' → +10%
+  3. TOD bonus         → getTODBonus().xpMult
+  4. Poción            → getPotionMult()
+  5. Berserker         → hero.berserker_exp check
+  6. Clima             → getWeatherXPMult()
+  7. Skill tree        → getSkillTreeXPBonus()
+  8. Runas             → getRuneBonus()
+  9. Mascota           → getPetEffect()
+  10. Reputación       → getReputationBonus()
+  11. Combo (15min)    → getComboMult()
+  12. Modo Furia       → HP < 20% → ×1.5
+  13. Nightmare Mode   → hero.nightmare_mode → daño si no completada
+  14. Wager            → resolveWagerWin()
+  + spawnLootDrop()    → animación visual
+  + addDailyGoalXP()   → meta diaria
+  + registerCombo()    → actualiza combo
+  + _checkMissionShield() → racha de tipo
+```
+
+### Patrones de código
+- `openModal(id)` → agrega clase `open` al `.modal-overlay`
+- `closeModal(id)` → remueve clase `open`
+- `toast(icon, msg)` → notificación flotante 3s
+- `escHtml(str)` → sanitizar output en templates HTML
+- `switchView(v)` → cambia vista activa; si `v === 'oracle'` llama `openOracle()` y retorna
+- `saveHero(patch)` → `db.from('dungeon_heroes').update(patch).eq('id', hero.id)` + actualiza `hero` local
+
+### localStorage permitido
+Solo para datos no críticos (se puede perder sin consecuencias):
+- `dungeon-gold` — gold sincronizado con hero.gold
+- `dungeon-combo-count` / `dungeon-combo-last` — combos
+- `dungeon-type-history` — historial tipos para escudos
+- `dungeon-ws-YYYY-WW` — weekly summary seen flag
+- `dungeon-morning-review-YYYY-MM-DD` — revisión matutina
+
+**Prohibido en localStorage:** tokens, fechas de sync, XP ganado, configuración crítica
 
 ---
 
 ## Character Hub
-- Acceso: clic en avatar/imagen del héroe → activa view `character`
-- Tab bar (`#charHubTabs`) vive FUERA de `.views` (como sibling en `.content-area`)
-  → evita que `overflow-y:auto` del `.view` oculte la barra
-- Tabs: 🛡️ Personaje (sheet) | 🌳 Habilidades (skills) | 💎 Runas (runes) | 📖 Bestiario (bestiary) | ⚒️ Herrero (smithy)
-- `switchCharTab(tab)` en ui.js — activa tab y llama render correspondiente
-- Las vistas antiguas de skills/runes/bestiary/smithy están dentro de `view-character` como `.char-tab-panel`
-- NO hay vistas standalone para esas secciones (se eliminaron del HTML)
+- **Acceso:** clic en avatar → `switchView('character')`
+- **Tab bar** `#charHubTabs` vive FUERA de `.views` (sibling de `.content-area`)
+- **Tabs:** 🛡️ Personaje | 🌳 Habilidades | 💎 Runas | 📖 Bestiario | ⚒️ Herrero
+- `switchCharTab(tab)` en ui.js — activa panel `.char-tab-panel[data-ctab]`
 
 ---
 
-## Índice del Héroe
-- Archivo: `js/hero_score.js`
-- Score 0-100 compuesto: Racha(25) + Nivel(20) + HP(15) + Misiones hoy(20) + Actividad 7d(20)
-- Tiers: Legendario(90+👑) | Épico(70+💜) | Raro(50+💙) | Normal(30+💚) | Común(0+🩶)
-- Widget: `#heroScoreWidget` div en la portrait card de la hoja de personaje
-- `renderHeroScoreWidget()` se llama al final de `renderCharacterSheet()`
+## Mobile (≤600px)
+- **Nav:** `#mobileNav` fijo al fondo — Misiones | Héroe | Trono | Más
+- **Más sheet:** Shop, Inventario, Logros, Historial, Herrero, Mascotas, Integrar, Metas
+- **Hero btn en header:** `.mobile-hero-btn#mobileHeroBtnHdr` → abre character view
+- **Elementos actualizados en renderHeroUI():** `mhbAvatar`, `mhbNavAvatar`, `mhbName`, `mhbHpFill`, `mhbLevel`
+- **View-tabs** ocultos en mobile (`display:none !important` en ≤480px)
 
 ---
 
-## Assets y Supabase Storage
-- Todos los assets visuales (mascotas, avatares, equipo, bosses) los crea Gerardo manualmente
-- Se suben a Supabase Storage con naming convention fija
-- La app construye la URL a partir del nombre: `[categoria]_[param1]_[param2].png`
-- **NO llamar Gemini en tiempo real** para generar assets — usar URLs predefinidas
-- Verificar siempre si el asset existe antes de mostrarlo (fallback a emoji/placeholder)
-
-### Convención de nombres en Storage
-```
-Mascotas:  pet_[huevo]_[pocion].png      (ej: pet_fuego_sombra.png)
-Monturas:  mount_[huevo]_[pocion].png
-Avatares:  avatar_[clase]_[raza].png     (ej: avatar_mago_elfo.png)
-Equipo:    item_[slug].png               (ej: item_espada_dungeon.png)
-Bosses:    boss_[slug].png               (ej: boss_halloween.png)
-```
+## Edge Functions (Supabase Aglaya)
+| Función | verify_jwt | Propósito |
+|---------|-----------|-----------|
+| `send-push` | false | Enviar Web Push notifications |
+| `google-oauth` | true | Exchange/refresh Google OAuth tokens |
+| `duolingo-proxy` | false | Proxy a API Duolingo (evita CORS) |
 
 ---
 
-## Status de Features (actualizado 2026-06-16)
+## Push Notifications
+- VAPID pública: `BEaYhse8leKsQniLSS9AiCNG3lt4Xz7H_swtNZAHKaJ_rUbIQTHt28pJBqv15yue4MRStrzB3yAa82jg2DoKGNU`
+- `dungeonPush(title, body, url?)` — dispara push real via Edge Function
+- `initPush()` — auto-suscribe si permiso ya concedido; llamado en boot
 
-### ✅ Completadas
-- Misiones (main/side/daily/weekly/habit) con rareza y XP
-- Pomodoro timer + vinculación a misión
-- Sistema de nivel y XP con bonos por clase/raza/runas
-- Racha diaria con daño por inactividad y Amuleto de Protección
-- Logros y achievements
-- Inventario + Tienda (Herrería)
-- Mascotas e incubación de huevos
-- Árbol de Habilidades con bonos activos
-- Runas con efectos pasivos
-- Bestiario con tracking de monstruos derrotados
-- Oracle (chat con Gemini)
-- Integración Google Fit (pasos)
-- Integración Google Calendar
-- Spotify widget
-- Clima en tiempo real
-- Reloj del dungeon (con hora y fase del día)
-- Mi Dungeon (mapa de salas con links)
-- Goals (metas con progreso)
-- Reputación de gremio
-- Patrones de actividad
-- Sistema de mecánicas (eventos, crafteo, apuestas, etc.)
-- Character Hub (tabs: Personaje / Habilidades / Runas / Bestiario / Herrero)
-- Índice del Héroe 0-100 con SVG ring y tiers
-- Push Notifications reales (Web Push + VAPID + Edge Function)
-- Misiones Encadenadas (depends_on → blocked UI)
-- Hábitos bidireccionales +/- (tipo `habit`, negativo con tag `habit-`)
-- Modo Pesadilla (toggle en hero, +50% daño a misiones incompletas)
-- Integración Duolingo (Edge Function `duolingo-proxy` + widget en Integraciones)
-- Sistema de Combos (ventana 15 min → 1.1x/1.25x/1.5x XP)
-- Ciclo Día/Noche visual (overlay tint basado en TOD)
-- Modo Furia (HP < 20% → +50% XP, pulsing red bar)
-- Atajos de Creación Ultrarrápida (Ctrl+N → parser `!epico #tag @mañana`)
-- Mapa de Calor de Pomodoros (grilla 7d × 24h en Stats)
-- Escudos de Misión (3 del mismo tipo seguidos → streak shield)
-- Ruleta del Dungeon (rueda CSS animada, cada 3 días, 12 premios)
-- Modo Revisión Exprés matutino (modal < 10am, bono XP por energía)
+---
 
-### 🔴 Pendientes (prioridad)
-- Crafteo con cooldown real (Item 14 del audit)
-- Drops al completar misiones (P1)
-- Hábitos bidireccionales +/- (P3)
+## Service Worker
+- Versión actual: `dungeon-v39`
+- **Siempre bumpar** al modificar cualquier JS/CSS antes del deploy
+- Estrategia: cache-first con skipWaiting + clients.claim
 
-### 🎨 Pendientes (esperando arte de Gerardo)
-- Sala Personal (habitación del héroe con decoraciones)
-- Jardín de Mascotas (vista especial)
-- Clases Secretas (contenido desbloqueado)
+---
 
-### 📋 Backlog (baja prioridad)
-- Habilidades de Clase con Maná (P4)
-- Equipamiento con Stats Funcionales (P5)
-- Avatar Visual con Capas (P6)
-- Retos de 30 Días vía Oráculo (P7)
-- Eventos Estacionales (P8)
-- **Facciones del Dungeon** (~3-4 semanas): gremios/facciones con reputación propia, misiones exclusivas por facción, rivalidades, y rangos dentro de cada facción. No empezar hasta tener las otras features estabilizadas.
+## Funciones globales reservadas (NO redefinir)
+- `updateBossBanner()` — solo en views.js
+- `renderMovimientos()` — nombre reservado globalmente
+- `_fechaLocal` — nombre reservado globalmente
 
 ---
 
 ## Features permanentemente excluidas
-Ver memory: feedback_dungeon_features_excluidas.md
-- Virtual scroll, re-render optimization, build step, SVG icons inline,
-  Supabase Realtime, sistema de Campaña, PWA widget, multiplayer
-- Precio por cantidad, modo kiosco (son de Maneki, no de Dungeon)
+- Virtual scroll, re-render optimization, build step, SVG icons inline
+- Supabase Realtime, sistema de Campaña, PWA widget, multiplayer
+- Kanban (removido v39)
+- Google Calendar (removido v39)
+- Precio por cantidad, modo kiosco (son de Maneki POS)
 
 ---
 
-## Nuevos Sistemas (v38)
+## Backlog (no implementar sin confirmar con Gerardo)
 
-### Hábitos (`js/habits.js`)
-- Tipo de misión `habit` con tags: presencia de `habit-` en tags = hábito negativo
-- Positivo: +20 XP, +8 gold, +5 HP | Negativo: −8 HP
-- Se renderizan en sección separada al final de la lista
+### Alta prioridad
+- **Crafteo con cooldown real** — sistema existe, falta lógica de cooldown (audit S19 #14)
+- **Boss semanal con daño real** — boss existe en UI pero no aplica consecuencias
+- **Notificaciones push para hábitos** — hora configurable por hábito
+- **Tienda mejorada** — consumibles con efectos reales, más variedad
 
-### Combos (`js/combos.js`)
-- Completar misiones dentro de ventana de 15 min activa combo
-- Tiers: x2 (1.1×), x3 (1.25×), x4+ (1.5×)
-- Chip `#comboChip` en header, persiste en localStorage
-- `getComboMult()` llamado en `completeQuest()` antes de aplicar XP
+### Media prioridad
+- **Habilidades de Clase con Maná** — sistema de maná nuevo
+- **Equipamiento con Stats Funcionales** — armas/armaduras con efectos
+- **Retos de 30 Días** — series de misiones encadenadas con progreso
 
-### Modo Furia
-- HP < 20% → clase `fury-mode` en `body` → +50% XP automático
-- Banner pulsante rojo en pantalla
+### Baja prioridad / largo plazo
+- **Facciones del Dungeon** (~3-4 semanas) — gremios con reputación propia, misiones exclusivas, rangos
+- **Avatar Visual con Capas** — composición de sprites
+- **Eventos Estacionales**
 
-### Ruleta del Dungeon (`js/ruleta.js`)
-- Disponible cada 3 días, 12 premios en canvas wheel
-- Botón en more-menu → abre `#ruletaModal`
-
-### Duolingo (`js/duolingo.js`)
-- Edge Function: `${SUPA_URL}/functions/v1/duolingo-proxy` (verify_jwt: false)
-- 10 XP Duolingo = 1 XP Arcanum (máx 200/día)
-- Widget en vista Integraciones: `#duoWidgetContent`
-
-### Modo Pesadilla
-- `hero.nightmare_mode` booleano en DB
-- Botón en more-menu (toggle)
-- `renderNightmareModeBtn()` en events.js actualiza botón
-
-### Ciclo Día/Noche
-- `<div id="todOverlay">` en index.html con `pointer-events:none; position:fixed`
-- `dungeon_clock.js` actualiza `overlay.style.background` cada minuto
-
-### Revisión Matutina
-- `checkMorningReview()` se llama en boot y cada hora
-- Gated por `localStorage('dungeon-morning-review-YYYY-MM-DD')`
-- Solo aparece si hora < 10am y aún no se hizo hoy
+### Esperando arte de Gerardo
+- Sala Personal del Héroe
+- Jardín de Mascotas
+- Clases Secretas
 
 ---
 
 ## Deploy
 ```bash
+# 1. Bumpar sw.js: dungeon-vXX → dungeon-v(XX+1)
+# 2. Anotar en CHANGELOG.md
+# 3. Deploy:
 git add -A
-git commit -m "mensaje"
+git commit -m "tipo: descripción"
 git push origin main
 ```
-Coolify detecta el push y despliega automáticamente.
+
+## Supabase migrations
+```javascript
+// Siempre usar apply_migration para DDL:
+mcp__11567dee...__apply_migration({
+  project_id: 'stdedxhxxoyostymldqn',
+  name: 'nombre_snake_case',
+  query: 'ALTER TABLE dungeon_heroes ADD COLUMN IF NOT EXISTS ...'
+})
+```
