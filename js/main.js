@@ -27,6 +27,9 @@ async function bootApp() {
   if (typeof syncGoogleFitSteps      === 'function') syncGoogleFitSteps();
   if (typeof renderFitWidget         === 'function') renderFitWidget();
   if (typeof renderCalendarWidget    === 'function') renderCalendarWidget();
+  if (typeof renderDuolingoWidget    === 'function') renderDuolingoWidget();
+  if (typeof renderNightmareModeBtn  === 'function') renderNightmareModeBtn();
+  if (typeof renderComboChip         === 'function') renderComboChip();
   await migrateRarity();
   await resetDailyQuests();
   await resetRepeatQuests();
@@ -47,6 +50,7 @@ async function bootApp() {
   checkDailySummary();
   checkWeeklyRetro();
   checkMorningBriefing();
+  if (typeof checkMorningReview === 'function') checkMorningReview();
   checkDeadlineAlerts();
   checkNightlyDiary();
   checkProphecyVerdict();

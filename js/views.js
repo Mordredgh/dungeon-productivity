@@ -79,6 +79,8 @@ function renderHeroUI() {
   hpFill.style.width = hpPct + '%';
   hpFill.classList.toggle('hp-critical', hpPct < 25);
   hpFill.classList.toggle('hp-warning',  hpPct >= 25 && hpPct < 50);
+  // Modo Furia — HP < 20%
+  document.body.classList.toggle('fury-mode', hpPct < 20);
 
   // HP danger text
   let hpDanger = document.getElementById('hpDangerText');
@@ -110,8 +112,15 @@ function renderQuestList() {
   const today  = new Date().toISOString().split('T')[0];
   const weekEnd = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
 
+  // Misiones bloqueadas por dependencia
+  const doneNames = new Set(quests.filter(q => q.done).map(q => q.name));
+  const blockedIds = new Set(
+    quests.filter(q => !q.done && q.depends_on && !doneNames.has(q.depends_on)).map(q => q.id)
+  );
+
   let filtered = quests.filter(q => {
     if (!q) return false;
+    if (q.type === 'habit') return false; // hábitos van en sección separada
     if (activeFilter === 'today') {
       if (q.done) return false;
       if (!(q.deadline === today || q.type === 'daily')) return false;
@@ -185,7 +194,7 @@ function renderQuestList() {
 
   if (pinned.length) {
     html += `<div class="type-separator">📌 Ancladas<span>${pinned.length}</span></div>`;
-    html += pinned.map(q => renderQuestItem(q)).join('');
+    html += pinned.map(q => renderQuestItem(q, blockedIds.has(q.id))).join('');
   }
 
   if (activeFilter === 'all') {
@@ -195,10 +204,16 @@ function renderQuestList() {
       else group = pending.filter(q => q.type === type && q.priority !== 'mitico');
       if (!group.length) return;
       html += `<div class="type-separator">${typeLabelsGroup[type]}<span>${group.length}</span></div>`;
-      html += group.map(q => renderQuestItem(q)).join('');
+      html += group.map(q => renderQuestItem(q, blockedIds.has(q.id))).join('');
     });
+    // Hábitos al final
+    const habits = quests.filter(q => q.type === 'habit');
+    if (habits.length && typeof renderHabitItem === 'function') {
+      html += `<div class="type-separator">⚡ Hábitos<span>${habits.filter(h=>!h.done).length}</span></div>`;
+      html += habits.map(q => renderHabitItem(q)).join('');
+    }
   } else {
-    html = pending.map(q => renderQuestItem(q)).join('');
+    html = pending.map(q => renderQuestItem(q, blockedIds.has(q.id))).join('');
   }
 
   el.innerHTML = html;
@@ -219,7 +234,7 @@ function formatRelativeDate(dateStr) {
   return `📅 ${dateStr}`;
 }
 
-function renderQuestItem(q) {
+function renderQuestItem(q, blocked = false) {
   const xp   = calcQuestXP(q);
   const diff = getQuestDifficulty(q.id);
   const today    = new Date().toISOString().split('T')[0];
@@ -283,7 +298,8 @@ function renderQuestItem(q) {
   const doubleNadaHtml  = isDoubleNada ? `<span class="wager-badge">🎲 Doble o Nada activo</span>` : '';
 
   const isPinned = !!q.is_pinned;
-  return `<div class="quest-item ${q.done ? 'done' : ''} ${isLocked ? 'quest-locked' : ''} ${isOverdue ? 'quest-overdue' : ''} ${isPinned ? 'pinned' : ''}" data-type="${q.type}" data-priority="${q.priority || 'normal'}" data-qid="${q.id}"
+  const isBlocked = blocked || isLocked;
+  return `<div class="quest-item ${q.done ? 'done' : ''} ${isBlocked ? 'quest-blocked' : ''} ${isOverdue ? 'quest-overdue' : ''} ${isPinned ? 'pinned' : ''}" data-type="${q.type}" data-priority="${q.priority || 'normal'}" data-qid="${q.id}"
     draggable="true"
     ondragstart="draggedQuestId='${q.id}';event.dataTransfer.effectAllowed='move';this.classList.add('dragging')"
     ondragend="this.classList.remove('dragging')"
@@ -466,6 +482,43 @@ function renderMastery() {
   }).join('');
 }
 
+function renderPomHeatmap() {
+  const el = document.getElementById('pomHeatmapGrid');
+  if (!el) return;
+  const now = new Date();
+  const days = 7;
+  const hours = 24;
+  // Count pomodoros per day+hour
+  const grid = {};
+  pomodoros.forEach(p => {
+    if (!p.started_at) return;
+    const d = new Date(p.started_at);
+    const dayOffset = Math.floor((now - d) / 86400000);
+    if (dayOffset >= days) return;
+    const h = d.getHours();
+    const key = `${dayOffset},${h}`;
+    grid[key] = (grid[key] || 0) + 1;
+  });
+  const maxVal = Math.max(...Object.values(grid), 1);
+  const dayNames = ['Hoy','Ayer','2d','3d','4d','5d','6d'];
+  let html = '<div class="pom-hm-wrap">';
+  // Header row: horas clave
+  html += '<div class="pom-hm-row pom-hm-head"><span class="pom-hm-day-lbl"></span>';
+  [0,3,6,9,12,15,18,21].forEach(h => { html += `<span class="pom-hm-h-lbl">${h}h</span>`; });
+  html += '</div>';
+  for (let d = 0; d < days; d++) {
+    html += `<div class="pom-hm-row"><span class="pom-hm-day-lbl">${dayNames[d]}</span>`;
+    for (let h = 0; h < hours; h++) {
+      const cnt = grid[`${d},${h}`] || 0;
+      const pct = Math.round((cnt / maxVal) * 100);
+      html += `<div class="pom-hm-cell" data-pct="${pct}" title="${dayNames[d]} ${h}:00 — ${cnt} pom${cnt!==1?'s':''}"></div>`;
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
 function renderStats() {
   renderHeroIndex();
   if (typeof renderReputation === 'function') renderReputation();
@@ -475,6 +528,7 @@ function renderStats() {
   renderTypeDist();
   renderMissionsChart();
   renderHeatmap();
+  renderPomHeatmap();
   renderHourlyChart();
   renderWeekComparison();
   renderAvgTime();

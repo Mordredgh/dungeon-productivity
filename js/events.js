@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function resetDailyQuests() {
   const today = new Date().toISOString().split('T')[0];
   const toReset = quests.filter(q =>
-    q.type === 'daily' && q.done && q.done_at && !q.done_at.startsWith(today)
+    (q.type === 'daily' || q.type === 'habit') && q.done && q.done_at && !q.done_at.startsWith(today)
   );
   for (const q of toReset) {
     await db.from('dungeon_quests').update({ done: false, done_at: null }).eq('id', q.id);
@@ -940,7 +940,130 @@ document.addEventListener('keydown', e => {
     e.preventDefault();
     openCmdk();
   }
+  // Ctrl+N / Cmd+N — Creación Ultrarrápida
+  if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+    e.preventDefault();
+    openQuickCreate();
+  }
 });
+
+/* ============================================================
+   CREACIÓN ULTRARRÁPIDA — Ctrl+N
+   Sintaxis: "nombre !epico #tag @mañana @2026-12-31"
+   ============================================================ */
+function openQuickCreate() {
+  openModal('quickCreateModal');
+  setTimeout(() => document.getElementById('quickCreateInput')?.focus(), 50);
+}
+
+function parseQuickCreate(raw) {
+  let name = raw;
+  let priority = 'normal';
+  let tags = '';
+  let deadline = null;
+  let type = document.getElementById('qType')?.value || 'side';
+
+  // Priority: !epico !legendario !mitico !comun
+  const prioMatch = name.match(/!(\w+)/);
+  if (prioMatch) {
+    const map = { epico:'epico', legendario:'legendario', mitico:'mitico', comun:'comun', ep:'epico', leg:'legendario', mit:'mitico' };
+    priority = map[prioMatch[1].toLowerCase()] || 'normal';
+    name = name.replace(/!\w+/, '').trim();
+  }
+
+  // Tags: #palabra
+  const tagMatches = name.match(/#\w+/g) || [];
+  if (tagMatches.length) {
+    tags = tagMatches.join(' ');
+    name = name.replace(/#\w+/g, '').trim();
+  }
+
+  // Deadline: @YYYY-MM-DD or @mañana @hoy @viernes etc.
+  const dateMatch = name.match(/@(\S+)/);
+  if (dateMatch) {
+    const raw2 = dateMatch[1].toLowerCase();
+    const today = new Date();
+    const tomorrow = new Date(Date.now() + 86400000);
+    const dayMap = { hoy:0, mañana:1, manana:1, lunes:1, martes:2, miercoles:3, miércoles:3, jueves:4, viernes:5, sabado:6, sábado:6, domingo:0 };
+    if (raw2 === 'hoy') {
+      deadline = today.toISOString().split('T')[0];
+    } else if (raw2 === 'mañana' || raw2 === 'manana') {
+      deadline = tomorrow.toISOString().split('T')[0];
+    } else if (/^\d{4}-\d{2}-\d{2}$/.test(raw2)) {
+      deadline = raw2;
+    }
+    name = name.replace(/@\S+/, '').trim();
+  }
+
+  return { name, priority, tags, deadline, type };
+}
+
+async function submitQuickCreate() {
+  const raw = (document.getElementById('quickCreateInput')?.value || '').trim();
+  if (!raw || !hero) { toast('⚠️', 'Escribe el nombre de la misión.'); return; }
+  const { name, priority, tags, deadline, type } = parseQuickCreate(raw);
+  if (!name) { toast('⚠️', 'Nombre vacío después del parseo.'); return; }
+  closeModal('quickCreateModal');
+  document.getElementById('quickCreateInput').value = '';
+  await addQuest({ name, type, priority, tags, deadline, hero_id: hero.id });
+}
+
+/* ============================================================
+   MODO PESADILLA — toggle
+   ============================================================ */
+async function toggleNightmareMode() {
+  if (!hero) return;
+  const enabled = !hero.nightmare_mode;
+  hero.nightmare_mode = enabled;
+  await saveHero({ nightmare_mode: enabled });
+  const btn = document.getElementById('nightmareModeBtn');
+  if (btn) {
+    btn.textContent = enabled ? '💀 Modo Pesadilla: ON' : '💀 Modo Pesadilla';
+    btn.classList.toggle('nightmare-active', enabled);
+  }
+  toast(enabled ? '💀' : '😌', enabled
+    ? '¡Modo Pesadilla activado! XP×2, Oro×2, pero el daño también es doble.'
+    : 'Modo Pesadilla desactivado.');
+}
+
+function renderNightmareModeBtn() {
+  const btn = document.getElementById('nightmareModeBtn');
+  if (!btn || !hero) return;
+  const enabled = !!hero.nightmare_mode;
+  btn.textContent = enabled ? '💀 Modo Pesadilla: ON' : '💀 Modo Pesadilla';
+  btn.classList.toggle('nightmare-active', enabled);
+}
+
+/* ============================================================
+   REVISIÓN EXPRÉS MATUTINA (antes de las 10am)
+   ============================================================ */
+function checkMorningReview() {
+  const hour = new Date().getHours();
+  if (hour >= 10) return;
+  const today = new Date().toISOString().split('T')[0];
+  if (localStorage.getItem('dungeon-morning-review-' + today)) return;
+  setTimeout(() => openModal('morningReviewModal'), 3000);
+}
+
+function mrSelectEnergy(btn, val) {
+  document.querySelectorAll('.mr-energy-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const inp = document.getElementById('mrEnergy');
+  if (inp) inp.value = val;
+}
+
+async function submitMorningReview() {
+  const energy  = document.getElementById('mrEnergy')?.value   || '3';
+  const mission = (document.getElementById('mrMission')?.value || '').trim();
+  const blocker = (document.getElementById('mrBlocker')?.value || '').trim();
+  const today   = new Date().toISOString().split('T')[0];
+  localStorage.setItem('dungeon-morning-review-' + today, JSON.stringify({ energy, mission, blocker }));
+  closeModal('morningReviewModal');
+  let xpBonus = parseInt(energy) * 5;
+  await addXP(xpBonus, 'side', null);
+  toast('🌅', `Revisión matutina completada · +${xpBonus} XP · ¡A conquistar el día!`);
+  if (mission) toast('⚔️', `Misión del día: "${mission}"`);
+}
 
 /* ============================================================
    FEATURE 8: Spell event listener

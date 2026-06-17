@@ -3847,3 +3847,150 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   border-radius: 8px; transition: color .2s, background .2s; font-family: inherit;
 }
 .sidebar-logout:hover { color: #f38ba8; background: rgba(243,139,168,.06); }
+
+/* ═══════════════════════════════════════════════════════════
+   SISTEMA DE COMBOS
+   ═══════════════════════════════════════════════════════════ */
+.combo-chip {
+  display: none; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 700; white-space: nowrap;
+  animation: combo-pop .35s cubic-bezier(.34,1.56,.64,1);
+}
+.combo-chip[data-tier="2"] { background: rgba(251,113,133,.15); color: #fb7185; border: 1px solid rgba(251,113,133,.3); }
+.combo-chip[data-tier="3"] { background: rgba(251,146,60,.18);  color: #fb923c; border: 1px solid rgba(251,146,60,.35); }
+.combo-chip[data-tier="4"] { background: rgba(250,204,21,.18);  color: #facc15; border: 1px solid rgba(250,204,21,.35);
+                              animation: combo-pulse 1.2s ease-in-out infinite; }
+@keyframes combo-pop   { from { transform: scale(.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes combo-pulse { 0%,100% { box-shadow: 0 0 0 rgba(250,204,21,0); } 50% { box-shadow: 0 0 12px rgba(250,204,21,.45); } }
+
+/* ═══════════════════════════════════════════════════════════
+   MODO FURIA — HP < 20%
+   ═══════════════════════════════════════════════════════════ */
+.fury-mode .hp-bar-fill  { background: #ef4444 !important; animation: fury-bar 1.2s ease-in-out infinite; }
+.fury-mode #hpLabel      { color: #ef4444 !important; font-weight: 700; }
+.fury-mode .sb-bars      { animation: fury-bar 1.2s ease-in-out infinite; }
+@keyframes fury-bar { 0%,100% { box-shadow: none; } 50% { box-shadow: 0 0 12px rgba(239,68,68,.4); } }
+/* Fury indicator banner */
+.fury-banner {
+  position: fixed; top: 56px; left: 50%; transform: translateX(-50%);
+  background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.4);
+  color: #ef4444; padding: 4px 16px; border-radius: 20px;
+  font-size: 12px; font-weight: 700; pointer-events: none; z-index: 200;
+  animation: fury-bar 1.2s ease-in-out infinite;
+  display: none;
+}
+.fury-mode .fury-banner { display: block; }
+
+/* ═══════════════════════════════════════════════════════════
+   HÁBITOS BIDIRECCIONALES
+   ═══════════════════════════════════════════════════════════ */
+.habit-item       { border-left: 3px solid transparent; }
+.habit-pos        { border-left-color: #4ade80; }
+.habit-neg        { border-left-color: #f87171; }
+.habit-icon       { font-size: 18px; flex-shrink: 0; width: 28px; text-align: center; }
+.habit-badge-pos  { background: rgba(74,222,128,.15); color: #4ade80; border: 1px solid rgba(74,222,128,.3); }
+.habit-badge-neg  { background: rgba(248,113,113,.15); color: #f87171; border: 1px solid rgba(248,113,113,.3); }
+.habit-btn-pos    { background: rgba(74,222,128,.18) !important; color: #4ade80 !important; border: 1px solid rgba(74,222,128,.4) !important; }
+.habit-btn-neg    { background: rgba(248,113,113,.18) !important; color: #f87171 !important; border: 1px solid rgba(248,113,113,.4) !important; }
+.habit-done-mark  { font-size: 16px; opacity: .6; }
+
+/* ═══════════════════════════════════════════════════════════
+   MISIONES BLOQUEADAS (depends_on no satisfecho)
+   ═══════════════════════════════════════════════════════════ */
+.quest-blocked { opacity: .45; pointer-events: none; filter: grayscale(.5); }
+.quest-blocked .quest-check,
+.quest-blocked .complete-btn { pointer-events: none; cursor: not-allowed !important; }
+
+/* ═══════════════════════════════════════════════════════════
+   RULETA DEL DUNGEON
+   ═══════════════════════════════════════════════════════════ */
+.ruleta-wrap     { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 8px 0; }
+.ruleta-canvas   { border-radius: 50%; border: 3px solid var(--accent); box-shadow: 0 0 24px rgba(137,180,250,.2); }
+.ruleta-pointer  { font-size: 28px; transform: rotate(180deg); }
+.ruleta-result   { min-height: 64px; display: flex; align-items: center; justify-content: center; }
+
+/* ═══════════════════════════════════════════════════════════
+   MAPA DE CALOR — POMODOROS
+   ═══════════════════════════════════════════════════════════ */
+.pom-hm-wrap     { overflow-x: auto; }
+.pom-hm-row      { display: flex; align-items: center; gap: 2px; margin-bottom: 2px; }
+.pom-hm-head     { margin-bottom: 4px; }
+.pom-hm-day-lbl  { font-size: 10px; color: var(--text2); width: 32px; flex-shrink: 0; }
+.pom-hm-h-lbl    { font-size: 9px; color: var(--text3); flex: 1; }
+.pom-hm-cell     {
+  flex: 1; height: 10px; border-radius: 2px;
+  background: var(--bg4);
+  transition: background .2s;
+}
+.pom-hm-cell[data-pct="0"]   { background: var(--bg4); }
+.pom-hm-cell[data-pct^="1"],
+.pom-hm-cell[data-pct^="2"],
+.pom-hm-cell[data-pct^="3"]  { background: rgba(137,180,250,.25); }
+.pom-hm-cell[data-pct^="4"],
+.pom-hm-cell[data-pct^="5"],
+.pom-hm-cell[data-pct^="6"]  { background: rgba(137,180,250,.55); }
+.pom-hm-cell[data-pct^="7"],
+.pom-hm-cell[data-pct^="8"],
+.pom-hm-cell[data-pct^="9"],
+.pom-hm-cell[data-pct="100"] { background: var(--accent); }
+
+/* ═══════════════════════════════════════════════════════════
+   REVISIÓN EXPRÉS MATUTINA
+   ═══════════════════════════════════════════════════════════ */
+.mr-energy-row  { display: flex; gap: 8px; margin: 8px 0; }
+.mr-energy-btn  {
+  flex: 1; padding: 10px 0; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--bg3); color: var(--text2); cursor: pointer;
+  font-size: 18px; transition: all .2s; font-family: inherit;
+}
+.mr-energy-btn.active { border-color: var(--accent); background: rgba(137,180,250,.15); color: var(--accent); }
+
+/* ═══════════════════════════════════════════════════════════
+   MODO PESADILLA TOGGLE
+   ═══════════════════════════════════════════════════════════ */
+.nightmare-active {
+  color: #f87171 !important;
+  background: rgba(248,113,113,.12) !important;
+  border-color: rgba(248,113,113,.3) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CREACIÓN ULTRARRÁPIDA
+   ═══════════════════════════════════════════════════════════ */
+.quick-create-hint {
+  font-size: 10px; color: var(--text3); margin-top: 6px;
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.quick-create-hint code {
+  background: var(--bg4); padding: 2px 6px; border-radius: 4px;
+  font-family: monospace; font-size: 10px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DUOLINGO WIDGET
+   ═══════════════════════════════════════════════════════════ */
+.duo-widget     { display: flex; flex-direction: column; gap: 10px; }
+.duo-header     { display: flex; align-items: center; gap: 8px; }
+.duo-logo       { font-size: 22px; }
+.duo-title      { font-family: var(--font-head); font-size: 14px; color: var(--text); }
+.duo-synced-badge { margin-left: auto; font-size: 10px; color: var(--green); }
+.duo-field-row  { display: flex; gap: 8px; }
+.duo-input      { flex: 1; }
+.duo-stats      { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.duo-stat       { display: flex; flex-direction: column; align-items: center; gap: 2px;
+                  background: var(--bg3); border-radius: 8px; padding: 8px; }
+.duo-stat-val   { font-family: var(--font-head); font-size: 18px; color: var(--gold); }
+.duo-stat-lbl   { font-size: 10px; color: var(--text2); text-align: center; }
+
+/* ═══════════════════════════════════════════════════════════
+   QUICK CREATE MODAL (Ctrl+N)
+   ═══════════════════════════════════════════════════════════ */
+.quick-create-modal .modal { max-width: 480px; }
+.quick-create-input-big {
+  font-size: 16px; padding: 14px 16px;
+  border: 2px solid var(--accent); border-radius: 12px;
+  background: var(--bg3); color: var(--text); width: 100%;
+  font-family: inherit; outline: none; transition: border-color .2s;
+}
+.quick-create-input-big:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(137,180,250,.15); }

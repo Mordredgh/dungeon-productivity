@@ -28,10 +28,25 @@ function getTODBonus() {
   return TOD_DEFS[getDungeonTOD()] || TOD_DEFS.afternoon;
 }
 
+const _TOD_TINTS = {
+  dawn:      'rgba(255,140,30,0.045)',
+  morning:   'rgba(255,210,80,0.030)',
+  afternoon: 'transparent',
+  dusk:      'rgba(240,80,30,0.050)',
+  evening:   'rgba(100,60,200,0.055)',
+  midnight:  'rgba(20,30,100,0.070)',
+};
+
 function updateDungeonClock() {
   const tod = getDungeonTOD();
   const def = TOD_DEFS[tod];
   document.documentElement.dataset.tod = tod;
+
+  // Ciclo Día/Noche — ambient tint overlay
+  const overlay = document.getElementById('todOverlay');
+  if (overlay) {
+    overlay.style.background = _TOD_TINTS[tod] || 'transparent';
+  }
 
   const chip = document.getElementById('dungeonClockChip');
   if (!chip) return;

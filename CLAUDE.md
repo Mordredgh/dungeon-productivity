@@ -24,14 +24,15 @@ spells.js → views.js → ui.js → events.js → shop.js → familiar.js → r
 pets.js → weapons.js → goals.js → reputation.js → patterns.js → mechanics.js →
 character.js → spotify.js → weather.js → dungeon_clock.js → skill_tree.js →
 bestiary.js → dungeon_grows.js → runes.js → google_fit.js → google_cal.js →
-hero_score.js → push.js → main.js
+hero_score.js → push.js → combos.js → habits.js → ruleta.js → duolingo.js →
+auth.js → main.js
 ```
 Agregar archivos nuevos ANTES de main.js.
 
 ---
 
 ## Service Worker
-Cache actual: `dungeon-v32`  
+Cache actual: `dungeon-v38`  
 Bumpar versión en `sw.js` siempre que se agregue o modifique JS/CSS.
 
 ---
@@ -119,7 +120,7 @@ Bosses:    boss_[slug].png               (ej: boss_halloween.png)
 ## Status de Features (actualizado 2026-06-16)
 
 ### ✅ Completadas
-- Misiones (main/side/daily/weekly) con rareza y XP
+- Misiones (main/side/daily/weekly/habit) con rareza y XP
 - Pomodoro timer + vinculación a misión
 - Sistema de nivel y XP con bonos por clase/raza/runas
 - Racha diaria con daño por inactividad y Amuleto de Protección
@@ -143,6 +144,18 @@ Bosses:    boss_[slug].png               (ej: boss_halloween.png)
 - Character Hub (tabs: Personaje / Habilidades / Runas / Bestiario / Herrero)
 - Índice del Héroe 0-100 con SVG ring y tiers
 - Push Notifications reales (Web Push + VAPID + Edge Function)
+- Misiones Encadenadas (depends_on → blocked UI)
+- Hábitos bidireccionales +/- (tipo `habit`, negativo con tag `habit-`)
+- Modo Pesadilla (toggle en hero, +50% daño a misiones incompletas)
+- Integración Duolingo (Edge Function `duolingo-proxy` + widget en Integraciones)
+- Sistema de Combos (ventana 15 min → 1.1x/1.25x/1.5x XP)
+- Ciclo Día/Noche visual (overlay tint basado en TOD)
+- Modo Furia (HP < 20% → +50% XP, pulsing red bar)
+- Atajos de Creación Ultrarrápida (Ctrl+N → parser `!epico #tag @mañana`)
+- Mapa de Calor de Pomodoros (grilla 7d × 24h en Stats)
+- Escudos de Misión (3 del mismo tipo seguidos → streak shield)
+- Ruleta del Dungeon (rueda CSS animada, cada 3 días, 12 premios)
+- Modo Revisión Exprés matutino (modal < 10am, bono XP por energía)
 
 ### 🔴 Pendientes (prioridad)
 - Crafteo con cooldown real (Item 14 del audit)
@@ -160,6 +173,7 @@ Bosses:    boss_[slug].png               (ej: boss_halloween.png)
 - Avatar Visual con Capas (P6)
 - Retos de 30 Días vía Oráculo (P7)
 - Eventos Estacionales (P8)
+- **Facciones del Dungeon** (~3-4 semanas): gremios/facciones con reputación propia, misiones exclusivas por facción, rivalidades, y rangos dentro de cada facción. No empezar hasta tener las otras features estabilizadas.
 
 ---
 
@@ -168,6 +182,48 @@ Ver memory: feedback_dungeon_features_excluidas.md
 - Virtual scroll, re-render optimization, build step, SVG icons inline,
   Supabase Realtime, sistema de Campaña, PWA widget, multiplayer
 - Precio por cantidad, modo kiosco (son de Maneki, no de Dungeon)
+
+---
+
+## Nuevos Sistemas (v38)
+
+### Hábitos (`js/habits.js`)
+- Tipo de misión `habit` con tags: presencia de `habit-` en tags = hábito negativo
+- Positivo: +20 XP, +8 gold, +5 HP | Negativo: −8 HP
+- Se renderizan en sección separada al final de la lista
+
+### Combos (`js/combos.js`)
+- Completar misiones dentro de ventana de 15 min activa combo
+- Tiers: x2 (1.1×), x3 (1.25×), x4+ (1.5×)
+- Chip `#comboChip` en header, persiste en localStorage
+- `getComboMult()` llamado en `completeQuest()` antes de aplicar XP
+
+### Modo Furia
+- HP < 20% → clase `fury-mode` en `body` → +50% XP automático
+- Banner pulsante rojo en pantalla
+
+### Ruleta del Dungeon (`js/ruleta.js`)
+- Disponible cada 3 días, 12 premios en canvas wheel
+- Botón en more-menu → abre `#ruletaModal`
+
+### Duolingo (`js/duolingo.js`)
+- Edge Function: `${SUPA_URL}/functions/v1/duolingo-proxy` (verify_jwt: false)
+- 10 XP Duolingo = 1 XP Arcanum (máx 200/día)
+- Widget en vista Integraciones: `#duoWidgetContent`
+
+### Modo Pesadilla
+- `hero.nightmare_mode` booleano en DB
+- Botón en more-menu (toggle)
+- `renderNightmareModeBtn()` en events.js actualiza botón
+
+### Ciclo Día/Noche
+- `<div id="todOverlay">` en index.html con `pointer-events:none; position:fixed`
+- `dungeon_clock.js` actualiza `overlay.style.background` cada minuto
+
+### Revisión Matutina
+- `checkMorningReview()` se llama en boot y cada hora
+- Gated por `localStorage('dungeon-morning-review-YYYY-MM-DD')`
+- Solo aparece si hora < 10am y aún no se hizo hoy
 
 ---
 

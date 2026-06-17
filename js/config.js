@@ -39,7 +39,7 @@ const TITLES = [
   'Señor del Caos Productivo'
 ];
 
-const XP_TABLE = { main: 100, side: 50, daily: 25, weekly: 75 };
+const XP_TABLE = { main: 100, side: 50, daily: 25, weekly: 75, habit: 20 };
 const POM_XP = 15;
 const LEVEL_BASE = 100;
 const LEVEL_SCALE = 1.5;
@@ -108,7 +108,7 @@ const FAMILIARS = {
   fundador: { emoji:'🐉', name:'Dragón Joven'    },
 };
 
-const GOLD_TABLE = { main:50, side:20, daily:10, weekly:35 };
+const GOLD_TABLE = { main:50, side:20, daily:10, weekly:35, habit:8 };
 
 const CDN = 'https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/';
 

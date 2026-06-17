@@ -24,6 +24,12 @@ async function completeQuest(id, el) {
   const q = quests.find(x => x.id === id);
   if (!q || q.done) return;
 
+  // Habits use their own simpler flow
+  if (q.type === 'habit') {
+    if (typeof completeHabitQuest === 'function') await completeHabitQuest(q);
+    return;
+  }
+
   const now = new Date().toISOString();
   await db.from('dungeon_quests').update({ done: true, done_at: now }).eq('id', id);
   q.done = true; q.done_at = now;
@@ -95,6 +101,15 @@ async function completeQuest(id, el) {
 
   // Modo Pesadilla — doble XP y oro
   if (hero && hero.nightmare_mode) xpAmt *= 2;
+
+  // Sistema de Combos — ráfaga activa multiplicador
+  if (typeof getComboMult === 'function') xpAmt = Math.round(xpAmt * getComboMult());
+
+  // Modo Furia — HP < 20% → +50% XP
+  if (hero) {
+    const hpPct = (hero.hp || 0) / (hero.hp_max || 100);
+    if (hpPct < 0.2) xpAmt = Math.round(xpAmt * 1.5);
+  }
 
   await addXP(xpAmt, q.type, el);
 
@@ -181,6 +196,12 @@ async function completeQuest(id, el) {
     }, 700);
   }
 
+  // Registrar combo después de completar
+  if (typeof registerCombo === 'function') registerCombo();
+
+  // Escudos de Misión — 3 del mismo tipo seguidas activa escudo de racha
+  _checkMissionShield(q.type);
+
   checkAchievements();
   renderQuestList();
   renderKanban();
@@ -229,4 +250,23 @@ async function updateQuest(id, patch) {
   renderKanban();
   updateBossBanner();
   toast('✏️', 'Misión actualizada');
+}
+
+/* ── ESCUDOS DE MISIÓN ──────────────────────────────────────────
+   3 misiones del mismo tipo seguidas → escudo de racha.       */
+async function _checkMissionShield(type) {
+  if (!hero || !type) return;
+  const hist = JSON.parse(localStorage.getItem('dungeon-type-history') || '[]');
+  hist.push(type);
+  const recent = hist.slice(-3);
+  localStorage.setItem('dungeon-type-history', JSON.stringify(hist.slice(-20)));
+  if (recent.length === 3 && recent.every(t => t === type)) {
+    if (!hero.streak_shield) {
+      hero.streak_shield = true;
+      await saveHero({ streak_shield: true });
+      const typeLabels = { main:'épicas', side:'encargos', daily:'búsquedas', weekly:'crónicas' };
+      toast('🛡️', `¡Escudo de Misión! 3 ${typeLabels[type]||type} seguidas. Tu racha está protegida.`);
+      localStorage.setItem('dungeon-type-history', '[]');
+    }
+  }
 }
