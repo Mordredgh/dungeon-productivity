@@ -79,7 +79,8 @@ async function syncGoogleFitSteps() {
   if (_fitSyncing) return;
   const token = await _fitEnsureToken();
   if (!token) { toast('⚠️', 'Token de Google Fit expirado. Reconecta.'); renderFitWidget(); return; }
-  const today = new Date().toISOString().split('T')[0];
+  const _d = new Date();
+  const today = `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;
   if (localStorage.getItem('fit-sync-date') === today && fitSynced && fitSteps > 0) return;
 
   _fitSyncing = true;
@@ -88,6 +89,7 @@ async function syncGoogleFitSteps() {
 
   try {
     const startMs = new Date(today + 'T00:00:00').getTime();
+    const localToday = today;
     const resp = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate', {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -113,9 +115,9 @@ async function syncGoogleFitSteps() {
     data.bucket?.forEach(b => b.dataset?.forEach(ds => ds.point?.forEach(p =>
       p.value?.forEach(v => { fitSteps += v.intVal || 0; }))));
     console.log('Fit steps:', fitSteps, '| bucket[0]:', JSON.stringify(data.bucket?.[0]));
-    localStorage.setItem('fit-sync-date', today);
+    localStorage.setItem('fit-sync-date', localToday);
     fitSynced = true;
-    await _applyFitXP(today);
+    await _applyFitXP(localToday);
     renderFitWidget();
   } catch(e) {
     console.error('Fit sync exception:', e);
