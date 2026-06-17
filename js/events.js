@@ -1029,7 +1029,7 @@ function checkMorningReview() {
   if (hour >= 10) return;
   const today = new Date().toISOString().split('T')[0];
   if (localStorage.getItem('dungeon-morning-review-' + today)) return;
-  setTimeout(() => openModal('morningReviewModal'), 3000);
+  setTimeout(() => { renderMorningSuggestions(); openModal('morningReviewModal'); }, 3000);
 }
 
 function mrSelectEnergy(btn, val) {
@@ -1620,3 +1620,110 @@ document.getElementById('oracleSend').addEventListener('click', oracleSend);
 document.getElementById('oracleInput').addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); oracleSend(); }
 });
+
+/* ============================================================
+   REVISIÓN MATUTINA MEJORADA — sugerencias de misiones
+   ============================================================ */
+function renderMorningSuggestions() {
+  const el = document.getElementById('mrSuggestions');
+  if (!el) return;
+  const today = new Date().toISOString().split('T')[0];
+  const pending = quests.filter(q => !q.done);
+  const scored = pending.map(q => {
+    let score = q.type === 'main' ? 30 : q.type === 'daily' ? 20 : q.type === 'weekly' ? 15 : 10;
+    if (q.deadline === today) score += 50;
+    else if (q.deadline) {
+      const diff = Math.round((new Date(q.deadline + 'T00:00:00') - new Date(today + 'T00:00:00')) / 86400000);
+      if (diff <= 1) score += 40; else if (diff <= 3) score += 20;
+    }
+    const prioMap = { mitico: 30, legendario: 20, epico: 10 };
+    score += prioMap[q.priority] || 0;
+    return { q, score };
+  }).sort((a, b) => b.score - a.score).slice(0, 3).map(x => x.q);
+
+  if (!scored.length) { el.style.display = 'none'; return; }
+  const typeIcons = { main: '⭐', side: '🗡️', daily: '🌅', weekly: '📜' };
+  el.style.display = 'block';
+  el.innerHTML = `<div class="mr-suggestions-title">🎯 Sugerencias para hoy</div>
+    <div class="mr-suggestions-list">${scored.map(q => `
+      <div class="mr-suggestion-item" onclick="mrSelectSuggestion('${q.id}')">
+        <span>${typeIcons[q.type] || '⚔️'}</span>
+        <span class="mr-suggestion-name">${escHtml(q.name)}</span>
+        ${q.deadline === today ? `<span class="mr-suggestion-deadline">🔥 HOY</span>` : q.deadline ? `<span class="mr-suggestion-deadline">${q.deadline}</span>` : ''}
+      </div>`).join('')}
+    </div>`;
+}
+
+function mrSelectSuggestion(questId) {
+  const q = quests.find(x => x.id === questId);
+  if (!q) return;
+  const inp = document.getElementById('mrMission');
+  if (inp) inp.value = q.name;
+  document.querySelectorAll('.mr-suggestion-item').forEach(el => {
+    el.classList.toggle('selected', el.querySelector('.mr-suggestion-name')?.textContent === q.name);
+  });
+}
+
+/* ============================================================
+   PLANTILLAS DE MISIONES
+   ============================================================ */
+function _getTemplates() {
+  try { return JSON.parse(hero.quest_templates || '[]'); } catch { return []; }
+}
+
+async function saveQuestTemplate(questId) {
+  const q = quests.find(x => x.id === questId);
+  if (!q || !hero) return;
+  const tmpls = _getTemplates();
+  const tmpl = {
+    id: 'tmpl_' + Date.now(),
+    name: q.name, type: q.type,
+    priority: q.priority || 'normal',
+    notes: q.notes || null, tags: q.tags || ''
+  };
+  tmpls.push(tmpl);
+  hero.quest_templates = JSON.stringify(tmpls);
+  await saveHero({ quest_templates: JSON.stringify(tmpls) });
+  toast('💾', `Plantilla "${q.name}" guardada.`);
+}
+
+async function applyTemplate(tmplId) {
+  const tmpl = _getTemplates().find(t => t.id === tmplId);
+  if (!tmpl || !hero) return;
+  closeModal('templatesModal');
+  await addQuest({ name: tmpl.name, type: tmpl.type, priority: tmpl.priority, notes: tmpl.notes, tags: tmpl.tags, hero_id: hero.id });
+  toast('✅', `"${tmpl.name}" creada desde plantilla.`);
+}
+
+async function deleteTemplate(tmplId) {
+  const tmpls = _getTemplates().filter(t => t.id !== tmplId);
+  hero.quest_templates = JSON.stringify(tmpls);
+  await saveHero({ quest_templates: JSON.stringify(tmpls) });
+  renderTemplatesModal();
+  toast('🗑️', 'Plantilla eliminada.');
+}
+
+function renderTemplatesModal() {
+  const el = document.getElementById('templatesContent');
+  if (!el) return;
+  const tmpls = _getTemplates();
+  if (!tmpls.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📋</div><p>Sin plantillas aún.<br>Edita una misión y pulsa "Guardar como plantilla".</p></div>`;
+    return;
+  }
+  const typeIcons = { main: '⭐', side: '🗡️', daily: '🌅', weekly: '📜' };
+  el.innerHTML = tmpls.map(t => `
+    <div class="template-item">
+      <span class="template-icon">${typeIcons[t.type] || '⚔️'}</span>
+      <span class="template-name">${escHtml(t.name)}</span>
+      <div class="template-actions">
+        <button class="btn-small btn-primary" onclick="applyTemplate('${t.id}')">➕ Usar</button>
+        <button class="btn-small btn-danger" onclick="deleteTemplate('${t.id}')">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+function openTemplatesModal() {
+  renderTemplatesModal();
+  openModal('templatesModal');
+}

@@ -107,6 +107,10 @@
           <div class="mhb-bars">
             <div class="mhb-hp-wrap"><div class="mhb-hp-fill" id="mhbHpFill" style="width:100%"></div></div>
           </div>
+          <div class="mhb-chips">
+            <span class="mhb-chip" id="mhbStreak">🔥 0</span>
+            <span class="mhb-chip" id="mhbXPToday">⭐ 0</span>
+          </div>
         </div>
         <div class="mhb-level" id="mhbLevel">1</div>
       </button>
@@ -128,6 +132,7 @@
         <button class="icon-btn" id="moreBtn" title="Más opciones">⋯</button>
         <div class="more-menu" id="moreMenu">
           <button class="more-menu-item" onclick="openModal('quickNotesModal')">📝 Pergamino Rápido</button>
+          <button class="more-menu-item" onclick="openTemplatesModal()">📋 Plantillas de misión</button>
           <button class="more-menu-item" onclick="openRuleta()">🎰 Ruleta del Dungeon</button>
           <button class="more-menu-item" id="nightmareModeBtn" onclick="toggleNightmareMode()">💀 Modo Pesadilla</button>
           <button class="more-menu-item" id="bulkToggleBtn">☑️ Selección múltiple</button>
@@ -152,11 +157,11 @@
 
       <!-- PERFIL DEL HÉROE -->
       <div class="sb-profile">
-        <button class="hero-avatar-btn" id="heroAvatarBtn" onclick="switchView('character')" title="Hoja de Personaje">🧙<span class="avatar-level-badge" id="avatarLevelBadge">1</span></button>
-        <div class="hero-info">
-          <div class="hero-name" id="heroName">Héroe</div>
-          <div class="hero-title" id="heroTitle">Nivel 1 · Aprendiz</div>
+        <div class="sb-avatar-ring" id="sbAvatarRing">
+          <button class="hero-avatar-btn" id="heroAvatarBtn" onclick="switchView('character')" title="Hoja de Personaje">🧙<span class="avatar-level-badge" id="avatarLevelBadge">1</span></button>
         </div>
+        <div class="hero-name" id="heroName">Héroe</div>
+        <div class="hero-title" id="heroTitle">Nivel 1 · Aprendiz</div>
       </div>
 
       <!-- BARRAS XP / HP -->
@@ -174,6 +179,13 @@
             <span class="sb-bar-val" id="hpLabel">100/100</span>
           </div>
           <div class="hp-bar sb-bar"><div class="hp-bar-fill" id="hpBarFill" style="width:100%"></div></div>
+        </div>
+        <div class="sb-bar-block">
+          <div class="sb-bar-header">
+            <span class="sb-bar-lbl">🔵 Maná</span>
+            <span class="sb-bar-val" id="manaLabel">0 / 100</span>
+          </div>
+          <div class="mana-bar sb-bar"><div class="mana-bar-fill" id="manaBarFill" style="width:0%"></div></div>
         </div>
       </div>
 
@@ -203,21 +215,20 @@
 
       <!-- NAVEGACIÓN -->
       <div class="sb-nav">
-        <div class="sb-nav-label">Aventura</div>
-        <button class="sidebar-item" data-view="dungeon-grows" onclick="switchView('dungeon-grows')"> <span class="si-icon">🏰</span><span class="si-label">Mi Dungeon</span></button>
-        <button class="sidebar-item active" data-view="quests"       onclick="switchView('quests')">       <span class="si-icon">⚔️</span><span class="si-label">Misiones</span></button>
-        <button class="sidebar-item"        data-view="goals"        onclick="switchView('goals')">        <span class="si-icon">🎯</span><span class="si-label">Metas</span></button>
+        <button class="sidebar-item" data-view="dungeon-grows" onclick="switchView('dungeon-grows')"><span class="si-icon">🏰</span><span class="si-label">Mi Dungeon</span></button>
+        <button class="sidebar-item active" data-view="quests" onclick="switchView('quests')"><span class="si-icon">⚔️</span><span class="si-label">Misiones</span></button>
+        <button class="sidebar-item" data-view="goals" onclick="switchView('goals')"><span class="si-icon">🎯</span><span class="si-label">Metas</span></button>
         <button class="sidebar-item" onclick="openChallengesModal()"><span class="si-icon">🏆</span><span class="si-label">Retos 30d</span></button>
-        <button class="sidebar-item"        data-view="stats"        onclick="switchView('stats')">        <span class="si-icon">📊</span><span class="si-label">Sala del Trono</span></button>
-        <button class="sidebar-item"        data-view="achievements" onclick="switchView('achievements')"> <span class="si-icon">🏆</span><span class="si-label">Logros</span></button>
-        <div class="sb-nav-label">Compañeros</div>
-        <button class="sidebar-item"        data-view="pets"         onclick="switchView('pets')">         <span class="si-icon">🐾</span><span class="si-label">Mascotas</span></button>
-        <div class="sb-nav-label">Gremio</div>
-        <button class="sidebar-item"        data-view="shop"         onclick="switchView('shop')">         <span class="si-icon">🏪</span><span class="si-label">Tienda</span></button>
-        <button class="sidebar-item"        data-view="inventory"    onclick="switchView('inventory')">    <span class="si-icon">🎒</span><span class="si-label">Inventario</span></button>
-        <div class="sb-nav-label">Archivo</div>
-        <button class="sidebar-item"        data-view="history"      onclick="switchView('history')">      <span class="si-icon">📜</span><span class="si-label">Historial</span></button>
-        <button class="sidebar-item" data-view="integrations"  onclick="switchView('integrations')">  <span class="si-icon">🔗</span><span class="si-label">Integraciones</span></button>
+        <button class="sidebar-item" data-view="stats" onclick="switchView('stats')"><span class="si-icon">📊</span><span class="si-label">Sala del Trono</span></button>
+        <button class="sidebar-item" data-view="achievements" onclick="switchView('achievements')"><span class="si-icon">🥇</span><span class="si-label">Logros</span></button>
+        <div class="sb-nav-sep">🐾</div>
+        <button class="sidebar-item" data-view="pets" onclick="switchView('pets')"><span class="si-icon">🐾</span><span class="si-label">Mascotas</span></button>
+        <div class="sb-nav-sep">🏪</div>
+        <button class="sidebar-item" data-view="shop" onclick="switchView('shop')"><span class="si-icon">🏪</span><span class="si-label">Tienda</span></button>
+        <button class="sidebar-item" data-view="inventory" onclick="switchView('inventory')"><span class="si-icon">🎒</span><span class="si-label">Inventario</span></button>
+        <div class="sb-nav-sep">📚</div>
+        <button class="sidebar-item" data-view="history" onclick="switchView('history')"><span class="si-icon">📜</span><span class="si-label">Historial</span></button>
+        <button class="sidebar-item" data-view="integrations" onclick="switchView('integrations')"><span class="si-icon">🔗</span><span class="si-label">Integraciones</span></button>
       </div>
 
       <!-- LOGOUT -->
@@ -840,6 +851,7 @@
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('editQuestModal')">Cancelar</button>
       <button class="btn btn-ghost" id="duplicateQuestBtn" title="Duplicar misión">📋 Duplicar</button>
+      <button class="btn btn-ghost" onclick="saveQuestTemplate(document.getElementById('editQuestId').value)" title="Guardar como plantilla">💾 Plantilla</button>
       <button class="btn btn-danger" id="deleteQuestBtn">Eliminar</button>
       <button class="btn btn-primary" id="saveQuestBtn">Guardar</button>
     </div>
@@ -1164,6 +1176,7 @@
     <div class="modal-title">🌅 Revisión Matutina</div>
     <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
       <p style="font-size:13px;color:var(--text2)">Tómate 30 segundos para preparar tu día. +XP por responder.</p>
+      <div id="mrSuggestions" style="display:none"></div>
       <div class="form-group">
         <label class="form-label">⚡ ¿Cómo está tu energía hoy?</label>
         <div class="mr-energy-row" id="mrEnergyRow">
@@ -1278,6 +1291,22 @@
     </div>
     <div id="challengesContent" style="padding:16px">
       <div class="empty-state"><div class="empty-state-icon">⏳</div><p>Cargando retos...</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- PLANTILLAS DE MISIONES -->
+<div class="modal-overlay" id="templatesModal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">📋 Plantillas de Misiones</div>
+      <button class="modal-close" onclick="closeModal('templatesModal')">&#x2715;</button>
+    </div>
+    <div id="templatesContent" style="padding:16px">
+      <div class="empty-state"><div class="empty-state-icon">📋</div><p>Sin plantillas aún.</p></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('templatesModal')">Cerrar</button>
     </div>
   </div>
 </div>

@@ -81,6 +81,15 @@ function renderHeroUI() {
   hpFill.classList.toggle('hp-critical', hpPct < 25);
   hpFill.classList.toggle('hp-warning',  hpPct >= 25 && hpPct < 50);
 
+  // Mana bar
+  const mana     = hero.mana    || 0;
+  const manaMax  = hero.mana_max || 100;
+  const manaPct  = Math.min(100, Math.round((mana / manaMax) * 100));
+  const manaFill = document.getElementById('manaBarFill');
+  const manaLbl  = document.getElementById('manaLabel');
+  if (manaFill) manaFill.style.width  = manaPct + '%';
+  if (manaLbl)  manaLbl.textContent   = `${mana} / ${manaMax}`;
+
   // Actualizar mobile hero button en header
   const mhbAvatar    = document.getElementById('mhbAvatar');
   const mhbNavAvatar = document.getElementById('mhbNavAvatar');
@@ -92,6 +101,17 @@ function renderHeroUI() {
   if (mhbName)      mhbName.textContent      = hero.name   || 'Héroe';
   if (mhbHpFill)    mhbHpFill.style.width    = hpPct + '%';
   if (mhbLevel)     mhbLevel.textContent     = 'Nv ' + (hero.level || 1);
+  // Mini chips: racha + XP hoy
+  const mhbStreak  = document.getElementById('mhbStreak');
+  const mhbXPToday = document.getElementById('mhbXPToday');
+  if (mhbStreak) mhbStreak.textContent = `🔥 ${hero.streak || 0}`;
+  if (mhbXPToday) {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const xpToday  = (typeof quests !== 'undefined' ? quests : [])
+      .filter(q => q.done && q.done_at?.startsWith(todayStr))
+      .reduce((s, q) => s + (XP_TABLE[q.type] || 25), 0);
+    mhbXPToday.textContent = `⭐ ${xpToday}`;
+  }
   // Modo Furia — HP < 20%
   document.body.classList.toggle('fury-mode', hpPct < 20);
 
@@ -252,6 +272,8 @@ function renderQuestItem(q, blocked = false) {
   const diff = getQuestDifficulty(q.id);
   const today    = new Date().toISOString().split('T')[0];
   const isOverdue = q.deadline && !q.done && q.deadline < today;
+  const deadlineDiff = q.deadline ? Math.round((new Date(q.deadline + 'T00:00:00') - new Date(today + 'T00:00:00')) / 86400000) : null;
+  const isUrgent = deadlineDiff !== null && !q.done && deadlineDiff >= 0 && deadlineDiff <= 1;
   const typeLabels = { main: '⚔️ Épica', side: '🗡️ Encargo', daily: '🌅 Búsqueda', weekly: '📜 Crónica' };
   const diffEmoji = { easy: '🟢', normal: '', hard: '🔴' };
   const diffLabel = { easy: ' Fácil', normal: '', hard: ' Difícil' };
@@ -326,7 +348,7 @@ function renderQuestItem(q, blocked = false) {
       <div class="quest-meta">
         <span class="badge badge-type-${q.type}">${typeLabels[q.type] || q.type}</span>
         ${q.priority ? `<span class="badge badge-rarity-${q.priority}">${RARITY_LABELS[q.priority] || q.priority}</span>` : ''}
-        ${q.deadline ? `<span class="deadline-badge ${isOverdue ? 'overdue' : ''}">${formatRelativeDate(q.deadline)}</span>` : ''}
+        ${q.deadline ? `<span class="deadline-badge ${isOverdue ? 'overdue' : isUrgent ? 'urgent' : ''}">${formatRelativeDate(q.deadline)}</span>` : ''}
         <span class="xp-reward">+${xp} XP</span>
         ${subtaskProgressHtml}
         ${estHtml}

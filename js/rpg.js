@@ -154,24 +154,39 @@ async function resolveEvent(evId, effect) {
   }
 }
 
+/* ── MANÁ ─────────────────────────────────────────────────── */
+const MANA_SKILL_COST = 60;
+
+function addMana(n) {
+  if (!hero) return;
+  const newMana = Math.min((hero.mana || 0) + n, hero.mana_max || 100);
+  hero.mana = newMana;
+  saveHero({ mana: newMana });
+  if (typeof renderHeroUI === 'function') renderHeroUI();
+}
+
 /* ── CLASS SKILLS ─────────────────────────────────────────── */
-function getSkillUsed() {
-  return hero && hero.skill_date === new Date().toISOString().split('T')[0];
-}
-function markSkillUsed() {
-  const d = new Date().toISOString().split('T')[0];
-  if (hero) { hero.skill_date = d; saveHero({ skill_date: d }); }
-}
 function renderClassSkillBtn() {
   const el = document.getElementById('classSkillBtn');
   if (!el || !hero) return;
-  el.style.display = 'none';
+  const mana = hero.mana || 0;
+  const canUse = mana >= MANA_SKILL_COST;
+  el.style.opacity = canUse ? '1' : '0.5';
+  el.title = canUse ? 'Usar habilidad de clase' : `Necesitas ${MANA_SKILL_COST} maná (tienes ${mana})`;
 }
 async function useClassSkill() {
-  if (!hero || getSkillUsed()) { toast('⏳', 'Habilidad en cooldown. Disponible mañana.'); return; }
-  const cls = hero.hero_class;
-  markSkillUsed();
+  if (!hero) return;
+  const mana = hero.mana || 0;
+  if (mana < MANA_SKILL_COST) {
+    toast('💙', `Maná insuficiente (${mana}/${hero.mana_max||100}). Completa hábitos (+10) y pomodoros (+20).`);
+    return;
+  }
+  // Consume mana
+  hero.mana = mana - MANA_SKILL_COST;
+  saveHero({ mana: hero.mana });
   renderClassSkillBtn();
+  if (typeof renderHeroUI === 'function') renderHeroUI();
+  const cls = hero.hero_class;
   if (cls === 'mago') {
     if (hero) { hero.transmute_next = true; saveHero({ transmute_next: true }); }
     toast('🔮', 'Transmutación lista: próxima side/daily da XP de épica.');
@@ -223,19 +238,97 @@ function generateDiaryEntry() {
   if (diary.length > 60) diary.pop();
   if (hero) { hero.diary = diary; hero.diary_date = today; saveHero({ diary, diary_date: today }); }
 }
+let _diaryTab = 'entries';
+function switchDiaryTab(tab) {
+  _diaryTab = tab;
+  document.querySelectorAll('.diary-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('diaryEntries').style.display = tab === 'entries' ? '' : 'none';
+  document.getElementById('diaryStats').style.display   = tab === 'stats'   ? '' : 'none';
+  if (tab === 'stats') renderDiaryStats();
+}
+
+function renderDiaryStats() {
+  const el = document.getElementById('diaryStats');
+  if (!el || !hero) return;
+  const diary = Array.isArray(hero.diary) ? hero.diary : [];
+
+  // Summary numbers
+  const totalXP     = diary.reduce((s, e) => s + (e.xp || 0), 0);
+  const totalQuests = diary.reduce((s, e) => s + (e.count || 0), 0);
+  const avgPerDay   = diary.length ? (totalQuests / diary.length).toFixed(1) : 0;
+  const bestDay     = diary.reduce((best, e) => (e.count > (best?.count || 0) ? e : best), null);
+
+  // Streak calendar: last 30 days
+  const activeDates = new Set(diary.map(e => e.date));
+  const today = new Date(); today.setHours(0,0,0,0);
+  let calHtml = '<div class="diary-cal">';
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    const entry = diary.find(e => e.date === ds);
+    const intensity = entry ? Math.min(4, Math.ceil(entry.count / 2)) : 0;
+    const label = entry ? `${ds}: ${entry.count} misiones, ${entry.xp} XP` : ds;
+    calHtml += `<div class="diary-cal-cell lvl-${intensity}" title="${label}"></div>`;
+  }
+  calHtml += '</div>';
+
+  // XP bar chart last 7 days
+  const last7 = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    const entry = diary.find(e => e.date === ds);
+    last7.push({ ds, xp: entry?.xp || 0, label: ['D','L','M','X','J','V','S'][d.getDay()] });
+  }
+  const maxXP = Math.max(...last7.map(d => d.xp), 1);
+  const chartHtml = `<div class="diary-xp-chart">${last7.map(d =>
+    `<div class="diary-xp-col">
+      <div class="diary-xp-bar-wrap"><div class="diary-xp-bar-fill" style="height:${Math.round((d.xp/maxXP)*60)}px" title="${d.xp} XP"></div></div>
+      <div class="diary-xp-label">${d.label}</div>
+    </div>`).join('')}</div>`;
+
+  el.innerHTML = `
+    <div class="diary-stats-grid">
+      <div class="diary-stat-card"><div class="diary-stat-num">${diary.length}</div><div class="diary-stat-lbl">días registrados</div></div>
+      <div class="diary-stat-card"><div class="diary-stat-num">${totalXP.toLocaleString()}</div><div class="diary-stat-lbl">XP total</div></div>
+      <div class="diary-stat-card"><div class="diary-stat-num">${totalQuests}</div><div class="diary-stat-lbl">misiones totales</div></div>
+      <div class="diary-stat-card"><div class="diary-stat-num">${avgPerDay}</div><div class="diary-stat-lbl">misiones/día</div></div>
+    </div>
+    ${bestDay ? `<div style="font-size:11px;color:var(--text3);margin-bottom:8px">🏆 Mejor día: <b style="color:var(--gold)">${bestDay.date}</b> — ${bestDay.count} misiones · ${bestDay.xp} XP</div>` : ''}
+    <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Actividad últimos 30 días</div>
+    ${calHtml}
+    <div style="font-size:10px;color:var(--text3);margin:12px 0 4px">XP últimos 7 días</div>
+    ${chartHtml}`;
+}
+
 function renderDiary() {
   const el = document.getElementById('diaryContent');
   if (!el) return;
+
+  // Tab bar (inject once)
+  if (!el.querySelector('.diary-tab-bar')) {
+    el.innerHTML = `
+      <div class="diary-tab-bar">
+        <button class="diary-tab-btn active" data-tab="entries" onclick="switchDiaryTab('entries')">📖 Entradas</button>
+        <button class="diary-tab-btn" data-tab="stats" onclick="switchDiaryTab('stats')">📊 Estadísticas</button>
+      </div>
+      <div id="diaryEntries" style="display:flex;flex-direction:column;gap:12px;padding:4px 0 8px"></div>
+      <div id="diaryStats" style="display:none;padding:4px 0 8px"></div>`;
+  }
+
+  const entriesEl = document.getElementById('diaryEntries');
+  if (!entriesEl) return;
   const diary = hero && Array.isArray(hero.diary) ? hero.diary : [];
   if (!diary.length) {
-    el.innerHTML = '<div class="empty-state" style="padding:24px"><div class="empty-state-icon">📖</div><p>El diario está vacío. Completa misiones para que el escribano registre tus hazañas.</p></div>';
+    entriesEl.innerHTML = '<div class="empty-state" style="padding:24px"><div class="empty-state-icon">📖</div><p>El diario está vacío. Completa misiones para que el escribano registre tus hazañas.</p></div>';
     return;
   }
-  el.innerHTML = diary.map(e => `
+  entriesEl.innerHTML = diary.map(e => `
     <div class="diary-entry">
       <div class="diary-meta">${e.date} · ${e.count} misión${e.count > 1 ? 'es' : ''} · ${e.xp} XP</div>
       <div class="diary-text">${escHtml(e.text)}</div>
     </div>`).join('');
+  if (_diaryTab === 'stats') renderDiaryStats();
 }
 async function generateDiaryEntryAI() {
   if (!hero) return;
@@ -290,11 +383,28 @@ function checkAndGenerateProphecy() {
   let existing = null;
   if (hero.prophecy) { try { const p = JSON.parse(hero.prophecy); if (p.week === week) existing = p.text; } catch {} }
   if (existing) return;
-  const mains  = Math.max(quests.filter(q => !q.done && q.type === 'main').length, 1);
-  const streak = Math.max((hero.streak || 0) + 3, 3);
-  const tmpl   = PROPHECY_TEMPLATES[_weekNum() % PROPHECY_TEMPLATES.length];
-  const text   = tmpl(mains, streak);
-  hero.prophecy = JSON.stringify({ week, text });
+
+  // Pick up to 3 real pending missions to embed in prophecy
+  const pending = quests.filter(q => !q.done);
+  const mainQ   = pending.filter(q => q.type === 'main').slice(0, 1);
+  const sideQ   = pending.filter(q => q.type === 'side').slice(0, 2);
+  const chosen  = [...mainQ, ...sideQ].slice(0, 3);
+  const missionNames = chosen.map(q => `"${q.name}"`);
+
+  let text;
+  if (missionNames.length >= 2) {
+    const streak = Math.max((hero.streak || 0) + 3, 3);
+    text = `El Oráculo ha visto esta semana. Las estrellas señalan las batallas que definirán tu destino: ${missionNames.join(', ')}. Quien las conquiste antes del domingo y mantenga una racha de ${streak} días será coronado campeón del gremio.`;
+  } else {
+    const mains  = Math.max(pending.filter(q => q.type === 'main').length, 1);
+    const streak = Math.max((hero.streak || 0) + 3, 3);
+    const tmpl   = PROPHECY_TEMPLATES[_weekNum() % PROPHECY_TEMPLATES.length];
+    text = tmpl(mains, streak);
+  }
+
+  // Store mission IDs for tracking
+  const prophecyMissionIds = chosen.map(q => q.id);
+  hero.prophecy = JSON.stringify({ week, text, missionIds: prophecyMissionIds });
   saveHero({ prophecy: hero.prophecy });
   renderProphecy();
 }

@@ -42,6 +42,7 @@ function advancePhase() {
     document.getElementById('timerPhase').textContent = isLong ? '☕ Descanso largo' : '☕ Descanso';
     toast('🍅', isLong ? '¡4 pomodoros! Descanso largo 15 min.' : '¡Pomodoro listo! Descansa 5 min.');
     sendNotif('🍅 Pomodoro completado', isLong ? 'Descanso largo: 15 min' : 'Descanso: 5 min');
+    if (typeof addMana === 'function') addMana(20);
     if (autoBreak) setTimeout(() => startTimer(), 700);
   } else {
     timer.phase = 'focus';

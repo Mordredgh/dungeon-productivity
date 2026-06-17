@@ -57,6 +57,7 @@ async function completeHabitQuest(q) {
     const newHp = Math.min(hero.hp_max || 100, (hero.hp || 100) + HABIT_HP_POS);
     hero.hp = newHp;
     await saveHero({ hp: newHp, quests_done: (hero.quests_done || 0) + 1 });
+    if (typeof addMana === 'function') addMana(10);
     toast('✅', `Hábito cumplido · +${HABIT_XP} XP · +${HABIT_HP_POS} HP`);
   } else {
     const newHp = Math.max(10, (hero.hp || 100) - HABIT_HP_NEG);

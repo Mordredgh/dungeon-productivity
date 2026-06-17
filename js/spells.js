@@ -170,17 +170,21 @@ function checkAchievements() {
   if (!hero) return;
   let unlocked;
   try { unlocked = JSON.parse(hero.achievements || '[]'); } catch { unlocked = []; }
+  let dates;
+  try { dates = JSON.parse(hero.achievement_dates || '{}'); } catch { dates = {}; }
   let changed = false;
   for (const a of ACHIEVEMENT_DEFS) {
     if (!unlocked.includes(a.id) && a.cond(hero)) {
       unlocked.push(a.id);
+      dates[a.id] = new Date().toISOString().split('T')[0];
       changed = true;
       toast('🏆', `¡Logro desbloqueado: ${a.name}!`);
     }
   }
   if (changed) {
-    saveHero({ achievements: JSON.stringify(unlocked) });
+    saveHero({ achievements: JSON.stringify(unlocked), achievement_dates: JSON.stringify(dates) });
     hero.achievements = JSON.stringify(unlocked);
+    hero.achievement_dates = JSON.stringify(dates);
     renderAchievements();
   }
 }
@@ -206,15 +210,19 @@ function renderAchievements() {
   const achById = {};
   ACHIEVEMENT_DEFS.forEach(a => achById[a.id] = a);
 
+  let dates2;
+  try { dates2 = JSON.parse(hero ? hero.achievement_dates || '{}' : '{}'); } catch { dates2 = {}; }
+
   const renderCard = a => {
     if (!a) return '';
     const ok = unlocked.includes(a.id);
+    const dateStr = ok && dates2[a.id] ? dates2[a.id] : null;
     return `<div class="achievement-card ${ok ? 'unlocked' : 'locked'}">
       <div class="achievement-icon">${a.icon}</div>
       <div class="achievement-info">
         <div class="achievement-name">${a.name}</div>
         <div class="achievement-desc">${ok ? a.desc : '???'}</div>
-        ${ok ? `<div style="font-size:10px;color:var(--green);margin-top:4px">✅</div>` : ''}
+        ${ok ? `<div class="achievement-date">✅${dateStr ? ' ' + dateStr : ''}</div>` : ''}
       </div>
     </div>`;
   };
