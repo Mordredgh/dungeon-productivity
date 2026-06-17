@@ -1870,6 +1870,53 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   .kanban-board { grid-template-columns: 1fr; }
   .stats-grid   { grid-template-columns: 1fr 1fr; }
   .achievements-grid { grid-template-columns: 1fr 1fr; }
+
+  /* ── BOTTOM NAV — emoji only, fits all 10 tabs ──────────── */
+  .tab-label { display: none !important; }
+  .view-tab {
+    min-width: 36px !important; max-width: 56px !important;
+    font-size: 20px !important;
+    padding: 8px 4px 6px !important;
+    line-height: 1 !important;
+  }
+
+  /* ── QUEST CARDS — compact meta row ─────────────────────── */
+  .drag-handle { display: none !important; }
+  .quest-item { padding: 10px 8px 10px 12px !important; }
+  .quest-body { min-width: 0; flex: 1; }
+  /* Name: single line with ellipsis */
+  .quest-name {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  /* Meta: single horizontally-scrollable row */
+  .quest-meta {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px !important;
+    margin-top: 3px !important;
+    padding-bottom: 1px;
+  }
+  .quest-meta::-webkit-scrollbar { display: none; }
+  .quest-meta .badge {
+    font-size: 10px !important; padding: 1px 5px !important;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .quest-meta .xp-reward {
+    font-size: 10px !important; padding: 1px 5px !important;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .quest-meta .deadline-badge { white-space: nowrap; flex-shrink: 0; font-size: 10px !important; }
+  .quest-meta .tag-badge, .quest-meta .esttime-badge,
+  .quest-meta .repeat-badge, .quest-meta .wager-badge,
+  .quest-meta .scheduled-badge, .quest-meta .locked-badge { white-space: nowrap; flex-shrink: 0; font-size: 9px !important; }
+  .quest-meta select { flex-shrink: 0; font-size: 9px !important; height: 16px !important; padding: 0 2px !important; }
+  /* Always show action buttons on touch */
+  .quest-actions { opacity: 1 !important; }
+  .quest-action-btn { width: 28px !important; height: 28px !important; font-size: 13px !important; }
 }
 
 /* ── MOBILE ADD SHEET (all sizes) ───────────────────────────── */
