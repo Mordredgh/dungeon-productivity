@@ -220,8 +220,7 @@ function switchView(v) {
   document.querySelectorAll('.view').forEach(el => {
     const active = el.id === `view-${v}`;
     el.classList.toggle('active', active);
-    const FONDO = { quests:'taberna', shop:'tienda', inventory:'inventario', character:'herrero' };
-    if (active) el.style.setProperty('--view-bg-url', `url(${CDN}dungeon/fondo_${FONDO[v] || v}.png)`);
+    if (active) el.style.setProperty('--view-bg-url', `url(${CDN}dungeon/fondo_${v}.png)`);
   });
   const charHub = document.getElementById('charHubTabs');
   if (charHub) charHub.style.display = v === 'character' ? 'flex' : 'none';
@@ -269,6 +268,10 @@ function switchCharTab(tab) {
   if (tab === 'runes')    { if (typeof renderRunePanel==='function')      renderRunePanel(); }
   if (tab === 'bestiary') { if (typeof renderBestiary==='function')       renderBestiary(); }
   if (tab === 'smithy')   { if (typeof renderSmithy==='function')         renderSmithy(); }
+  // Set sub-tab background image
+  const charView = document.getElementById('view-character');
+  const tabFondo = { sheet:'character', skills:'skills', runes:'runes', bestiary:'bestiary', smithy:'smithy' };
+  if (charView && tabFondo[tab]) charView.style.setProperty('--view-bg-url', `url(${CDN}dungeon/fondo_${tabFondo[tab]}.png)`);
 }
 
 function renderIntegrations() {

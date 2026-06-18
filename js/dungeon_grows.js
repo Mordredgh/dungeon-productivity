@@ -31,11 +31,16 @@ function renderDungeonGrows() {
       <div class="dg-progress-bar"><div class="dg-progress-fill" style="width:${Math.round(unlocked/DUNGEON_ROOMS.length*100)}%"></div></div>
     </div>
     <div class="dg-grid">
-      ${DUNGEON_ROOMS.map(r => {
-        const open = lvl >= r.level;
+      ${DUNGEON_ROOMS.map((r, ri) => {
+        const open   = lvl >= r.level;
+        const roomN  = ri + 1;
+        const imgUrl = CDN + 'dungeon/dungeon_room_' + roomN + '.png';
+        const bgStyle = open
+          ? `background-image:linear-gradient(180deg,rgba(0,0,0,.35) 0%,rgba(0,0,0,.6) 100%),url("${imgUrl}");background-size:cover;background-position:center`
+          : '';
         return `
           <div class="dg-room ${open ? 'dg-room-open' : 'dg-room-locked'}"
-               style="--rc:${r.color}"
+               style="--rc:${r.color};${bgStyle}"
                ${open && r.link ? `onclick="switchView('${r.link}')" title="Ir a ${r.name}"` : ''}>
             <div class="dg-room-glow"></div>
             <div class="dg-room-icon">${open ? r.icon : '🔒'}</div>

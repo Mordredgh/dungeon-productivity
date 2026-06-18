@@ -9,13 +9,13 @@
    ─────────────────────────────────────────────────────────── */
 
 const RUNE_DEFS = {
-  fuerza:    { icon:'⚔️', name:'Runa de Fuerza',    desc:'⚔️ +8% XP en épicas',         effect:'epic_xp',    val:0.08, color:'#ef4444' },
-  vigor:     { icon:'❤️', name:'Runa de Vigor',     desc:'❤️ +15 HP máximo',             effect:'hp_max',     val:15,   color:'#f43f5e' },
-  celeridad: { icon:'🏃', name:'Runa de Celeridad', desc:'🏃 +8% Oro en misiones',       effect:'gold',       val:0.08, color:'#f59e0b' },
-  sabiduria: { icon:'📚', name:'Runa de Sabiduría', desc:'📚 +6% XP en todas',          effect:'all_xp',     val:0.06, color:'#8b5cf6' },
-  suerte:    { icon:'🍀', name:'Runa de Suerte',    desc:'🍀 +10% probabilidad de drop', effect:'drop_rate',  val:0.10, color:'#22c55e' },
-  oscuridad: { icon:'🌑', name:'Runa de Oscuridad', desc:'🌑 +12% XP de noche (20-05h)', effect:'night_xp',   val:0.12, color:'#6b7280' },
-  fuego:     { icon:'🔥', name:'Runa de Fuego',     desc:'🔥 +15% daño al Jefe Semanal', effect:'boss_dmg',   val:0.15, color:'#f97316' },
+  fuerza:    { icon:'⚔️', img:'runa_fuerza',    name:'Runa de Fuerza',    desc:'⚔️ +8% XP en épicas',         effect:'epic_xp',    val:0.08, color:'#ef4444' },
+  vigor:     { icon:'❤️', img:'runa_vida',      name:'Runa de Vigor',     desc:'❤️ +15 HP máximo',             effect:'hp_max',     val:15,   color:'#f43f5e' },
+  celeridad: { icon:'🏃', img:'runa_velocidad', name:'Runa de Celeridad', desc:'🏃 +8% Oro en misiones',       effect:'gold',       val:0.08, color:'#f59e0b' },
+  sabiduria: { icon:'📚', img:'runa_arcana',    name:'Runa de Sabiduría', desc:'📚 +6% XP en todas',          effect:'all_xp',     val:0.06, color:'#8b5cf6' },
+  suerte:    { icon:'🍀', img:'runa_xp',        name:'Runa de Suerte',    desc:'🍀 +10% probabilidad de drop', effect:'drop_rate',  val:0.10, color:'#22c55e' },
+  oscuridad: { icon:'🌑', img:'runa_sombra',    name:'Runa de Oscuridad', desc:'🌑 +12% XP de noche (20-05h)', effect:'night_xp',   val:0.12, color:'#6b7280' },
+  fuego:     { icon:'🔥', img:'runa_fuerza',    name:'Runa de Fuego',     desc:'🔥 +15% daño al Jefe Semanal', effect:'boss_dmg',   val:0.15, color:'#f97316' },
 };
 
 const RUNE_SOCKET_COUNT = { comun:0, raro:1, epico:2, legendario:3, mitico:3 };
@@ -136,7 +136,9 @@ function renderRunePanel() {
             const def = RUNE_DEFS[r.rune_type] || { icon:'💎', name:r.rune_type, desc:'', color:'#9ca3af' };
             return `
               <div class="rune-inv-card" style="--rc:${def.color}" title="${def.desc}">
-                <div class="rune-inv-icon">${def.icon}</div>
+                <div class="rune-inv-icon">
+                  ${def.img ? `<img src="${CDN}dungeon/${def.img}.png" class="rune-img" alt="${def.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${def.icon}</span>` : def.icon}
+                </div>
                 <div class="rune-inv-name">${def.name}</div>
                 <div class="rune-inv-desc">${def.desc}</div>
                 ${equipped.length

@@ -3109,7 +3109,10 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
    BOSS IMAGE
    ============================================================ */
 .boss-icon-wrap { flex-shrink:0; width:52px; height:52px; display:flex; align-items:center; justify-content:center; }
-.boss-img { width:52px; height:52px; object-fit:contain; border-radius:8px; }
+.boss-img { width:52px; height:52px; object-fit:contain; border-radius:8px; image-rendering:pixelated; }
+
+/* Skill node pixel art image overlay */
+.skill-node-img { width:100%; height:40px; object-fit:contain; image-rendering:pixelated; margin-bottom:4px; opacity:.85; }
 
 /* ============================================================
    HERO AVATAR IMAGE
@@ -3799,7 +3802,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   border:1px solid color-mix(in srgb,var(--rc,#9ca3af) 30%,var(--border));
   border-radius:12px; padding:12px; width:150px; text-align:center; --rc:#9ca3af;
 }
-.rune-inv-icon { font-size:24px; margin-bottom:6px; }
+.rune-inv-icon { font-size:24px; margin-bottom:6px; display:flex; align-items:center; justify-content:center; height:36px; }
+.rune-img { width:36px; height:36px; object-fit:contain; image-rendering:pixelated; }
 .rune-inv-name { font-size:12px; font-weight:700; color:var(--rc); margin-bottom:4px; }
 .rune-inv-desc { font-size:10px; color:var(--text2); margin-bottom:8px; }
 .rune-equip-sel { font-size:10px; width:100%; background:var(--card2); border:1px solid var(--border); border-radius:6px; padding:3px 6px; color:var(--text); }

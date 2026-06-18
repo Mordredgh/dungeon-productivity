@@ -42,7 +42,7 @@ function renderHeroUI() {
   // Avatar image (CDN) with emoji fallback
   const cls  = hero.hero_class || 'guerrero';
   const race = (typeof heroRace !== 'undefined' ? heroRace : null) || hero.race || 'humano';
-  const avatarImgUrl = `${CDN}dungeon/avatar_${cls}_${race}.png`;
+  const avatarImgUrl = `${CDN}dungeon/char_${cls}_${race}.png`;
   let avatarVisual = avatarBtn.querySelector('.hero-avatar-img, .hero-avatar-emoji');
   const needRebuild = !avatarVisual || avatarVisual.dataset.cls !== cls || avatarVisual.dataset.race !== race;
   if (needRebuild) {
@@ -674,26 +674,41 @@ function updateBossBanner() {
     if (!banner) return;
     const state = getBossState();
     banner.style.display = 'flex';
+
+    // Rarity → banner background image
+    const bossDef = (typeof BOSS_DEFS !== 'undefined') ? BOSS_DEFS.find(b => b.key === state.bossKey) : null;
+    const rarity  = bossDef?.rarity || 'comun';
+    const variant = (Math.floor(Date.now() / 86400000) % 2) + 1; // alternates daily
+    const bannerImg = `${CDN}dungeon/boss_banner_${rarity}_${variant}.png`;
+    banner.style.background = `linear-gradient(135deg,rgba(26,5,32,.74) 0%,rgba(13,7,32,.68) 50%,rgba(10,13,31,.74) 100%),url("${bannerImg}") center/cover no-repeat`;
+
     if (state.defeated) {
       banner.innerHTML = `<div class="boss-defeated">🏆 ¡${escHtml(state.name)} DERROTADO! Semana conquistada.</div>`;
     } else {
       const pct      = Math.round((state.hp / state.maxHp) * 100);
       const hpColor  = pct > 60 ? '#fb7185' : pct > 30 ? '#facc15' : '#4ade80';
+      const rarityColors = { comun:'#9ca3af', raro:'#60a5fa', epico:'#a78bfa', legendario:'#facc15', mitico:'#f97316', cataclismo:'#e11d48' };
+      const rarityLabel  = { comun:'Común', raro:'Raro', epico:'Épico', legendario:'Legendario', mitico:'Mítico', cataclismo:'CATACLISMO' };
+      const rarClr  = rarityColors[rarity] || '#9ca3af';
+      const rarLbl  = rarityLabel[rarity]  || rarity;
       const bossImgHtml = state.bossKey
         ? `<img src="${CDN}dungeon/boss_${state.bossKey}.png" class="boss-img" alt="${escHtml(state.name)}"
                onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
            <div class="boss-icon" style="display:none">👹</div>`
         : `<div class="boss-icon">👹</div>`;
       const lowHp = pct <= 30 ? 'anim-pulse-danger' : '';
-      // Days remaining until Sunday penalty
-      const dow = new Date().getDay(); // 0=Sun,1=Mon...6=Sat
+      const dow = new Date().getDay();
       const daysLeft = dow === 0 ? 0 : 7 - dow;
-      const urgency  = daysLeft <= 2 ? `<span style="font-size:10px;color:#fb7185;font-weight:700">⏰ ${daysLeft === 0 ? '¡Hoy es el último día!' : `${daysLeft} día${daysLeft===1?'':'s'} restante${daysLeft===1?'':'s'}`}</span>` : '';
+      const urgency = daysLeft <= 2 ? `<span style="font-size:10px;color:#fb7185;font-weight:700">⏰ ${daysLeft === 0 ? '¡Hoy es el último día!' : `${daysLeft} día${daysLeft===1?'':'s'} restante${daysLeft===1?'':'s'}`}</span>` : '';
       banner.innerHTML = `
         <div class="boss-icon-wrap ${lowHp}">${bossImgHtml}</div>
         <div class="boss-info" style="flex:1;min-width:0">
           <div class="boss-label">⚔️ Jefe Semanal — ¡Atácalo completando misiones!</div>
-          <div style="display:flex;align-items:center;gap:8px"><div class="boss-name">${escHtml(state.name)}</div>${urgency}</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="boss-name">${escHtml(state.name)}</div>
+            <span style="font-size:10px;font-weight:700;color:${rarClr};text-shadow:0 0 8px ${rarClr}66;letter-spacing:.04em">${rarLbl}</span>
+            ${urgency}
+          </div>
           <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
             <div style="flex:1;height:14px;background:rgba(255,255,255,.15);border-radius:7px;overflow:hidden;border:1px solid rgba(255,255,255,.2)">
               <div style="width:${pct}%;height:100%;background:${hpColor};border-radius:7px"></div>

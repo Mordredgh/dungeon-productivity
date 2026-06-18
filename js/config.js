@@ -181,7 +181,8 @@ const SHOP_ITEMS = [
   { id:'egg_lobo-tormenta',     name:'Huevo Lobo',     img:'pet_egg_lobo-tormenta.png',     cost:400, desc:'Eclosiona con pociones de Lobo',     category:'egg' },
   { id:'egg_grifo',             name:'Huevo Grifo',    img:'pet_egg_grifo.png',             cost:500, desc:'Eclosiona con pociones de Grifo',    category:'egg' },
   { id:'egg_dragon-fuego',      name:'Huevo Dragón',   img:'pet_egg_dragon-fuego.png',      cost:600, desc:'Eclosiona con pociones de Dragón',   category:'egg' },
-  { id:'egg_fenix-mitico',      name:'Huevo Fénix',    img:'pet_egg_fenix-mitico.png',      cost:800, desc:'Eclosiona con pociones de Fénix',    category:'egg' },
+  { id:'egg_fenix-mitico',      name:'Huevo Fénix',    img:'pet_egg_fenix-mitico.png',      cost:800,  desc:'Eclosiona con pociones de Fénix',    category:'egg' },
+  { id:'egg_rey-tempestad',     name:'Huevo del Rey',  img:'pet_rey-tempestad_egg.png',     cost:0,    desc:'Se desbloquea al llevar las 6 mascotas al nivel máximo.', category:'egg', unlock:'all_pets_max' },
   /* Fragmentos de hechizo (×5 por compra) */
   { id:'frag_frenzy',        name:'Fragmento de Frenesí',       img:'spell_frenzy.png',        cost:30,  qty:5, desc:'×5 frags · necesitas 30 para lanzar Frenesí',      category:'fragment' },
   { id:'frag_speed',         name:'Pluma de Velocidad',         img:'spell_speed.png',         cost:20,  qty:5, desc:'×5 frags · necesitas 20 para lanzar Velocidad',     category:'fragment' },
@@ -198,19 +199,21 @@ const SHOP_ITEMS = [
   { id:'weapon_daga',   name:'Daga Común',    icon:'🗡️', cost:40,  desc:'Arma · mano secundaria · forjable a Rara (×5)', category:'armas', weaponKey:'daga',   tier:'comun' },
   { id:'weapon_escudo', name:'Escudo Común',  icon:'🛡️', cost:40,  desc:'Arma · mano secundaria · forjable a Rara (×5)', category:'armas', weaponKey:'escudo', tier:'comun' },
   /* Pociones de mascota (×1 por compra) */
-  { id:'pot_zorro-naturaleza', name:'Poción Zorro',   img:'pet_potion_zorro-naturaleza.png', cost:40,  desc:'Alimenta a tu Zorro Gigante',    category:'potion' },
-  { id:'pot_pantera-sombra',   name:'Poción Pantera', img:'pet_potion_pantera-sombra.png',   cost:55,  desc:'Alimenta a tu Pantera Sombra',   category:'potion' },
-  { id:'pot_lobo-tormenta',    name:'Poción Lobo',    img:'pet_potion_lobo-tormenta.png',    cost:70,  desc:'Alimenta a tu Lobo Tormenta',    category:'potion' },
-  { id:'pot_grifo',            name:'Poción Grifo',   img:'pet_potion_grifo.png',            cost:90,  desc:'Alimenta a tu Grifo',            category:'potion' },
-  { id:'pot_dragon-fuego',     name:'Poción Dragón',  img:'pet_potion_dragon-fuego.png',     cost:110, desc:'Alimenta a tu Dragón de Fuego',  category:'potion' },
-  { id:'pot_fenix-mitico',     name:'Poción Fénix',   img:'pet_potion_fenix-mitico.png',     cost:140, desc:'Alimenta a tu Fénix Mítico',     category:'potion' },
+  { id:'pot_zorro-naturaleza', name:'Poción Zorro',   img:'pet_pocion_zorro-naturaleza.png', cost:40,  desc:'Alimenta a tu Zorro Gigante',    category:'potion' },
+  { id:'pot_pantera-sombra',   name:'Poción Pantera', img:'pet_pocion_pantera-sombra.png',   cost:55,  desc:'Alimenta a tu Pantera Sombra',   category:'potion' },
+  { id:'pot_lobo-tormenta',    name:'Poción Lobo',    img:'pet_pocion_lobo-tormenta.png',    cost:70,  desc:'Alimenta a tu Lobo Tormenta',    category:'potion' },
+  { id:'pot_grifo',            name:'Poción Grifo',   img:'pet_pocion_grifo.png',            cost:90,  desc:'Alimenta a tu Grifo',            category:'potion' },
+  { id:'pot_dragon-fuego',     name:'Poción Dragón',  img:'pet_pocion_dragon-fuego.png',     cost:110, desc:'Alimenta a tu Dragón de Fuego',  category:'potion' },
+  { id:'pot_fenix-mitico',     name:'Poción Fénix',   img:'pet_pocion_fenix-mitico.png',     cost:140, desc:'Alimenta a tu Fénix Mítico',     category:'potion' },
+  { id:'pot_rey-tempestad',    name:'Poción del Rey', img:'pet_pocion_rey-tempestad.png',    cost:250, desc:'Alimenta al Rey de la Tempestad (desbloquea al max todas)', category:'potion' },
   /* Alimento especial — sube nivel de montura (1→50) */
-  { id:'food_zorro-naturaleza', name:'Baya Silvestre',    icon:'🫐', cost:50,  desc:'+50 XP al Zorro Gigante (requiere montura)',    category:'alimento' },
-  { id:'food_pantera-sombra',   name:'Carne Nocturna',    icon:'🥩', cost:65,  desc:'+60 XP a la Pantera Sombra (requiere montura)', category:'alimento' },
-  { id:'food_lobo-tormenta',    name:'Carne de Tormenta', icon:'🍖', cost:80,  desc:'+70 XP al Lobo Tormenta (requiere montura)',    category:'alimento' },
-  { id:'food_grifo',            name:'Presa Aérea',       icon:'🦤', cost:100, desc:'+85 XP al Grifo (requiere montura)',            category:'alimento' },
-  { id:'food_dragon-fuego',     name:'Brasa Volcánica',   icon:'🔥', cost:125, desc:'+100 XP al Dragón de Fuego (requiere montura)', category:'alimento' },
-  { id:'food_fenix-mitico',     name:'Llama Eterna',      icon:'✨', cost:160, desc:'+120 XP al Fénix Mítico (requiere montura)',    category:'alimento' },
+  { id:'food_zorro-naturaleza', name:'Baya Silvestre',    img:'pet_alimento_zorro-naturaleza.png', cost:50,  desc:'+50 XP al Zorro Gigante (requiere montura)',    category:'alimento' },
+  { id:'food_pantera-sombra',   name:'Carne Nocturna',    img:'pet_alimento_pantera-sombra.png',   cost:65,  desc:'+60 XP a la Pantera Sombra (requiere montura)', category:'alimento' },
+  { id:'food_lobo-tormenta',    name:'Carne de Tormenta', img:'pet_alimento_lobo-tormenta.png',    cost:80,  desc:'+70 XP al Lobo Tormenta (requiere montura)',    category:'alimento' },
+  { id:'food_grifo',            name:'Presa Aérea',       img:'pet_alimento_grifo.png',            cost:100, desc:'+85 XP al Grifo (requiere montura)',            category:'alimento' },
+  { id:'food_dragon-fuego',     name:'Brasa Volcánica',   img:'pet_alimento_dragon-fuego.png',     cost:125, desc:'+100 XP al Dragón de Fuego (requiere montura)', category:'alimento' },
+  { id:'food_fenix-mitico',     name:'Llama Eterna',      img:'pet_alimento_fenix-mitico.png',     cost:160, desc:'+120 XP al Fénix Mítico (requiere montura)',    category:'alimento' },
+  { id:'food_rey-tempestad',    name:'Esencia de Furias', img:'pet_alimento_rey-tempestad.png',    cost:300, desc:'+200 XP al Rey de la Tempestad (requiere montura)', category:'alimento' },
 ];
 
 /* ── MASCOTAS ────────────────────────────────────────────── */
@@ -243,16 +246,48 @@ const PET_DEFS = [
     level_req:15, food_xp:120,
     base_stats:{ atk:6,  def:15, spd:5,  lck:6  },
     stat_gain: { atk:.50, def:.60, spd:.40, lck:.50 } },
+  { key:'rey-tempestad',    name:'Rey de la Tempestad', icon:'👑', rarity:'cataclismo', eggCost:0, hatch:0, evolve:100,
+    level_req:30, food_xp:200, unlock:'all_pets_max',
+    base_stats:{ atk:12, def:30, spd:10, lck:12 },
+    stat_gain: { atk:1.0, def:1.0, spd:.80, lck:1.0 } },
 ];
 
 /* ── JEFES ───────────────────────────────────────────────── */
 const BOSS_DEFS = [
-  { key:'caballero-esqueleto', name:'Caballero Esqueleto',    rarity:'normal',     hp:100, seasonal:null },
-  { key:'demonio-sombras',     name:'Demonio de Sombras',     rarity:'legendario', hp:200, seasonal:null },
-  { key:'liche-ancestral',     name:'Liche Ancestral',        rarity:'mitico',     hp:350, seasonal:null },
-  { key:'halloween',           name:'Señor de las Sombras',   rarity:'mitico',     hp:500, seasonal:{ month:9,  dayStart:24, dayEnd:31 } },
-  { key:'navidad',             name:'Krampus Arcano',         rarity:'mitico',     hp:500, seasonal:{ month:11, dayStart:20, dayEnd:26 } },
-  { key:'anio-nuevo',          name:'Dragón del Tiempo',      rarity:'mitico',     hp:500, seasonal:{ month:11, dayStart:28, dayEnd:31 } },
+  // ── COMÚN ──────────────────────────────────────────────────
+  { key:'caballero-esqueleto', name:'Caballero Esqueleto',         rarity:'comun',      hp:80,  seasonal:null },
+  { key:'golem-piedra',        name:'Gólem de Piedra',             rarity:'comun',      hp:80,  seasonal:null },
+  { key:'ogro-cripta',         name:'Ogro de la Cripta',           rarity:'comun',      hp:100, seasonal:null },
+  { key:'slime-corrosivo',     name:'Slime Corrosivo',             rarity:'comun',      hp:60,  seasonal:null },
+  { key:'arana-gigante',       name:'Araña Gigante de Cueva',      rarity:'comun',      hp:70,  seasonal:null },
+  // ── RARO ───────────────────────────────────────────────────
+  { key:'caballero-espectral', name:'Caballero Espectral',         rarity:'raro',       hp:150, seasonal:null },
+  { key:'quimera',             name:'Quimera de Tres Cabezas',     rarity:'raro',       hp:160, seasonal:null },
+  { key:'wyvern-hielo',        name:'Wyvern de Hielo',             rarity:'raro',       hp:140, seasonal:null },
+  // ── ÉPICO ──────────────────────────────────────────────────
+  { key:'golem-cristal',       name:'Gólem de Cristal Arcano',     rarity:'epico',      hp:220, seasonal:null },
+  { key:'dragon-obsidiana',    name:'Dragón de Obsidiana',         rarity:'epico',      hp:250, seasonal:null },
+  { key:'hidra-pesadilla',     name:'Hidra de Pesadilla',          rarity:'epico',      hp:270, seasonal:null },
+  { key:'behemot-vacio',       name:'Behemot del Vacío',           rarity:'epico',      hp:280, seasonal:null },
+  { key:'custodio-tiempo',     name:'Custodio del Tiempo Roto',    rarity:'epico',      hp:260, seasonal:null },
+  // ── LEGENDARIO ─────────────────────────────────────────────
+  { key:'demonio-sombras',     name:'Demonio de Sombras',          rarity:'legendario', hp:350, seasonal:null },
+  { key:'liche-rey',           name:'Liche Rey Coronado',          rarity:'legendario', hp:400, seasonal:null },
+  { key:'serafin-caido',       name:'Serafín Caído',               rarity:'legendario', hp:380, seasonal:null },
+  { key:'titan-magma',         name:'Titán de Magma Ancestral',    rarity:'legendario', hp:420, seasonal:null },
+  { key:'devorador-constelaciones', name:'Devorador de Constelaciones', rarity:'legendario', hp:450, seasonal:null },
+  // ── MÍTICO ─────────────────────────────────────────────────
+  { key:'liche-ancestral',     name:'Liche Ancestral',             rarity:'mitico',     hp:500, seasonal:null },
+  { key:'fenix-cenizas',       name:'Fénix de Cenizas Eternas',    rarity:'mitico',     hp:550, seasonal:null },
+  { key:'kraken-abisal',       name:'Kraken Abisal',               rarity:'mitico',     hp:600, seasonal:null },
+  { key:'dragon-tormentas',    name:'Dragón Anciano de las Tormentas', rarity:'mitico', hp:580, seasonal:null },
+  // ── CATACLISMO ─────────────────────────────────────────────
+  { key:'arquitecto-vacio',    name:'El Arquitecto del Vacío',     rarity:'cataclismo', hp:800, seasonal:null },
+  { key:'la-que-susurra',      name:'La Que Susurra entre Eones',  rarity:'cataclismo', hp:900, seasonal:null },
+  // ── ESTACIONALES ───────────────────────────────────────────
+  { key:'halloween',           name:'Señor de las Sombras',        rarity:'mitico',     hp:500, seasonal:{ month:9,  dayStart:24, dayEnd:31 } },
+  { key:'navidad',             name:'Krampus Arcano',              rarity:'mitico',     hp:500, seasonal:{ month:11, dayStart:20, dayEnd:26 } },
+  { key:'anio-nuevo',          name:'Dragón del Tiempo',           rarity:'mitico',     hp:500, seasonal:{ month:11, dayStart:28, dayEnd:31 } },
 ];
 
 /* ── EVENTOS ESTACIONALES ───────────────────────────────── */

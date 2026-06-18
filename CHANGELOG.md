@@ -4,6 +4,25 @@ Todas las fechas en formato YYYY-MM-DD (hora Monterrey, CDT = UTC-5).
 
 ---
 
+## [v67] — 2026-06-17
+
+### Arte completo wired (150+ assets CDN)
+- **Banner del Boss (1420×120)** — fondo de boss varía por rareza (común/raro/épico/legendario/mítico/cataclismo) + badge de rareza en color
+- **28 bosses sprites** — nuevo pool de bosses expandido con rareza completa (comun→cataclismo) en BOSS_DEFS
+- **50 armas/armaduras** — imágenes pixel art en el herrero (espada, báculo, dagas, mazo, arco, pecho, casco, botas, guantes, grebas × 5 tiers)
+- **8 runas** — imágenes en inventario de runas (con fallback emoji)
+- **11 nodos árbol de habilidades** — nodo ofensivo/defensivo/arcano × bloqueado/disponible/desbloqueado por posición en tier
+- **18 retratos de personaje** — char_${clase}_${raza}.png (guerrero/mago/pícaro/clérigo/arquero/fundador × humano/elfo + 6 clases secretas)
+- **42 fondos de mascotas** — fondo per pet por etapa (egg/baby/mount) para 7 mascotas
+- **7 alimentos de mascota** — imagen en shop y en inventario
+- **7 pociones de mascota** — imagen en shop
+- **9 salas de dungeon** — imagen de fondo en dungeon-grows rooms
+- **15 fondos de vistas** — fondos propios para quests, stats, shop, inventory, pets, goals, integrations, achievements, history, character, skills, runes, smithy, bestiary, dungeon-grows
+- **Rey de la Tempestad** — 7ª mascota definitiva agregada a PET_DEFS + shop (huevo, pociones, alimento)
+- **image-rendering:pixelated** en todas las imágenes pixel art
+
+---
+
 ## [v40] — 2026-06-17
 
 ### Agregado

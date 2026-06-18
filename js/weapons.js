@@ -110,7 +110,8 @@ function renderInventory() {
   const weaponCard = w => {
     const def  = WEAPON_DEFS.find(d => d.key === w.weapon_key) || { icon:'⚔️' };
     const tier = WEAPON_TIERS[w.tier] || { color:'#9ca3af', label:w.tier };
-    const img  = CDN + 'dungeon/weapon_' + w.weapon_key + '_' + w.tier + '.png';
+    const _wImgSlug = { daga:'dagas' };
+    const img  = CDN + 'dungeon/arma_' + (_wImgSlug[w.weapon_key] || w.weapon_key) + '_' + w.tier + '.png';
     const forging = isForging(w);
     const stats = [
       tier.xpBonus  ? `✨ +${Math.round(tier.xpBonus*100)}% XP`   : '',
@@ -136,7 +137,10 @@ function renderInventory() {
   };
 
   const itemRow = (i, labelFn) => {
-    const img = CDN + 'dungeon/' + i.item_key + '.png';
+    const _iKey = i.item_key
+      .replace(/^pet_food_/,    'pet_alimento_')
+      .replace(/^pet_potion_/,  'pet_pocion_');
+    const img = CDN + 'dungeon/' + _iKey + '.png';
     return `
       <div class="inv-item-row">
         <img src="${img}" class="inv-item-img" alt=""

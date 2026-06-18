@@ -41,7 +41,7 @@ async function assignAttrPoint(key) {
 function _charPortraitHtml() {
   const cls = hero.hero_class || 'guerrero';
   const race = heroRace || hero.race || 'humano';
-  const url = `${CDN}dungeon/avatar_${cls}_${race}.png`;
+  const url = `${CDN}dungeon/char_${cls}_${race}.png`;
   return `
     <div class="char-portrait-ring">
       <img src="${url}" class="char-portrait-img" alt=""
@@ -284,7 +284,7 @@ function _charPreviewPortrait() {
   const ring = document.querySelector('.char-portrait-ring');
   if (!ring) return;
   ring.innerHTML = `
-    <img src="${CDN}dungeon/avatar_${cls}_${race}.png" class="char-portrait-img" alt=""
+    <img src="${CDN}dungeon/char_${cls}_${race}.png" class="char-portrait-img" alt=""
          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
     <div class="char-portrait-emoji" style="display:none">${hero.avatar || '🧙'}</div>`;
 }

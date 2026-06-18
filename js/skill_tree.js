@@ -153,14 +153,18 @@ function renderSkillTree() {
         <div class="skill-tier">
           <div class="skill-tier-label">Tier ${t}</div>
           <div class="skill-tier-row">
-            ${skills.map(s => {
+            ${skills.map((s, si) => {
               const learned   = hasSkill(s.id);
               const learnable = canLearnSkill(s);
-              const locked    = !learned && !learnable;
+              const branch    = t === 3 ? 'arcano' : si === 0 ? 'ofensivo' : 'defensivo';
+              const state     = learned ? 'desbloqueado' : learnable ? 'disponible' : 'bloqueado';
+              const nodeImg   = `${CDN}dungeon/skill_nodo_${branch}_${state}.png`;
               return `
                 <div class="skill-card ${learned ? 'skill-learned' : learnable ? 'skill-available' : 'skill-locked'}"
                      onclick="${learnable ? `learnSkill('${s.id}')` : ''}"
                      title="${s.desc}${s.requires.length ? ' | Requiere: '+s.requires.map(r=>defs.find(x=>x.id===r)?.name||r).join(', ') : ''}">
+                  <img src="${nodeImg}" class="skill-node-img" alt=""
+                       onerror="this.style.display='none'">
                   <div class="skill-icon">${s.icon}</div>
                   <div class="skill-name">${s.name}</div>
                   <div class="skill-desc">${s.desc}</div>
