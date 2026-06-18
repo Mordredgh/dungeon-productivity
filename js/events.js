@@ -767,7 +767,7 @@ document.getElementById('cmdkInput').addEventListener('input', function() {
   if (!hits.length) { res.innerHTML = '<div class="cmdk-empty">Sin resultados</div>'; return; }
   const typeLabels = { main:'⚔️ Épica', side:'🗡️ Encargo', daily:'🌅 Búsqueda', weekly:'📜 Crónica' };
   res.innerHTML = hits.map(h => `
-    <div class="cmdk-result-item" onclick="closeModal('cmdkModal');switchView('quests');document.getElementById('searchBox').value='${escHtml(h.name)}';renderQuestList()">
+    <div class="cmdk-result-item" data-qname="${escHtml(h.name)}" onclick="closeModal('cmdkModal');switchView('quests');document.getElementById('searchBox').value=this.dataset.qname;renderQuestList()">
       <span style="font-size:16px">${h.done?'✅':'⚔️'}</span>
       <span class="cmdk-result-name">${escHtml(h.name)}</span>
       <span class="cmdk-result-type">${typeLabels[h.type]||h.type}</span>
