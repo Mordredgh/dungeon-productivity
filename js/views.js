@@ -733,38 +733,68 @@ function updateDailyProgress() {
 function renderHourlyChart() {
   const el = document.getElementById('hourlyChart');
   if (!el) return;
-  const counts = Array(24).fill(0);
+
+  // 7×24 grid: day-of-week (Mon=0) × hour
+  const grid = Array.from({length:7}, () => Array(24).fill(0));
   quests.forEach(q => {
-    if (q.done && q.done_at) counts[new Date(q.done_at).getHours()]++;
+    if (!q.done || !q.done_at) return;
+    const d   = new Date(q.done_at);
+    const dow = (d.getDay() + 6) % 7;
+    grid[dow][d.getHours()]++;
   });
-  const max  = Math.max(...counts, 1);
-  const peak = counts.indexOf(Math.max(...counts));
-  el.innerHTML = `<div class="hourly-bars">` +
-    counts.map((c, h) => `
-      <div class="hourly-col" title="${h}:00 — ${c} misiones">
-        <div class="hourly-bar" style="height:${Math.round((c/max)*50)}px;background:${h===peak&&c>0?'var(--accent)':'var(--bg4)'}"></div>
-        <div class="hourly-label">${h%6===0?h+'h':''}</div>
-      </div>`).join('') + `</div>` +
-    (counts[peak] ? `<div style="font-size:11px;color:var(--text2);text-align:center;margin-top:4px">Pico: ${peak}:00h (${counts[peak]})</div>` : '<div style="font-size:11px;color:var(--text3);text-align:center">Completa misiones para ver tu horario</div>');
+  const maxVal = Math.max(...grid.flat(), 1);
+  const days   = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  let peakDow = 0, peakH = 0;
+  grid.forEach((row, d) => row.forEach((v, h) => { if (v > grid[peakDow][peakH]) { peakDow=d; peakH=h; } }));
+
+  el.innerHTML = `
+    <div class="hourly-heatmap">
+      <div class="hh-hour-labels">
+        <div class="hh-day-lbl"></div>
+        ${Array.from({length:24}, (_,h) => `<div class="hh-hl">${h%6===0?h+'h':''}</div>`).join('')}
+      </div>
+      ${days.map((day, d) => `
+        <div class="hh-row">
+          <div class="hh-day-lbl">${day}</div>
+          ${grid[d].map((v, h) => {
+            const a = v === 0 ? 0 : Math.max(0.15, (v/maxVal));
+            return `<div class="hh-cell2" style="background:rgba(168,85,247,${a.toFixed(2)})" title="${day} ${h}:00 — ${v} misiones"></div>`;
+          }).join('')}
+        </div>`).join('')}
+    </div>
+    ${grid[peakDow][peakH] > 0
+      ? `<div style="font-size:11px;color:var(--text2);text-align:center;margin-top:6px">🔥 Pico: ${days[peakDow]} ${peakH}:00h — ${grid[peakDow][peakH]} misiones</div>`
+      : `<div style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px">Completa misiones para ver tu heatmap</div>`}`;
 }
 
-/* ── Week comparison ────────────────────────────── */
+/* ── Week comparison — últimas 4 semanas ─────────── */
 function renderWeekComparison() {
   const el = document.getElementById('weekCompare');
   if (!el) return;
-  const now      = Date.now();
-  const wkStart  = now - 7  * 86400000;
-  const pwkStart = now - 14 * 86400000;
-  const thisWeek = quests.filter(q => q.done && q.done_at && new Date(q.done_at).getTime() >= wkStart).length;
-  const lastWeek = quests.filter(q => q.done && q.done_at && new Date(q.done_at).getTime() >= pwkStart && new Date(q.done_at).getTime() < wkStart).length;
-  const diff = thisWeek - lastWeek;
-  const pct  = lastWeek > 0 ? Math.round(Math.abs(diff / lastWeek) * 100) : (thisWeek > 0 ? 100 : 0);
-  const arrow = diff > 0 ? '▲' : diff < 0 ? '▼' : '→';
-  const color = diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--red)' : 'var(--text2)';
+
+  const now   = Date.now();
+  const weeks = Array.from({length:4}, (_, w) => {
+    const end   = now - w * 7 * 86400000;
+    const start = end - 7 * 86400000;
+    const qs    = quests.filter(q => q.done && q.done_at && +new Date(q.done_at) >= start && +new Date(q.done_at) < end);
+    const xp    = qs.reduce((s,q) => s + (XP_TABLE[q.type]||50), 0);
+    return { label: w===0?'Esta semana':w===1?'Sem. pasada':`Hace ${w} sem`, count:qs.length, xp };
+  });
+
+  const maxXP = Math.max(...weeks.map(w => w.xp), 1);
   el.innerHTML = `
-    <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Esta semana</span><strong style="color:var(--accent)">${thisWeek}</strong></div>
-    <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Semana anterior</span><strong>${lastWeek}</strong></div>
-    <div style="text-align:center;font-size:16px;font-weight:700;color:${color};margin-top:4px">${arrow} ${pct}%${diff!==0?(diff>0?' más':' menos'):' igual'}</div>`;
+    <div style="font-size:10px;color:var(--text3);display:flex;justify-content:flex-end;gap:4px;margin-bottom:6px">
+      <span style="background:var(--accent);width:10px;height:10px;border-radius:2px;display:inline-block"></span>Esta semana
+      <span style="background:rgba(168,85,247,.35);width:10px;height:10px;border-radius:2px;display:inline-block;margin-left:6px"></span>Anteriores
+    </div>
+    ${weeks.map((w, i) => `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+      <div style="width:76px;font-size:10px;color:var(--text3);flex-shrink:0">${w.label}</div>
+      <div style="flex:1;height:16px;background:var(--bg4);border-radius:8px;overflow:hidden">
+        <div style="width:${Math.round((w.xp/maxXP)*100)}%;height:100%;background:${i===0?'var(--accent)':'rgba(168,85,247,.35)'};border-radius:8px;transition:width .5s"></div>
+      </div>
+      <div style="font-size:10px;color:var(--text2);white-space:nowrap;width:68px;text-align:right">${w.xp} XP · ${w.count}⚔️</div>
+    </div>`).join('')}`;
 }
 
 /* ── XP por día de la semana (histórico) ───────── */

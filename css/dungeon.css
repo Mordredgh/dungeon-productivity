@@ -4670,3 +4670,12 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   margin: 0 0 14px;
   text-align: center;
 }
+
+/* ── HEATMAP HORARIO 7x24 ────────────────────────────────────────── */
+.hourly-heatmap { display: flex; flex-direction: column; gap: 3px; overflow-x: auto; }
+.hh-hour-labels,
+.hh-row         { display: flex; align-items: center; gap: 3px; }
+.hh-day-lbl     { width: 26px; font-size: 9px; color: var(--text3); flex-shrink: 0; text-align: right; }
+.hh-hl          { width: 14px; font-size: 8px; color: var(--text3); text-align: center; flex-shrink: 0; }
+.hh-cell2       { width: 14px; height: 14px; border-radius: 3px; background: var(--bg4); flex-shrink: 0; transition: opacity .15s; cursor: default; }
+.hh-cell2:hover { opacity: .75; }
