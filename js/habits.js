@@ -77,6 +77,36 @@ async function completeHabitQuest(q) {
   if (typeof registerCombo === 'function' && !isNeg) registerCombo();
 }
 
+/* ── RECORDATORIOS — UI ──────────────────────────────── */
+let _habitReminderId = null;
+
+function openHabitReminder(questId) {
+  _habitReminderId = questId;
+  const q  = quests.find(x => x.id === questId);
+  if (!q) return;
+  const rt  = getHabitReminderTime(q);
+  const inp = document.getElementById('hrTimeInput');
+  const chk = document.getElementById('hrEnabled');
+  if (inp) inp.value = rt || '07:00';
+  if (chk) chk.checked = !!rt;
+  openModal('habitReminderModal');
+}
+
+async function saveHabitReminder() {
+  if (!_habitReminderId) return;
+  const q   = quests.find(x => x.id === _habitReminderId);
+  const inp = document.getElementById('hrTimeInput');
+  const chk = document.getElementById('hrEnabled');
+  if (!q || !inp) return;
+  let tags = (q.tags || '').replace(/\s*reminder-\d{1,2}:\d{2}/gi, '').trim();
+  if (chk?.checked && inp.value) tags = (tags + ' reminder-' + inp.value).trim();
+  await db.from('dungeon_quests').update({ tags }).eq('id', q.id);
+  q.tags = tags;
+  closeModal('habitReminderModal');
+  renderQuestList();
+  toast('🔔', chk?.checked ? `Recordatorio a las ${inp.value}` : 'Recordatorio eliminado');
+}
+
 function renderHabitHeatmap(questId) {
   const modal = document.getElementById('habitHeatmapModal');
   if (!modal) return;
@@ -119,7 +149,11 @@ function renderHabitItem(q) {
   const btnLbl = isNeg ? '✗ Ocurrió' : '✓ Hecho';
   const effect = isNeg ? `-${HABIT_HP_NEG} HP` : `+${HABIT_HP_POS} HP · +${HABIT_XP} XP`;
   const rt     = getHabitReminderTime(q);
-  const reminderBadge = rt ? `<span class="habit-reminder-badge">🔔 ${rt}</span>` : '';
+  const reminderBadge = !isNeg
+    ? (rt
+        ? `<button class="habit-reminder-badge habit-reminder-btn" onclick="event.stopPropagation();openHabitReminder('${q.id}')">🔔 ${rt}</button>`
+        : `<button class="habit-reminder-badge habit-reminder-btn habit-reminder-unset" onclick="event.stopPropagation();openHabitReminder('${q.id}')">🔔 Añadir</button>`)
+    : '';
 
   return `<div class="quest-item habit-item habit-${dir} ${q.done ? 'done' : ''}" data-qid="${q.id}">
     <div class="habit-icon">${icon}</div>

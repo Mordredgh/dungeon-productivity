@@ -684,11 +684,15 @@ function updateBossBanner() {
            <div class="boss-icon" style="display:none">👹</div>`
         : `<div class="boss-icon">👹</div>`;
       const lowHp = pct <= 30 ? 'anim-pulse-danger' : '';
+      // Days remaining until Sunday penalty
+      const dow = new Date().getDay(); // 0=Sun,1=Mon...6=Sat
+      const daysLeft = dow === 0 ? 0 : 7 - dow;
+      const urgency  = daysLeft <= 2 ? `<span style="font-size:10px;color:#fb7185;font-weight:700">⏰ ${daysLeft === 0 ? '¡Hoy es el último día!' : `${daysLeft} día${daysLeft===1?'':'s'} restante${daysLeft===1?'':'s'}`}</span>` : '';
       banner.innerHTML = `
         <div class="boss-icon-wrap ${lowHp}">${bossImgHtml}</div>
         <div class="boss-info" style="flex:1;min-width:0">
           <div class="boss-label">⚔️ Jefe Semanal — ¡Atácalo completando misiones!</div>
-          <div class="boss-name">${escHtml(state.name)}</div>
+          <div style="display:flex;align-items:center;gap:8px"><div class="boss-name">${escHtml(state.name)}</div>${urgency}</div>
           <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
             <div style="flex:1;height:14px;background:rgba(255,255,255,.15);border-radius:7px;overflow:hidden;border:1px solid rgba(255,255,255,.2)">
               <div style="width:${pct}%;height:100%;background:${hpColor};border-radius:7px"></div>

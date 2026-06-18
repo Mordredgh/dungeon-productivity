@@ -1320,6 +1320,27 @@
   </div>
 </div>
 
+<!-- Habit Reminder -->
+<div class="modal-overlay" id="habitReminderModal">
+  <div class="modal" style="max-width:300px">
+    <div class="modal-title">🔔 Recordatorio</div>
+    <div class="modal-body">
+      <label style="display:flex;align-items:center;gap:10px;margin-bottom:16px;cursor:pointer;font-size:13px">
+        <input type="checkbox" id="hrEnabled"> Activar recordatorio diario
+      </label>
+      <div class="form-group">
+        <label class="form-label">Hora del recordatorio</label>
+        <input type="time" class="form-input" id="hrTimeInput" value="07:00">
+      </div>
+      <p style="font-size:11px;color:var(--text3);margin-top:8px">Necesitas tener notificaciones activadas. Recibirás un push si el hábito no está completado a esa hora.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('habitReminderModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveHabitReminder()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Habit Heatmap -->
 <div class="modal-overlay" id="habitHeatmapModal">
   <div class="modal" style="max-width:400px">
