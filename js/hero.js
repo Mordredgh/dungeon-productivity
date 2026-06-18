@@ -100,8 +100,9 @@ async function addXP(amount, type, sourceEl) {
   const skillMult  = typeof getSkillTreeXPBonus === 'function' ? (1 + getSkillTreeXPBonus(type || 'side')) : 1;
   const runeMult   = typeof getRuneBonus === 'function' ? (1 + getRuneBonus('all_xp')) : 1;
   const weaponMult   = typeof getWeaponXPBonus  === 'function' ? (1 + getWeaponXPBonus()) : 1;
-  const mountAtkMult = typeof getPetMountStat   === 'function' ? (1 + getPetMountStat('atk') / 100) : 1;
-  let finalXP = Math.round(amount * classXPBonus(type || 'side') * xpMultiplier * todMult * skillMult * runeMult * weaponMult * mountAtkMult);
+  const mountAtkMult   = typeof getPetMountStat    === 'function' ? (1 + getPetMountStat('atk') / 100) : 1;
+  const seasonalMult   = typeof getSeasonalXPMult  === 'function' ? getSeasonalXPMult() : 1;
+  let finalXP = Math.round(amount * classXPBonus(type || 'side') * xpMultiplier * todMult * skillMult * runeMult * weaponMult * mountAtkMult * seasonalMult);
 
   const prevLevel = calcLevel(hero.xp_total || 0);
   const newTotal = (hero.xp_total || 0) + finalXP;

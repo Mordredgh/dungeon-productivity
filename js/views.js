@@ -28,6 +28,7 @@ function renderAll() {
   renderHistory();
   renderStats();
   updateBossBanner();
+  if (typeof renderSeasonalBanner === 'function') renderSeasonalBanner();
   if (typeof renderActivePet === 'function') renderActivePet();
 }
 

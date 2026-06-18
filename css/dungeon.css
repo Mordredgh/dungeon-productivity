@@ -2525,6 +2525,29 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .cmdk-hint { font-size: 10px; color: var(--text3); padding: 8px 16px; border-top: 1px solid var(--border); }
 
 /* ============================================================
+   SEASONAL EVENT BANNER
+   ============================================================ */
+.seasonal-banner {
+  --sb-clr: #a855f7;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--sb-clr) 12%, transparent), color-mix(in srgb, var(--sb-clr) 6%, transparent));
+  border: 1px solid color-mix(in srgb, var(--sb-clr) 30%, transparent);
+  animation: seasonal-pulse 4s ease-in-out infinite;
+}
+@keyframes seasonal-pulse {
+  0%, 100% { box-shadow: 0 0 0px color-mix(in srgb, var(--sb-clr) 0%, transparent); }
+  50%       { box-shadow: 0 0 12px color-mix(in srgb, var(--sb-clr) 25%, transparent); }
+}
+.sb-icon { font-size: 22px; flex-shrink: 0; }
+.sb-text { font-size: 12px; color: var(--text); line-height: 1.4; }
+.sb-bonus { font-weight: 700; color: color-mix(in srgb, var(--sb-clr) 90%, white); font-size: 12px; }
+
+/* ============================================================
    WEEKLY MISSION BANNER
    ============================================================ */
 .weekly-banner {

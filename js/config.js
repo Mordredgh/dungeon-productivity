@@ -255,6 +255,26 @@ const BOSS_DEFS = [
   { key:'anio-nuevo',          name:'Dragón del Tiempo',      rarity:'mitico',     hp:500, seasonal:{ month:11, dayStart:28, dayEnd:31 } },
 ];
 
+/* ── EVENTOS ESTACIONALES ───────────────────────────────── */
+// month: 0-11 (enero=0). dayStart/dayEnd inclusivos. xpBonus: fracción adicional (0.20 = +20%).
+const SEASONAL_EVENTS = [
+  // Festividades especiales — mayor prioridad
+  { id:'halloween',   icon:'🎃', name:'Noche de Espectros',   desc:'Los muertos susurran poder arcano.',       xpBonus:0.25, color:'#f97316', month:9,  dayStart:25, dayEnd:31 },
+  { id:'dia_muertos', icon:'💀', name:'Día de Muertos',        desc:'Los ancestros conceden su bendición.',     xpBonus:0.20, color:'#a855f7', month:10, dayStart:1,  dayEnd:2  },
+  { id:'navidad',     icon:'🎄', name:'Festival de Krampus',   desc:'El frío arcano amplifica el esfuerzo.',   xpBonus:0.30, color:'#22d3ee', month:11, dayStart:20, dayEnd:26 },
+  { id:'anio_nuevo',  icon:'🎆', name:'Alba del Año Nuevo',    desc:'El año comienza con poder renovado.',      xpBonus:0.25, color:'#facc15', month:11, dayStart:28, dayEnd:31 },
+  { id:'reyes',       icon:'⭐', name:'Noche de Reyes',         desc:'Los reyes magos traen XP extra.',          xpBonus:0.20, color:'#f59e0b', month:0,  dayStart:5,  dayEnd:6  },
+  // Estaciones (menor prioridad si no hay festividad)
+  { id:'primavera',   icon:'🌸', name:'Despertar del Bosque',  desc:'La primavera impulsa el crecimiento.',     xpBonus:0.12, color:'#4ade80', month:null, dayStart:null, dayEnd:null,
+    season: d => { const m=d.getMonth(),dy=d.getDate(); return (m===2&&dy>=20)||(m===3||m===4)||(m===5&&dy<=20); } },
+  { id:'verano',      icon:'🌞', name:'Festival del Sol',      desc:'El calor veraniego forja guerreros.',      xpBonus:0.15, color:'#fbbf24', month:null, dayStart:null, dayEnd:null,
+    season: d => { const m=d.getMonth(),dy=d.getDate(); return (m===5&&dy>=21)||(m===6||m===7)||(m===8&&dy<=22); } },
+  { id:'otonio',      icon:'🍂', name:'Cosecha Oscura',         desc:'El otoño trae frutos del dungeon.',        xpBonus:0.10, color:'#fb923c', month:null, dayStart:null, dayEnd:null,
+    season: d => { const m=d.getMonth(),dy=d.getDate(); return (m===8&&dy>=23)||(m===9||m===10)||(m===11&&dy<=20); } },
+  { id:'invierno',    icon:'❄️', name:'Solsticio de Invierno', desc:'El frío forja voluntades de acero.',       xpBonus:0.20, color:'#93c5fd', month:null, dayStart:null, dayEnd:null,
+    season: d => { const m=d.getMonth(),dy=d.getDate(); return (m===11&&dy>=21)||(m===0||m===1)||(m===2&&dy<=19); } },
+];
+
 /* ── DROPS AL COMPLETAR MISIÓN ──────────────────────────── */
 // chance: probabilidad de que caiga algo. min/max: cantidad de ítems.
 const DROP_TABLE = {

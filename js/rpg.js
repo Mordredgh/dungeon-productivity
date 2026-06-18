@@ -2,6 +2,37 @@
    RPG SYSTEMS: Weather · Boss · Events · Class Skills · Diary · Prophecy
    ============================================================ */
 
+/* ── EVENTOS ESTACIONALES ───────────────────────────────── */
+function getSeasonalEvent() {
+  const d = new Date();
+  const m = d.getMonth(), dy = d.getDate();
+  // Prioridad: festividades especiales primero
+  for (const ev of SEASONAL_EVENTS) {
+    if (ev.month !== null) {
+      if (ev.month === m && dy >= ev.dayStart && dy <= ev.dayEnd) return ev;
+    } else if (ev.season && ev.season(d)) {
+      return ev;
+    }
+  }
+  return null;
+}
+
+function getSeasonalXPMult() {
+  const ev = getSeasonalEvent();
+  return ev ? 1 + ev.xpBonus : 1;
+}
+
+function renderSeasonalBanner() {
+  const el = document.getElementById('seasonalBanner');
+  if (!el) return;
+  const ev = getSeasonalEvent();
+  if (!ev) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  el.innerHTML = `<span class="sb-icon">${ev.icon}</span>
+    <span class="sb-text"><strong>${escHtml(ev.name)}</strong> — ${escHtml(ev.desc)} <span class="sb-bonus">+${Math.round(ev.xpBonus*100)}% XP</span></span>`;
+  el.style.setProperty('--sb-clr', ev.color);
+}
+
 /* ── WEATHER ─────────────────────────────────────────────── */
 function calcTodayWeather() {
   if (!hero) return 'clear';
