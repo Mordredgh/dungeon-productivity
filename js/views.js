@@ -690,35 +690,55 @@ function _bossTimeLeft(cycle) {
 }
 
 function _bossCycleCardHtml(cycle, b) {
-  if (!b) return `<div class="boss-card boss-card-empty"><div class="boss-card-cycle">${_BOSS_CYCLE_ICON[cycle]} ${_BOSS_CYCLE_LABEL[cycle]}</div><div style="font-size:28px;opacity:.3">👻</div><div style="font-size:11px;opacity:.4">Sin jefe</div></div>`;
-  const pct     = Math.round((b.hp / b.maxHp) * 100);
-  const hpClr   = pct > 60 ? '#fb7185' : pct > 30 ? '#facc15' : '#4ade80';
-  const rarClr  = _BOSS_RARITY_CLR[b.rarity]   || '#9ca3af';
-  const rarLbl  = _BOSS_RARITY_LABEL[b.rarity] || b.rarity;
+  const cycleTag = `<span class="boss-banner-cycle-tag">${_BOSS_CYCLE_ICON[cycle]} ${_BOSS_CYCLE_LABEL[cycle]}</span>`;
+  if (!b) return `<div class="boss-banner-row boss-banner-empty">${cycleTag}<span style="opacity:.35;font-size:12px">Sin jefe activo</span></div>`;
+
+  const pct    = Math.round((b.hp / b.maxHp) * 100);
+  const hpClr  = pct > 60 ? '#fb7185' : pct > 30 ? '#facc15' : '#4ade80';
+  const rarClr = _BOSS_RARITY_CLR[b.rarity]   || '#9ca3af';
+  const rarLbl = _BOSS_RARITY_LABEL[b.rarity] || b.rarity;
   const timeLeft = _bossTimeLeft(cycle);
-  const urgent   = pct <= 30 ? 'boss-card-urgent' : '';
+  const urgent   = pct <= 30 ? 'boss-banner-urgent' : '';
+
+  // Background uses the boss_banner image (1420×120)
+  const variant    = (Math.floor(Date.now() / 86400000) % 2) + 1;
+  const bannerImg  = `${CDN}dungeon/boss_banner_${b.rarity}_${variant}.png`;
+  const bgStyle    = `background:linear-gradient(90deg,rgba(15,5,25,.88) 0%,rgba(15,5,25,.6) 60%,rgba(15,5,25,.3) 100%),url("${bannerImg}") right center/auto 100% no-repeat`;
+
   if (b.defeated) {
-    return `<div class="boss-card boss-card-defeated">
-      <div class="boss-card-cycle">${_BOSS_CYCLE_ICON[cycle]} ${_BOSS_CYCLE_LABEL[cycle]}</div>
-      <div style="font-size:28px">🏆</div>
-      <div class="boss-card-name" style="color:#4ade80">${escHtml(b.name)}</div>
-      <div style="font-size:10px;color:#4ade80;font-weight:700">¡DERROTADO!</div>
+    return `<div class="boss-banner-row boss-banner-defeated" style="${bgStyle}">
+      ${cycleTag}
+      <div class="boss-banner-icon-wrap"><div style="font-size:32px">🏆</div></div>
+      <div class="boss-banner-info">
+        <div class="boss-name" style="color:#4ade80">${escHtml(b.name)}</div>
+        <div style="font-size:11px;color:#4ade80;font-weight:700;margin-top:2px">¡DERROTADO! ✓</div>
+      </div>
     </div>`;
   }
+
   const imgHtml = b.key
-    ? `<img src="${CDN}dungeon/boss_${escHtml(b.key)}.png" class="boss-card-img" alt="${escHtml(b.name)}"
-           onerror="this.style.display='none';this.nextSibling.style.display='block'"><div class="boss-card-emoji" style="display:none">👹</div>`
-    : `<div class="boss-card-emoji">👹</div>`;
-  return `<div class="boss-card ${urgent}">
-    <div class="boss-card-cycle">${_BOSS_CYCLE_ICON[cycle]} ${_BOSS_CYCLE_LABEL[cycle]}</div>
-    <div class="boss-card-portrait">${imgHtml}</div>
-    <div class="boss-card-name">${escHtml(b.name)}</div>
-    <div class="boss-card-rarity" style="color:${rarClr};text-shadow:0 0 8px ${rarClr}55">${rarLbl}</div>
-    <div class="boss-card-hp-bar">
-      <div class="boss-card-hp-fill" style="width:${pct}%;background:${hpClr}"></div>
+    ? `<img src="${CDN}dungeon/boss_${escHtml(b.key)}.png" class="boss-banner-portrait" alt=""
+           onerror="this.style.display='none';this.nextSibling.style.display='block'">
+       <div class="boss-banner-emoji" style="display:none">👹</div>`
+    : `<div class="boss-banner-emoji">👹</div>`;
+
+  return `<div class="boss-banner-row ${urgent}" style="${bgStyle}">
+    ${cycleTag}
+    <div class="boss-banner-icon-wrap">${imgHtml}</div>
+    <div class="boss-banner-info">
+      <div class="boss-label">⚔️ ¡Atácalo completando misiones!</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div class="boss-name">${escHtml(b.name)}</div>
+        <span style="font-size:10px;font-weight:700;color:${rarClr};text-shadow:0 0 8px ${rarClr}55;letter-spacing:.04em">${rarLbl}</span>
+        <span style="font-size:10px;color:var(--text3)">⏰ ${timeLeft}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
+        <div style="flex:1;height:10px;background:rgba(255,255,255,.13);border-radius:5px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:${hpClr};border-radius:5px;transition:width .4s"></div>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap">❤️ ${b.hp}/${b.maxHp}</span>
+      </div>
     </div>
-    <div class="boss-card-hp-text">❤️ ${b.hp}/${b.maxHp}</div>
-    <div class="boss-card-time">⏰ ${timeLeft}</div>
   </div>`;
 }
 

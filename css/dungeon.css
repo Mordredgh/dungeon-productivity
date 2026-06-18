@@ -716,61 +716,60 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 /* Boss-defeated state */
 .boss-defeated { font-family: var(--font-head); font-size: 13px; color: var(--green); }
 
-/* ── MULTI-BOSS GRID (v69) ──────────────────────────────────── */
+/* ── MULTI-BOSS BANNERS (v69) ───────────────────────────────── */
 .boss-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.boss-card {
-  background: linear-gradient(160deg, rgba(26,5,32,.85) 0%, rgba(10,13,31,.9) 100%);
-  border: 1px solid rgba(251,113,133,.22);
-  border-radius: var(--radius);
-  padding: 12px 10px 10px;
   display: flex;
   flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.boss-banner-row {
+  display: flex;
   align-items: center;
-  gap: 5px;
-  text-align: center;
+  gap: 12px;
+  border: 1px solid rgba(251,113,133,.22);
+  border-left: 3px solid rgba(251,113,133,.5);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  min-height: 72px;
   position: relative;
-  min-height: 140px;
+  overflow: hidden;
 }
-.boss-card-urgent { border-color: rgba(251,113,133,.6); animation: pulseBorder 1.4s infinite alternate; }
-@keyframes pulseBorder { to { box-shadow: 0 0 14px rgba(251,113,133,.35); } }
-.boss-card-defeated { border-color: rgba(74,222,128,.3); background: linear-gradient(160deg, rgba(5,32,14,.85) 0%, rgba(10,31,13,.9) 100%); }
-.boss-card-empty    { opacity: .4; }
-.boss-card-cycle {
+.boss-banner-urgent {
+  border-left-color: #fb7185;
+  animation: pulseBorder 1.4s infinite alternate;
+}
+@keyframes pulseBorder { to { box-shadow: 0 0 12px rgba(251,113,133,.3); } }
+.boss-banner-defeated { border-left-color: rgba(74,222,128,.6); }
+.boss-banner-empty    { opacity: .4; min-height: 44px; }
+
+.boss-banner-cycle-tag {
+  position: absolute;
+  top: 6px;
+  right: 10px;
   font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: .1em;
+  font-weight: 700;
   color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .08em;
   font-family: var(--font-head);
-  margin-bottom: 2px;
 }
-.boss-card-portrait {
+.boss-banner-icon-wrap {
+  flex-shrink: 0;
   width: 52px;
   height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
-.boss-card-img   { width: 52px; height: 52px; object-fit: contain; image-rendering: pixelated; }
-.boss-card-emoji { font-size: 36px; line-height: 1; }
-.boss-card-name  { font-family: var(--font-head); font-size: 12px; color: var(--text); font-weight: 700; line-height: 1.2; }
-.boss-card-rarity { font-size: 9px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
-.boss-card-hp-bar {
-  width: 100%;
-  height: 7px;
-  background: rgba(255,255,255,.12);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-top: 2px;
+.boss-banner-portrait {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
-.boss-card-hp-fill { height: 100%; border-radius: 4px; transition: width .4s; }
-.boss-card-hp-text { font-size: 10px; color: var(--text2); font-weight: 600; }
-.boss-card-time    { font-size: 9px; color: var(--text3); }
+.boss-banner-emoji { font-size: 36px; line-height: 1; }
+.boss-banner-info  { flex: 1; min-width: 0; }
 
 /* ── EFFECTS BAR (v69) ──────────────────────────────────────── */
 .effects-bar {
