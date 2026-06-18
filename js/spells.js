@@ -51,10 +51,10 @@ function sendNotif(title, body) {
   try { new Notification(title, { body }); } catch {}
 }
 
-/* SPELLS — sistema de fragmentos (no cooldown por tiempo) */
+/* SPELLS — sistema de fragmentos + coste de maná */
 const SPELL_DEFS = [
   {
-    id: 'frenzy', icon: '⚡', name: 'Frenesí Arcano',
+    id: 'frenzy', icon: '⚡', name: 'Frenesí Arcano', mana: 40,
     desc: 'XP x2 durante 1 hora', color: '#a855f7',
     cast() {
       xpMultiplier = 2; xpMultiplierEnd = Date.now() + 3600000;
@@ -62,7 +62,7 @@ const SPELL_DEFS = [
     }
   },
   {
-    id: 'speed', icon: '💨', name: 'Velocidad',
+    id: 'speed', icon: '💨', name: 'Velocidad', mana: 15,
     desc: 'Próximo pom: 10 min con XP completo', color: '#22d3ee',
     cast() {
       if (timer.running) { toast('⚠️', 'Pausa el pomodoro primero.'); return; }
@@ -73,7 +73,7 @@ const SPELL_DEFS = [
     }
   },
   {
-    id: 'berserker', icon: '🔥', name: 'Berserker',
+    id: 'berserker', icon: '🔥', name: 'Berserker', mana: 25,
     desc: 'XP x1.5 durante 25 min', color: '#fb7185',
     cast() {
       xpMultiplier = 1.5; xpMultiplierEnd = Date.now() + 25 * 60 * 1000;
@@ -81,35 +81,35 @@ const SPELL_DEFS = [
     }
   },
   {
-    id: 'shield', icon: '🛡️', name: 'Escudo Arcano',
+    id: 'shield', icon: '🛡️', name: 'Escudo Arcano', mana: 20,
     desc: 'Recupera 25 HP al instante', color: '#4ade80',
     cast() {
       if (!hero) return;
       const newHp = Math.min(hero.hp_max || 100, (hero.hp || 0) + 25);
-      hero.hp = newHp; saveHero({ hp: newHp }); renderHero();
+      hero.hp = newHp; saveHero({ hp: newHp }); renderHeroUI();
       toast('🛡️', '¡Escudo Arcano! +25 HP recuperado.');
     }
   },
   {
-    id: 'modo-berserker', icon: '🧨', name: 'Modo Berserker',
-    desc: 'XP x2 en las próximas 3 misiones', color: '#f97316',
+    id: 'modo-berserker', icon: '🧨', name: 'Modo Berserker', mana: 50,
+    desc: 'XP x2 durante 90 min', color: '#f97316',
     cast() {
       xpMultiplier = 2; xpMultiplierEnd = Date.now() + 90 * 60 * 1000;
-      toast('🧨', '¡Modo Berserker! XP x2 en las próximas misiones.');
+      toast('🧨', '¡Modo Berserker! XP x2 durante 90 minutos.');
     }
   },
   {
-    id: 'healing', icon: '🌿', name: 'Curación Mayor',
+    id: 'healing', icon: '🌿', name: 'Curación Mayor', mana: 30,
     desc: 'Restaura 50 HP al instante', color: '#86efac',
     cast() {
       if (!hero) return;
       const newHp = Math.min(hero.hp_max || 100, (hero.hp || 0) + 50);
-      hero.hp = newHp; saveHero({ hp: newHp }); renderHero();
+      hero.hp = newHp; saveHero({ hp: newHp }); renderHeroUI();
       toast('🌿', '¡Curación Mayor! +50 HP recuperado.');
     }
   },
   {
-    id: 'mente-acero', icon: '🔷', name: 'Mente de Acero',
+    id: 'mente-acero', icon: '🔷', name: 'Mente de Acero', mana: 35,
     desc: '+200 XP instantáneos', color: '#60a5fa',
     cast() {
       if (!hero) return;
@@ -128,8 +128,17 @@ async function castSpell(spellId) {
     toast('❌', `Necesitas ${cost} fragmentos de ${spell.name} (tienes ${have}).`);
     return;
   }
+  if (spell.mana && (hero.mana || 0) < spell.mana) {
+    toast('💧', `Maná insuficiente (necesitas ${spell.mana}, tienes ${hero.mana || 0}).`);
+    return;
+  }
   const ok = await consumeInvItem('spell_' + spellId, cost);
   if (!ok) { toast('❌', 'No se pudo consumir los fragmentos.'); return; }
+  if (spell.mana) {
+    hero.mana = (hero.mana || 0) - spell.mana;
+    saveHero({ mana: hero.mana });
+    if (typeof renderHeroUI === 'function') renderHeroUI();
+  }
   spell.cast();
   saveHero({ spells_cast: (hero.spells_cast || 0) + 1 });
   renderSpells();
@@ -141,20 +150,27 @@ async function castSpell(spellId) {
 function renderSpells() {
   const el = document.getElementById('spellsList');
   if (!el) return;
+  const curMana = hero ? (hero.mana || 0) : 0;
   el.innerHTML = `<div class="spell-orbs-grid">${SPELL_DEFS.map(s => {
-    const cost = SPELL_FRAG_COST[s.id] || 10;
-    const have = getInvCount('spell_' + s.id);
-    const ready = have >= cost;
-    const clr   = s.color || '#a855f7';
-    const imgUrl = CDN + 'dungeon/spell_' + s.id + '.png';
+    const cost     = SPELL_FRAG_COST[s.id] || 10;
+    const have     = getInvCount('spell_' + s.id);
+    const hasFrags = have >= cost;
+    const hasMana  = !s.mana || curMana >= s.mana;
+    const ready    = hasFrags && hasMana;
+    const clr      = s.color || '#a855f7';
+    const imgUrl   = CDN + 'dungeon/spell_' + s.id + '.png';
+    const manaBadge = s.mana
+      ? `<div class="spell-orb-mana ${hasMana ? '' : 'spell-mana-low'}">💧${s.mana}</div>`
+      : '';
     return `<button class="spell-orb ${ready ? '' : 'cd'}" onclick="castSpell('${s.id}')"
-        title="${escHtml(s.name)}: ${escHtml(s.desc)} | Coste: ${cost} frags"
+        title="${escHtml(s.name)}: ${escHtml(s.desc)} | ${cost} frags · ${s.mana || 0} maná"
         style="--spell-clr:${clr}">
       <img src="${imgUrl}" class="spell-orb-img" alt="${escHtml(s.name)}"
            onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
       <div class="spell-orb-icon" style="display:none">${s.icon}</div>
       <div class="spell-orb-name">${escHtml(s.name)}</div>
-      <div class="spell-orb-frags ${ready ? 'spell-orb-ready' : 'spell-orb-cd'}">${have}/${cost}</div>
+      <div class="spell-orb-frags ${hasFrags ? 'spell-orb-ready' : 'spell-orb-cd'}">${have}/${cost}</div>
+      ${manaBadge}
     </button>`;
   }).join('')}</div>`;
 }
