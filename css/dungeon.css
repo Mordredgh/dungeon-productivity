@@ -3985,8 +3985,22 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   border-bottom-color: var(--accent);
 }
 
-.char-tab-panel        { display: none; }
+.char-tab-panel        { display: none; position: relative; }
 .char-tab-panel.active { display: block; }
+.char-tab-panel.active::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--ctab-bg-url, none) center / cover no-repeat;
+  opacity: .07;
+  pointer-events: none;
+  z-index: 0;
+}
+.char-tab-panel > * { position: relative; z-index: 1; }
+
+#ctab-skills   { --ctab-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_habilidades.png'); }
+#ctab-runes    { --ctab-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_runas.png'); }
+#ctab-bestiary { --ctab-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_bestiario.png'); }
 
 
 /* ── ÍNDICE DEL HÉROE ───────────────────────────────────────── */
