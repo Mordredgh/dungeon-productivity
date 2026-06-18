@@ -178,7 +178,12 @@ function checkAchievements() {
       unlocked.push(a.id);
       dates[a.id] = new Date().toISOString().split('T')[0];
       changed = true;
-      toast('🏆', `¡Logro desbloqueado: ${a.name}!`);
+      if (a.hidden) {
+        toast('🔮', `¡Logro secreto descubierto: ${a.name}!`);
+        if (typeof addGold === 'function') addGold(50);
+      } else {
+        toast('🏆', `¡Logro desbloqueado: ${a.name}!`);
+      }
     }
   }
   if (changed) {
@@ -199,6 +204,7 @@ const ACH_CATS = [
   { name: '❤️ Salud',      ids: ['full_hp','healer'] },
   { name: '🪙 Oro',        ids: ['gold_500','gold_2000','gold_10k'] },
   { name: '🌟 Especiales', ids: ['collector','daily_5','weekly_done','pom_streak_4','nightowl','earlybird'] },
+  { name: '🔮 Secretos',  ids: ['h_madrugador','h_nocturno','h_maldito','h_dia_gloria','h_renacido','h_domingo','h_equilibrio','h_atributos','h_racha21','h_xp10k','h_ultimo_seg','h_triple_main','h_zona_legend','h_pom_dia','h_habito10'] },
 ];
 
 function renderAchievements() {
@@ -215,22 +221,33 @@ function renderAchievements() {
 
   const renderCard = a => {
     if (!a) return '';
-    const ok = unlocked.includes(a.id);
+    const ok      = unlocked.includes(a.id);
     const dateStr = ok && dates2[a.id] ? dates2[a.id] : null;
-    return `<div class="achievement-card ${ok ? 'unlocked' : 'locked'}">
-      <div class="achievement-icon">${a.icon}</div>
+    const mystery = a.hidden && !ok;
+    const icon    = mystery ? '🔒' : a.icon;
+    const name    = mystery ? '???' : escHtml(a.name);
+    const desc    = ok ? a.desc : (mystery ? 'Logro secreto — ¡descúbrelo!' : '???');
+    return `<div class="achievement-card ${ok ? 'unlocked' : 'locked'} ${mystery ? 'ach-mystery' : ''}">
+      <div class="achievement-icon">${icon}</div>
       <div class="achievement-info">
-        <div class="achievement-name">${a.name}</div>
-        <div class="achievement-desc">${ok ? a.desc : '???'}</div>
+        <div class="achievement-name">${name}</div>
+        <div class="achievement-desc">${desc}</div>
         ${ok ? `<div class="achievement-date">✅${dateStr ? ' ' + dateStr : ''}</div>` : ''}
       </div>
     </div>`;
   };
 
-  const knownIds = new Set(ACH_CATS.flatMap(c => c.ids));
+  const knownIds  = new Set(ACH_CATS.flatMap(c => c.ids));
   const extraAchs = ACHIEVEMENT_DEFS.filter(a => !knownIds.has(a.id));
 
-  el.innerHTML = ACH_CATS.map(cat => {
+  // Secret achievements counter banner
+  const secretDefs  = ACHIEVEMENT_DEFS.filter(a => a.hidden);
+  const secretFound = secretDefs.filter(a => unlocked.includes(a.id)).length;
+  const secretBanner = secretDefs.length
+    ? `<div class="ach-secret-banner">🔮 ${secretFound} / ${secretDefs.length} secretos descubiertos</div>`
+    : '';
+
+  el.innerHTML = secretBanner + ACH_CATS.map(cat => {
     const cards = cat.ids.map(id => renderCard(achById[id])).filter(Boolean);
     if (!cards.length) return '';
     return `<div class="ach-cat-section">

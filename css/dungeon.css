@@ -4641,3 +4641,32 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .zone-bar-bg   { height: 5px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; }
 .zone-bar-fill { height: 100%; border-radius: 3px; transition: width .5s ease; }
 .zone-next-msg { font-size: 10px; color: var(--text3); margin-top: 4px; }
+
+/* ── LOGROS OCULTOS ──────────────────────────────────────────────── */
+.ach-mystery {
+  background: rgba(127,90,240,.06);
+  border-color: rgba(127,90,240,.2);
+  opacity: .75;
+  filter: saturate(0.2);
+  transition: all .25s;
+}
+.ach-mystery:hover {
+  opacity: 1;
+  filter: saturate(1);
+  border-color: rgba(127,90,240,.55);
+}
+.ach-mystery .achievement-icon { font-size: 18px; }
+.ach-mystery .achievement-name { color: var(--text3); letter-spacing: .08em; }
+.ach-mystery .achievement-desc { color: var(--text3); font-style: italic; }
+
+.ach-secret-banner {
+  font-size: 12px;
+  font-weight: 600;
+  color: #a78bfa;
+  background: rgba(127,90,240,.1);
+  border: 1px solid rgba(127,90,240,.25);
+  border-radius: 10px;
+  padding: 7px 14px;
+  margin: 0 0 14px;
+  text-align: center;
+}
