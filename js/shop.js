@@ -32,6 +32,7 @@ function renderShopItems() {
   const cats = [
     { id: 'consumible', label: '⚗️ Consumibles' },
     { id: 'armas',      label: '⚔️ Armas'       },
+    { id: 'armaduras',  label: '🛡️ Armaduras'  },
     { id: 'egg',        label: '🥚 Huevos'       },
     { id: 'fragment',   label: '✨ Fragmentos'   },
     { id: 'potion',     label: '🧪 Pociones'     },
@@ -143,8 +144,8 @@ async function buyItem(id, cost) {
     await addInvItem('pet_food_' + petKey, 'pet_food', 1);
     toast('🍖', `Alimento adquirido. Ve a Mascotas → montura para dárselo.`);
 
-  /* ── Armas ──────────────────────────────────────── */
-  } else if (id.startsWith('weapon_') && item.weaponKey) {
+  /* ── Armas y Armaduras ───────────────────────────── */
+  } else if ((id.startsWith('weapon_') || id.startsWith('armor_')) && item.weaponKey) {
     if (typeof addWeapon === 'function') {
       await addWeapon(item.weaponKey, item.tier || 'comun');
       toast(item.icon, `${item.name} obtenida. Ve al Inventario.`);

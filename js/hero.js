@@ -158,4 +158,67 @@ async function checkDailyStreak() {
   await saveHero({ streak: newStreak, longest_streak: longest, last_active_date: today, hp: newHp });
   renderHeroUI();
   checkAchievements();
+
+  // Track total active days for Titán secret class
+  const _prog = getSecretProgress();
+  _prog.total_active_days = (_prog.total_active_days || 0) + 1;
+  if (newHp <= 10) _prog.hp_zeros = (_prog.hp_zeros || 0) + 1;
+  await saveSecretProgress(_prog);
+  checkSecretClassUnlocks();
+}
+
+/* ── CLASES SECRETAS ─────────────────────────────────────── */
+function getSecretProgress() {
+  try { return JSON.parse(hero.secret_progress || '{}'); } catch { return {}; }
+}
+
+async function saveSecretProgress(prog) {
+  hero.secret_progress = JSON.stringify(prog);
+  await db.from('dungeon_heroes').update({ secret_progress: hero.secret_progress }).eq('id', hero.id);
+}
+
+async function checkSecretClassUnlocks() {
+  if (!hero) return;
+  const prog = getSecretProgress();
+  const classes = (() => { try { return JSON.parse(hero.secret_classes || '[]'); } catch { return []; } })();
+
+  const conds = {
+    'crononauta':    (prog.midnight_total || 0) >= 100,
+    'paladin':       (prog.health_total || 0) >= 50,
+    'nigromante':    (prog.hp_zeros || 0) >= 3,
+    'titan':         (prog.total_active_days || 0) >= 500,
+    'druida':        (prog.midnight_streak || 0) >= 30,
+    'estrella-caida':['crononauta','paladin','nigromante','titan','druida'].every(k => classes.includes(k)),
+  };
+
+  const newOnes = Object.entries(conds)
+    .filter(([k, met]) => met && !classes.includes(k))
+    .map(([k]) => k);
+  if (!newOnes.length) return;
+
+  const updated = [...classes, ...newOnes];
+  hero.secret_classes = JSON.stringify(updated);
+  await db.from('dungeon_heroes').update({ secret_classes: hero.secret_classes }).eq('id', hero.id);
+
+  const defs = typeof SECRET_CLASS_DEFS !== 'undefined' ? SECRET_CLASS_DEFS : [];
+  newOnes.forEach(k => {
+    const d = defs.find(x => x.key === k);
+    toast(d?.icon || '🔓', `¡Clase Secreta desbloqueada: ${d?.name || k}!`);
+    if (typeof dungeonPush === 'function') dungeonPush('🔓 Clase Secreta', `${d?.name || k} desbloqueada. Ve a tu personaje para adoptarla.`);
+  });
+  if (typeof renderCharacterSheet === 'function') renderCharacterSheet();
+}
+
+/* addHP — helper global para modificar HP y rastrear mínimos */
+async function addHP(amount) {
+  if (!hero) return;
+  const newHp = Math.max(0, Math.min((hero.hp || 0) + amount, hero.hp_max || 100));
+  await saveHero({ hp: newHp });
+  renderHeroUI();
+  if (amount < 0 && newHp <= 10) {
+    const _prog = getSecretProgress();
+    _prog.hp_zeros = (_prog.hp_zeros || 0) + 1;
+    await saveSecretProgress(_prog);
+    checkSecretClassUnlocks();
+  }
 }

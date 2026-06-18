@@ -60,7 +60,8 @@ function _charEquipSlotHtml(label, icon, weapon) {
   }
   const def = WEAPON_DEFS.find(d => d.key === weapon.weapon_key) || { icon };
   const tier = WEAPON_TIERS[weapon.tier] || { color: '#9ca3af', label: weapon.tier };
-  const img = `${CDN}dungeon/weapon_${weapon.weapon_key}_${weapon.tier}.png`;
+  const _wSlug = { daga:'dagas' };
+  const img = `${CDN}dungeon/arma_${_wSlug[weapon.weapon_key] || weapon.weapon_key}_${weapon.tier}.png`;
   const glow = (weapon.tier === 'legendario' || weapon.tier === 'mitico') ? 'anim-pulse-glow' : '';
   return `
     <div class="char-slot ${glow}" style="--wc:${tier.color};border-color:${tier.color}55" onclick="unequipWeapon('${weapon.id}')" title="Click para desequipar">
@@ -78,6 +79,101 @@ function _charLockedSlotHtml(label, icon) {
       <span class="char-slot-icon">🔒</span>
       <span class="char-slot-label">${label}</span>
     </div>`;
+}
+
+function _charArmorSlotHtml(slotKey, label, icon) {
+  const equipped = (typeof weapons !== 'undefined' ? weapons : [])
+    .find(w => w.is_equipped && w.slot === slotKey);
+  if (!equipped) {
+    return `
+      <div class="char-slot" onclick="switchView('smithy')" title="Forjar o comprar en Tienda">
+        <span class="char-slot-icon">${icon}</span>
+        <span class="char-slot-label">${label}</span>
+      </div>`;
+  }
+  const tier = WEAPON_TIERS[equipped.tier] || { color:'#9ca3af', label:equipped.tier };
+  const img  = `${CDN}dungeon/arma_${equipped.weapon_key}_${equipped.tier}.png`;
+  const armorDef = typeof ARMOR_DEFS !== 'undefined' ? ARMOR_DEFS.find(d => d.key === equipped.weapon_key) : null;
+  const statLine = armorDef
+    ? (armorDef.statKey === 'hpMax'
+        ? `+${armorDef.statBase[equipped.tier] || 0} HP máx`
+        : `+${Math.round((armorDef.statBase[equipped.tier] || 0) * 100)}% ${armorDef.statKey === 'xpBonus' ? 'XP' : 'Oro'}`)
+    : '';
+  const glow = (equipped.tier === 'legendario' || equipped.tier === 'mitico') ? 'anim-pulse-glow' : '';
+  return `
+    <div class="char-slot ${glow}" style="--wc:${tier.color};border-color:${tier.color}55" onclick="unequipWeapon('${equipped.id}')" title="Click para desequipar">
+      <img src="${img}" class="char-slot-img" alt=""
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <span class="char-slot-icon" style="display:none">${icon}</span>
+      <span class="char-slot-name" style="color:${tier.color}">${escHtml(equipped.name)}</span>
+      ${statLine ? `<span class="char-slot-stat">${statLine}</span>` : ''}
+      <span class="char-slot-label">${label}</span>
+    </div>`;
+}
+
+function _charSecretClassesHtml() {
+  const defs = typeof SECRET_CLASS_DEFS !== 'undefined' ? SECRET_CLASS_DEFS : [];
+  if (!defs.length) return '';
+  const unlocked = (() => { try { return JSON.parse(hero.secret_classes || '[]'); } catch { return []; } })();
+  const prog = typeof getSecretProgress === 'function' ? getSecretProgress() : {};
+
+  const progressFor = key => {
+    if (key === 'crononauta')    return `${prog.midnight_total || 0}/100 misiones de madrugada`;
+    if (key === 'paladin')       return `${prog.health_total || 0}/50 misiones de salud`;
+    if (key === 'nigromante')    return `${prog.hp_zeros || 0}/3 veces al mínimo HP`;
+    if (key === 'titan')         return `${prog.total_active_days || 0}/500 días activos`;
+    if (key === 'druida')        return `${prog.midnight_streak || 0}/30 días madrugada consecutivos`;
+    if (key === 'estrella-caida'){
+      const base = ['crononauta','paladin','nigromante','titan','druida'];
+      return `${base.filter(k => unlocked.includes(k)).length}/5 clases secretas`;
+    }
+    return '';
+  };
+
+  const cards = defs.map(d => {
+    const isUnlocked = unlocked.includes(d.key);
+    const portraitUrl = `${CDN}dungeon/${d.portrait}`;
+    const progText = progressFor(d.key);
+    const barPct = (() => {
+      const k = d.key;
+      if (k === 'crononauta')    return Math.min(100, Math.round((prog.midnight_total||0)/100*100));
+      if (k === 'paladin')       return Math.min(100, Math.round((prog.health_total||0)/50*100));
+      if (k === 'nigromante')    return Math.min(100, Math.round((prog.hp_zeros||0)/3*100));
+      if (k === 'titan')         return Math.min(100, Math.round((prog.total_active_days||0)/500*100));
+      if (k === 'druida')        return Math.min(100, Math.round((prog.midnight_streak||0)/30*100));
+      if (k === 'estrella-caida'){
+        const base=['crononauta','paladin','nigromante','titan','druida'];
+        return Math.round(base.filter(x=>unlocked.includes(x)).length/5*100);
+      }
+      return 0;
+    })();
+    return `
+      <div class="secret-class-card ${isUnlocked ? 'secret-unlocked' : 'secret-locked'}">
+        <div class="secret-class-portrait">
+          ${isUnlocked
+            ? `<img src="${portraitUrl}" class="secret-portrait-img" alt="${escHtml(d.name)}"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+               <div class="secret-portrait-emoji" style="display:none">${d.icon}</div>`
+            : `<div class="secret-portrait-emoji secret-portrait-mystery">?</div>`}
+        </div>
+        <div class="secret-class-info">
+          <div class="secret-class-name">${isUnlocked ? escHtml(d.name) : '??? Clase Secreta ???'}</div>
+          ${isUnlocked
+            ? `<div class="secret-class-bonus">✨ ${escHtml(d.bonus)}</div>
+               <button class="btn btn-primary" style="margin-top:6px;font-size:11px;padding:4px 12px"
+                 onclick="adoptSecretClass('${d.key}')">Adoptar Clase</button>`
+            : `<div class="secret-class-cond">${escHtml(d.condition)}</div>
+               <div class="secret-class-prog-bar"><div class="secret-class-prog-fill" style="width:${barPct}%"></div></div>
+               <div class="secret-class-prog-txt">${escHtml(progText)}</div>`}
+        </div>
+      </div>`;
+  }).join('');
+
+  return `<div class="char-section">
+    <div class="char-section-title">🔮 Clases Secretas</div>
+    <p style="font-size:12px;color:var(--text3);margin:0 0 12px">Completa condiciones especiales para desbloquear clases únicas.</p>
+    <div class="secret-classes-grid">${cards}</div>
+  </div>`;
 }
 
 function _charInvMiniHtml() {
@@ -181,14 +277,21 @@ function renderCharacterSheet() {
         </div>
 
         <div class="char-section">
-          <div class="char-section-title">⚔️ Equipamiento</div>
+          <div class="char-section-title">⚔️ Armas</div>
           <div class="char-equip-grid">
             ${_charEquipSlotHtml('Arma principal', '⚔️', mainHand)}
             ${_charEquipSlotHtml('Arma secundaria', '🗡️', offHand)}
-            ${_charLockedSlotHtml('Pecho', '👕')}
-            ${_charLockedSlotHtml('Casco', '🪖')}
-            ${_charLockedSlotHtml('Accesorio I', '💍')}
-            ${_charLockedSlotHtml('Accesorio II', '💍')}
+          </div>
+        </div>
+
+        <div class="char-section">
+          <div class="char-section-title">🛡️ Armadura</div>
+          <div class="char-equip-grid char-armor-grid">
+            ${_charArmorSlotHtml('body',  'Pecho',   '🧱')}
+            ${_charArmorSlotHtml('head',  'Casco',   '⛑️')}
+            ${_charArmorSlotHtml('feet',  'Botas',   '👢')}
+            ${_charArmorSlotHtml('hands', 'Guantes', '🧤')}
+            ${_charArmorSlotHtml('legs',  'Grebas',  '🦵')}
           </div>
         </div>
 
@@ -270,6 +373,8 @@ function renderCharacterSheet() {
           <button class="btn btn-primary" onclick="generateHeroCard()" style="width:100%">⬇️ Descargar Carnet PNG</button>
         </div>
 
+        ${_charSecretClassesHtml()}
+
       </div>
     </div>`;
 
@@ -287,6 +392,18 @@ function _charPreviewPortrait() {
     <img src="${CDN}dungeon/char_${cls}_${race}.png" class="char-portrait-img" alt=""
          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
     <div class="char-portrait-emoji" style="display:none">${hero.avatar || '🧙'}</div>`;
+}
+
+async function adoptSecretClass(key) {
+  if (!hero) return;
+  const unlocked = (() => { try { return JSON.parse(hero.secret_classes || '[]'); } catch { return []; } })();
+  if (!unlocked.includes(key)) { toast('🔒', 'Primero debes desbloquear esa clase.'); return; }
+  const def = (typeof SECRET_CLASS_DEFS !== 'undefined' ? SECRET_CLASS_DEFS : []).find(d => d.key === key);
+  await saveHero({ hero_class: key });
+  applyClassTheme();
+  toast(def?.icon || '🔮', `¡Adoptaste la clase ${def?.name || key}!`);
+  renderHeroUI();
+  renderCharacterSheet();
 }
 
 async function saveCharacterSheet() {

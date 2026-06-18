@@ -99,8 +99,10 @@ async function feedPet(petId) {
   if (newStage === 'mount') { updateObj.pet_level = 1; updateObj.pet_xp = 0; }
   await db.from('dungeon_pets').update(updateObj).eq('id', petId);
   Object.assign(pet, updateObj);
-  if (newStage === 'mount') toast('🌟', `¡${def.name} evolucionó a Montura! Nv.1 — aliméntala para subir de nivel.`);
-  else toast('🧪', `+1 poción a ${def.name}. Progreso: ${newFed}/${def.evolve}`);
+  if (newStage === 'mount') {
+    toast('🌟', `¡${def.name} evolucionó a Montura! Nv.1 — aliméntala para subir de nivel.`);
+    checkReyTempestad();
+  } else toast('🧪', `+1 poción a ${def.name}. Progreso: ${newFed}/${def.evolve}`);
   renderPets();
   renderActivePet();
 }
@@ -132,11 +134,35 @@ async function feedPetFood(petId) {
     const st = getPetStatAtLevel(def, newLvl);
     toast('⭐', `¡${def.name} → Nv.${newLvl}! ⚔️+${st.atk}% 🛡️+${Math.floor(st.def)}HP ⚡+${st.spd}% 🍀+${st.lck}%`);
     if (typeof dungeonPush === 'function') dungeonPush(`⭐ ¡${def.name} subió a Nv.${newLvl}!`, `¡Sigue alimentándola para desbloquear más stats!`);
+    checkReyTempestad();
   } else {
     const need = _petXPForNextLevel(newLvl);
     toast(def.icon, `+${gained} XP · ${def.name} Nv.${newLvl} (${newXP}/${need} para siguiente)`);
   }
   renderPets(); renderActivePet();
+}
+
+/* Rey de la Tempestad — se auto-otorga cuando las 6 mascotas base están en montura nv.50 */
+async function checkReyTempestad() {
+  if (!hero) return;
+  const reyDef = typeof PET_DEFS !== 'undefined' ? PET_DEFS.find(p => p.key === 'rey-tempestad') : null;
+  if (!reyDef) return;
+  // Ya tiene al Rey
+  if (pets.some(p => p.pet_key === 'rey-tempestad')) return;
+  // Ya tiene el huevo
+  if (typeof getInvCount === 'function' && getInvCount('pet_egg_rey-tempestad') > 0) return;
+  // Verificar que las 6 mascotas base estén en montura nv.50
+  const mainKeys = ['zorro-naturaleza','pantera-sombra','lobo-tormenta','grifo','dragon-fuego','fenix-mitico'];
+  const allMaxed = mainKeys.every(key => {
+    const pet = pets.find(p => p.pet_key === key);
+    return pet && pet.stage === 'mount' && (pet.pet_level || 1) >= 50;
+  });
+  if (!allMaxed) return;
+  // Otorgar el huevo
+  if (typeof addInvItem === 'function') await addInvItem('pet_egg_rey-tempestad', 'pet_egg', 1);
+  toast('👑', '¡El Rey de la Tempestad despertó! Huevo épico añadido a tu inventario.');
+  if (typeof dungeonPush === 'function') dungeonPush('👑 Rey de la Tempestad', '¡Tus 6 mascotas alcanzaron el nivel máximo! El huevo está en tu inventario.');
+  if (typeof renderInventory === 'function') renderInventory();
 }
 
 async function setActivePet(petId) {

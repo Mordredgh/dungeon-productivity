@@ -175,6 +175,29 @@ async function completeQuest(id, el) {
   if (q.type === 'main') patch.main_done = (hero.main_done || 0) + 1;
   await saveHero(patch);
 
+  // Secret class progress tracking
+  if (typeof getSecretProgress === 'function') {
+    const _sp = getSecretProgress();
+    const _hour = new Date().getHours();
+    if (_hour >= 0 && _hour < 5) {
+      _sp.midnight_total = (_sp.midnight_total || 0) + 1;
+      const _today = new Date().toISOString().split('T')[0];
+      const _lastDate = _sp.midnight_last_date;
+      if (_lastDate) {
+        const _diff = Math.round((new Date(_today) - new Date(_lastDate)) / 86400000);
+        _sp.midnight_streak = _diff === 1 ? (_sp.midnight_streak || 0) + 1 : 1;
+      } else { _sp.midnight_streak = 1; }
+      _sp.midnight_last_date = _today;
+    }
+    const _tags = Array.isArray(q.tags) ? q.tags
+      : (typeof q.tags === 'string' && q.tags ? q.tags.split(',').map(t => t.trim()) : []);
+    if (_tags.some(t => t.toLowerCase() === 'salud')) {
+      _sp.health_total = (_sp.health_total || 0) + 1;
+    }
+    await saveSecretProgress(_sp);
+    checkSecretClassUnlocks();
+  }
+
   // Undo state
   lastCompletedUndo = { id, xpAmt, q: { ...q } };
   let undoUsed = false;

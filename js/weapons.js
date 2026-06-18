@@ -9,17 +9,29 @@ async function loadWeapons() {
   weapons = data || [];
 }
 
+function _armorDef(weaponKey) {
+  return typeof ARMOR_DEFS !== 'undefined' ? ARMOR_DEFS.find(d => d.key === weaponKey) : null;
+}
 function getWeaponXPBonus() {
-  return weapons.filter(w => w.is_equipped)
-    .reduce((sum, w) => sum + (WEAPON_TIERS[w.tier]?.xpBonus || 0), 0);
+  return weapons.filter(w => w.is_equipped).reduce((sum, w) => {
+    const ad = _armorDef(w.weapon_key);
+    if (ad) return ad.statKey === 'xpBonus' ? sum + (ad.statBase[w.tier] || 0) : sum;
+    return sum + (WEAPON_TIERS[w.tier]?.xpBonus || 0);
+  }, 0);
 }
 function getWeaponGoldBonus() {
-  return weapons.filter(w => w.is_equipped)
-    .reduce((sum, w) => sum + (WEAPON_TIERS[w.tier]?.goldBonus || 0), 0);
+  return weapons.filter(w => w.is_equipped).reduce((sum, w) => {
+    const ad = _armorDef(w.weapon_key);
+    if (ad) return ad.statKey === 'goldBonus' ? sum + (ad.statBase[w.tier] || 0) : sum;
+    return sum + (WEAPON_TIERS[w.tier]?.goldBonus || 0);
+  }, 0);
 }
 function getWeaponHPMaxBonus() {
-  return weapons.filter(w => w.is_equipped)
-    .reduce((sum, w) => sum + (WEAPON_TIERS[w.tier]?.hpMax || 0), 0);
+  return weapons.filter(w => w.is_equipped).reduce((sum, w) => {
+    const ad = _armorDef(w.weapon_key);
+    if (ad) return ad.statKey === 'hpMax' ? sum + (ad.statBase[w.tier] || 0) : sum;
+    return sum + (WEAPON_TIERS[w.tier]?.hpMax || 0);
+  }, 0);
 }
 
 async function addWeapon(weaponKey, tier, readyAt) {
@@ -214,8 +226,13 @@ function renderSmithy() {
 
   const tierOrder = ['raro','epico','legendario','mitico'];
 
-  let rows = '';
-  WEAPON_DEFS.forEach(def => {
+  const armorKeys = typeof ARMOR_DEFS !== 'undefined' ? ARMOR_DEFS.map(d => d.key) : [];
+  const weaponOnlyDefs = WEAPON_DEFS.filter(d => !armorKeys.includes(d.key));
+  const armorDefs = WEAPON_DEFS.filter(d => armorKeys.includes(d.key));
+
+  const buildRecipeRow = def => {
+    let out = '';
+    const ad = _armorDef(def.key);
     tierOrder.forEach(targetTier => {
       const recipe  = CRAFT_RECIPES[targetTier];
       if (!recipe) return;
@@ -223,15 +240,22 @@ function renderSmithy() {
       const canCraft= have >= recipe.count;
       const srcT    = WEAPON_TIERS[recipe.from];
       const dstT    = WEAPON_TIERS[targetTier];
-      const img     = CDN + 'dungeon/weapon_' + def.key + '_' + targetTier + '.png';
-      const stats   = [
-        dstT.xpBonus  ? `✨ +${Math.round(dstT.xpBonus*100)}% XP`   : '',
-        dstT.goldBonus? `🪙 +${Math.round(dstT.goldBonus*100)}% Oro` : '',
-        dstT.hpMax    ? `❤️ +${dstT.hpMax} HP máx`                   : '',
-      ].filter(Boolean).join(' · ');
-
+      const img     = CDN + 'dungeon/arma_' + def.key + '_' + targetTier + '.png';
+      let stats = '';
+      if (ad) {
+        const val = ad.statBase[targetTier] || 0;
+        stats = ad.statKey === 'hpMax'
+          ? `❤️ +${val} HP máx`
+          : `${ad.statKey === 'xpBonus' ? '✨' : '🪙'} +${Math.round(val*100)}% ${ad.statKey === 'xpBonus' ? 'XP' : 'Oro'}`;
+      } else {
+        stats = [
+          dstT.xpBonus  ? `✨ +${Math.round(dstT.xpBonus*100)}% XP`   : '',
+          dstT.goldBonus? `🪙 +${Math.round(dstT.goldBonus*100)}% Oro` : '',
+          dstT.hpMax    ? `❤️ +${dstT.hpMax} HP máx`                   : '',
+        ].filter(Boolean).join(' · ');
+      }
       const glow = (canCraft && (targetTier === 'legendario' || targetTier === 'mitico')) ? 'anim-pulse-glow' : '';
-      rows += `
+      out += `
         <div class="smithy-recipe ${canCraft?'smithy-ready':'smithy-locked'}">
           <img src="${img}" class="smithy-img ${glow}" style="--wc:${dstT.color}" alt=""
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -252,7 +276,11 @@ function renderSmithy() {
           </button>
         </div>`;
     });
-  });
+    return out;
+  };
+
+  let rows = weaponOnlyDefs.map(buildRecipeRow).join('');
+  const armorRows = armorDefs.map(buildRecipeRow).join('');
 
   const forgingNow = weapons.filter(w => isForging(w));
   let forgingHtml = '';
@@ -275,13 +303,14 @@ function renderSmithy() {
   const bagCount = weapons.filter(w => !w.is_equipped).length;
   el.innerHTML = `
     <div class="smithy-header">
-      <p class="smithy-desc">Combina armas del mismo tipo para forjar versiones más poderosas.<br>
-      Las armas equipadas no se pueden usar en recetas.</p>
-      ${!bagCount ? `<div class="inv-empty">Sin armas en la mochila.
+      <p class="smithy-desc">Combina piezas del mismo tipo para forjar versiones más poderosas.<br>
+      Los ítems equipados no se pueden usar en recetas.</p>
+      ${!bagCount ? `<div class="inv-empty">Sin armas ni armaduras en la mochila.
         <button class="btn btn-ghost" style="padding:3px 10px;font-size:12px" onclick="switchView('shop')">Comprar en Tienda</button>
       </div>` : ''}
     </div>
     ${forgingHtml}
-    <div class="smithy-recipes">${rows}</div>
+    ${rows ? `<div class="smithy-section-title">⚔️ Armas</div><div class="smithy-recipes">${rows}</div>` : ''}
+    ${armorRows ? `<div class="smithy-section-title" style="margin-top:18px">🛡️ Armaduras</div><div class="smithy-recipes">${armorRows}</div>` : ''}
   `;
 }

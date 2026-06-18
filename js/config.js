@@ -127,6 +127,28 @@ const FAMILIARS = {
   fundador: { emoji:'🐉', name:'Dragón Joven'    },
 };
 
+/* ── CLASES SECRETAS ─────────────────────────────────────── */
+const SECRET_CLASS_DEFS = [
+  { key:'crononauta',     name:'Crononauta',        icon:'⏰', portrait:'char_secreto_crononauta.png',
+    condition:'Completa 100 misiones entre 00:00 y 05:00h',
+    bonus:'+15% XP en misiones de madrugada (00:00–05:00h)' },
+  { key:'paladin',        name:'Paladín',            icon:'🛡️', portrait:'char_secreto_paladin.png',
+    condition:'Completa 50 misiones con el tag "salud"',
+    bonus:'+10% HP extra al completar cualquier misión' },
+  { key:'nigromante',     name:'Nigromante',         icon:'💀', portrait:'char_secreto_nigromante.png',
+    condition:'Tu HP llega al mínimo 3 veces (≤10 HP)',
+    bonus:'Resucitas con 25 HP en vez de 10 cuando pierdes toda tu salud' },
+  { key:'titan',          name:'Titán',              icon:'⛰️', portrait:'char_secreto_titan.png',
+    condition:'Acumula 500 días de actividad total',
+    bonus:'+20% XP en misiones épicas, legendarias y míticas' },
+  { key:'druida',         name:'Druida del Abismo',  icon:'🌑', portrait:'char_secreto_druida.png',
+    condition:'30 días consecutivos con al menos una misión de madrugada',
+    bonus:'+30% XP en misiones completadas entre 00:00 y 05:00h' },
+  { key:'estrella-caida', name:'Estrella Caída',     icon:'💫', portrait:'char_secreto_estrella-caida.png',
+    condition:'Desbloquea las otras 5 clases secretas',
+    bonus:'+5% a todos los multiplicadores de XP en cualquier misión' },
+];
+
 const GOLD_TABLE = { main:50, side:20, daily:10, weekly:35, habit:8 };
 
 const CDN = 'https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/';
@@ -144,6 +166,27 @@ const WEAPON_DEFS = [
   { key:'arco',   name:'Arco',    icon:'🏹', slot:'main_hand' },
   { key:'daga',   name:'Daga',    icon:'🗡️', slot:'off_hand'  },
   { key:'escudo', name:'Escudo',  icon:'🛡️', slot:'off_hand'  },
+  // Armaduras
+  { key:'pecho',   name:'Pecho',   icon:'🧱', slot:'body'  },
+  { key:'casco',   name:'Casco',   icon:'⛑️', slot:'head'  },
+  { key:'botas',   name:'Botas',   icon:'👢', slot:'feet'  },
+  { key:'guantes', name:'Guantes', icon:'🧤', slot:'hands' },
+  { key:'grebas',  name:'Grebas',  icon:'🦵', slot:'legs'  },
+];
+
+/* ── ARMADURAS — stat por pieza y tier ───────────────────── */
+// statKey: qué bonus otorga (hpMax=HP máx plana, xpBonus/goldBonus=fracción)
+const ARMOR_DEFS = [
+  { key:'pecho',   name:'Pecho',   icon:'🧱', slot:'body',  statKey:'hpMax',
+    statBase:{ comun:4,  raro:8,    epico:14,   legendario:22,  mitico:38  } },
+  { key:'casco',   name:'Casco',   icon:'⛑️', slot:'head',  statKey:'xpBonus',
+    statBase:{ comun:.04, raro:.08, epico:.14,  legendario:.22, mitico:.35 } },
+  { key:'botas',   name:'Botas',   icon:'👢', slot:'feet',  statKey:'goldBonus',
+    statBase:{ comun:.04, raro:.08, epico:.14,  legendario:.22, mitico:.35 } },
+  { key:'guantes', name:'Guantes', icon:'🧤', slot:'hands', statKey:'xpBonus',
+    statBase:{ comun:.03, raro:.06, epico:.10,  legendario:.16, mitico:.26 } },
+  { key:'grebas',  name:'Grebas',  icon:'🦵', slot:'legs',  statKey:'hpMax',
+    statBase:{ comun:3,  raro:6,    epico:10,   legendario:16,  mitico:28  } },
 ];
 const WEAPON_TIERS = {
   comun:      { label:'Común',      color:'#9ca3af', xpBonus:0,    goldBonus:0,    hpMax:0  },
@@ -182,7 +225,7 @@ const SHOP_ITEMS = [
   { id:'egg_grifo',             name:'Huevo Grifo',    img:'pet_egg_grifo.png',             cost:500, desc:'Eclosiona con pociones de Grifo',    category:'egg' },
   { id:'egg_dragon-fuego',      name:'Huevo Dragón',   img:'pet_egg_dragon-fuego.png',      cost:600, desc:'Eclosiona con pociones de Dragón',   category:'egg' },
   { id:'egg_fenix-mitico',      name:'Huevo Fénix',    img:'pet_egg_fenix-mitico.png',      cost:800,  desc:'Eclosiona con pociones de Fénix',    category:'egg' },
-  { id:'egg_rey-tempestad',     name:'Huevo del Rey',  img:'pet_rey-tempestad_egg.png',     cost:0,    desc:'Se desbloquea al llevar las 6 mascotas al nivel máximo.', category:'egg', unlock:'all_pets_max' },
+  // egg_rey-tempestad se otorga automáticamente — no aparece en tienda
   /* Fragmentos de hechizo (×5 por compra) */
   { id:'frag_frenzy',        name:'Fragmento de Frenesí',       img:'spell_frenzy.png',        cost:30,  qty:5, desc:'×5 frags · necesitas 30 para lanzar Frenesí',      category:'fragment' },
   { id:'frag_speed',         name:'Pluma de Velocidad',         img:'spell_speed.png',         cost:20,  qty:5, desc:'×5 frags · necesitas 20 para lanzar Velocidad',     category:'fragment' },
@@ -198,6 +241,12 @@ const SHOP_ITEMS = [
   { id:'weapon_arco',   name:'Arco Común',    icon:'🏹', cost:50,  desc:'Arma · mano principal · forjable a Rara (×5)',   category:'armas', weaponKey:'arco',   tier:'comun' },
   { id:'weapon_daga',   name:'Daga Común',    icon:'🗡️', cost:40,  desc:'Arma · mano secundaria · forjable a Rara (×5)', category:'armas', weaponKey:'daga',   tier:'comun' },
   { id:'weapon_escudo', name:'Escudo Común',  icon:'🛡️', cost:40,  desc:'Arma · mano secundaria · forjable a Rara (×5)', category:'armas', weaponKey:'escudo', tier:'comun' },
+  /* Armaduras (comunes) — forjables igual que armas */
+  { id:'armor_pecho',   name:'Pecho Común',   icon:'🧱', cost:60,  desc:'+4 HP máx · forjable a Rara (×5)', category:'armaduras', weaponKey:'pecho',   tier:'comun' },
+  { id:'armor_casco',   name:'Casco Común',   icon:'⛑️', cost:55,  desc:'+4% XP · forjable a Rara (×5)',    category:'armaduras', weaponKey:'casco',   tier:'comun' },
+  { id:'armor_botas',   name:'Botas Comunes', icon:'👢', cost:55,  desc:'+4% Oro · forjable a Rara (×5)',   category:'armaduras', weaponKey:'botas',   tier:'comun' },
+  { id:'armor_guantes', name:'Guantes Comunes',icon:'🧤',cost:50,  desc:'+3% XP · forjable a Rara (×5)',    category:'armaduras', weaponKey:'guantes', tier:'comun' },
+  { id:'armor_grebas',  name:'Grebas Comunes',icon:'🦵', cost:50,  desc:'+3 HP máx · forjable a Rara (×5)', category:'armaduras', weaponKey:'grebas',  tier:'comun' },
   /* Pociones de mascota (×1 por compra) */
   { id:'pot_zorro-naturaleza', name:'Poción Zorro',   img:'pet_pocion_zorro-naturaleza.png', cost:40,  desc:'Alimenta a tu Zorro Gigante',    category:'potion' },
   { id:'pot_pantera-sombra',   name:'Poción Pantera', img:'pet_pocion_pantera-sombra.png',   cost:55,  desc:'Alimenta a tu Pantera Sombra',   category:'potion' },
