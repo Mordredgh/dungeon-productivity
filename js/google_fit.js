@@ -75,13 +75,13 @@ async function _fitEnsureToken() {
   return _fitToken;
 }
 
-async function syncGoogleFitSteps() {
+async function syncGoogleFitSteps(force = false) {
   if (_fitSyncing) return;
   const token = await _fitEnsureToken();
   if (!token) { toast('⚠️', 'Token de Google Fit expirado. Reconecta.'); renderFitWidget(); return; }
   const _d = new Date();
   const today = `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;
-  if (hero?.fit_sync_date === today && fitSynced && fitSteps > 0) return;
+  if (!force && hero?.fit_sync_date === today && fitSynced && fitSteps > 0) return;
 
   _fitSyncing = true;
   const btn = document.querySelector('#fitWidgetContent .btn-ghost');
@@ -161,7 +161,7 @@ function renderFitWidget() {
         ${[2500,5000,7500,10000].map(n=>`<span class="fit-ms ${fitSteps>=n?'fit-ms-done':''}">${n>=10000?'+80':n>=7500?'+50':n>=5000?'+30':'+15'} XP</span>`).join('')}
       </div>
       <div style="display:flex;gap:8px;margin-top:10px;justify-content:center">
-        <button class="btn btn-ghost" style="font-size:11px;padding:3px 10px" onclick="syncGoogleFitSteps()">🔄 Sync</button>
+        <button class="btn btn-ghost" style="font-size:11px;padding:3px 10px" onclick="syncGoogleFitSteps(true)">🔄 Sync</button>
         <button class="btn btn-ghost" style="font-size:11px;padding:3px 10px;color:var(--red)" onclick="disconnectGoogleFit()">Desconectar</button>
       </div>
     </div>`;
