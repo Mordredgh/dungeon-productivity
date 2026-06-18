@@ -1,5 +1,5 @@
 # Arcanum Dungeon Productivity — CLAUDE.md
-> Última actualización: 2026-06-17 · SW cache: `dungeon-v39`
+> Última actualización: 2026-06-17 · SW cache: `dungeon-v67`
 
 ## Proyecto
 - **URL:** https://dungeon.mordredgh.com
