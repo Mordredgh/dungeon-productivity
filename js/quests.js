@@ -94,6 +94,11 @@ async function completeQuest(id, el) {
     xpAmt = Math.round(xpAmt * (1 + getReputationBonus(q.tags)));
   }
 
+  // Zona del Dungeon — bonus por rango en la zona de esta misión
+  if (typeof getZoneBonus === 'function') {
+    xpAmt = Math.round(xpAmt * (1 + getZoneBonus(q)));
+  }
+
   // Doble o Nada — multiplica (o anula) XP y oro de esta misión
   const doubleNadaMult = typeof resolveDoubleOrNothing === 'function' ? resolveDoubleOrNothing(q) : 1;
   xpAmt = Math.round(xpAmt * doubleNadaMult);

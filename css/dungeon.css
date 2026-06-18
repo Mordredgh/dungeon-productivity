@@ -4595,3 +4595,49 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 .btn-small.btn-primary { background: var(--accent); color: #fff; }
 .btn-small.btn-danger  { background: rgba(239,68,68,.2); color: #f87171; }
+
+/* ── ZONAS DEL DUNGEON ──────────────────────────────────────────── */
+.zones-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 4px 16px 24px;
+}
+@media (max-width: 600px) { .zones-grid { grid-template-columns: 1fr; } }
+
+.zone-card {
+  background: rgba(137,180,250,.04);
+  border: 1px solid rgba(137,180,250,.12);
+  border-radius: 14px;
+  padding: 14px;
+  transition: border-color .2s, transform .15s;
+  border-color: color-mix(in srgb, var(--zc) 25%, transparent);
+}
+.zone-card:hover {
+  border-color: color-mix(in srgb, var(--zc) 50%, transparent);
+  transform: translateY(-1px);
+}
+.zone-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.zone-icon  { font-size: 26px; line-height: 1; flex-shrink: 0; }
+.zone-name  { font-size: 13px; font-weight: 700; color: var(--text); }
+.zone-desc  { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.zone-rank-lbl { font-size: 11px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+.zone-xp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+.zone-bonus-chip {
+  font-size: 10px; font-weight: 700;
+  background: rgba(250,204,21,.15); color: #facc15;
+  border-radius: 20px; padding: 2px 8px;
+}
+.zone-bar-bg   { height: 5px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; }
+.zone-bar-fill { height: 100%; border-radius: 3px; transition: width .5s ease; }
+.zone-next-msg { font-size: 10px; color: var(--text3); margin-top: 4px; }

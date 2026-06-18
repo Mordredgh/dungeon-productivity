@@ -227,6 +227,7 @@
         <button class="sidebar-item" data-view="shop" onclick="switchView('shop')" title="Tienda"><span class="si-icon">🏪</span></button>
         <button class="sidebar-item" data-view="inventory" onclick="switchView('inventory')" title="Inventario"><span class="si-icon">🎒</span></button>
         <div class="sb-nav-sep"></div>
+        <button class="sidebar-item" data-view="zones" onclick="switchView('zones')" title="Zonas del Dungeon"><span class="si-icon">🗺️</span></button>
         <button class="sidebar-item" data-view="history" onclick="switchView('history')" title="Historial"><span class="si-icon">📜</span></button>
         <button class="sidebar-item" data-view="integrations" onclick="switchView('integrations')" title="Integraciones"><span class="si-icon">🔗</span></button>
       </div>
@@ -255,6 +256,7 @@
         <button class="view-tab" data-view="inventory">🎒<span class="tab-label"> Inventario</span></button>
         <button class="view-tab" data-view="smithy">⚒️<span class="tab-label"> Herrero</span></button>
         <button class="view-tab" data-view="pets">🐾<span class="tab-label"> Mascotas</span></button>
+        <button class="view-tab" data-view="zones">🗺️<span class="tab-label"> Zonas</span></button>
       </div>
 
       <!-- CHARACTER HUB TAB BAR — fuera del .view para evitar conflictos de padding/z-index -->
@@ -524,6 +526,12 @@
 
 
 
+        <!-- ZONES VIEW -->
+        <div class="view" id="view-zones">
+          <div class="view-header"><h2 class="view-title">🗺️ Zonas del Dungeon</h2></div>
+          <div id="zonesView"></div>
+        </div>
+
         <!-- DUNGEON GROWS VIEW -->
         <div class="view" id="view-dungeon-grows">
           <div class="view-header">
@@ -749,6 +757,9 @@
     </button>
     <button class="mobile-more-item view-tab" data-view="goals" onclick="closeMobileMore();switchView('goals')">
       <span>🎯</span><span>Metas</span>
+    </button>
+    <button class="mobile-more-item view-tab" data-view="zones" onclick="closeMobileMore();switchView('zones')">
+      <span>🗺️</span><span>Zonas</span>
     </button>
     <button class="mobile-more-item" onclick="closeMobileMore();openChallengesModal()">
       <span>🏆</span><span>Retos</span>
@@ -1288,6 +1299,7 @@
 <script src="js/daily_goal.js?v=1"></script>
 <script src="js/weekly_summary.js?v=1"></script>
 <script src="js/challenges.js?v=1"></script>
+<script src="js/zones.js?v=1"></script>
 <script src="js/auth.js?v=1"></script>
 <script src="js/main.js?v=14"></script>
 
