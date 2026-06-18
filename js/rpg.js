@@ -23,14 +23,8 @@ function getSeasonalXPMult() {
 }
 
 function renderSeasonalBanner() {
-  const el = document.getElementById('seasonalBanner');
-  if (!el) return;
-  const ev = getSeasonalEvent();
-  if (!ev) { el.style.display = 'none'; return; }
-  el.style.display = '';
-  el.innerHTML = `<span class="sb-icon">${ev.icon}</span>
-    <span class="sb-text"><strong>${escHtml(ev.name)}</strong> — ${escHtml(ev.desc)} <span class="sb-bonus">+${Math.round(ev.xpBonus*100)}% XP</span></span>`;
-  el.style.setProperty('--sb-clr', ev.color);
+  // Seasonal event now shows in the effects bar — trigger a re-render
+  if (typeof renderEffectsBar === 'function') renderEffectsBar();
 }
 
 /* ── WEATHER ─────────────────────────────────────────────── */
@@ -74,72 +68,139 @@ function renderWeather() {
   }
 }
 
-/* ── WEEKLY BOSS ──────────────────────────────────────────── */
-function _bossWeekKey() {
-  const d    = new Date();
-  const jan1 = new Date(d.getFullYear(), 0, 1);
-  const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
-  return `dungeon-boss-${d.getFullYear()}-${week}`;
-}
-function getBossState() {
-  const week = _bossWeekKey();
-  if (hero && hero.boss_state) {
-    const s = typeof hero.boss_state === 'string' ? JSON.parse(hero.boss_state) : hero.boss_state;
-    if (s.week === week) return s;
-  }
+/* ── SISTEMA DE JEFES MÚLTIPLES (v69) ────────────────────────
+   3 jefes simultáneos: diario / semanal / mensual
+   Rareza define el ciclo: comun+raro=diario, epico+legendario=semanal, mitico+cataclismo=mensual
+   ─────────────────────────────────────────────────────────── */
+const BOSS_CYCLE_RARITIES = {
+  daily:   ['comun', 'raro'],
+  weekly:  ['epico', 'legendario'],
+  monthly: ['mitico', 'cataclismo'],
+};
+// HP calibrado para ser vencible en su ciclo con ~150-200 daño/día
+const BOSS_CYCLE_HP = {
+  comun:80, raro:150, epico:600, legendario:1000, mitico:2500, cataclismo:4200,
+};
+const BOSS_DEFEAT_REWARDS = {
+  comun:      { gold:40,   xp:80   },
+  raro:       { gold:80,   xp:160  },
+  epico:      { gold:180,  xp:400  },
+  legendario: { gold:300,  xp:700  },
+  mitico:     { gold:700,  xp:1800 },
+  cataclismo: { gold:1500, xp:4000 },
+};
+const BOSS_CYCLE_LABELS = { daily:'Diario', weekly:'Semanal', monthly:'Mensual' };
+const BOSS_CYCLE_ICONS  = { daily:'☀️', weekly:'📅', monthly:'🌙' };
 
-  // Seasonal boss check
-  const now   = new Date();
-  const month = now.getMonth();
-  const day   = now.getDate();
-  const seasonal = BOSS_DEFS.find(b => b.seasonal &&
-    b.seasonal.month === month &&
-    day >= b.seasonal.dayStart &&
-    day <= b.seasonal.dayEnd);
-
-  let boss, bossMaxHp;
-  if (seasonal) {
-    boss = seasonal;
-    bossMaxHp = boss.hp;
-  } else {
-    const pending      = quests.filter(q => !q.done && q.type !== 'daily');
-    const regularBosses = BOSS_DEFS.filter(b => !b.seasonal);
-    const d    = new Date();
+function _bossPeriodKey(cycle) {
+  const d = new Date();
+  if (cycle === 'daily') return d.toISOString().split('T')[0];
+  if (cycle === 'weekly') {
     const jan1 = new Date(d.getFullYear(), 0, 1);
-    const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
-    boss = regularBosses[week % regularBosses.length];
-    bossMaxHp = Math.min(Math.max(pending.length * 20, 60), 400);
+    const w    = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+    return `${d.getFullYear()}-W${w}`;
+  }
+  return `${d.getFullYear()}-${d.getMonth() + 1}`;
+}
+
+function _selectBossForCycle(cycle, periodKey) {
+  const rarities = BOSS_CYCLE_RARITIES[cycle] || [];
+  const pool     = (typeof BOSS_DEFS !== 'undefined' ? BOSS_DEFS : [])
+    .filter(b => rarities.includes(b.rarity) && !b.seasonal);
+  if (!pool.length) return null;
+  const seed = periodKey.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  return pool[seed % pool.length];
+}
+
+function _applyBossPenalty(cycle, boss) {
+  if (!hero) return;
+  const hpLoss  = { daily:5, weekly:10, monthly:20 }[cycle] || 5;
+  const goldPct = { daily:0, weekly:0.05, monthly:0.08 }[cycle] || 0;
+  const newHp   = Math.max(10, (hero.hp || 100) - hpLoss);
+  hero.hp = newHp; saveHero({ hp: newHp });
+  const goldLoss = Math.floor((hero.gold || 0) * goldPct);
+  if (goldLoss > 0 && typeof addGold === 'function') addGold(-goldLoss);
+  if (typeof renderHeroUI === 'function') renderHeroUI();
+  toast('💀', `${escHtml(boss.name)} escapó (${BOSS_CYCLE_LABELS[cycle]}). -${hpLoss} HP${goldLoss ? ` · -${goldLoss}🪙` : ''}`);
+}
+
+function getMultiBossState() {
+  let saved = null;
+  if (hero && hero.boss_state) {
+    try {
+      const raw = typeof hero.boss_state === 'string' ? JSON.parse(hero.boss_state) : hero.boss_state;
+      if (raw && typeof raw === 'object' && ('daily' in raw || 'weekly' in raw || 'monthly' in raw)) saved = raw;
+    } catch {}
   }
 
-  const state = { hp: bossMaxHp, maxHp: bossMaxHp, name: boss.name, bossKey: boss.key, defeated: false, week: _bossWeekKey() };
-  saveBossState(state);
+  const state   = saved ? { ...saved } : {};
+  let   changed = false;
+  const cycles  = ['daily', 'weekly', 'monthly'];
+
+  cycles.forEach(cycle => {
+    const periodKey = _bossPeriodKey(cycle);
+    const existing  = state[cycle];
+    if (existing && existing.periodKey !== periodKey) {
+      if (!existing.defeated) setTimeout(() => _applyBossPenalty(cycle, existing), 600);
+    }
+    if (!existing || existing.periodKey !== periodKey) {
+      const def = _selectBossForCycle(cycle, periodKey);
+      if (def) {
+        const hp = BOSS_CYCLE_HP[def.rarity] || 100;
+        state[cycle] = { key:def.key, name:def.name, rarity:def.rarity, hp, maxHp:hp, defeated:false, periodKey };
+        changed = true;
+      }
+    }
+  });
+
+  if (changed || !saved) {
+    if (hero) hero.boss_state = state;
+    if (typeof saveHero === 'function') saveHero({ boss_state: state });
+  }
   return state;
 }
-function saveBossState(s) {
-  const state = { ...s, week: _bossWeekKey() };
+
+function saveMultiBossState(state) {
   if (hero) { hero.boss_state = state; saveHero({ boss_state: state }); }
 }
 
+// Compat: getBossState() devuelve el boss semanal (usado por bestiary/bestiary)
+function getBossState() { return getMultiBossState().weekly || {}; }
+function saveBossState(s) { /* deprecated — usa saveMultiBossState */ }
+
 function damageBoss(dmg) {
-  const state = getBossState();
-  if (state.defeated) return;
+  const state   = getMultiBossState();
   const weather = getTodayWeather();
-  const bossMult = typeof getPetEffect === 'function' ? (getPetEffect('boss_dmg') || 1) : 1;
-  const finalDmg = (weather === 'storm' ? dmg * 2 : dmg) * bossMult;
-  state.hp = Math.max(0, state.hp - finalDmg);
-  if (state.hp === 0 && !state.defeated) {
-    state.defeated = true;
-    saveBossState(state);
-    setTimeout(async () => {
-      addGold(150);
-      await addXP(250, 'main', null);
-      toast('🏆', `¡${state.name} DERROTADO! +150🪙 +250 XP`);
-      updateBossBanner();
-    }, 800);
-    return;
-  }
-  saveBossState(state);
+  const petMult = typeof getPetEffect === 'function' ? (getPetEffect('boss_dmg') || 1) : 1;
+  const finalDmg = (weather === 'storm' ? dmg * 2 : dmg) * petMult;
+  let changed   = false;
+
+  ['daily','weekly','monthly'].forEach(cycle => {
+    const b = state[cycle];
+    if (!b || b.defeated) return;
+    b.hp = Math.max(0, b.hp - finalDmg);
+    changed = true;
+    if (b.hp === 0) {
+      b.defeated = true;
+      const reward = BOSS_DEFEAT_REWARDS[b.rarity] || { gold:50, xp:100 };
+      setTimeout(async () => {
+        addGold(reward.gold);
+        await addXP(reward.xp, 'main', null);
+        toast('🏆', `¡${escHtml(b.name)} DERROTADO! +${reward.gold}🪙 +${reward.xp} XP`);
+        if (typeof dungeonPush === 'function') dungeonPush('🏆 ¡Jefe Derrotado!', `${b.name} venció. +${reward.gold}🪙 +${reward.xp} XP`);
+        if (typeof recordBossDefeat === 'function') recordBossDefeat(b.key);
+        updateBossBanner();
+      }, 800);
+    }
+  });
+
+  if (changed) saveMultiBossState(state);
   updateBossBanner();
+}
+
+function checkBossDeadline() {
+  // Deprecated wrapper — la lógica de penalidad está en getMultiBossState()
+  getMultiBossState();
 }
 
 /* ── RANDOM EVENTS ────────────────────────────────────────── */

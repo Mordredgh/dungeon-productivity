@@ -275,16 +275,9 @@
         <!-- QUESTS VIEW -->
         <div class="view active" id="view-quests">
 
-          <div class="seasonal-banner" id="seasonalBanner" style="display:none"></div>
+          <div id="effectsBar" class="effects-bar" style="display:none" onclick="openEffectsModal()" title="Ver efectos activos"></div>
 
-          <div class="boss-banner" id="bossBanner" style="display:none">
-            <div class="boss-icon-wrap"><div class="boss-icon">👹</div></div>
-            <div class="boss-info">
-              <div class="boss-label">⚠️ Misión Épica — ¡Ataca primero!</div>
-              <div class="boss-name" id="bossName">—</div>
-              <div class="boss-meta" id="bossMeta"></div>
-            </div>
-          </div>
+          <div id="bossGrid" class="boss-grid"></div>
 
           <div class="weekly-banner" id="weeklyBanner" style="display:none">
             <div style="font-size:22px">📜</div>
@@ -781,6 +774,17 @@
 </div>
 
 <!-- MODALS -->
+
+<!-- Effects Modal -->
+<div class="modal-overlay" id="effectsModal" onclick="if(event.target===this)closeModal('effectsModal')">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <h2 class="modal-title">✨ Efectos Activos</h2>
+      <button class="modal-close" onclick="closeModal('effectsModal')">✕</button>
+    </div>
+    <div id="effectsModalBody" style="display:flex;flex-direction:column;gap:10px;padding:4px 0 8px"></div>
+  </div>
+</div>
 
 <!-- Level Up -->
 <div class="modal-overlay levelup-modal" id="levelupModal">

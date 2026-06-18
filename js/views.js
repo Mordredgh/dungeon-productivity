@@ -667,57 +667,69 @@ function renderTypeDist() {
 }
 
 
-function updateBossBanner() {
-  // Delegated to rpg.js — called after that script loads
-  if (typeof getBossState === 'function') {
-    const banner = document.getElementById('bossBanner');
-    if (!banner) return;
-    const state = getBossState();
-    banner.style.display = 'flex';
+const _BOSS_RARITY_CLR   = { comun:'#9ca3af', raro:'#60a5fa', epico:'#a78bfa', legendario:'#facc15', mitico:'#f97316', cataclismo:'#e11d48' };
+const _BOSS_RARITY_LABEL = { comun:'Común', raro:'Raro', epico:'Épico', legendario:'Legendario', mitico:'Mítico', cataclismo:'CATACLISMO' };
+const _BOSS_CYCLE_ICON   = { daily:'☀️', weekly:'📅', monthly:'🌙' };
+const _BOSS_CYCLE_LABEL  = { daily:'Diario', weekly:'Semanal', monthly:'Mensual' };
 
-    // Rarity → banner background image
-    const bossDef = (typeof BOSS_DEFS !== 'undefined') ? BOSS_DEFS.find(b => b.key === state.bossKey) : null;
-    const rarity  = bossDef?.rarity || 'comun';
-    const variant = (Math.floor(Date.now() / 86400000) % 2) + 1; // alternates daily
-    const bannerImg = `${CDN}dungeon/boss_banner_${rarity}_${variant}.png`;
-    banner.style.background = `linear-gradient(135deg,rgba(26,5,32,.74) 0%,rgba(13,7,32,.68) 50%,rgba(10,13,31,.74) 100%),url("${bannerImg}") center/cover no-repeat`;
-
-    if (state.defeated) {
-      banner.innerHTML = `<div class="boss-defeated">🏆 ¡${escHtml(state.name)} DERROTADO! Semana conquistada.</div>`;
-    } else {
-      const pct      = Math.round((state.hp / state.maxHp) * 100);
-      const hpColor  = pct > 60 ? '#fb7185' : pct > 30 ? '#facc15' : '#4ade80';
-      const rarityColors = { comun:'#9ca3af', raro:'#60a5fa', epico:'#a78bfa', legendario:'#facc15', mitico:'#f97316', cataclismo:'#e11d48' };
-      const rarityLabel  = { comun:'Común', raro:'Raro', epico:'Épico', legendario:'Legendario', mitico:'Mítico', cataclismo:'CATACLISMO' };
-      const rarClr  = rarityColors[rarity] || '#9ca3af';
-      const rarLbl  = rarityLabel[rarity]  || rarity;
-      const bossImgHtml = state.bossKey
-        ? `<img src="${CDN}dungeon/boss_${state.bossKey}.png" class="boss-img" alt="${escHtml(state.name)}"
-               onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-           <div class="boss-icon" style="display:none">👹</div>`
-        : `<div class="boss-icon">👹</div>`;
-      const lowHp = pct <= 30 ? 'anim-pulse-danger' : '';
-      const dow = new Date().getDay();
-      const daysLeft = dow === 0 ? 0 : 7 - dow;
-      const urgency = daysLeft <= 2 ? `<span style="font-size:10px;color:#fb7185;font-weight:700">⏰ ${daysLeft === 0 ? '¡Hoy es el último día!' : `${daysLeft} día${daysLeft===1?'':'s'} restante${daysLeft===1?'':'s'}`}</span>` : '';
-      banner.innerHTML = `
-        <div class="boss-icon-wrap ${lowHp}">${bossImgHtml}</div>
-        <div class="boss-info" style="flex:1;min-width:0">
-          <div class="boss-label">⚔️ Jefe Semanal — ¡Atácalo completando misiones!</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="boss-name">${escHtml(state.name)}</div>
-            <span style="font-size:10px;font-weight:700;color:${rarClr};text-shadow:0 0 8px ${rarClr}66;letter-spacing:.04em">${rarLbl}</span>
-            ${urgency}
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
-            <div style="flex:1;height:14px;background:rgba(255,255,255,.15);border-radius:7px;overflow:hidden;border:1px solid rgba(255,255,255,.2)">
-              <div style="width:${pct}%;height:100%;background:${hpColor};border-radius:7px"></div>
-            </div>
-            <span style="font-size:12px;font-weight:700;color:#fff;white-space:nowrap">❤️ ${state.hp}/${state.maxHp}</span>
-          </div>
-        </div>`;
-    }
+function _bossTimeLeft(cycle) {
+  const d = new Date();
+  if (cycle === 'daily') {
+    const secs = 86400 - (d.getHours()*3600 + d.getMinutes()*60 + d.getSeconds());
+    const h = Math.floor(secs/3600), m = Math.floor((secs%3600)/60);
+    return `${h}h ${m}m`;
   }
+  if (cycle === 'weekly') {
+    const dow = d.getDay(); // 0=Sun
+    const daysLeft = dow === 0 ? 0 : 7 - dow;
+    return daysLeft === 0 ? '¡Hoy!' : `${daysLeft}d`;
+  }
+  // monthly
+  const lastDay = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+  return `${lastDay - d.getDate()}d`;
+}
+
+function _bossCycleCardHtml(cycle, b) {
+  if (!b) return `<div class="boss-card boss-card-empty"><div class="boss-card-cycle">${_BOSS_CYCLE_ICON[cycle]} ${_BOSS_CYCLE_LABEL[cycle]}</div><div style="font-size:28px;opacity:.3">👻</div><div style="font-size:11px;opacity:.4">Sin jefe</div></div>`;
+  const pct     = Math.round((b.hp / b.maxHp) * 100);
+  const hpClr   = pct > 60 ? '#fb7185' : pct > 30 ? '#facc15' : '#4ade80';
+  const rarClr  = _BOSS_RARITY_CLR[b.rarity]   || '#9ca3af';
+  const rarLbl  = _BOSS_RARITY_LABEL[b.rarity] || b.rarity;
+  const timeLeft = _bossTimeLeft(cycle);
+  const urgent   = pct <= 30 ? 'boss-card-urgent' : '';
+  if (b.defeated) {
+    return `<div class="boss-card boss-card-defeated">
+      <div class="boss-card-cycle">${_BOSS_CYCLE_ICON[cycle]} ${_BOSS_CYCLE_LABEL[cycle]}</div>
+      <div style="font-size:28px">🏆</div>
+      <div class="boss-card-name" style="color:#4ade80">${escHtml(b.name)}</div>
+      <div style="font-size:10px;color:#4ade80;font-weight:700">¡DERROTADO!</div>
+    </div>`;
+  }
+  const imgHtml = b.key
+    ? `<img src="${CDN}dungeon/boss_${escHtml(b.key)}.png" class="boss-card-img" alt="${escHtml(b.name)}"
+           onerror="this.style.display='none';this.nextSibling.style.display='block'"><div class="boss-card-emoji" style="display:none">👹</div>`
+    : `<div class="boss-card-emoji">👹</div>`;
+  return `<div class="boss-card ${urgent}">
+    <div class="boss-card-cycle">${_BOSS_CYCLE_ICON[cycle]} ${_BOSS_CYCLE_LABEL[cycle]}</div>
+    <div class="boss-card-portrait">${imgHtml}</div>
+    <div class="boss-card-name">${escHtml(b.name)}</div>
+    <div class="boss-card-rarity" style="color:${rarClr};text-shadow:0 0 8px ${rarClr}55">${rarLbl}</div>
+    <div class="boss-card-hp-bar">
+      <div class="boss-card-hp-fill" style="width:${pct}%;background:${hpClr}"></div>
+    </div>
+    <div class="boss-card-hp-text">❤️ ${b.hp}/${b.maxHp}</div>
+    <div class="boss-card-time">⏰ ${timeLeft}</div>
+  </div>`;
+}
+
+function updateBossBanner() {
+  const grid = document.getElementById('bossGrid');
+  if (grid && typeof getMultiBossState === 'function') {
+    const state = getMultiBossState();
+    grid.innerHTML = ['daily','weekly','monthly'].map(c => _bossCycleCardHtml(c, state[c])).join('');
+  }
+  // Effects bar
+  if (typeof renderEffectsBar === 'function') renderEffectsBar();
   // Weekly quests progress banner
   const weeklies    = quests.filter(q => q.type === 'weekly');
   const weeklyDone  = weeklies.filter(q => q.done).length;
@@ -730,6 +742,76 @@ function updateBossBanner() {
     document.getElementById('weeklyBossFill').style.width = Math.round((weeklyDone / weeklyTotal) * 100) + '%';
     document.getElementById('weeklyBannerMeta').textContent = `${weeklyDone}/${weeklyTotal}`;
   } else if (wb) wb.style.display = 'none';
+}
+
+/* ── EFFECTS BAR + MODAL ────────────────────────────────────── */
+function _collectActiveEffects() {
+  const effects = [];
+  // Seasonal event
+  if (typeof getSeasonalEvent === 'function') {
+    const ev = getSeasonalEvent();
+    if (ev) effects.push({ icon: ev.icon, name: ev.name, desc: `+${Math.round(ev.xpBonus*100)}% XP`, color: ev.color || '#a78bfa', category: '🌟 Estacional' });
+  }
+  // Weather
+  if (typeof getTodayWeather === 'function' && typeof WEATHER_TYPES !== 'undefined') {
+    const w  = getTodayWeather();
+    const wd = WEATHER_TYPES[w];
+    if (wd) effects.push({ icon: wd.icon, name: wd.name, desc: wd.desc, color: '#60a5fa', category: '🌤️ Clima' });
+  }
+  // Active potions (inventory items with xpBonus or goldBonus)
+  if (typeof inventory !== 'undefined' && typeof ITEM_DEFS !== 'undefined') {
+    inventory.filter(i => (i.item_type||'').startsWith('potion') && i.qty > 0).forEach(i => {
+      const def = ITEM_DEFS.find(d => d.id === i.item_id);
+      if (def) effects.push({ icon: def.icon || '🧪', name: def.name, desc: def.effect || '', color: '#4ade80', category: '🧪 Pociones' });
+    });
+  }
+  // Secret class bonus
+  if (hero) {
+    const cls = (() => { try { return JSON.parse(hero.secret_classes || '[]'); } catch { return []; } })();
+    const adopted = hero.hero_class;
+    if (cls.length > 0 && typeof SECRET_CLASS_DEFS !== 'undefined') {
+      const sd = SECRET_CLASS_DEFS.find(d => d.key === adopted);
+      if (sd) effects.push({ icon: sd.icon, name: sd.name, desc: sd.bonus, color: '#facc15', category: '🔮 Clase Secreta' });
+    }
+  }
+  return effects;
+}
+
+function renderEffectsBar() {
+  const bar = document.getElementById('effectsBar');
+  if (!bar) return;
+  const efx = _collectActiveEffects();
+  if (!efx.length) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  bar.innerHTML = efx.slice(0, 4).map(e =>
+    `<span class="efx-chip" style="--efx-clr:${e.color}">${e.icon} <span class="efx-chip-name">${escHtml(e.name)}</span> <span class="efx-chip-val">${escHtml(e.desc)}</span></span>`
+  ).join('') + (efx.length > 4 ? `<span class="efx-chip efx-more">+${efx.length-4} más</span>` : '') +
+  `<span class="efx-expand" title="Ver todos">▶</span>`;
+}
+
+function openEffectsModal() {
+  const body = document.getElementById('effectsModalBody');
+  if (!body) return;
+  const efx = _collectActiveEffects();
+  if (!efx.length) {
+    body.innerHTML = `<div style="text-align:center;color:var(--text3);padding:20px">Sin efectos activos ahora mismo.</div>`;
+  } else {
+    const grouped = {};
+    efx.forEach(e => { if (!grouped[e.category]) grouped[e.category] = []; grouped[e.category].push(e); });
+    body.innerHTML = Object.entries(grouped).map(([cat, items]) =>
+      `<div>
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">${escHtml(cat)}</div>
+        ${items.map(e => `<div class="efx-row" style="--efx-clr:${e.color}">
+          <span class="efx-row-icon">${e.icon}</span>
+          <div style="flex:1;min-width:0">
+            <div class="efx-row-name">${escHtml(e.name)}</div>
+            <div class="efx-row-desc">${escHtml(e.desc)}</div>
+          </div>
+        </div>`).join('')}
+      </div>`
+    ).join('');
+  }
+  openModal('effectsModal');
 }
 
 function updateDailyProgress() {
