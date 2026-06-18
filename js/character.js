@@ -264,6 +264,12 @@ function renderCharacterSheet() {
           </div>`;
         })()}
 
+        <div class="char-section">
+          <div class="char-section-title">🪪 Carnet de Héroe</div>
+          <p style="font-size:12px;color:var(--text2);margin:0 0 12px">Exporta tu ficha de personaje como imagen PNG.</p>
+          <button class="btn btn-primary" onclick="generateHeroCard()" style="width:100%">⬇️ Descargar Carnet PNG</button>
+        </div>
+
       </div>
     </div>`;
 
