@@ -3240,6 +3240,19 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 .view > * { position:relative; z-index:1; }
 
+/* ── FONDOS POR VISTA ───────────────────────────────────────── */
+#view-quests       { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_misiones.png'); }
+#view-goals        { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_metas.png'); }
+#view-stats        { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_stats.png'); }
+#view-achievements { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_logros.png'); }
+#view-history      { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_history.png'); }
+#view-shop         { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_shop.png'); }
+#view-inventory    { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_inventario.png'); }
+#view-pets         { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_pets.png'); }
+#view-dungeon-grows{ --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_dungeon-grows.png'); }
+#view-integrations { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_integrations.png'); }
+#view-character    { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_character.png'); }
+
 /* ============================================================
    ACTIVE PET DISPLAY (sidebar)
    ============================================================ */
