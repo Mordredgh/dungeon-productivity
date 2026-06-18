@@ -236,6 +236,7 @@ function switchView(v) {
   if (v === 'goals')        { if (typeof renderGoals==='function')        renderGoals(); }
   if (v === 'dungeon-grows'){ if (typeof renderDungeonGrows==='function') renderDungeonGrows(); }
   if (v === 'zones')        { if (typeof renderZones==='function')        renderZones(); }
+  if (v === 'worldmap')     { if (typeof renderWorldMap==='function')     renderWorldMap(); }
   if (v === 'integrations') { renderIntegrations(); }
   // Mobile nav: highlight "Más" button when active view isn't a primary tab
   const moreBtn = document.getElementById('mobileNavMoreBtn');
