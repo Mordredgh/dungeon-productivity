@@ -3,12 +3,12 @@
 // Posiciones (% del ancho/alto del contenedor) para cada zona.
 // Ajustables según el arte final del mapa.
 const ZONE_MAP_POSITIONS = {
-  ciudadela: { x: 44, y: 14 },
-  campo:     { x: 72, y: 48 },
-  torre:     { x: 68, y: 12 },
-  fortaleza: { x: 74, y: 72 },
-  jardin:    { x: 22, y: 70 },
-  cripta:    { x: 16, y: 46 },
+  ciudadela: { x: 43, y: 22 },
+  campo:     { x: 72, y: 30 },
+  torre:     { x: 12, y: 12 },
+  fortaleza: { x: 75, y: 70 },
+  jardin:    { x: 17, y: 68 },
+  cripta:    { x: 43, y: 80 },
 };
 
 let _worldMapEl = null;
