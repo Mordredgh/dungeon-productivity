@@ -811,8 +811,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   align-self: flex-start;
 }
 .bcard-portrait-wrap {
-  width: 120px;
-  height: 120px;
+  width: 160px;
+  height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -822,8 +822,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .bcard-img {
   width: 100%;
   height: 100%;
-  max-width: 120px;
-  max-height: 120px;
+  max-width: 160px;
+  max-height: 160px;
   object-fit: contain;
   image-rendering: pixelated;
   filter: drop-shadow(0 4px 16px rgba(0,0,0,.6));
