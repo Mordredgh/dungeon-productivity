@@ -266,8 +266,9 @@ function switchCharTab(tab) {
   if (tab === 'sheet')    { if (typeof renderCharacterSheet==='function') renderCharacterSheet(); }
   if (tab === 'skills')   { if (typeof renderSkillTree==='function')      renderSkillTree(); }
   if (tab === 'runes')    { if (typeof renderRunePanel==='function')      renderRunePanel(); }
-  if (tab === 'bestiary') { if (typeof renderBestiary==='function')       renderBestiary(); }
-  if (tab === 'smithy')   { if (typeof renderSmithy==='function')         renderSmithy(); }
+  if (tab === 'bestiary')       { if (typeof renderBestiary==='function')      renderBestiary(); }
+  if (tab === 'smithy')         { if (typeof renderSmithy==='function')        renderSmithy(); }
+  if (tab === 'sala-personal')  { if (typeof renderSalaPersonal==='function')  renderSalaPersonal(); }
   // Set sub-tab background image
   const charView = document.getElementById('view-character');
   const tabFondo = { sheet:'character', skills:'skills', runes:'runes', bestiary:'bestiary', smithy:'smithy' };

@@ -3926,22 +3926,24 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 /* ================================================================
    BLOQUE E — BESTIARIO
    ================================================================ */
-.bestiary-header { display:flex; align-items:center; gap:16px; margin-bottom:20px; font-size:13px; font-weight:600; }
+.bestiary-header { display:flex; align-items:center; gap:16px; margin-bottom:16px; font-size:13px; font-weight:600; }
 .bestiary-prog-bar { flex:1; height:8px; background:rgba(137,180,250,.1); border-radius:4px; overflow:hidden; }
 .bestiary-prog-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:4px; transition:width .4s ease; }
-.bestiary-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:14px; }
+.bestiary-group-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:var(--text3); margin:16px 0 8px; }
+.bestiary-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin-bottom:4px; }
 .bestiary-card {
-  background:var(--card); border:1px solid color-mix(in srgb,var(--bc,#9ca3af) 30%,var(--border));
-  border-radius:14px; padding:16px; text-align:center; transition:var(--transition); --bc:#9ca3af;
+  background:var(--card); border:1px solid rgba(156,163,175,.15);
+  border-radius:12px; padding:12px 8px; text-align:center; transition:var(--transition); --bc:#9ca3af;
 }
-.bestiary-known:hover { transform:translateY(-3px); border-color:var(--bc); }
-.bestiary-unknown { opacity:.5; }
-.bestiary-img   { width:80px; height:80px; object-fit:contain; margin-bottom:10px; }
-.bestiary-emoji { width:80px; height:80px; font-size:44px; display:flex; align-items:center; justify-content:center; margin:0 auto 10px; }
-.bestiary-hidden { opacity:.3; }
-.bestiary-name  { font-family:var(--font-head); font-size:14px; font-weight:700; margin-bottom:6px; }
-.bestiary-lore  { font-size:11px; color:var(--text2); line-height:1.5; }
-.bestiary-rarity { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; margin-top:8px; display:block; }
+.bestiary-known:hover { transform:translateY(-2px); border-color:var(--bc); box-shadow:0 0 12px rgba(0,0,0,.3); }
+.bestiary-unknown { opacity:.6; }
+.bestiary-img-wrap { position:relative; width:80px; height:80px; margin:0 auto 8px; }
+.bestiary-img   { width:80px; height:80px; object-fit:contain; image-rendering:pixelated; }
+.bestiary-locked { filter:brightness(0) contrast(1.2); opacity:.55; }
+.bestiary-lock-icon { position:absolute; bottom:0; right:0; font-size:16px; line-height:1; }
+.bestiary-fallback { width:80px; height:80px; font-size:44px; display:flex; align-items:center; justify-content:center; }
+.bestiary-name  { font-family:var(--font-head); font-size:12px; font-weight:700; margin-bottom:4px; }
+.bestiary-rarity { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; display:block; }
 
 /* ================================================================
    BLOQUE E — EL DUNGEON CRECE CONTIGO
@@ -4981,3 +4983,68 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   border-radius: 3px; transition: width .4s ease; }
 .secret-class-prog-txt { font-size: 11px; color: var(--text3); }
 
+
+/* ================================================================
+   SALA PERSONAL
+   ================================================================ */
+#ctab-sala-personal { padding: 0; overflow: hidden; }
+.sala-layout {
+  display: flex;
+  gap: 0;
+  height: 500px;
+}
+.sala-room {
+  flex: 1;
+  position: relative;
+  background: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_sala_personal.png') center/cover no-repeat;
+  cursor: crosshair;
+  overflow: hidden;
+}
+.sala-room-overlay {
+  position: absolute; inset: 0;
+  background: rgba(4,4,14,.35);
+  pointer-events: none;
+}
+.sala-item {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.7));
+  transition: transform .1s, filter .1s;
+  user-select: none;
+}
+.sala-item:hover { filter: drop-shadow(0 0 12px rgba(99,102,241,.7)) drop-shadow(0 4px 10px rgba(0,0,0,.7)); transform: translate(-50%, -50%) scale(1.1); }
+.sala-item.sala-dragging { cursor: grabbing; opacity: .85; z-index: 100; }
+.sala-item img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
+.sala-hint {
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+  font-size: 11px; color: rgba(255,255,255,.5); pointer-events: none;
+  background: rgba(0,0,0,.4); padding: 4px 10px; border-radius: 20px;
+}
+.sala-picker {
+  width: 220px;
+  flex-shrink: 0;
+  background: rgba(6,6,18,.95);
+  border-left: 1px solid rgba(255,255,255,.07);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+.sala-picker-title { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .08em; }
+.sala-picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.sala-picker-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 8px; padding: 8px 4px; cursor: pointer;
+  transition: all .15s;
+}
+.sala-picker-item:hover { background: rgba(99,102,241,.12); border-color: rgba(99,102,241,.3); }
+.sala-picker-item.sala-selected { border-color: var(--accent); background: rgba(99,102,241,.2); }
+.sala-picker-item img { width: 44px; height: 44px; object-fit: contain; image-rendering: pixelated; }
+.sala-picker-label { font-size: 9px; color: var(--text2); text-align: center; line-height: 1.2; }
+.sala-help { font-size: 10px; color: var(--text3); text-align: center; line-height: 1.5; margin-top: auto; padding-top: 8px; }
