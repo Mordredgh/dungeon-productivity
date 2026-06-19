@@ -4990,15 +4990,18 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 #ctab-sala-personal { padding: 0; overflow: hidden; }
 .sala-layout {
   display: flex;
+  flex-direction: row;
   gap: 0;
-  height: 500px;
+  height: 520px;
+  min-height: 420px;
 }
 .sala-room {
   flex: 1;
   position: relative;
-  background: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_sala_personal.png') center/cover no-repeat;
+  background: var(--sala-bg, rgba(10,6,30,.9)) center/cover no-repeat;
   cursor: crosshair;
   overflow: hidden;
+  border-radius: 8px 0 0 8px;
 }
 .sala-room-overlay {
   position: absolute; inset: 0;
@@ -5007,17 +5010,18 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 .sala-item {
   position: absolute;
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   transform: translate(-50%, -50%);
   cursor: grab;
   filter: drop-shadow(0 4px 10px rgba(0,0,0,.7));
   transition: transform .1s, filter .1s;
   user-select: none;
+  overflow: hidden;
 }
 .sala-item:hover { filter: drop-shadow(0 0 12px rgba(99,102,241,.7)) drop-shadow(0 4px 10px rgba(0,0,0,.7)); transform: translate(-50%, -50%) scale(1.1); }
 .sala-item.sala-dragging { cursor: grabbing; opacity: .85; z-index: 100; }
-.sala-item img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
+.sala-item img { display: block; width: 90px; height: 90px; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
 .sala-hint {
   position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
   font-size: 11px; color: rgba(255,255,255,.5); pointer-events: none;

@@ -37,9 +37,11 @@ function renderSalaPersonal() {
   const data   = _getSala();
   const placed = data.placed || [];
 
+  const bgUrl = CDN + 'dungeon/fondo_sala_personal.png';
   el.innerHTML = `
     <div class="sala-layout">
-      <div class="sala-room" id="salaRoom">
+      <div class="sala-room" id="salaRoom"
+           style="background-image:url('${bgUrl}'); background-size:cover; background-position:center;">
         <div class="sala-room-overlay"></div>
         ${placed.map((item, i) => {
           const def = SALA_FURNITURE.find(f => f.id === item.id);
