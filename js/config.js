@@ -161,11 +161,10 @@ const GOOGLE_REDIRECT_URI = 'https://dungeon.mordredgh.com/';
 /* ── ARMAS ───────────────────────────────────────────────── */
 const WEAPON_DEFS = [
   { key:'espada', name:'Espada',  icon:'⚔️', slot:'main_hand' },
-  { key:'hacha',  name:'Hacha',   icon:'🪓', slot:'main_hand' },
+  { key:'mazo',   name:'Mazo',    icon:'🔨', slot:'main_hand' },
   { key:'baculo', name:'Báculo',  icon:'🪄', slot:'main_hand' },
   { key:'arco',   name:'Arco',    icon:'🏹', slot:'main_hand' },
-  { key:'daga',   name:'Daga',    icon:'🗡️', slot:'off_hand'  },
-  { key:'escudo', name:'Escudo',  icon:'🛡️', slot:'off_hand'  },
+  { key:'dagas',  name:'Dagas',   icon:'🗡️', slot:'off_hand'  },
   // Armaduras
   { key:'pecho',   name:'Pecho',   icon:'🧱', slot:'body'  },
   { key:'casco',   name:'Casco',   icon:'⛑️', slot:'head'  },
@@ -236,11 +235,10 @@ const SHOP_ITEMS = [
   { id:'frag_mente-acero',   name:'Cristal de Mente de Acero', img:'spell_mente-acero.png',   cost:25,  qty:5, desc:'×5 frags · necesitas 25 para Mente de Acero',       category:'fragment' },
   /* Armas (comunes) */
   { id:'weapon_espada', name:'Espada Común',  icon:'⚔️', cost:50,  desc:'Arma · mano principal · forjable a Rara (×5)',   category:'armas', weaponKey:'espada', tier:'comun' },
-  { id:'weapon_hacha',  name:'Hacha Común',   icon:'🪓', cost:50,  desc:'Arma · mano principal · forjable a Rara (×5)',   category:'armas', weaponKey:'hacha',  tier:'comun' },
+  { id:'weapon_mazo',   name:'Mazo Común',    icon:'🔨', cost:50,  desc:'Arma · mano principal · forjable a Rara (×5)',   category:'armas', weaponKey:'mazo',   tier:'comun' },
   { id:'weapon_baculo', name:'Báculo Común',  icon:'🪄', cost:50,  desc:'Arma · mano principal · forjable a Rara (×5)',   category:'armas', weaponKey:'baculo', tier:'comun' },
   { id:'weapon_arco',   name:'Arco Común',    icon:'🏹', cost:50,  desc:'Arma · mano principal · forjable a Rara (×5)',   category:'armas', weaponKey:'arco',   tier:'comun' },
-  { id:'weapon_daga',   name:'Daga Común',    icon:'🗡️', cost:40,  desc:'Arma · mano secundaria · forjable a Rara (×5)', category:'armas', weaponKey:'daga',   tier:'comun' },
-  { id:'weapon_escudo', name:'Escudo Común',  icon:'🛡️', cost:40,  desc:'Arma · mano secundaria · forjable a Rara (×5)', category:'armas', weaponKey:'escudo', tier:'comun' },
+  { id:'weapon_dagas',  name:'Dagas Comunes', icon:'🗡️', cost:40,  desc:'Arma · mano secundaria · forjable a Rara (×5)', category:'armas', weaponKey:'dagas',  tier:'comun' },
   /* Armaduras (comunes) — forjables igual que armas */
   { id:'armor_pecho',   name:'Pecho Común',   icon:'🧱', cost:60,  desc:'+4 HP máx · forjable a Rara (×5)', category:'armaduras', weaponKey:'pecho',   tier:'comun' },
   { id:'armor_casco',   name:'Casco Común',   icon:'⛑️', cost:55,  desc:'+4% XP · forjable a Rara (×5)',    category:'armaduras', weaponKey:'casco',   tier:'comun' },
