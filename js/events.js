@@ -81,6 +81,12 @@ document.getElementById('saveQuestBtn').addEventListener('click', () => {
   } else if (reminderInp && !reminderInp.value) {
     tags = tags.replace(/reminder-\d{1,2}:\d{2}/gi, '').trim();
   }
+  // Merge zone tag from zone selector
+  const zoneTag = document.getElementById('editQZone')?.value;
+  if (zoneTag) {
+    tags = tags.replace(/\b(estudio|ejercicio)\b/gi, '').replace(/\s+/g, ' ').trim();
+    tags = (tags + ' ' + zoneTag).trim();
+  }
   const estTime = document.getElementById('editQEstTime').value.trim();
   const repeat  = document.getElementById('editQRepeat').value.trim();
   const startDate = document.getElementById('editQStartDate').value;
@@ -716,6 +722,17 @@ function setTagFilter(tag) {
   tagFilter = (tagFilter === tag) ? null : tag;
   renderQuestList();
   if (tagFilter) toast('🏷️', `Filtrando por: ${tag} (click de nuevo para quitar)`);
+}
+
+/* ============================================================
+   PIVOT SKILL
+   ============================================================ */
+function activatePivot(questId) {
+  if (!hero) return;
+  const today = new Date().toISOString().split('T')[0];
+  localStorage.setItem('dungeon-pivot-' + hero.id, JSON.stringify({ date: today, questId }));
+  toast('🔄', '¡Pivot activado! Completa esa misión hoy para +50% XP.');
+  renderQuestList();
 }
 
 /* ============================================================

@@ -84,6 +84,23 @@ async function updateChallengeProgress() {
   if (changed) await _saveChallenges(arr);
 }
 
+async function trackBossKill() {
+  const arr = _getChallenges();
+  let changed = false;
+  for (const c of arr) {
+    if (c.completed) continue;
+    const def = CHALLENGE_DEFS.find(d => d.id === c.id);
+    if (!def || def.type !== 'boss_kills') continue;
+    c.boss_kills = (c.boss_kills || 0) + 1;
+    if (c.boss_kills >= def.target && !c.completed) {
+      c.completed = true;
+      toast(def.icon, `¡Reto completado: ${def.name}! +${def.reward.xp} XP +${def.reward.gold}🪙`);
+    }
+    changed = true;
+  }
+  if (changed) { await _saveChallenges(arr); await updateChallengeProgress(); renderChallenges(); }
+}
+
 async function claimChallengeReward(defId) {
   const arr = _getChallenges();
   const c = arr.find(x => x.id === defId);

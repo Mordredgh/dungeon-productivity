@@ -35,8 +35,16 @@ async function completeQuest(id, el) {
 
   let xpAmt = calcQuestXP(q);
 
-  // XP multipliers from RPG systems
+  // Pivot boost (+50% XP si esta misión fue marcada con Pivot hoy)
   const today = new Date().toISOString().split('T')[0];
+  const _pivotData = (() => { try { return JSON.parse(localStorage.getItem('dungeon-pivot-' + (hero?.id||'')) || '{}'); } catch { return {}; } })();
+  if (_pivotData.date === today && _pivotData.questId === q.id) {
+    xpAmt = Math.round(xpAmt * 1.5);
+    toast('🔄', '¡Pivot activado! +50% XP');
+    localStorage.removeItem('dungeon-pivot-' + (hero?.id||''));
+  }
+
+  // XP multipliers from RPG systems
   const potionMult    = typeof getPotionMult    === 'function' ? getPotionMult()    : 1;
   const berserkerExp  = hero ? (hero.berserker_exp || 0) : 0;
   const berserkerMult = berserkerExp > Date.now() ? 2 : 1;

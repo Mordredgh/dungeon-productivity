@@ -4954,6 +4954,19 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .wm-bar-bg       { height: 8px; background: var(--bg4); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
 .wm-bar-fill     { height: 100%; border-radius: 4px; transition: width .4s ease; }
 .wm-detail-bonus { font-size: 12px; color: var(--text2); font-weight: 600; }
+.wm-ap-btn    { margin-top: 10px; width: 100%; padding: 8px 12px; border-radius: 8px;
+                background: rgba(137,180,250,.12); border: 1px solid rgba(137,180,250,.25);
+                color: #89b4fa; font-size: 12px; cursor: pointer; transition: background .2s; }
+.wm-ap-btn:hover:not(:disabled) { background: rgba(137,180,250,.22); }
+.wm-ap-btn:disabled { opacity: .4; cursor: not-allowed; }
+.wm-ap-count  { font-size: 10px; color: var(--text3); margin-top: 4px; }
+.wm-ap-active { margin-top: 10px; font-size: 12px; color: #4ade80; font-weight: 600;
+                background: rgba(74,222,128,.1); border: 1px solid rgba(74,222,128,.25);
+                border-radius: 8px; padding: 6px 10px; }
+.pivot-btn    { background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.3);
+                color: #a78bfa; border-radius: 6px; padding: 2px 8px; font-size: 11px;
+                cursor: pointer; margin-left: 4px; transition: background .2s; }
+.pivot-btn:hover { background: rgba(167,139,250,.25); }
 
 /* ============================================================
    SISTEMA DE ARMADURAS v68

@@ -33,6 +33,13 @@ function openEditQuest(id) {
   document.getElementById('editQStartDate').value  = q.quest_start_date || '';
   document.getElementById('editQDependsOn').value  = q.depends_on || '';
   if (typeof populateGoalSelect === 'function') populateGoalSelect(q.goal_id || '');
+  const zoneEl = document.getElementById('editQZone');
+  if (zoneEl) {
+    const tagStr = q.tags || '';
+    if (/\bestudio\b/i.test(tagStr)) zoneEl.value = 'estudio';
+    else if (/\bejercicio\b/i.test(tagStr)) zoneEl.value = 'ejercicio';
+    else zoneEl.value = '';
+  }
   openModal('editQuestModal');
 }
 

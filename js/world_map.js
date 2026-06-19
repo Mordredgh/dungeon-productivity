@@ -64,6 +64,29 @@ function renderWorldMap() {
     <div class="wm-detail-panel" id="wmDetailPanel" style="display:none"></div>`;
 }
 
+/* ── PUNTOS DE ACCIÓN DEL MAPA (3/día, gasto 1 AP → +15% XP 2h en zona) ── */
+function _wmGetAP() {
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    const d = JSON.parse(localStorage.getItem('dungeon-map-ap') || '{}');
+    return d.date === today ? (d.ap ?? 3) : 3;
+  } catch { return 3; }
+}
+function _wmSetAP(n) {
+  const today = new Date().toISOString().split('T')[0];
+  localStorage.setItem('dungeon-map-ap', JSON.stringify({ date: today, ap: Math.max(0, n) }));
+}
+function wmSpendAP(zoneId) {
+  const ap = _wmGetAP();
+  if (ap <= 0) { toast('⚡', 'Sin Puntos de Acción. Se renuevan mañana (3/día).'); return; }
+  _wmSetAP(ap - 1);
+  const expires = Date.now() + 2 * 60 * 60 * 1000;
+  localStorage.setItem('dungeon-map-bonus-' + zoneId, JSON.stringify({ expires }));
+  const z = (typeof ZONES !== 'undefined' ? ZONES : []).find(z => z.id === zoneId);
+  toast('🗺️', `${z ? z.icon + ' ' + z.name : 'Zona'} activada: +15% XP por 2h (${ap - 1} AP restantes).`);
+  _wmOpenZone(zoneId);
+}
+
 function _wmOpenZone(zoneId) {
   const z     = ZONES.find(z => z.id === zoneId);
   const panel = document.getElementById('wmDetailPanel');
@@ -79,6 +102,19 @@ function _wmOpenZone(zoneId) {
   const pct    = inf.next > 0 ? Math.min(100, Math.round((xp / inf.next) * 100)) : 100;
   const bonusTxt = inf.bonus > 0 ? `+${Math.round(inf.bonus * 100)}% XP` : 'Sin bonus aún';
 
+  // AP system
+  const ap = _wmGetAP();
+  let mapBonus = null;
+  try { mapBonus = JSON.parse(localStorage.getItem('dungeon-map-bonus-' + zoneId) || 'null'); } catch {}
+  const apActive = mapBonus && mapBonus.expires > Date.now();
+  const apMinsLeft = apActive ? Math.ceil((mapBonus.expires - Date.now()) / 60000) : 0;
+  const apSection = apActive
+    ? `<div class="wm-ap-active">⚡ +15% XP activo — ${apMinsLeft} min restantes</div>`
+    : `<button class="wm-ap-btn" onclick="wmSpendAP('${zoneId}')" ${ap <= 0 ? 'disabled' : ''}>
+         🗺️ Activar +15% XP (2h) · Cuesta 1 AP
+       </button>
+       <div class="wm-ap-count">${ap}/3 AP disponibles hoy</div>`;
+
   // Highlight active hotspot
   document.querySelectorAll('.wm-hotspot').forEach(b => b.classList.toggle('wm-hs-active', b.dataset.zone === zoneId));
 
@@ -93,5 +129,6 @@ function _wmOpenZone(zoneId) {
       <div class="wm-detail-xp">${xp} / ${inf.next || '∞'} XP</div>
       <div class="wm-bar-bg"><div class="wm-bar-fill" style="width:${pct}%;background:${z.color}"></div></div>
       <div class="wm-detail-bonus">${bonusTxt}</div>
+      ${apSection}
     </div>`;
 }

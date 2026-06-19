@@ -379,6 +379,14 @@ function renderQuestItem(q, blocked = false) {
         ${wagerHtml}
         ${doubleNadaHtml}
         ${tagsHtml}
+        ${(() => {
+          if (q.done || q.type !== 'daily') return '';
+          if (typeof hasSkill !== 'function' || !hasSkill('pivot')) return '';
+          const today = new Date().toISOString().split('T')[0];
+          const pd = (() => { try { return JSON.parse(localStorage.getItem('dungeon-pivot-' + (hero?.id||'')) || '{}'); } catch { return {}; } })();
+          if (pd.date === today) return '';
+          return `<button class="pivot-btn" onclick="event.stopPropagation();activatePivot('${q.id}')" title="Pivot: +50% XP al completar (1/día)">🔄 Pivot</button>`;
+        })()}
         ${!q.done ? `<select style="font-size:10px;padding:1px 4px;height:18px" onchange="setQuestDifficulty('${q.id}',this.value)" onclick="event.stopPropagation()">
           <option value="easy" ${diff==='easy'?'selected':''}>Fácil</option>
           <option value="normal" ${diff==='normal'?'selected':''}>Normal</option>

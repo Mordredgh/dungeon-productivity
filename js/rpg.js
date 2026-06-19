@@ -105,7 +105,14 @@ function _bossPeriodKey(cycle) {
 
 function _selectBossForCycle(cycle, periodKey) {
   const rarities = BOSS_CYCLE_RARITIES[cycle] || [];
-  const pool     = (typeof BOSS_DEFS !== 'undefined' ? BOSS_DEFS : [])
+  // Seasonal boss takes the monthly slot when its date window is active
+  if (cycle === 'monthly') {
+    const d = new Date(), m = d.getMonth(), dy = d.getDate();
+    const seasonal = (typeof BOSS_DEFS !== 'undefined' ? BOSS_DEFS : [])
+      .find(b => b.seasonal && b.seasonal.month === m && dy >= b.seasonal.dayStart && dy <= b.seasonal.dayEnd);
+    if (seasonal) return seasonal;
+  }
+  const pool = (typeof BOSS_DEFS !== 'undefined' ? BOSS_DEFS : [])
     .filter(b => rarities.includes(b.rarity) && !b.seasonal);
   if (!pool.length) return null;
   const seed = periodKey.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
@@ -190,6 +197,7 @@ function damageBoss(dmg) {
         toast('🏆', `¡${escHtml(b.name)} DERROTADO! +${reward.gold}🪙 +${reward.xp} XP`);
         if (typeof dungeonPush === 'function') dungeonPush('🏆 ¡Jefe Derrotado!', `${b.name} venció. +${reward.gold}🪙 +${reward.xp} XP`);
         if (typeof recordBossDefeat === 'function') recordBossDefeat(b.key);
+        if (typeof trackBossKill === 'function') trackBossKill();
         if (typeof tryRuneDrop === 'function' && Math.random() < (reward.runeChance || 0)) {
           setTimeout(() => tryRuneDrop('boss'), 1400);
         }

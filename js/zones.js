@@ -62,7 +62,13 @@ function getZoneBonus(q) {
   const z = ZONES.find(z => z.match(q));
   if (!z) return 0;
   const xpByZone = calcZoneXP();
-  return _zoneRankInfo(z, xpByZone[z.id] || 0).bonus;
+  let bonus = _zoneRankInfo(z, xpByZone[z.id] || 0).bonus;
+  // World map action point boost (+15% XP, 2h)
+  try {
+    const mb = JSON.parse(localStorage.getItem('dungeon-map-bonus-' + z.id) || 'null');
+    if (mb && mb.expires > Date.now()) bonus += 0.15;
+  } catch {}
+  return bonus;
 }
 
 function renderZones() {
