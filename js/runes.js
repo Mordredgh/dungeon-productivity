@@ -20,10 +20,6 @@ const RUNE_DEFS = {
 
 const RUNE_SOCKET_COUNT = { comun:0, raro:1, epico:2, legendario:3, mitico:3 };
 
-const RUNE_DROP_CHANCE = {
-  comun:0.03, normal:0.05, epico:0.10, legendario:0.15, mitico:0.25
-};
-
 let runes = [];
 
 async function loadRunes() {
@@ -31,12 +27,11 @@ async function loadRunes() {
   runes = data || [];
 }
 
-async function tryRuneDrop(questRarity) {
-  const chance = RUNE_DROP_CHANCE[questRarity] || 0.03;
-  if (Math.random() > chance) return;
-  const keys   = Object.keys(RUNE_DEFS);
-  const key    = keys[Math.floor(Math.random() * keys.length)];
-  const def    = RUNE_DEFS[key];
+/* Llamado solo desde rpg.js al derrotar un boss — el caller ya validó la probabilidad */
+async function tryRuneDrop() {
+  const keys = Object.keys(RUNE_DEFS);
+  const key  = keys[Math.floor(Math.random() * keys.length)];
+  const def  = RUNE_DEFS[key];
   const { data } = await db.from('dungeon_runes').insert({
     hero_id:   hero.id,
     rune_type: key,
@@ -45,7 +40,7 @@ async function tryRuneDrop(questRarity) {
   }).select().single();
   if (data) {
     runes.push(data);
-    setTimeout(() => toast(def.icon, `¡Runa obtenida: ${def.name}!`), 1200);
+    toast(def.icon, `✨ ¡El jefe dejó caer: ${def.name}!`);
   }
 }
 

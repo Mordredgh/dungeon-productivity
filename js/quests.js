@@ -132,7 +132,7 @@ async function completeQuest(id, el) {
     addGold(goldAmt);
     if (typeof spawnGoldParticle === 'function') spawnGoldParticle(goldAmt, el);
   }
-  if (typeof tryRuneDrop === 'function') tryRuneDrop(q.priority || 'normal');
+  // Runas solo dropean de bosses (ver rpg.js damageBoss)
 
   // Apuesta del Dungeon — si ganaste a tiempo, recuperas el doble
   if (typeof resolveWagerWin === 'function') resolveWagerWin(q);

@@ -82,12 +82,12 @@ const BOSS_CYCLE_HP = {
   comun:80, raro:150, epico:600, legendario:1000, mitico:2500, cataclismo:4200,
 };
 const BOSS_DEFEAT_REWARDS = {
-  comun:      { gold:40,   xp:80   },
-  raro:       { gold:80,   xp:160  },
-  epico:      { gold:180,  xp:400  },
-  legendario: { gold:300,  xp:700  },
-  mitico:     { gold:700,  xp:1800 },
-  cataclismo: { gold:1500, xp:4000 },
+  comun:      { gold:40,   xp:80,   runeChance:0.05 },
+  raro:       { gold:80,   xp:160,  runeChance:0.10 },
+  epico:      { gold:180,  xp:400,  runeChance:0.15 },
+  legendario: { gold:300,  xp:700,  runeChance:0.20 },
+  mitico:     { gold:700,  xp:1800, runeChance:0.25 },
+  cataclismo: { gold:1500, xp:4000, runeChance:0.25 },
 };
 const BOSS_CYCLE_LABELS = { daily:'Diario', weekly:'Semanal', monthly:'Mensual' };
 const BOSS_CYCLE_ICONS  = { daily:'☀️', weekly:'📅', monthly:'🌙' };
@@ -189,6 +189,9 @@ function damageBoss(dmg) {
         toast('🏆', `¡${escHtml(b.name)} DERROTADO! +${reward.gold}🪙 +${reward.xp} XP`);
         if (typeof dungeonPush === 'function') dungeonPush('🏆 ¡Jefe Derrotado!', `${b.name} venció. +${reward.gold}🪙 +${reward.xp} XP`);
         if (typeof recordBossDefeat === 'function') recordBossDefeat(b.key);
+        if (typeof tryRuneDrop === 'function' && Math.random() < (reward.runeChance || 0)) {
+          setTimeout(() => tryRuneDrop('boss'), 1400);
+        }
         updateBossBanner();
       }, 800);
     }
