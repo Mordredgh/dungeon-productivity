@@ -89,6 +89,14 @@ async function completeQuest(id, el) {
     }
   }
 
+  // Runa de Fuerza — +8% XP en misiones épicas y superiores
+  if (typeof getRuneBonus === 'function') {
+    const runeEpicMult = getRuneBonus('epic_xp');
+    if (runeEpicMult && (q.priority === 'epico' || q.priority === 'legendario' || q.priority === 'mitico')) {
+      xpAmt = Math.round(xpAmt * (1 + runeEpicMult));
+    }
+  }
+
   // Reputación por área (tags) — bonus de XP si superaste el umbral
   if (typeof getReputationBonus === 'function') {
     xpAmt = Math.round(xpAmt * (1 + getReputationBonus(q.tags)));

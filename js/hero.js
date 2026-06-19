@@ -103,7 +103,9 @@ async function addXP(amount, type, sourceEl) {
   const mountAtkMult   = typeof getPetMountStat    === 'function' ? (1 + getPetMountStat('atk') / 100) : 1;
   const seasonalMult   = typeof getSeasonalXPMult  === 'function' ? getSeasonalXPMult() : 1;
   const dungeonXPMult = typeof getDungeonBonus==='function' ? getDungeonBonus('xp') : 1;
-  let finalXP = Math.round(amount * classXPBonus(type || 'side') * xpMultiplier * todMult * skillMult * runeMult * weaponMult * mountAtkMult * seasonalMult * dungeonXPMult);
+  const h = new Date().getHours();
+  const nightRuneMult = (typeof getRuneBonus==='function' && (h >= 20 || h < 5)) ? (1 + getRuneBonus('night_xp')) : 1;
+  let finalXP = Math.round(amount * classXPBonus(type || 'side') * xpMultiplier * todMult * skillMult * runeMult * weaponMult * mountAtkMult * seasonalMult * dungeonXPMult * nightRuneMult);
 
   const prevLevel = calcLevel(hero.xp_total || 0);
   const newTotal = (hero.xp_total || 0) + finalXP;
@@ -218,7 +220,8 @@ async function checkSecretClassUnlocks() {
 /* addHP — helper global para modificar HP y rastrear mínimos */
 async function addHP(amount) {
   if (!hero) return;
-  const newHp = Math.max(0, Math.min((hero.hp || 0) + amount, hero.hp_max || 100));
+  const runeHpMax = typeof getRuneBonus === 'function' ? getRuneBonus('hp_max') : 0;
+  const newHp = Math.max(0, Math.min((hero.hp || 0) + amount, (hero.hp_max || 100) + runeHpMax));
   await saveHero({ hp: newHp });
   renderHeroUI();
   if (amount < 0 && newHp <= 10) {

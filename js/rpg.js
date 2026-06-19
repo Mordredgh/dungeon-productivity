@@ -171,8 +171,9 @@ function saveBossState(s) { /* deprecated — usa saveMultiBossState */ }
 function damageBoss(dmg) {
   const state   = getMultiBossState();
   const weather = getTodayWeather();
-  const petMult = typeof getPetEffect === 'function' ? (getPetEffect('boss_dmg') || 1) : 1;
-  const finalDmg = (weather === 'storm' ? dmg * 2 : dmg) * petMult;
+  const petMult  = typeof getPetEffect  === 'function' ? (getPetEffect('boss_dmg')  || 1) : 1;
+  const runeMult = typeof getRuneBonus  === 'function' ? (1 + getRuneBonus('boss_dmg'))  : 1;
+  const finalDmg = (weather === 'storm' ? dmg * 2 : dmg) * petMult * runeMult;
   let changed   = false;
 
   ['daily','weekly','monthly'].forEach(cycle => {
