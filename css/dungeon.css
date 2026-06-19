@@ -769,8 +769,11 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
 }
 .bcard-img {
+  width: 100%;
+  height: 100%;
   max-width: 160px;
   max-height: 160px;
   object-fit: contain;
