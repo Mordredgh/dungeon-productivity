@@ -275,9 +275,28 @@
         <!-- QUESTS VIEW -->
         <div class="view active" id="view-quests">
 
-          <div id="effectsBar" class="effects-bar" style="display:none" onclick="openEffectsModal()" title="Ver efectos activos"></div>
-
-          <div id="bossGrid" class="boss-grid"></div>
+          <div class="boss-layout">
+            <div class="boss-scroll">
+              <div id="bossGrid" class="boss-grid"></div>
+            </div>
+            <div class="boss-info-panel">
+              <div class="bip-title">✨ Efectos Activos</div>
+              <div id="effectsBar" class="effects-bar" style="display:none" onclick="openEffectsModal()" title="Ver efectos activos"></div>
+              <div style="flex:1"></div>
+              <div class="bip-title">📊 Progreso Diario</div>
+              <div id="dailyGoalBar" class="daily-goal-bar" style="display:none">
+                <div class="dgb-label">
+                  <span>🎯 Meta diaria</span>
+                  <span id="dgbText">0 / 300 XP</span>
+                </div>
+                <div class="dgb-track"><div class="dgb-fill" id="dgbFill" style="width:0%"></div></div>
+              </div>
+              <div class="daily-progress-wrap" id="dailyProgressWrap" style="display:none">
+                <div class="daily-progress-label" id="dailyProgressLabel">0/0 búsquedas</div>
+                <div class="daily-progress-bar"><div class="daily-progress-fill" id="dailyProgressFill" style="width:0%"></div></div>
+              </div>
+            </div>
+          </div>
 
           <div class="weekly-banner" id="weeklyBanner" style="display:none">
             <div style="font-size:22px">📜</div>
@@ -289,19 +308,6 @@
               </div>
             </div>
             <div style="font-size:11px;color:var(--blue)" id="weeklyBannerMeta"></div>
-          </div>
-
-          <div id="dailyGoalBar" class="daily-goal-bar" style="display:none">
-            <div class="dgb-label">
-              <span>🎯 Meta diaria</span>
-              <span id="dgbText">0 / 300 XP</span>
-            </div>
-            <div class="dgb-track"><div class="dgb-fill" id="dgbFill" style="width:0%"></div></div>
-          </div>
-
-          <div class="daily-progress-wrap" id="dailyProgressWrap" style="display:none">
-            <div class="daily-progress-label" id="dailyProgressLabel">0/0 búsquedas</div>
-            <div class="daily-progress-bar"><div class="daily-progress-fill" id="dailyProgressFill" style="width:0%"></div></div>
           </div>
 
           <div class="quest-toolbar">

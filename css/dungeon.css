@@ -717,6 +717,54 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .boss-defeated { font-family: var(--font-head); font-size: 13px; color: var(--green); }
 
 /* ── MULTI-BOSS CARDS (v72) ──────────────────────────────────── */
+.boss-layout {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.boss-scroll {
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.boss-scroll::-webkit-scrollbar { display: none; }
+.boss-scroll .boss-grid {
+  flex-wrap: nowrap;
+  margin-bottom: 0;
+  min-width: min-content;
+  justify-content: flex-start;
+}
+.boss-info-panel {
+  width: 320px;
+  min-height: 350px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, rgba(12,3,22,.82) 0%, rgba(4,4,14,.97) 100%);
+  border: 1px solid rgba(99,102,241,.2);
+  border-top: 2px solid var(--accent);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+}
+.bip-title {
+  font-family: var(--font-head);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+.boss-info-panel .effects-bar {
+  margin-bottom: 0;
+}
+.boss-info-panel .daily-goal-bar {
+  margin: 0 0 10px;
+}
 .boss-grid {
   display: flex;
   justify-content: center;
