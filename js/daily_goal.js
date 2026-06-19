@@ -28,6 +28,8 @@ async function addDailyGoalXP(amount) {
   renderDailyGoalBar();
   if (current < goal && newAmt >= goal) {
     toast('🎯', `¡Meta diaria alcanzada! ${newAmt} XP`);
+    if (typeof damageBoss === 'function') damageBoss(50);
+    toast('⚔️', '¡Meta completada! -50 HP al jefe.');
   }
 }
 

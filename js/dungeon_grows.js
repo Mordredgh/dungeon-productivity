@@ -18,6 +18,17 @@ const DUNGEON_ROOMS = [
   { id:'trono',      level:10, icon:'👑', name:'Sala del Señor del Caos','desc':'Solo el héroe de nivel máximo puede reclamar este trono. Aquí comienza la leyenda eterna.', color:'#92400e', link:null },
 ];
 
+function getDungeonBonus(type) {
+  const lvl = (hero && hero._level) || 1;
+  switch (type) {
+    case 'xp':   return lvl >= 5 ? 1.02 : 1;   // Sala del Trono: +2% XP global
+    case 'mana': return lvl >= 3 ? 0.90 : 1;   // Biblioteca: -10% costo de maná
+    case 'gold': return lvl >= 7 ? 1.03 : 1;   // Tesorería: +3% oro ganado
+    case 'pet_xp': return lvl >= 4 ? 1.05 : 1; // Establo: +5% XP de mascotas
+    default:     return 1;
+  }
+}
+
 function renderDungeonGrows() {
   const el = document.getElementById('dungeonGrowsContent');
   if (!el || !hero) return;

@@ -367,7 +367,7 @@ const DROP_TABLE = {
   mitico:     { chance:1.00, min:8, max:15 },
 };
 // 60% fragmento de hechizo aleatorio · 40% poción de mascota aleatoria
-const SPELL_FRAGMENT_KEYS = ['frenzy','speed','berserker','shield','modo-berserker','healing','mente-acero'];
+const SPELL_FRAGMENT_KEYS = ['frenzy','speed','berserker','shield','modo-berserker','healing','mente-acero','rayo-arcano','bola-fuego','maldicion-abismal','tormenta-hielo','furia-dragon'];
 const PET_POTION_KEYS     = ['zorro-naturaleza','pantera-sombra','lobo-tormenta','grifo','dragon-fuego','fenix-mitico'];
 
 /* ── HECHIZOS — coste en fragmentos ────────────────────────
@@ -379,7 +379,12 @@ const SPELL_FRAG_COST = {
   shield:         15,
   'modo-berserker': 20,
   healing:        10,
-  'mente-acero':  25,
+  'mente-acero':       25,
+  'rayo-arcano':       15,
+  'bola-fuego':        25,
+  'maldicion-abismal': 20,
+  'tormenta-hielo':    35,
+  'furia-dragon':      50,
 };
 
 /* ── HABILIDADES DE MASCOTA ──────────────────────────────── */

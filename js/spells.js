@@ -117,6 +117,31 @@ const SPELL_DEFS = [
       toast('🔷', '¡Mente de Acero! +200 XP.');
     }
   },
+  {
+    id: 'rayo-arcano', icon: '⚡', name: 'Rayo Arcano', mana: 20,
+    desc: 'Inflige 25 de daño directo al jefe activo', color: '#fbbf24',
+    cast() { if (typeof damageBoss==='function') damageBoss(25); toast('⚡', '¡Rayo Arcano! -25 HP al jefe.'); }
+  },
+  {
+    id: 'bola-fuego', icon: '🔥', name: 'Bola de Fuego', mana: 30,
+    desc: 'Inflige 40 de daño directo al jefe activo', color: '#f97316',
+    cast() { if (typeof damageBoss==='function') damageBoss(40); toast('🔥', '¡Bola de Fuego! -40 HP al jefe.'); }
+  },
+  {
+    id: 'maldicion-abismal', icon: '🌑', name: 'Maldición Abisal', mana: 25,
+    desc: 'Inflige 35 de daño directo al jefe activo', color: '#7c3aed',
+    cast() { if (typeof damageBoss==='function') damageBoss(35); toast('🌑', '¡Maldición Abisal! -35 HP al jefe.'); }
+  },
+  {
+    id: 'tormenta-hielo', icon: '❄️', name: 'Tormenta de Hielo', mana: 40,
+    desc: 'Inflige 60 de daño directo al jefe activo', color: '#93c5fd',
+    cast() { if (typeof damageBoss==='function') damageBoss(60); toast('❄️', '¡Tormenta de Hielo! -60 HP al jefe.'); }
+  },
+  {
+    id: 'furia-dragon', icon: '🐉', name: 'Furia del Dragón', mana: 60,
+    desc: 'Inflige 100 de daño directo al jefe activo', color: '#ef4444',
+    cast() { if (typeof damageBoss==='function') damageBoss(100); toast('🐉', '¡Furia del Dragón! -100 HP al jefe.'); }
+  },
 ];
 
 async function castSpell(spellId) {
@@ -128,14 +153,15 @@ async function castSpell(spellId) {
     toast('❌', `Necesitas ${cost} fragmentos de ${spell.name} (tienes ${have}).`);
     return;
   }
-  if (spell.mana && (hero.mana || 0) < spell.mana) {
-    toast('💧', `Maná insuficiente (necesitas ${spell.mana}, tienes ${hero.mana || 0}).`);
+  const manaCost = spell.mana ? Math.floor(spell.mana * (typeof getDungeonBonus==='function' ? getDungeonBonus('mana') : 1)) : 0;
+  if (manaCost && (hero.mana || 0) < manaCost) {
+    toast('💧', `Maná insuficiente (necesitas ${manaCost}, tienes ${hero.mana || 0}).`);
     return;
   }
   const ok = await consumeInvItem('spell_' + spellId, cost);
   if (!ok) { toast('❌', 'No se pudo consumir los fragmentos.'); return; }
-  if (spell.mana) {
-    hero.mana = (hero.mana || 0) - spell.mana;
+  if (manaCost) {
+    hero.mana = (hero.mana || 0) - manaCost;
     saveHero({ mana: hero.mana });
     if (typeof renderHeroUI === 'function') renderHeroUI();
   }

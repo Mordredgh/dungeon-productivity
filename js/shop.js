@@ -4,7 +4,10 @@
    ============================================================ */
 function getGold()  { return hero ? (hero.gold || 0) : 0; }
 function setGold(n) { const g = Math.max(0, Math.round(n)); if (hero) { hero.gold = g; saveHero({ gold: g }); } renderGold(); }
-function addGold(n)   { setGold(getGold() + n); }
+function addGold(n) {
+  const bonus = n > 0 && typeof getDungeonBonus==='function' ? getDungeonBonus('gold') : 1;
+  setGold(getGold() + Math.round(n * bonus));
+}
 function spendGold(n) { if (getGold() < n) { toast('💸', 'Oro insuficiente.'); return false; } addGold(-n); return true; }
 
 function renderGold() {

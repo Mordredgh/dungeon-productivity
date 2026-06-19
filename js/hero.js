@@ -102,7 +102,8 @@ async function addXP(amount, type, sourceEl) {
   const weaponMult   = typeof getWeaponXPBonus  === 'function' ? (1 + getWeaponXPBonus()) : 1;
   const mountAtkMult   = typeof getPetMountStat    === 'function' ? (1 + getPetMountStat('atk') / 100) : 1;
   const seasonalMult   = typeof getSeasonalXPMult  === 'function' ? getSeasonalXPMult() : 1;
-  let finalXP = Math.round(amount * classXPBonus(type || 'side') * xpMultiplier * todMult * skillMult * runeMult * weaponMult * mountAtkMult * seasonalMult);
+  const dungeonXPMult = typeof getDungeonBonus==='function' ? getDungeonBonus('xp') : 1;
+  let finalXP = Math.round(amount * classXPBonus(type || 'side') * xpMultiplier * todMult * skillMult * runeMult * weaponMult * mountAtkMult * seasonalMult * dungeonXPMult);
 
   const prevLevel = calcLevel(hero.xp_total || 0);
   const newTotal = (hero.xp_total || 0) + finalXP;
@@ -158,6 +159,11 @@ async function checkDailyStreak() {
   await saveHero({ streak: newStreak, longest_streak: longest, last_active_date: today, hp: newHp });
   renderHeroUI();
   checkAchievements();
+  if (newStreak > 1 && typeof damageBoss === 'function') {
+    const dmg = Math.min(newStreak * 2, 30);
+    damageBoss(dmg);
+    toast('🔥', `¡Racha ×${newStreak}! El jefe recibe ${dmg} de daño.`);
+  }
 
   // Track total active days for Titán secret class
   const _prog = getSecretProgress();
