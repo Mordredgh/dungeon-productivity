@@ -3641,6 +3641,10 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .inv-weapon-name { font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 4px; }
 .inv-weapon-stats { font-size: 11px; color: var(--text2); margin-top: 3px; }
 .inv-weapon-slot { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.inv-rune-row { display: flex; align-items: center; gap: 4px; margin-top: 4px; font-size: 11px; color: var(--text3); }
+.inv-rune-slot { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--rc, #4b5563); font-size: 13px; background: color-mix(in srgb, var(--rc, #4b5563) 15%, transparent); }
+.inv-rune-slot.inv-rune-filled { border-color: var(--rc); background: color-mix(in srgb, var(--rc) 25%, transparent); }
+.smithy-rune-slots { font-size: 10px; color: #a78bfa; margin-top: 3px; letter-spacing: .02em; }
 .inv-tier-badge {
   display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .5px;
   padding: 2px 7px; border-radius: 6px; border: 1px solid; margin-right: 4px;

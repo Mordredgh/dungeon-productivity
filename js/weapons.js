@@ -139,6 +139,19 @@ function renderInventory() {
           <span class="inv-tier-badge" style="color:${tier.color};border-color:${tier.color}40;background:${tier.color}18">${tier.label}</span>
           ${forging ? `<div class="inv-weapon-stats" style="color:var(--gold)">${forgingLabel(w)}</div>` : stats ? `<div class="inv-weapon-stats">${stats}</div>` : ''}
           ${w.slot ? `<div class="inv-weapon-slot">${w.slot==='main_hand'?'⚔️ Mano principal':'🛡️ Mano secundaria'}</div>` : ''}
+          ${(() => {
+            const maxSlots = (typeof RUNE_SOCKET_COUNT !== 'undefined' ? RUNE_SOCKET_COUNT[w.tier] : 0) || 0;
+            if (!maxSlots) return '<div class="inv-rune-row" style="color:var(--text3);font-size:10px">Sin ranuras de runa</div>';
+            const filled = w.rune_slots ? JSON.parse(w.rune_slots) : [];
+            const runeArr = typeof runes !== 'undefined' ? runes : [];
+            const slots = Array.from({length: maxSlots}, (_, i) => {
+              const rid = filled[i];
+              const r   = rid ? runeArr.find(x => x.id === rid) : null;
+              const d   = r && typeof RUNE_DEFS !== 'undefined' ? RUNE_DEFS[r.rune_type] : null;
+              return `<span class="inv-rune-slot${d?' inv-rune-filled':''}" style="${d?`--rc:${d.color}`:'--rc:#4b5563'}" title="${d?d.name+' · '+d.desc:'Ranura vacía — engasta en Runas'}">${d?d.icon:'◇'}</span>`;
+            }).join('');
+            return `<div class="inv-rune-row">💎 ${slots}</div>`;
+          })()}
         </div>
         <button class="inv-eq-btn ${w.is_equipped?'inv-eq-active':''}" ${forging ? 'disabled' : ''}
           onclick="${w.is_equipped?`unequipWeapon('${w.id}')`:`equipWeapon('${w.id}')`}">
@@ -268,6 +281,7 @@ function renderSmithy() {
               <span class="smithy-have ${canCraft?'smithy-have-ok':'smithy-have-no'}">tienes ${have}</span>
             </div>
             ${stats ? `<div class="smithy-stats">${stats}</div>` : ''}
+            ${(() => { const s = (typeof RUNE_SOCKET_COUNT!=='undefined'?RUNE_SOCKET_COUNT[targetTier]:0)||0; return s ? `<div class="smithy-rune-slots">💎 ${Array(s).fill('◇').join(' ')} ${s} ranura${s>1?'s':''} de runa</div>` : ''; })()}
           </div>
           <button class="smithy-btn ${canCraft?'':'smithy-btn-locked'}"
             onclick="craftWeapon('${def.key}','${targetTier}')" ${canCraft?'':'disabled'}>
