@@ -597,7 +597,12 @@
             <h2 class="view-title">🐾 Mascotas</h2>
             <button class="btn btn-ghost" style="font-size:12px" onclick="switchView('shop')">🏪 Tienda</button>
           </div>
+          <div class="pets-tabs">
+            <button class="pets-tab-btn pets-tab-active" data-tab="list" onclick="switchPetsTab('list')">📋 Lista</button>
+            <button class="pets-tab-btn" data-tab="garden" onclick="switchPetsTab('garden')">🌸 Jardín</button>
+          </div>
           <div id="petsView"></div>
+          <div id="petGardenView" style="display:none"></div>
         </div>
 
       </div>
@@ -1334,6 +1339,7 @@
 <script src="js/hero_card.js?v=1"></script>
 <script src="js/world_map.js?v=1"></script>
 <script src="js/sala_personal.js?v=1"></script>
+<script src="js/pet_garden.js?v=1"></script>
 <script src="js/auth.js?v=1"></script>
 <script src="js/main.js?v=14"></script>
 

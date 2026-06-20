@@ -5286,3 +5286,125 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .sala-picker-item img { width: 44px; height: 44px; object-fit: contain; image-rendering: pixelated; }
 .sala-picker-label { font-size: 9px; color: var(--text2); text-align: center; line-height: 1.2; }
 .sala-help { font-size: 10px; color: var(--text3); text-align: center; line-height: 1.5; margin-top: auto; padding-top: 8px; }
+
+/* ============================================================
+   JARDÍN DE MASCOTAS v104
+   ============================================================ */
+
+/* Pets tabs */
+.pets-tabs         { display: flex; gap: 8px; margin-bottom: 16px; }
+.pets-tab-btn      { flex: 1; padding: 7px 12px; border-radius: 10px;
+                     background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+                     color: var(--text2); font-size: 13px; cursor: pointer; transition: all .2s; }
+.pets-tab-btn:hover { background: rgba(255,255,255,.1); }
+.pets-tab-active   { background: rgba(167,139,250,.15); border-color: #a78bfa;
+                     color: #a78bfa; font-weight: 600; }
+
+/* Garden container */
+.garden-wrap       { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden;
+                     border-radius: 12px; background: #0a0a15; user-select: none; cursor: default; }
+.garden-bg-img     { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.garden-tod-overlay { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.garden-tod-dawn      { background: rgba(251,146,60,.12); }
+.garden-tod-morning   { background: rgba(250,204,21,.04); }
+.garden-tod-afternoon { background: transparent; }
+.garden-tod-dusk      { background: rgba(249,115,22,.16); }
+.garden-tod-evening   { background: rgba(127,90,240,.20); }
+.garden-tod-midnight  { background: rgba(10,5,30,.50); }
+
+/* Pets layer */
+.garden-pets-layer { position: absolute; inset: 0; z-index: 3; }
+.garden-pet        { position: absolute; cursor: pointer; filter: drop-shadow(0 2px 8px rgba(0,0,0,.6));
+                     transition: transform .2s ease; z-index: 4; }
+.garden-pet:hover  { transform: scale(1.12) !important; z-index: 10; }
+.garden-pet-img    { width: 100%; height: 100%; object-fit: contain;
+                     animation: g-float 3s ease-in-out infinite; }
+.garden-pet-mount .garden-pet-img  { animation: g-float-slow 4s ease-in-out infinite; }
+.garden-pet-egg .garden-pet-img    { animation: none; }
+.garden-egg-near-hatch .garden-pet-img { animation: g-wobble .6s ease-in-out infinite; }
+.garden-pet-active .garden-pet-img { filter: brightness(1.2); }
+.garden-pet-rey    { z-index: 8; }
+.garden-pet-rey .garden-pet-img { animation: g-float-slow 5s ease-in-out infinite;
+                                   filter: drop-shadow(0 0 16px rgba(147,51,234,.7)); }
+
+/* Active glow */
+.garden-pet-active::before { content: ''; position: absolute; inset: -6px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(250,204,21,.35) 0%, transparent 70%);
+  animation: g-glow 2s ease-in-out infinite; pointer-events: none; }
+
+/* Crown & mood */
+.garden-pet-crown  { position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+                     font-size: 14px; animation: g-float 2s ease-in-out infinite; }
+.garden-pet-mood   { position: absolute; bottom: -14px; right: -2px; font-size: 13px; line-height: 1; }
+
+/* Controls */
+.garden-controls   { position: absolute; top: 8px; right: 8px; z-index: 20; }
+.garden-fs-btn     { background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.2);
+                     color: #fff; font-size: 16px; padding: 4px 9px; border-radius: 6px;
+                     cursor: pointer; transition: background .2s; line-height: 1.4; }
+.garden-fs-btn:hover { background: rgba(255,255,255,.15); }
+
+/* Fullscreen */
+.garden-fullscreen { position: fixed !important; inset: 0 !important; width: 100vw !important;
+                     height: 100vh !important; aspect-ratio: auto !important;
+                     z-index: 9000 !important; border-radius: 0 !important; }
+
+/* Empty state */
+.garden-empty      { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 14px; }
+
+/* Pet click modal */
+.garden-modal-overlay { position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,.6);
+                        display: flex; align-items: center; justify-content: center; }
+.garden-modal      { background: var(--surface); border: 1px solid rgba(255,255,255,.12);
+                     border-radius: 16px; padding: 22px 20px; min-width: 220px; max-width: 300px;
+                     text-align: center; display: flex; flex-direction: column; gap: 10px; }
+.gm-pet-img        { width: 96px; height: 96px; object-fit: contain; margin: 0 auto; }
+.gm-name           { font-size: 16px; font-weight: 700; color: var(--text); }
+.gm-stage          { font-size: 12px; color: var(--text2); }
+.gm-xp-bar-wrap    { display: flex; flex-direction: column; gap: 3px; }
+.gm-xp-bar         { background: rgba(255,255,255,.1); border-radius: 4px; height: 6px; overflow: hidden; }
+.gm-xp-fill        { height: 100%; background: var(--accent); border-radius: 4px; transition: width .3s; }
+.gm-xp-label       { font-size: 10px; color: var(--text3); }
+.gm-meta           { font-size: 11px; color: var(--text3); }
+.gm-close-btn      { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
+                     border-radius: 8px; color: var(--text2); padding: 6px 14px;
+                     cursor: pointer; font-size: 12px; margin-top: 2px; }
+.gm-close-btn:hover { background: rgba(255,255,255,.13); }
+
+/* Rey de la Tempestad sanctuary */
+.rey-sanctuary       { position: fixed; inset: 0; z-index: 11000;
+                        background: radial-gradient(ellipse at center, rgba(50,10,90,.96) 0%, rgba(3,3,18,.98) 100%);
+                        display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.rey-sanctuary-inner { position: relative; text-align: center; cursor: default;
+                        max-width: 380px; width: 90%; }
+.rey-sanctuary-bg    { position: absolute; inset: -80px; border-radius: 50%;
+                        background: radial-gradient(ellipse at center, rgba(147,51,234,.28) 0%, transparent 70%);
+                        animation: rey-pulse 3.5s ease-in-out infinite; }
+.rey-close-btn       { position: absolute; top: -44px; right: 0; background: rgba(255,255,255,.15);
+                        border: none; color: #fff; font-size: 18px; width: 32px; height: 32px;
+                        border-radius: 50%; cursor: pointer; line-height: 32px; }
+.rey-pet-wrap        { position: relative; z-index: 2; display: flex; flex-direction: column;
+                        align-items: center; gap: 14px; }
+.rey-pet-img         { width: 200px; height: 200px; object-fit: contain;
+                        animation: rey-float 4s ease-in-out infinite;
+                        filter: drop-shadow(0 0 30px rgba(147,51,234,.75)); }
+.rey-pet-name        { font-size: 22px; font-weight: 700; color: #fff;
+                        text-shadow: 0 0 24px rgba(147,51,234,.9); }
+.rey-pet-stage       { font-size: 14px; color: rgba(255,255,255,.7); }
+.rey-pet-maxed       { font-size: 13px; font-weight: 700; color: #a855f7;
+                        background: rgba(147,51,234,.2); border: 1px solid rgba(147,51,234,.4);
+                        border-radius: 8px; padding: 6px 14px; }
+
+/* Garden keyframes */
+@keyframes g-float      { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-4px)} }
+@keyframes g-float-slow { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-7px)} }
+@keyframes g-wobble     { 0%,100%{transform:rotate(-8deg)}  50%{transform:rotate(8deg)} }
+@keyframes g-glow       { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.08)} }
+@keyframes rey-pulse    { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.12);opacity:.9} }
+@keyframes rey-float    { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-14px) scale(1.03)} }
+
+/* Mobile: garden smaller aspect */
+@media (max-width: 600px) {
+  .garden-wrap { aspect-ratio: 4/3; }
+  .pets-tab-btn { font-size: 12px; padding: 6px 10px; }
+}

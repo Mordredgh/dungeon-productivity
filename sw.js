@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v103';
+﻿const CACHE = 'dungeon-v104';
 const ASSETS = [
   '/',
   '/index.html',
@@ -146,6 +146,49 @@ const ASSETS = [
   '/images/map_fortaleza.png',
   '/images/map_jardin.png',
   '/images/map_cripta.png',
+  /* Pet garden */
+  '/js/pet_garden.js',
+  '/images/jardin_fondo.png',
+  /* Pet eggs */
+  '/images/pet_egg_zorro-naturaleza.png',
+  '/images/pet_egg_pantera-sombra.png',
+  '/images/pet_egg_lobo-tormenta.png',
+  '/images/pet_egg_grifo.png',
+  '/images/pet_egg_dragon-fuego.png',
+  '/images/pet_egg_fenix-mitico.png',
+  '/images/pet_egg_rey-tempestad.png',
+  /* Pet babies */
+  '/images/pet_baby_zorro-naturaleza.png',
+  '/images/pet_baby_pantera-sombra.png',
+  '/images/pet_baby_lobo-tormenta.png',
+  '/images/pet_baby_grifo.png',
+  '/images/pet_baby_dragon-fuego.png',
+  '/images/pet_baby_fenix-mitico.png',
+  '/images/pet_baby_rey-tempestad.png',
+  /* Pet mounts */
+  '/images/pet_mount_zorro-naturaleza.png',
+  '/images/pet_mount_pantera-sombra.png',
+  '/images/pet_mount_lobo-tormenta.png',
+  '/images/pet_mount_grifo.png',
+  '/images/pet_mount_dragon-fuego.png',
+  '/images/pet_mount_fenix-mitico.png',
+  '/images/pet_mount_rey-tempestad.png',
+  /* Pet potions */
+  '/images/pet_pocion_zorro-naturaleza.png',
+  '/images/pet_pocion_pantera-sombra.png',
+  '/images/pet_pocion_lobo-tormenta.png',
+  '/images/pet_pocion_grifo.png',
+  '/images/pet_pocion_dragon-fuego.png',
+  '/images/pet_pocion_fenix-mitico.png',
+  '/images/pet_pocion_rey-tempestad.png',
+  /* Pet food */
+  '/images/pet_alimento_zorro-naturaleza.png',
+  '/images/pet_alimento_pantera-sombra.png',
+  '/images/pet_alimento_lobo-tormenta.png',
+  '/images/pet_alimento_grifo.png',
+  '/images/pet_alimento_dragon-fuego.png',
+  '/images/pet_alimento_fenix-mitico.png',
+  '/images/pet_alimento_rey-tempestad.png',
 ];
 
 self.addEventListener('install', e => {

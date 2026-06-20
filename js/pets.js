@@ -223,11 +223,10 @@ function renderActivePet() {
   if (chip) {
     if (!active || !def) { chip.style.display = 'none'; }
     else {
-      const imgUrl = `${CDN}dungeon/pet_${active.stage}_${active.pet_key}.png`;
       chip.style.display = 'flex';
       chip.innerHTML = `
-        <img src="${imgUrl}" class="active-pet-img" alt="${escHtml(def.name)}"
-             onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+        <img src="images/pet_${active.stage}_${active.pet_key}.png" class="active-pet-img" alt="${escHtml(def.name)}"
+             onerror="this.src='${CDN}dungeon/pet_${active.stage}_${active.pet_key}.png';this.onerror=null">
         <span style="display:none;font-size:20px">${def.icon}</span>
         <div class="active-pet-info">
           <span class="active-pet-name">${escHtml(def.name)}</span>
@@ -259,8 +258,8 @@ function renderActivePet() {
       <div class="pet-rpanel" style="--pet-fondo:url('${fondoUrl}')">
         <div class="pet-rpanel-imgwrap">
           <div class="pet-rpanel-bg"></div>
-          <img src="${CDN}dungeon/pet_${stage}_${active.pet_key}.png" class="pet-rpanel-img ${isMount?'anim-bounce':'anim-float'}" alt=""
-               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/pet_${stage}_${active.pet_key}.png" class="pet-rpanel-img ${isMount?'anim-bounce':'anim-float'}" alt=""
+               onerror="this.src='${CDN}dungeon/pet_${stage}_${active.pet_key}.png';this.onerror=null">
           <div class="pet-rpanel-emoji" style="display:none">${def.icon}</div>
         </div>
         <div class="pet-rpanel-body">
@@ -338,8 +337,8 @@ function renderActivePet() {
       <div class="pet-rpanel" style="--pet-fondo:url('${fondoUrl}')">
         <div class="pet-rpanel-imgwrap">
           <div class="pet-rpanel-bg"></div>
-          <img src="${CDN}dungeon/pet_egg_${petKey}.png" class="pet-rpanel-img anim-shake" alt=""
-               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img src="images/pet_egg_${petKey}.png" class="pet-rpanel-img anim-shake" alt=""
+               onerror="this.src='${CDN}dungeon/pet_egg_${petKey}.png';this.onerror=null">
           <div class="pet-rpanel-emoji" style="display:none">${eDef?.icon||'🥚'}</div>
         </div>
         <div class="pet-rpanel-body">
@@ -441,15 +440,14 @@ function renderPets() {
   if (eggRows.length) {
     html += `<div class="pets-section-title">🥚 Huevos en Inventario</div><div class="pets-grid">`;
     for (const { def, qty } of eggRows) {
-      const imgUrl = `${CDN}dungeon/pet_egg_${def.key}.png`;
+      const imgUrl = `images/pet_egg_${def.key}.png`;
       const potions  = getInvCount('pet_potion_' + def.key);
       const canHatch = potions >= def.hatch;
       html += `
       <div class="pet-card">
         <div class="pet-card-visual">
           <img src="${imgUrl}" class="pet-card-img" alt="${escHtml(def.name)}"
-               onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-          <div class="pet-card-emoji" style="display:none">${def.icon}</div>
+               onerror="this.src='${CDN}dungeon/pet_egg_${def.key}.png';this.onerror=null">
           ${qty > 1 ? `<span class="pet-qty-badge">×${qty}</span>` : ''}
         </div>
         <div class="pet-card-name">${escHtml(def.name)}</div>
@@ -468,7 +466,7 @@ function renderPets() {
     html += `<div class="pets-section-title" style="margin-top:20px">🐾 Tus Mascotas</div><div class="pets-grid">`;
     for (const { def, myPets } of ownedGroups) {
       for (const pet of myPets) {
-        const imgUrl   = `${CDN}dungeon/pet_${pet.stage}_${def.key}.png`;
+        const imgUrl   = `images/pet_${pet.stage}_${def.key}.png`;
         const fedPct   = Math.min(100, Math.round(((pet.potions_fed||0) / def.evolve) * 100));
         const potions  = getInvCount('pet_potion_' + def.key);
         const isActive = pet.is_active;
@@ -477,8 +475,7 @@ function renderPets() {
         <div class="pet-card ${isActive ? 'pet-card-active' : ''}">
           <div class="pet-card-visual">
             <img src="${imgUrl}" class="pet-card-img" alt="${escHtml(def.name)}"
-                 onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-            <div class="pet-card-emoji" style="display:none">${def.icon}</div>
+                 onerror="this.src='${CDN}dungeon/pet_${pet.stage}_${def.key}.png';this.onerror=null">
             ${isMount ? `<span class="pet-mount-crown">🌟</span>` : ''}
           </div>
           <div class="pet-card-name">${escHtml(def.name)}</div>
