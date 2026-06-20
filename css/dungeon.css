@@ -5145,13 +5145,15 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
                   cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;
                   padding: 0; z-index: 2; transition: transform .2s; }
 .wm-hotspot:hover, .wm-hs-active { transform: translate(-50%, -50%) scale(1.25); }
-.wm-hs-icon     { font-size: 20px; filter: drop-shadow(0 0 6px var(--z-clr)); }
+.wm-hs-icon     { font-size: 20px; filter: drop-shadow(0 0 6px var(--z-clr)); display:flex; align-items:center; justify-content:center; }
+.wm-hs-img      { width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 0 6px var(--z-clr)); }
 .wm-hs-label    { font-size: 9px; font-weight: 700; background: rgba(0,0,0,.7); padding: 1px 4px;
                   border-radius: 4px; white-space: nowrap; letter-spacing: .03em; }
 .wm-legend      { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
 .wm-legend-row  { display: flex; align-items: center; gap: 8px; background: var(--card2);
                   border-radius: 8px; padding: 8px 10px; font-size: 12px; }
-.wm-legend-icon { font-size: 18px; filter: drop-shadow(0 0 4px var(--z-clr)); }
+.wm-legend-icon { font-size: 18px; filter: drop-shadow(0 0 4px var(--z-clr)); display:flex; align-items:center; }
+.wm-legend-img  { width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 0 4px var(--z-clr)); }
 .wm-legend-name { flex: 1; color: var(--text); font-weight: 500; }
 .wm-legend-rank { font-size: 11px; font-weight: 600; }
 .wm-legend-xp   { font-size: 10px; color: var(--text3); }
@@ -5160,7 +5162,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
                    background: linear-gradient(135deg, color-mix(in srgb, var(--z-clr) 10%, transparent), transparent); }
 .wm-detail-close { position: absolute; top: 10px; right: 12px; background: none; border: none;
                    color: var(--text3); cursor: pointer; font-size: 16px; padding: 4px 8px; }
-.wm-detail-icon  { font-size: 36px; filter: drop-shadow(0 0 12px var(--z-clr)); margin-bottom: 6px; }
+.wm-detail-icon  { font-size: 36px; filter: drop-shadow(0 0 12px var(--z-clr)); margin-bottom: 6px; display:flex; align-items:center; justify-content:center; }
+.wm-detail-img   { width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(0 0 12px var(--z-clr)); }
 .wm-detail-name  { font-size: 18px; font-weight: 700; color: var(--text); font-family: var(--font-head); }
 .wm-detail-desc  { font-size: 12px; color: var(--text2); margin: 4px 0 10px; }
 .wm-detail-rank  { font-size: 14px; font-weight: 700; margin-bottom: 4px; }

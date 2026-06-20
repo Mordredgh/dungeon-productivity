@@ -31,7 +31,11 @@ function renderWorldMap() {
         style="left:${pos.x}%;top:${pos.y}%;--z-clr:${z.color}"
         onclick="_wmOpenZone('${z.id}')"
         title="${z.name} — ${rankName}">
-      <div class="wm-hs-icon">${z.icon}</div>
+      <div class="wm-hs-icon">
+        <img src="images/map_${z.id}.png" class="wm-hs-img" alt="${z.name}"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span style="display:none">${z.icon}</span>
+      </div>
       <div class="wm-hs-label" style="color:${rankColor}">${z.name}</div>
     </button>`;
   }).join('');
@@ -53,7 +57,11 @@ function renderWorldMap() {
           const rn  = ['Forastero','Conocido','Aliado','Campeón','Leyenda'][inf.rank] || 'Forastero';
           const rc  = ['var(--text3)','#60a5fa','#a78bfa','#fb923c','#facc15'][inf.rank] || 'var(--text3)';
           return `<div class="wm-legend-row">
-            <span class="wm-legend-icon" style="--z-clr:${z.color}">${z.icon}</span>
+            <span class="wm-legend-icon" style="--z-clr:${z.color}">
+              <img src="images/map_${z.id}.png" class="wm-legend-img" alt="${z.name}"
+                   onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+              <span style="display:none">${z.icon}</span>
+            </span>
             <span class="wm-legend-name">${z.name}</span>
             <span class="wm-legend-rank" style="color:${rc}">${rn}</span>
             <span class="wm-legend-xp">${xp} XP</span>
@@ -122,7 +130,11 @@ function _wmOpenZone(zoneId) {
   panel.innerHTML = `
     <div class="wm-detail-inner" style="--z-clr:${z.color}">
       <button class="wm-detail-close" onclick="document.getElementById('wmDetailPanel').style.display='none';document.querySelectorAll('.wm-hotspot').forEach(b=>b.classList.remove('wm-hs-active'))">✕</button>
-      <div class="wm-detail-icon">${z.icon}</div>
+      <div class="wm-detail-icon">
+        <img src="images/map_${z.id}.png" class="wm-detail-img" alt="${z.name}"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span style="display:none">${z.icon}</span>
+      </div>
       <div class="wm-detail-name">${z.name}</div>
       <div class="wm-detail-desc">${z.desc}</div>
       <div class="wm-detail-rank" style="color:${rColor}">${rName}</div>

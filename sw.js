@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v102';
+﻿const CACHE = 'dungeon-v103';
 const ASSETS = [
   '/',
   '/index.html',
@@ -139,6 +139,13 @@ const ASSETS = [
   '/images/dungeon_sala7.png',
   '/images/dungeon_sala8.png',
   '/images/dungeon_sala9.png',
+  /* World map icons */
+  '/images/map_ciudadela.png',
+  '/images/map_campo.png',
+  '/images/map_torre.png',
+  '/images/map_fortaleza.png',
+  '/images/map_jardin.png',
+  '/images/map_cripta.png',
 ];
 
 self.addEventListener('install', e => {
