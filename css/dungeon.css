@@ -5250,46 +5250,106 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .sala-layout {
   display: flex;
   flex-direction: row;
-  gap: 0;
   height: 520px;
   min-height: 420px;
 }
+
+/* ── Cuarto CSS puro — sin imagen de fondo ── */
 .sala-room {
   flex: 1;
   position: relative;
-  background: var(--sala-bg, rgba(10,6,30,.9)) center/cover no-repeat;
   cursor: crosshair;
   overflow: hidden;
   border-radius: 8px 0 0 8px;
+  /* Pared de piedra oscura + suelo de madera */
+  background:
+    radial-gradient(ellipse 75% 40% at 50% 0%,  rgba(110,65,220,.18) 0%, transparent 65%),
+    radial-gradient(ellipse 110% 50% at 50% 100%, rgba(70,35,8,.55)   0%, transparent 60%),
+    linear-gradient(to bottom,
+      #0d0720 0%,
+      #130b2a 38%,
+      #110920 54%,
+      #0f0910 55.5%,
+      #0d0808 100%
+    );
 }
-.sala-room-overlay {
-  position: absolute; inset: 0;
-  background: rgba(4,4,14,.35);
+/* Tablones del suelo */
+.sala-room::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 46%;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0, transparent 37px,
+      rgba(0,0,0,.18) 37px, rgba(0,0,0,.18) 39px
+    ),
+    linear-gradient(to bottom, rgba(45,22,6,.2) 0%, rgba(30,12,3,.55) 100%);
   pointer-events: none;
+  z-index: 0;
 }
+/* Zócalo pared/suelo */
+.sala-room::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 54%;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(90,55,18,.5) 10%,
+    rgba(140,85,28,.65) 50%,
+    rgba(90,55,18,.5) 90%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Items colocados ── */
 .sala-item {
   position: absolute;
   width: 90px;
   height: 90px;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(var(--s, 1));
   cursor: grab;
-  filter: drop-shadow(0 4px 10px rgba(0,0,0,.7));
-  transition: transform .1s, filter .1s;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,.75));
+  transition: filter .12s;
   user-select: none;
-  overflow: hidden;
+  will-change: transform;
 }
-.sala-item:hover { filter: drop-shadow(0 0 12px rgba(99,102,241,.7)) drop-shadow(0 4px 10px rgba(0,0,0,.7)); transform: translate(-50%, -50%) scale(1.1); }
-.sala-item.sala-dragging { cursor: grabbing; opacity: .85; z-index: 100; }
+.sala-item:hover {
+  filter: drop-shadow(0 0 14px rgba(99,102,241,.65)) drop-shadow(0 4px 10px rgba(0,0,0,.7));
+}
+.sala-item.sala-item-selected {
+  filter: drop-shadow(0 0 18px rgba(165,130,255,.9)) drop-shadow(0 0 6px rgba(255,255,255,.25));
+}
+.sala-item.sala-dragging { cursor: grabbing; opacity: .82; z-index: 200 !important; transition: none; }
 .sala-item img { display: block; width: 90px; height: 90px; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
+
+/* Sombra elipse bajo cada mueble */
+.sala-shadow {
+  position: absolute;
+  bottom: 2px; left: 50%;
+  transform: translateX(-50%);
+  width: 68px; height: 10px;
+  background: radial-gradient(ellipse, rgba(0,0,0,.55) 0%, transparent 70%);
+  pointer-events: none;
+}
+
 .sala-hint {
   position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
-  font-size: 11px; color: rgba(255,255,255,.5); pointer-events: none;
-  background: rgba(0,0,0,.4); padding: 4px 10px; border-radius: 20px;
+  font-size: 11px; color: rgba(255,255,255,.45); pointer-events: none;
+  background: rgba(0,0,0,.5); padding: 4px 14px; border-radius: 20px;
+  white-space: nowrap; z-index: 300;
 }
+
+/* ── Panel lateral ── */
 .sala-picker {
-  width: 220px;
+  width: 200px;
   flex-shrink: 0;
-  background: rgba(6,6,18,.95);
+  background: rgba(6,4,18,.97);
   border-left: 1px solid rgba(255,255,255,.07);
   padding: 12px;
   display: flex;
@@ -5307,10 +5367,27 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   transition: all .15s;
 }
 .sala-picker-item:hover { background: rgba(99,102,241,.12); border-color: rgba(99,102,241,.3); }
-.sala-picker-item.sala-selected { border-color: var(--accent); background: rgba(99,102,241,.2); }
+.sala-picker-item.sala-selected { border-color: var(--accent); background: rgba(99,102,241,.18); box-shadow: 0 0 0 1px var(--accent); }
 .sala-picker-item img { width: 44px; height: 44px; object-fit: contain; image-rendering: pixelated; }
 .sala-picker-label { font-size: 9px; color: var(--text2); text-align: center; line-height: 1.2; }
-.sala-help { font-size: 10px; color: var(--text3); text-align: center; line-height: 1.5; margin-top: auto; padding-top: 8px; }
+.sala-help { font-size: 10px; color: var(--text3); text-align: center; line-height: 1.6; margin-top: auto; padding-top: 8px; }
+
+/* ── Panel de propiedades de item seleccionado ── */
+.sala-props-panel { display: flex; flex-direction: column; gap: 10px; animation: fadeIn .15s ease; }
+.sala-props-name {
+  font-size: 13px; font-weight: 700; color: var(--text);
+  padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.sala-props-preview {
+  width: 70px; height: 70px; object-fit: contain; image-rendering: pixelated;
+  margin: 0 auto; display: block; filter: drop-shadow(0 0 10px rgba(99,102,241,.4));
+}
+.sala-props-label { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: .06em; }
+.sala-size-slider { width: 100%; accent-color: var(--accent); cursor: pointer; }
+.sala-props-pct { font-size: 12px; color: var(--text3); text-align: center; font-variant-numeric: tabular-nums; }
+.sala-delete-btn { width: 100%; color: #f87171 !important; border-color: rgba(248,113,113,.25) !important; margin-top: 4px; }
+.sala-delete-btn:hover { background: rgba(248,113,113,.1) !important; }
+.sala-deselect-btn { width: 100%; font-size: 11px; }
 
 /* ============================================================
    JARDÍN DE MASCOTAS v104
