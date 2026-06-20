@@ -302,39 +302,39 @@ const PET_DEFS = [
 /* ── JEFES ───────────────────────────────────────────────── */
 const BOSS_DEFS = [
   // ── COMÚN ──────────────────────────────────────────────────
-  { key:'caballero-esqueleto', name:'Caballero Esqueleto',         rarity:'comun',      hp:80,  seasonal:null },
-  { key:'golem-piedra',        name:'Gólem de Piedra',             rarity:'comun',      hp:80,  seasonal:null },
-  { key:'ogro-cripta',         name:'Ogro de la Cripta',           rarity:'comun',      hp:100, seasonal:null },
-  { key:'slime-corrosivo',     name:'Slime Corrosivo',             rarity:'comun',      hp:60,  seasonal:null },
-  { key:'arana-gigante',       name:'Araña Gigante de Cueva',      rarity:'comun',      hp:70,  seasonal:null },
+  { key:'caballero-esqueleto', name:'Caballero Esqueleto',         rarity:'comun',      hp:80,  seasonal:null, emoji:'💀' },
+  { key:'golem-piedra',        name:'Gólem de Piedra',             rarity:'comun',      hp:80,  seasonal:null, emoji:'🗿' },
+  { key:'ogro-cripta',         name:'Ogro de la Cripta',           rarity:'comun',      hp:100, seasonal:null, emoji:'👹' },
+  { key:'slime-corrosivo',     name:'Slime Corrosivo',             rarity:'comun',      hp:60,  seasonal:null, emoji:'🟢' },
+  { key:'arana-gigante',       name:'Araña Gigante de Cueva',      rarity:'comun',      hp:70,  seasonal:null, emoji:'🕷️' },
   // ── RARO ───────────────────────────────────────────────────
-  { key:'caballero-espectral', name:'Caballero Espectral',         rarity:'raro',       hp:150, seasonal:null },
-  { key:'quimera',             name:'Quimera de Tres Cabezas',     rarity:'raro',       hp:160, seasonal:null },
-  { key:'wyvern-hielo',        name:'Wyvern de Hielo',             rarity:'raro',       hp:140, seasonal:null },
+  { key:'caballero-espectral', name:'Caballero Espectral',         rarity:'raro',       hp:150, seasonal:null, emoji:'👻' },
+  { key:'quimera',             name:'Quimera de Tres Cabezas',     rarity:'raro',       hp:160, seasonal:null, emoji:'🐲' },
+  { key:'wyvern-hielo',        name:'Wyvern de Hielo',             rarity:'raro',       hp:140, seasonal:null, emoji:'🐉' },
   // ── ÉPICO ──────────────────────────────────────────────────
-  { key:'golem-cristal',       name:'Gólem de Cristal Arcano',     rarity:'epico',      hp:220, seasonal:null },
-  { key:'dragon-obsidiana',    name:'Dragón de Obsidiana',         rarity:'epico',      hp:250, seasonal:null },
-  { key:'hidra-pesadilla',     name:'Hidra de Pesadilla',          rarity:'epico',      hp:270, seasonal:null },
-  { key:'behemot-vacio',       name:'Behemot del Vacío',           rarity:'epico',      hp:280, seasonal:null },
-  { key:'custodio-tiempo',     name:'Custodio del Tiempo Roto',    rarity:'epico',      hp:260, seasonal:null },
+  { key:'golem-cristal',       name:'Gólem de Cristal Arcano',     rarity:'epico',      hp:220, seasonal:null, emoji:'💎' },
+  { key:'dragon-obsidiana',    name:'Dragón de Obsidiana',         rarity:'epico',      hp:250, seasonal:null, emoji:'🖤' },
+  { key:'hidra-pesadilla',     name:'Hidra de Pesadilla',          rarity:'epico',      hp:270, seasonal:null, emoji:'🐍' },
+  { key:'behemot-vacio',       name:'Behemot del Vacío',           rarity:'epico',      hp:280, seasonal:null, emoji:'🌑' },
+  { key:'custodio-tiempo',     name:'Custodio del Tiempo Roto',    rarity:'epico',      hp:260, seasonal:null, emoji:'⏳' },
   // ── LEGENDARIO ─────────────────────────────────────────────
-  { key:'demonio-sombras',     name:'Demonio de Sombras',          rarity:'legendario', hp:350, seasonal:null },
-  { key:'liche-rey',           name:'Liche Rey Coronado',          rarity:'legendario', hp:400, seasonal:null },
-  { key:'serafin-caido',       name:'Serafín Caído',               rarity:'legendario', hp:380, seasonal:null },
-  { key:'titan-magma',         name:'Titán de Magma Ancestral',    rarity:'legendario', hp:420, seasonal:null },
-  { key:'devorador-constelaciones', name:'Devorador de Constelaciones', rarity:'legendario', hp:450, seasonal:null },
+  { key:'demonio-sombras',     name:'Demonio de Sombras',          rarity:'legendario', hp:350, seasonal:null, emoji:'😈' },
+  { key:'liche-rey',           name:'Liche Rey Coronado',          rarity:'legendario', hp:400, seasonal:null, emoji:'👑' },
+  { key:'serafin-caido',       name:'Serafín Caído',               rarity:'legendario', hp:380, seasonal:null, emoji:'🪽' },
+  { key:'titan-magma',         name:'Titán de Magma Ancestral',    rarity:'legendario', hp:420, seasonal:null, emoji:'🌋' },
+  { key:'devorador-constelaciones', name:'Devorador de Constelaciones', rarity:'legendario', hp:450, seasonal:null, emoji:'🌌' },
   // ── MÍTICO ─────────────────────────────────────────────────
-  { key:'liche-ancestral',     name:'Liche Ancestral',             rarity:'mitico',     hp:500, seasonal:null },
-  { key:'fenix-cenizas',       name:'Fénix de Cenizas Eternas',    rarity:'mitico',     hp:550, seasonal:null },
-  { key:'kraken-abisal',       name:'Kraken Abisal',               rarity:'mitico',     hp:600, seasonal:null },
-  { key:'dragon-tormentas',    name:'Dragón Anciano de las Tormentas', rarity:'mitico', hp:580, seasonal:null },
+  { key:'liche-ancestral',     name:'Liche Ancestral',             rarity:'mitico',     hp:500, seasonal:null, emoji:'☠️' },
+  { key:'fenix-cenizas',       name:'Fénix de Cenizas Eternas',    rarity:'mitico',     hp:550, seasonal:null, emoji:'🔥' },
+  { key:'kraken-abisal',       name:'Kraken Abisal',               rarity:'mitico',     hp:600, seasonal:null, emoji:'🐙' },
+  { key:'dragon-tormentas',    name:'Dragón Anciano de las Tormentas', rarity:'mitico', hp:580, seasonal:null, emoji:'⛈️' },
   // ── CATACLISMO ─────────────────────────────────────────────
-  { key:'arquitecto-vacio',    name:'El Arquitecto del Vacío',     rarity:'cataclismo', hp:800, seasonal:null },
-  { key:'la-que-susurra',      name:'La Que Susurra entre Eones',  rarity:'cataclismo', hp:900, seasonal:null },
+  { key:'arquitecto-vacio',    name:'El Arquitecto del Vacío',     rarity:'cataclismo', hp:800, seasonal:null, emoji:'🌀' },
+  { key:'la-que-susurra',      name:'La Que Susurra entre Eones',  rarity:'cataclismo', hp:900, seasonal:null, emoji:'👁️' },
   // ── ESTACIONALES ───────────────────────────────────────────
-  { key:'halloween',           name:'Señor de las Sombras',        rarity:'mitico',     hp:500, seasonal:{ month:9,  dayStart:24, dayEnd:31 } },
-  { key:'navidad',             name:'Krampus Arcano',              rarity:'mitico',     hp:500, seasonal:{ month:11, dayStart:20, dayEnd:26 } },
-  { key:'anio-nuevo',          name:'Dragón del Tiempo',           rarity:'mitico',     hp:500, seasonal:{ month:11, dayStart:28, dayEnd:31 } },
+  { key:'halloween',           name:'Señor de las Sombras',        rarity:'mitico',     hp:500, seasonal:{ month:9,  dayStart:24, dayEnd:31 }, emoji:'🎃' },
+  { key:'navidad',             name:'Krampus Arcano',              rarity:'mitico',     hp:500, seasonal:{ month:11, dayStart:20, dayEnd:26 }, emoji:'🎄' },
+  { key:'anio-nuevo',          name:'Dragón del Tiempo',           rarity:'mitico',     hp:500, seasonal:{ month:11, dayStart:28, dayEnd:31 }, emoji:'🎆' },
 ];
 
 /* ── EVENTOS ESTACIONALES ───────────────────────────────── */

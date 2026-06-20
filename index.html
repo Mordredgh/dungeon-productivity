@@ -247,6 +247,8 @@
         <button class="sidebar-item" data-view="worldmap" onclick="switchView('worldmap')" title="Mapa del Mundo"><span class="si-icon">🌍</span></button>
         <button class="sidebar-item" data-view="history" onclick="switchView('history')" title="Historial"><span class="si-icon">📜</span></button>
         <button class="sidebar-item" data-view="integrations" onclick="switchView('integrations')" title="Integraciones"><span class="si-icon">🔗</span></button>
+        <div class="sb-nav-sep"></div>
+        <button class="sidebar-item" onclick="openSpellsModal()" title="Hechizos"><span class="si-icon">⚡</span></button>
       </div>
 
       <!-- LOGOUT -->
@@ -682,11 +684,7 @@
       <!-- class skill kept hidden for JS compatibility -->
       <button id="classSkillBtn" style="display:none" onclick="useClassSkill()"></button>
 
-      <!-- SPELLS / TAVERNA -->
-      <div class="panel-section">
-        <div class="panel-title">✨ Hechizos</div>
-        <div class="spells-list" id="spellsList"></div>
-      </div>
+      <!-- spellsList kept in modal — see spellsModal below -->
 
 
 
@@ -1338,6 +1336,19 @@
 <script src="js/main.js?v=14"></script>
 
 <!-- Challenges Modal -->
+<!-- HECHIZOS MODAL -->
+<div class="modal-overlay" id="spellsModal">
+  <div class="modal" style="max-width:560px;max-height:85vh;overflow-y:auto">
+    <div class="modal-header">
+      <div class="modal-title">⚡ Hechizos</div>
+      <button class="modal-close" onclick="closeModal('spellsModal')">&#x2715;</button>
+    </div>
+    <div style="padding:16px">
+      <div class="spells-list" id="spellsList"></div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="challengesModal">
   <div class="modal" style="max-width:520px;max-height:80vh;overflow-y:auto">
     <div class="modal-header">

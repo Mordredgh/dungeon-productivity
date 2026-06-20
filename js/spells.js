@@ -173,6 +173,11 @@ async function castSpell(spellId) {
   document.dispatchEvent(new CustomEvent('dungeon:spellcast'));
 }
 
+function openSpellsModal() {
+  openModal('spellsModal');
+  renderSpells();
+}
+
 function renderSpells() {
   const el = document.getElementById('spellsList');
   if (!el) return;

@@ -361,6 +361,24 @@ input, textarea, select {
   flex-shrink: unset !important;
 }
 
+/* ─── SPELLS MODAL — grid de hechizos en popup ──────────────── */
+#spellsModal .spells-list { display: block; }
+#spellsModal .spell-orbs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+/* ─── BESTIARY — ocultar nombres de bosses desconocidos ─────── */
+.bestiary-unknown .bestiary-name { display: none; }
+/* Nombre conocido más compacto */
+.bestiary-known .bestiary-name {
+  font-size: 11px;
+  text-align: center;
+  line-height: 1.3;
+  padding: 0 4px;
+}
+
 /* ─── REDUCED MOTION — respetar preferencia del OS ──────────── */
 @media (prefers-reduced-motion: reduce) {
   *,

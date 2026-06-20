@@ -4,6 +4,18 @@ Todas las fechas en formato YYYY-MM-DD (hora Monterrey, CDT = UTC-5).
 
 ---
 
+## [v94] — 2026-06-19
+
+### Hechizos como modal + Bestiario mejorado
+
+- **Hechizos → modal popup** — removido del aside panel; ahora abre con botón ⚡ en la sidebar, modal con grid 2 columnas (mismo estilo que Retos 30 días)
+- **`openSpellsModal()`** — nueva función en spells.js: abre modal y llama `renderSpells()`
+- **Bestiario — emojis específicos por boss** — cada boss en BOSS_DEFS ahora tiene campo `emoji` (🕷️ araña, 💀 esqueleto, 🐙 kraken, etc.); se usa como fallback cuando la imagen CDN no carga
+- **Bestiario — bosses desconocidos** — eliminado el texto "??? ???" debajo de los iconos bloqueados; solo se muestra el nombre cuando el boss está derrotado
+- **SW** bump `dungeon-v93` → `dungeon-v94`
+
+---
+
 ## [v92] — 2026-06-19
 
 ### HUD: Efectos Activos + Progreso Diario en header; Boss cards ancho completo

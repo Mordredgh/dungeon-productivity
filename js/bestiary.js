@@ -42,11 +42,11 @@ function renderBestiary() {
       <div class="bestiary-img-wrap">
         <img src="${img}" class="bestiary-img${known ? '' : ' bestiary-locked'}" alt=""
              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div class="bestiary-fallback" style="display:none">${known ? '👹' : '❓'}</div>
+        <div class="bestiary-fallback" style="display:none">${known ? (b.emoji || '👹') : '❓'}</div>
         ${known ? '' : '<div class="bestiary-lock-icon">🔒</div>'}
       </div>
       <div class="bestiary-name" style="color:${known ? clr : 'var(--text3)'}">
-        ${known ? escHtml(b.name) : '??? ???'}
+        ${known ? escHtml(b.name) : ''}
       </div>
       <span class="bestiary-rarity" style="color:${clr}">${b.rarity}</span>
     </div>`;
