@@ -116,16 +116,6 @@
         <div class="mhb-level" id="mhbLevel">1</div>
       </button>
     </div>
-
-    <!-- HUD CHIPS — HP / Gold / MP / Streak visibles en desktop -->
-    <div class="hud-chips" id="hudChips">
-      <div class="hud-chip hud-chip-hp" title="Puntos de Vida">❤️ <span id="hudHp">100/100</span></div>
-      <div class="hud-chip hud-chip-gold" id="hudGoldChip" onclick="switchView('shop')" style="cursor:pointer" title="Oro">🪙 <span id="hudGold">0</span></div>
-      <div class="hud-chip hud-chip-mp" title="Maná">💧 <span id="hudMp">0/100</span></div>
-      <div class="hud-chip-sep"></div>
-      <div class="hud-chip hud-chip-streak" title="Racha de días">🔥 <span id="hudStreak">0</span></div>
-    </div>
-
     <div class="header-actions">
       <div class="weather-wrap">
         <div id="realWeatherChip" class="weather-chip" style="display:none" title="Clima"></div>
@@ -166,11 +156,63 @@
     <!-- SIDEBAR — hero profile + nav -->
     <nav class="sidebar" id="sidebarNav">
 
-      <!-- ocultos, solo para JS — mantener aquí para compatibilidad -->
+      <!-- PERFIL DEL HÉROE -->
+      <div class="sb-profile">
+        <div class="sb-avatar-ring" id="sbAvatarRing">
+          <button class="hero-avatar-btn" id="heroAvatarBtn" onclick="switchView('character')" title="Hoja de Personaje">🧙<span class="avatar-level-badge" id="avatarLevelBadge">1</span></button>
+        </div>
+        <div class="hero-name" id="heroName">Héroe</div>
+        <div class="hero-title" id="heroTitle">Nivel 1 · Aprendiz</div>
+      </div>
+
+      <!-- BARRAS XP / HP / MANÁ -->
+      <div class="sb-bars">
+        <div class="sb-bar-block">
+          <div class="sb-bar-header">
+            <span class="sb-bar-lbl">✨</span>
+            <span class="sb-bar-val" id="xpLabel">0/100</span>
+          </div>
+          <div class="xp-bar sb-bar"><div class="xp-bar-fill" id="xpBarFill" style="width:0%"></div></div>
+        </div>
+        <div class="sb-bar-block">
+          <div class="sb-bar-header">
+            <span class="sb-bar-lbl">❤️</span>
+            <span class="sb-bar-val" id="hpLabel">100/100</span>
+          </div>
+          <div class="hp-bar sb-bar"><div class="hp-bar-fill" id="hpBarFill" style="width:100%"></div></div>
+        </div>
+        <div class="sb-bar-block">
+          <div class="sb-bar-header">
+            <span class="sb-bar-lbl">🔵</span>
+            <span class="sb-bar-val" id="manaLabel">0 / 100</span>
+          </div>
+          <div class="mana-bar sb-bar"><div class="mana-bar-fill" id="manaBarFill" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <!-- MINI STATS -->
+      <div class="sb-stats">
+        <div class="sb-stat-card">
+          <div class="sb-stat-val"><span id="statLevel">1</span></div>
+          <div class="sb-stat-lbl">Nivel</div>
+        </div>
+        <div class="sb-stat-card">
+          <div class="sb-stat-val"><span id="statStreak">0</span>🔥</div>
+          <div class="sb-stat-lbl">Racha</div>
+        </div>
+        <div class="sb-stat-card" id="goldDisplay" onclick="switchView('shop')" style="cursor:pointer" title="Tienda del Gremio">
+          <div class="sb-stat-val gold-display">🪙 0</div>
+          <div class="sb-stat-lbl">Oro</div>
+        </div>
+      </div>
+
+      <!-- ocultos, solo para JS -->
       <span id="statTotalXP"    style="display:none">0</span>
       <span id="statBestStreak" style="display:none">0</span>
       <div  id="weatherDisplay" style="display:none">☀️</div>
       <div  id="focusTodayChip" style="display:none">⏱ <span id="focusTodayVal">0h 0m</span></div>
+
+      <div class="sb-divider"></div>
 
       <!-- NAVEGACIÓN -->
       <div class="sb-nav">
@@ -563,58 +605,6 @@
 
     <!-- RIGHT PANEL -->
     <aside class="right-panel">
-
-      <!-- HÉROE — retrato + nombre + barras (movido de sidebar) -->
-      <div class="rp-hero">
-        <div class="sb-avatar-ring" id="sbAvatarRing">
-          <button class="hero-avatar-btn" id="heroAvatarBtn" onclick="switchView('character')" title="Hoja de Personaje">🧙<span class="avatar-level-badge" id="avatarLevelBadge">1</span></button>
-        </div>
-        <div class="rp-hero-info">
-          <div class="hero-name" id="heroName">Héroe</div>
-          <div class="hero-title" id="heroTitle">Nivel 1 · Aprendiz</div>
-        </div>
-      </div>
-
-      <!-- BARRAS XP / HP / MANÁ -->
-      <div class="sb-bars rp-bars">
-        <div class="sb-bar-block">
-          <div class="sb-bar-header">
-            <span class="sb-bar-lbl">✨</span>
-            <span class="sb-bar-val" id="xpLabel">0/100</span>
-          </div>
-          <div class="xp-bar sb-bar"><div class="xp-bar-fill" id="xpBarFill" style="width:0%"></div></div>
-        </div>
-        <div class="sb-bar-block">
-          <div class="sb-bar-header">
-            <span class="sb-bar-lbl">❤️</span>
-            <span class="sb-bar-val" id="hpLabel">100/100</span>
-          </div>
-          <div class="hp-bar sb-bar"><div class="hp-bar-fill" id="hpBarFill" style="width:100%"></div></div>
-        </div>
-        <div class="sb-bar-block">
-          <div class="sb-bar-header">
-            <span class="sb-bar-lbl">🔵</span>
-            <span class="sb-bar-val" id="manaLabel">0 / 100</span>
-          </div>
-          <div class="mana-bar sb-bar"><div class="mana-bar-fill" id="manaBarFill" style="width:0%"></div></div>
-        </div>
-      </div>
-
-      <!-- MINI STATS -->
-      <div class="sb-stats rp-mini-stats">
-        <div class="sb-stat-card">
-          <div class="sb-stat-val"><span id="statLevel">1</span></div>
-          <div class="sb-stat-lbl">Nivel</div>
-        </div>
-        <div class="sb-stat-card">
-          <div class="sb-stat-val"><span id="statStreak">0</span>🔥</div>
-          <div class="sb-stat-lbl">Racha</div>
-        </div>
-        <div class="sb-stat-card" id="goldDisplay" onclick="switchView('shop')" style="cursor:pointer" title="Tienda del Gremio">
-          <div class="sb-stat-val gold-display">🪙 0</div>
-          <div class="sb-stat-lbl">Oro</div>
-        </div>
-      </div>
 
       <!-- POMODORO / POSADA -->
       <div class="panel-section">

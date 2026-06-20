@@ -156,25 +156,6 @@ function renderHeroUI() {
   if (stLvl) stLvl.textContent = lvl;
   const stXP = document.getElementById('st-total-xp');
   if (stXP) stXP.textContent = (hero.xp_total || 0).toLocaleString();
-
-  // HUD chips (header) — sincronizar con valores del héroe
-  const hudHp     = document.getElementById('hudHp');
-  const hudGold   = document.getElementById('hudGold');
-  const hudMp     = document.getElementById('hudMp');
-  const hudStreak = document.getElementById('hudStreak');
-  const hudChips  = document.getElementById('hudChips');
-  if (hudChips)  hudChips.style.display  = 'flex';
-  if (hudHp)     hudHp.textContent     = `${hp}/${hpMax}`;
-  if (hudGold)   hudGold.textContent   = (hero.gold || 0).toLocaleString();
-  if (hudMp)     hudMp.textContent     = `${mana}/${manaMax}`;
-  if (hudStreak) hudStreak.textContent = hero.streak || 0;
-
-  // goldDisplay en right panel (mini-stat card)
-  const gdEl = document.getElementById('goldDisplay');
-  if (gdEl) {
-    const gv = gdEl.querySelector('.gold-display, .sb-stat-val');
-    if (gv) gv.textContent = `🪙 ${(hero.gold || 0).toLocaleString()}`;
-  }
 }
 
 function renderQuestList() {

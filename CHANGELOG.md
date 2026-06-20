@@ -4,6 +4,27 @@ Todas las fechas en formato YYYY-MM-DD (hora Monterrey, CDT = UTC-5).
 
 ---
 
+## [v91] — 2026-06-19
+
+### Revert diseño + capa de animaciones Emil Kowalski / Silao
+
+- **Revert total**: `index.html` y `views.js` restaurados al estado pre-rediseño (`aea81db`) — diseño original intacto
+- **dungeon-v2.css reescrito** como capa de solo animaciones (sin colores, sin layout, sin cambios estructurales)
+- **Curvas de easing** (Emil Kowalski): `--ek-out`, `--ek-in-out`, `--ek-spring`, `--ek-drawer`
+- **Botones**: `:active { scale(0.97) }` en 100ms en todos los elementos presionables
+- **Modales**: entran desde `scale(0.95) translateY(6px)` ease-out 220ms
+- **Toasts (Silao/Sonner)**: entran desde abajo `translateY(8px) scale(0.95)` 240ms; salen 160ms
+- **Quest stagger**: 35ms entre ítems, animación `quest-enter`
+- **Sidebar stagger**: 30ms entre items al cargar
+- **Hover lifts**: boss cards `translateY(-3px)`, achievements `translateY(-2px)`, pets spring scale
+- **Barras**: XP fill 700ms, HP/Mana 500ms ease-out
+- **Heatmap cells**: `scale(1.3)` hover
+- **Loot particles**: float animación 850ms
+- **Reduced motion**: todas las animaciones desactivadas con `prefers-reduced-motion`
+- **SW** bump `dungeon-v90` → `dungeon-v91`
+
+---
+
 ## [v87] — 2026-06-19
 
 ### Rediseño UI — Dark Void + Emil Kowalski Animations

@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcanum — Premium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   ARCANUM — SISTEMA DE DISEÑO
+   Void × Azure × Antique Gold — Dark Fantasy Premium
+   ═══════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Fondos */
+  --void:    #08080d;
+  --stone:   #0f0f18;
+  --slate:   #171724;
+  --mist:    #202030;
+
+  /* Acento principal */
+  --azure:       #89b4fa;
+  --azure-dim:   rgba(137,180,250,.12);
+  --azure-line:  rgba(137,180,250,.22);
+
+  /* Oro — solo para ornamentos y legendario */
+  --gold:    #c8960c;
+  --gold-l:  #f0b429;
+  --gold-dim: rgba(200,150,12,.1);
+
+  /* Texto */
+  --t1:  #cdd6f4;
+  --t2:  #a6adc8;
+  --t3:  #585b70;
+  --t4:  #313244;
+
+  /* Separadores */
+  --line: rgba(255,255,255,.05);
+  --line-m: rgba(255,255,255,.09);
+
+  /* Raridades — SÓLO para bordes/indicadores */
+  --rc: #585b70;   /* común */
+  --rr: #89b4fa;   /* raro */
+  --re: #cba6f7;   /* épico */
+  --rl: #f0b429;   /* legendario */
+  --rm: #f5c2e7;   /* mítico */
+
+  /* Fuentes */
+  --f-display: 'Cinzel', serif;
+  --f-body:    'Inter', sans-serif;
+  --f-mono:    'JetBrains Mono', monospace;
+
+  /* Grid */
+  --sp1: 4px;  --sp2: 8px;  --sp3: 12px;
+  --sp4: 16px; --sp6: 24px; --sp8: 32px;
+  --r: 4px; --r-m: 8px;
+}
+
+body {
+  font-family: var(--f-body);
+  font-size: 13px;
+  background: var(--void);
+  color: var(--t1);
+  line-height: 1.5;
+  min-height: 100vh;
+  /* Textura de grano sutil — hace las superficies materiales */
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.008) 0px, rgba(255,255,255,.008) 1px, transparent 1px, transparent 3px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.005) 0px, rgba(255,255,255,.005) 1px, transparent 1px, transparent 3px);
+}
+
+/* ─── LAYOUT PRINCIPAL ─────────────────────────────────── */
+.layout {
+  display: grid;
+  grid-template-rows: 48px 1fr;
+  grid-template-columns: 56px 1fr 272px;
+  height: 100vh;
+}
+
+/* ─── TOPBAR / HUD ─────────────────────────────────────── */
+.hud {
+  grid-column: 1 / -1;
+  background: rgba(8,8,13,.96);
+  border-bottom: 1px solid var(--line-m);
+  display: flex;
+  align-items: center;
+  padding: 0 16px 0 0;
+  gap: 0;
+}
+
+.hud-logo {
+  width: 56px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.hud-logo-text {
+  font-family: var(--f-display);
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--azure);
+  letter-spacing: .14em;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(137,180,250,.4);
+}
+
+.hud-hero {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  border-right: 1px solid var(--line);
+  height: 100%;
+}
+
+/* Avatar con doble anillo */
+.hero-avatar {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+}
+.hero-avatar-img {
+  width: 34px;
+  height: 34px;
+  border-radius: 3px;
+  background: var(--slate);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: 1px solid var(--azure-line);
+  box-shadow: 0 0 8px rgba(137,180,250,.2), inset 0 0 8px rgba(137,180,250,.05);
+}
+.hero-avatar-level {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: var(--azure);
+  color: var(--void);
+  font-family: var(--f-mono);
+  font-size: 8px;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 2px;
+  line-height: 1.2;
+}
+
+.hero-info { display: flex; flex-direction: column; gap: 2px; }
+.hero-name {
+  font-family: var(--f-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--t1);
+  letter-spacing: .04em;
+  line-height: 1;
+}
+.hero-class {
+  font-size: 10px;
+  color: var(--t3);
+  letter-spacing: .04em;
+}
+
+.hero-bars { display: flex; flex-direction: column; gap: 3px; }
+.bar-row { display: flex; align-items: center; gap: 6px; }
+.bar-lbl {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 600;
+  width: 16px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.bar-track {
+  width: 96px;
+  height: 3px;
+  background: var(--mist);
+  border-radius: 2px;
+  overflow: visible;
+  position: relative;
+}
+/* Marcas en 50% */
+.bar-track::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  width: 1px;
+  height: 7px;
+  background: rgba(255,255,255,.1);
+}
+.bar-fill { height: 100%; border-radius: 2px; }
+.bar-val {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  color: var(--t3);
+  width: 40px;
+  flex-shrink: 0;
+}
+
+/* Chips de recursos */
+.hud-resources {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  border-right: 1px solid var(--line);
+  height: 100%;
+}
+.res {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border: 1px solid var(--line-m);
+  border-radius: var(--r);
+  background: var(--stone);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-weight: 500;
+}
+.res-icon { font-size: 12px; }
+.res-val { color: var(--gold-l); }
+.res.mana .res-val { color: #cba6f7; }
+.res.hp   .res-val { color: #f38ba8; }
+
+.hud-streak {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--f-mono);
+  color: #fab387;
+  padding: 4px 10px;
+  border: 1px solid rgba(250,179,135,.2);
+  border-radius: 20px;
+  background: rgba(250,179,135,.05);
+  letter-spacing: .04em;
+}
+
+/* ─── SIDEBAR ICON NAV ─────────────────────────────────── */
+.sidebar {
+  background: var(--stone);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+  gap: 2px;
+}
+
+.nav-sep {
+  width: 24px;
+  height: 1px;
+  background: var(--line);
+  margin: 6px 0;
+}
+
+.nav-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-m);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 17px;
+  color: var(--t3);
+  transition: color .15s, background .15s;
+  border: 1px solid transparent;
+  background: transparent;
+}
+.nav-btn:hover { color: var(--t2); background: var(--slate); }
+.nav-btn.active {
+  color: var(--azure);
+  background: var(--azure-dim);
+  border-color: var(--azure-line);
+}
+/* Indicador azul pequeño */
+.nav-btn.active::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 16px;
+  background: var(--azure);
+  border-radius: 2px 0 0 2px;
+}
+
+.nav-bottom { margin-top: auto; }
+.nav-hero-mini {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r);
+  background: var(--slate);
+  border: 1px solid var(--azure-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  box-shadow: 0 0 6px rgba(137,180,250,.15);
+}
+
+/* ─── MAIN CONTENT ─────────────────────────────────────── */
+.main {
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.main::-webkit-scrollbar { width: 3px; }
+.main::-webkit-scrollbar-thumb { background: var(--mist); }
+
+/* ── BOSS SECTION ───────────────────────────────────────── */
+.boss-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+/* LA FIRMA: card frame con corner pips de rareza */
+.boss-card {
+  position: relative;
+  background: var(--stone);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: var(--r);
+  padding: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.boss-card:hover { border-color: rgba(255,255,255,.14); }
+
+/* Gradiente de rareza en el fondo — muy sutil */
+.boss-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(145deg, var(--rarity-glow) 0%, transparent 55%);
+  opacity: 0;
+  transition: opacity .2s;
+}
+.boss-card:hover::before { opacity: 1; }
+
+/* Corner pips — el elemento firma del card frame */
+.pip { position: absolute; width: 8px; height: 8px; }
+.pip-tl { top: 4px; left: 4px; border-top: 1.5px solid; border-left: 1.5px solid; }
+.pip-tr { top: 4px; right: 4px; border-top: 1.5px solid; border-right: 1.5px solid; }
+.pip-bl { bottom: 4px; left: 4px; border-bottom: 1.5px solid; border-left: 1.5px solid; }
+.pip-br { bottom: 4px; right: 4px; border-bottom: 1.5px solid; border-right: 1.5px solid; }
+
+/* Raridades en el boss card */
+.boss-card.epic   { --rarity-glow: rgba(203,166,247,.07); }
+.boss-card.epic   .pip { border-color: #cba6f7; }
+.boss-card.epic   .boss-rarity-tag { color: #cba6f7; background: rgba(203,166,247,.1); border-color: rgba(203,166,247,.2); }
+
+.boss-card.legendary { --rarity-glow: rgba(240,180,41,.07); }
+.boss-card.legendary .pip { border-color: var(--gold-l); }
+.boss-card.legendary .boss-rarity-tag { color: var(--gold-l); background: var(--gold-dim); border-color: rgba(240,180,41,.25); }
+
+.boss-card.mythic { --rarity-glow: rgba(245,194,231,.07); }
+.boss-card.mythic .pip { border-color: #f5c2e7; }
+.boss-card.mythic .boss-rarity-tag { color: #f5c2e7; background: rgba(245,194,231,.08); border-color: rgba(245,194,231,.2); }
+
+.boss-card.defeated { opacity: .45; pointer-events: none; }
+.boss-card.defeated .boss-name { text-decoration: line-through; }
+
+.boss-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.boss-cycle {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  color: var(--t3);
+  text-transform: uppercase;
+}
+.boss-rarity-tag {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  padding: 2px 7px;
+  border-radius: 2px;
+  border: 1px solid;
+  text-transform: uppercase;
+}
+
+.boss-portrait {
+  font-size: 40px;
+  text-align: center;
+  display: block;
+  margin: 8px 0 10px;
+  line-height: 1;
+  /* Leve sombra de ambiente */
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,.6));
+}
+
+.boss-name {
+  font-family: var(--f-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--t1);
+  letter-spacing: .03em;
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+
+/* HP bar del boss — doble track */
+.boss-hp-wrap { margin-bottom: 6px; }
+.boss-hp-outer {
+  height: 8px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 1px;
+  padding: 1px;
+  overflow: hidden;
+}
+.boss-hp-fill {
+  height: 100%;
+  border-radius: 0;
+  position: relative;
+}
+.boss-hp-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: rgba(255,255,255,.18);
+}
+
+.boss-card.epic .boss-hp-fill      { background: #cba6f7; }
+.boss-card.legendary .boss-hp-fill  { background: var(--gold-l); }
+.boss-card.mythic .boss-hp-fill     { background: #f5c2e7; }
+
+.boss-hp-text {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: var(--t3);
+}
+
+/* "Defeated" estado */
+.boss-defeated-badge {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: #a6e3a1;
+  letter-spacing: .08em;
+  padding: 3px 8px;
+  border: 1px solid rgba(166,227,161,.2);
+  border-radius: var(--r);
+  background: rgba(166,227,161,.05);
+  display: inline-block;
+  margin-top: 6px;
+}
+
+/* ── QUEST LOG ──────────────────────────────────────────── */
+
+/* Separador de sección — la inscripción de dungeon */
+.quest-section { margin-bottom: 4px; }
+
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.section-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line-m));
+}
+.section-divider-line.right {
+  background: linear-gradient(90deg, var(--line-m), transparent);
+}
+.section-divider-diamond {
+  color: var(--t4);
+  font-size: 8px;
+  line-height: 1;
+}
+.section-divider-label {
+  font-family: var(--f-display);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  color: var(--t3);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Quest rows — bitácora real, no cards */
+.quest-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px 9px 0;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  transition: background .12s;
+  position: relative;
+}
+.quest-row:last-child { border-bottom: none; }
+.quest-row:hover { background: rgba(255,255,255,.02); }
+
+/* Indicador de rareza izquierdo */
+.quest-rar {
+  width: 2px;
+  align-self: stretch;
+  border-radius: 1px;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+.quest-rar.common  { background: var(--rc); }
+.quest-rar.rare    { background: var(--rr); }
+.quest-rar.epic    { background: var(--re); }
+.quest-rar.legendary { background: var(--rl); }
+
+/* Check circle */
+.quest-check {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--t4);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+}
+.quest-row:hover .quest-check {
+  border-color: var(--azure-line);
+  color: var(--azure);
+}
+
+.quest-body { flex: 1; min-width: 0; }
+.quest-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.quest-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: var(--t3);
+}
+.quest-type-badge {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 2px;
+  letter-spacing: .06em;
+  background: var(--slate);
+  border: 1px solid var(--line-m);
+  color: var(--t2);
+}
+.quest-type-badge.epic    { border-color: rgba(203,166,247,.2); color: #cba6f7; background: rgba(203,166,247,.06); }
+.quest-type-badge.rare    { border-color: rgba(137,180,250,.2); color: var(--azure); background: var(--azure-dim); }
+.quest-type-badge.legend  { border-color: rgba(240,180,41,.2); color: var(--gold-l); background: var(--gold-dim); }
+
+.quest-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.quest-xp {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--azure);
+}
+.quest-deadline {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: var(--t3);
+}
+.quest-deadline.urgent { color: #f38ba8; }
+
+.quest-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity .12s;
+}
+.quest-row:hover .quest-actions { opacity: 1; }
+.q-act-btn {
+  width: 24px; height: 24px;
+  border-radius: var(--r);
+  border: 1px solid var(--line-m);
+  background: var(--slate);
+  color: var(--t3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  transition: all .12s;
+}
+.q-act-btn:hover { border-color: var(--azure-line); color: var(--azure); }
+.q-act-btn.done:hover { border-color: rgba(166,227,161,.3); color: #a6e3a1; }
+
+/* Add quest row */
+.quest-add-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px dashed var(--line-m);
+  border-radius: var(--r);
+  color: var(--t3);
+  font-size: 12px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all .15s;
+}
+.quest-add-row:hover { border-color: var(--azure-line); color: var(--azure); background: var(--azure-dim); }
+
+/* ─── RIGHT PANEL ──────────────────────────────────────── */
+.right {
+  background: var(--stone);
+  border-left: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.right::-webkit-scrollbar { width: 0; }
+
+.right-section {
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.r-label {
+  font-family: var(--f-display);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .2em;
+  color: var(--t4);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.r-label::before, .r-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* POMODORO — respeta el diseño original */
+.pom-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.pom-presets {
+  display: flex;
+  gap: 4px;
+}
+.pom-preset {
+  padding: 3px 9px;
+  border-radius: 2px;
+  border: 1px solid var(--line-m);
+  background: transparent;
+  color: var(--t3);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all .12s;
+}
+.pom-preset.active {
+  background: var(--azure-dim);
+  border-color: var(--azure-line);
+  color: var(--azure);
+}
+
+/* Círculo de timer — el que le gusta */
+.pom-circle {
+  position: relative;
+  width: 120px; height: 120px;
+}
+.pom-svg { transform: rotate(-90deg); }
+.pom-ring-bg { fill: none; stroke: var(--mist); stroke-width: 5; }
+.pom-ring-fill {
+  fill: none;
+  stroke: #f38ba8;
+  stroke-width: 5;
+  stroke-linecap: butt;
+  stroke-dasharray: 340;
+  stroke-dashoffset: 84;
+  filter: drop-shadow(0 0 5px rgba(243,139,168,.4));
+}
+.pom-time {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.pom-digits {
+  font-family: var(--f-mono);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--t1);
+  letter-spacing: -.02em;
+}
+.pom-phase-label {
+  font-size: 9px;
+  color: var(--t3);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.pom-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pom-btn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line-m);
+  background: var(--slate);
+  color: var(--t2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all .12s;
+}
+.pom-btn:hover { background: var(--mist); }
+.pom-btn.play {
+  width: 40px; height: 40px;
+  background: #f38ba8;
+  border-color: #f38ba8;
+  color: var(--void);
+  font-size: 16px;
+  box-shadow: 0 0 14px rgba(243,139,168,.3);
+}
+.pom-btn.play:hover { box-shadow: 0 0 20px rgba(243,139,168,.45); transform: scale(1.04); }
+
+.pom-task {
+  font-size: 11px;
+  color: var(--t3);
+  text-align: center;
+  max-width: 200px;
+}
+.pom-task strong { color: var(--azure); font-weight: 500; }
+
+.pom-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.pom-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--azure);
+  box-shadow: 0 0 5px rgba(137,180,250,.5);
+}
+.pom-dot.empty {
+  background: var(--mist);
+  box-shadow: none;
+  border: 1px solid var(--line-m);
+}
+
+/* Stats mini */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.stat-cell {
+  background: var(--slate);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 8px;
+  text-align: center;
+}
+.stat-cell-val {
+  font-family: var(--f-mono);
+  font-size: 18px;
+  font-weight: 600;
+  display: block;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.stat-cell-lbl { font-size: 9px; color: var(--t3); letter-spacing: .06em; }
+
+/* Meta diaria */
+.goal-wrap {}
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.goal-lbl { font-size: 11px; color: var(--t2); }
+.goal-pct {
+  font-family: var(--f-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gold-l);
+}
+.goal-bar {
+  height: 5px;
+  background: var(--mist);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.goal-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-l));
+  border-radius: 2px;
+  width: 68%;
+}
+.goal-sub {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  color: var(--t3);
+}
+
+/* Mascota — conservada */
+.pet-card {
+  border-radius: var(--r);
+  overflow: hidden;
+  border: 1px solid var(--line-m);
+  background: var(--slate);
+}
+.pet-img {
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(135deg, #0d1a0d, #1a2a1a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 54px;
+  border-bottom: 1px solid var(--line);
+}
+.pet-info { padding: 8px 10px; }
+.pet-name {
+  font-family: var(--f-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--t1);
+  margin-bottom: 2px;
+}
+.pet-rarity { font-size: 10px; color: var(--rc); margin-bottom: 6px; }
+.pet-skill {
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: var(--r);
+  background: rgba(137,180,250,.06);
+  border: 1px solid var(--azure-line);
+  color: var(--azure);
+}
+
+/* ─── CLIMA + TOD en HUD ───────────────────────────────── */
+.hud-weather {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 14px;
+  border-right: 1px solid var(--line);
+  height: 100%;
+  font-size: 12px;
+  color: var(--t2);
+}
+.hud-weather-icon { font-size: 15px; }
+.hud-weather-temp { font-family: var(--f-mono); font-size: 12px; font-weight: 600; color: var(--t1); }
+.hud-tod {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--f-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  color: #fab387;
+  padding: 2px 7px;
+  border: 1px solid rgba(250,179,135,.2);
+  border-radius: 3px;
+  background: rgba(250,179,135,.06);
+  margin-left: 4px;
+}
+.hud-tod-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #fab387;
+  box-shadow: 0 0 5px rgba(250,179,135,.6);
+}
+
+/* ─── RETRATO DEL HÉROE — showpiece ─────────────────────── */
+.hero-portrait-section {
+  padding: 16px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(203,166,247,.04) 0%, transparent 100%);
+}
+
+.portrait-frame {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin-bottom: 10px;
+}
+
+/* Anillo exterior — el elemento visual que lo hace vistoso */
+.portrait-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: conic-gradient(
+    #cba6f7 0deg,
+    #f0b429 90deg,
+    #cba6f7 180deg,
+    #89b4fa 270deg,
+    #cba6f7 360deg
+  );
+  animation: ring-spin 8s linear infinite;
+}
+@keyframes ring-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+/* Capa interior que crea el "hueco" del anillo */
+.portrait-ring-inner {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--stone);
+}
+
+/* La imagen en sí — circular */
+.portrait-img {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 40% 30%, rgba(203,166,247,.2) 0%, rgba(8,8,13,.9) 70%);
+  font-size: 52px;
+  z-index: 2;
+  /* Sombra interna que profundiza el retrato */
+  box-shadow: inset 0 -16px 24px rgba(0,0,0,.6);
+}
+/* Brillo en la parte superior del círculo */
+.portrait-img::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%; right: 10%;
+  height: 35%;
+  background: linear-gradient(180deg, rgba(255,255,255,.08) 0%, transparent 100%);
+  border-radius: 0 0 50% 50%;
+  pointer-events: none;
+}
+
+/* Badge de nivel */
+.portrait-level {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--azure);
+  color: var(--void);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--stone);
+  box-shadow: 0 0 8px rgba(137,180,250,.5);
+  z-index: 3;
+}
+
+/* Nombre del héroe — grande y en display */
+.portrait-name {
+  font-family: var(--f-display);
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  color: var(--t1);
+  text-align: center;
+  text-shadow: 0 0 20px rgba(203,166,247,.3);
+  margin-bottom: 2px;
+}
+.portrait-class {
+  font-size: 10px;
+  color: var(--t3);
+  letter-spacing: .08em;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Barras de stats del personaje — compactas */
+.portrait-bars { width: 100%; display: flex; flex-direction: column; gap: 4px; }
+.pb-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pb-icon { font-size: 11px; width: 14px; text-align: center; flex-shrink: 0; }
+.pb-track {
+  flex: 1;
+  height: 5px;
+  background: rgba(255,255,255,.05);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.pb-fill { height: 100%; border-radius: 2px; }
+.pb-val {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  color: var(--t3);
+  width: 52px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ─── SPOTIFY PLAYER ────────────────────────────────────── */
+.spotify-wrap { width: 100%; }
+.spotify-track {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.spotify-art {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-m);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--mist);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  border: 1px solid var(--line-m);
+  box-shadow: 0 2px 8px rgba(0,0,0,.4);
+}
+.spotify-info { flex: 1; min-width: 0; }
+.spotify-song {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--t1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.spotify-artist {
+  font-size: 10px;
+  color: var(--t3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.spotify-badge {
+  font-size: 9px;
+  font-weight: 700;
+  color: #1db954;
+  letter-spacing: .04em;
+  opacity: .7;
+}
+/* Barra de progreso */
+.spotify-bar-wrap { margin-bottom: 8px; }
+.spotify-bar {
+  width: 100%;
+  height: 3px;
+  background: var(--mist);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+.spotify-progress {
+  height: 100%;
+  background: #1db954;
+  border-radius: 2px;
+  width: 34%;
+}
+.spotify-times {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  color: var(--t3);
+}
+/* Controles */
+.spotify-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sp-btn {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--t3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: color .12s;
+}
+.sp-btn:hover { color: var(--t1); }
+.sp-btn.play {
+  width: 36px; height: 36px;
+  background: #1db954;
+  color: #000;
+  font-size: 16px;
+  box-shadow: 0 0 12px rgba(29,185,84,.3);
+  transition: all .12s;
+}
+.sp-btn.play:hover { transform: scale(1.07); box-shadow: 0 0 18px rgba(29,185,84,.5); }
+.sp-vol {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--t3);
+}
+.sp-vol-bar {
+  width: 48px;
+  height: 3px;
+  background: var(--mist);
+  border-radius: 2px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.sp-vol-fill { height: 100%; background: var(--t3); border-radius: 2px; width: 70%; }
+
+/* ─── Hechizos grid compacto ──────────────────────────── */
+/* Hechizos grid compacto */
+.spells-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+.spell-ico {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--slate);
+  cursor: pointer;
+  transition: all .12s;
+  font-size: 16px;
+}
+.spell-ico:hover {
+  border-color: rgba(203,166,247,.3);
+  background: rgba(203,166,247,.07);
+}
+.spell-mana {
+  font-family: var(--f-mono);
+  font-size: 8px;
+  color: #cba6f7;
+  font-weight: 600;
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- ─── HUD ──────────────────────────────────────────────── -->
+<header class="hud">
+  <div class="hud-logo">
+    <span class="hud-logo-text">ARC</span>
+  </div>
+
+  <div class="hud-hero">
+    <div class="hero-avatar">
+      <div class="hero-avatar-img">⚔️</div>
+      <span class="hero-avatar-level">12</span>
+    </div>
+    <div class="hero-info">
+      <span class="hero-name">Mordred</span>
+      <span class="hero-class">Arcano · Comandante</span>
+    </div>
+    <div class="hero-bars">
+      <div class="bar-row">
+        <span class="bar-lbl" style="color:#f38ba8">HP</span>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:73%;background:#f38ba8"></div>
+        </div>
+        <span class="bar-val">73/100</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-lbl" style="color:var(--azure)">XP</span>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:45%;background:var(--azure)"></div>
+        </div>
+        <span class="bar-val">450/1k</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-lbl" style="color:#cba6f7">MP</span>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:80%;background:#cba6f7"></div>
+        </div>
+        <span class="bar-val">80/100</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hud-resources">
+    <div class="res hp">
+      <span class="res-icon">❤️</span>
+      <span class="res-val">73</span>
+    </div>
+    <div class="res mana">
+      <span class="res-icon">✦</span>
+      <span class="res-val">80 MP</span>
+    </div>
+    <div class="res">
+      <span class="res-icon">🪙</span>
+      <span class="res-val">1164</span>
+    </div>
+  </div>
+
+  <!-- Clima + TOD -->
+  <div class="hud-weather">
+    <span class="hud-weather-icon">🌤</span>
+    <span class="hud-weather-temp">22°C</span>
+    <div class="hud-tod">
+      <span class="hud-tod-dot"></span>
+      OCASO
+    </div>
+  </div>
+
+  <div class="hud-streak">🔥 RACHA ×7</div>
+</header>
+
+<!-- ─── SIDEBAR ──────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="nav-btn" title="Misiones">⚔️</div>
+  <div class="nav-btn active" title="Misiones activas">📜</div>
+  <div class="nav-btn" title="Estadísticas">📊</div>
+  <div class="nav-sep"></div>
+  <div class="nav-btn" title="Personaje">🛡️</div>
+  <div class="nav-btn" title="Habilidades">🌳</div>
+  <div class="nav-btn" title="Runas">💎</div>
+  <div class="nav-btn" title="Herrero">⚒️</div>
+  <div class="nav-sep"></div>
+  <div class="nav-btn" title="Mapa">🗺️</div>
+  <div class="nav-btn" title="Tienda">🛍️</div>
+  <div class="nav-btn" title="Logros">🏆</div>
+  <div class="nav-bottom">
+    <div class="nav-hero-mini">⚔️</div>
+  </div>
+</aside>
+
+<!-- ─── MAIN ──────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- BOSSES — EL SHOWPIECE -->
+  <div class="boss-row">
+
+    <!-- Boss 1: Derrotado -->
+    <div class="boss-card defeated">
+      <div class="pip pip-tl" style="border-color:var(--rc)"></div>
+      <div class="pip pip-tr" style="border-color:var(--rc)"></div>
+      <div class="pip pip-bl" style="border-color:var(--rc)"></div>
+      <div class="pip pip-br" style="border-color:var(--rc)"></div>
+      <div class="boss-header-row">
+        <span class="boss-cycle">☀ Diario</span>
+        <span class="boss-rarity-tag" style="color:var(--rc);background:rgba(88,91,112,.1);border-color:rgba(88,91,112,.2)">COMÚN</span>
+      </div>
+      <span class="boss-portrait">🕷️</span>
+      <div class="boss-name">Araña Gigante de Cueva</div>
+      <div class="boss-defeated-badge">✓ DERROTADO</div>
+    </div>
+
+    <!-- Boss 2: Épico -->
+    <div class="boss-card epic">
+      <div class="pip pip-tl"></div>
+      <div class="pip pip-tr"></div>
+      <div class="pip pip-bl"></div>
+      <div class="pip pip-br"></div>
+      <div class="boss-header-row">
+        <span class="boss-cycle">📅 Semanal</span>
+        <span class="boss-rarity-tag">LEGENDARIO</span>
+      </div>
+      <span class="boss-portrait">👼</span>
+      <div class="boss-name">Serafín Caído</div>
+      <div class="boss-hp-wrap">
+        <div class="boss-hp-outer">
+          <div class="boss-hp-fill" style="width:86%;background:#cba6f7"></div>
+        </div>
+        <div class="boss-hp-text">
+          <span>860 / 1000 HP</span>
+          <span>2d restantes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Boss 3: Mítico -->
+    <div class="boss-card mythic">
+      <div class="pip pip-tl"></div>
+      <div class="pip pip-tr"></div>
+      <div class="pip pip-bl"></div>
+      <div class="pip pip-br"></div>
+      <div class="boss-header-row">
+        <span class="boss-cycle">🌙 Mensual</span>
+        <span class="boss-rarity-tag">MÍTICO</span>
+      </div>
+      <span class="boss-portrait">🦅</span>
+      <div class="boss-name">Fénix de Cenizas Eternas</div>
+      <div class="boss-hp-wrap">
+        <div class="boss-hp-outer">
+          <div class="boss-hp-fill" style="width:94%;background:#f5c2e7"></div>
+        </div>
+        <div class="boss-hp-text">
+          <span>2360 / 2500 HP</span>
+          <span>1d restante</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- QUEST LOG -->
+  <div>
+
+    <!-- Sección Épicas -->
+    <div class="quest-section">
+      <div class="section-divider">
+        <div class="section-divider-line"></div>
+        <span class="section-divider-diamond">◆</span>
+        <span class="section-divider-label">⚔ Misiones Épicas</span>
+        <span class="section-divider-diamond">◆</span>
+        <div class="section-divider-line right"></div>
+      </div>
+
+      <div class="quest-row">
+        <div class="quest-rar epic"></div>
+        <div class="quest-check"></div>
+        <div class="quest-body">
+          <div class="quest-name">Cocinar</div>
+          <div class="quest-meta">
+            <span class="quest-type-badge epic">Épica</span>
+            <span>Normal</span>
+            <span>Vence hoy</span>
+          </div>
+        </div>
+        <div class="quest-right">
+          <span class="quest-xp">+100 XP</span>
+          <span class="quest-deadline urgent">HOY</span>
+          <div class="quest-actions">
+            <button class="q-act-btn">✏</button>
+            <button class="q-act-btn done">✓</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quest-row">
+        <div class="quest-rar epic"></div>
+        <div class="quest-check"></div>
+        <div class="quest-body">
+          <div class="quest-name">Ir por los vasos a Janna</div>
+          <div class="quest-meta">
+            <span class="quest-type-badge epic">Épica</span>
+            <span>Normal</span>
+            <span>Vence hoy</span>
+          </div>
+        </div>
+        <div class="quest-right">
+          <span class="quest-xp">+100 XP</span>
+          <span class="quest-deadline urgent">HOY</span>
+          <div class="quest-actions">
+            <button class="q-act-btn">✏</button>
+            <button class="q-act-btn done">✓</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección Encargos -->
+    <div class="quest-section" style="margin-top:16px">
+      <div class="section-divider">
+        <div class="section-divider-line"></div>
+        <span class="section-divider-diamond">◆</span>
+        <span class="section-divider-label">🗡 Encargos</span>
+        <span class="section-divider-diamond">◆</span>
+        <div class="section-divider-line right"></div>
+      </div>
+
+      <div class="quest-row">
+        <div class="quest-rar common"></div>
+        <div class="quest-check"></div>
+        <div class="quest-body">
+          <div class="quest-name">Empaquetado de las velas</div>
+          <div class="quest-meta">
+            <span class="quest-type-badge">Encargo</span>
+            <span>Normal</span>
+            <span>Vence hoy</span>
+          </div>
+        </div>
+        <div class="quest-right">
+          <span class="quest-xp" style="color:var(--t3)">+50 XP</span>
+          <span class="quest-deadline urgent">HOY</span>
+          <div class="quest-actions">
+            <button class="q-act-btn">✏</button>
+            <button class="q-act-btn done">✓</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quest-row">
+        <div class="quest-rar common"></div>
+        <div class="quest-check"></div>
+        <div class="quest-body">
+          <div class="quest-name">Recorte etiquetas</div>
+          <div class="quest-meta">
+            <span class="quest-type-badge">Encargo</span>
+            <span>Normal</span>
+            <span>Vence hoy</span>
+          </div>
+        </div>
+        <div class="quest-right">
+          <span class="quest-xp" style="color:var(--t3)">+50 XP</span>
+          <span class="quest-deadline urgent">HOY</span>
+          <div class="quest-actions">
+            <button class="q-act-btn">✏</button>
+            <button class="q-act-btn done">✓</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quest-add-row" style="margin-top:16px">
+      <span style="font-size:14px">＋</span>
+      Nueva misión
+    </div>
+
+  </div>
+
+</main>
+
+<!-- ─── RIGHT PANEL ─────────────────────────────────────── -->
+<aside class="right">
+
+  <!-- RETRATO DEL HÉROE — showpiece -->
+  <div class="hero-portrait-section">
+    <div class="portrait-frame">
+      <div class="portrait-ring"></div>
+      <div class="portrait-ring-inner"></div>
+      <div class="portrait-img">🧙</div>
+      <div class="portrait-level">7</div>
+    </div>
+    <div class="portrait-name">MORDRED</div>
+    <div class="portrait-class">Nv.7 · Comandante del Gremio</div>
+    <div class="portrait-bars">
+      <div class="pb-row">
+        <span class="pb-icon">⚔️</span>
+        <div class="pb-track"><div class="pb-fill" style="width:82%;background:var(--azure)"></div></div>
+        <span class="pb-val" style="color:var(--azure)">936 / 1,139</span>
+      </div>
+      <div class="pb-row">
+        <span class="pb-icon">❤️</span>
+        <div class="pb-track"><div class="pb-fill" style="width:100%;background:#f38ba8"></div></div>
+        <span class="pb-val" style="color:#f38ba8">100 / 100</span>
+      </div>
+      <div class="pb-row">
+        <span class="pb-icon">✦</span>
+        <div class="pb-track"><div class="pb-fill" style="width:20%;background:#cba6f7"></div></div>
+        <span class="pb-val" style="color:#cba6f7">20 / 100</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- POMODORO — el que le gusta, respetado -->
+  <div class="right-section">
+    <div class="r-label">Pomodoro</div>
+    <div class="pom-wrap">
+      <div class="pom-presets">
+        <button class="pom-preset">15m</button>
+        <button class="pom-preset active">25m</button>
+        <button class="pom-preset">45m</button>
+        <button class="pom-preset">60m</button>
+      </div>
+
+      <div class="pom-circle">
+        <svg class="pom-svg" width="120" height="120" viewBox="0 0 120 120">
+          <circle class="pom-ring-bg" cx="60" cy="60" r="54"/>
+          <circle class="pom-ring-fill" cx="60" cy="60" r="54"/>
+        </svg>
+        <div class="pom-time">
+          <span class="pom-digits">25:00</span>
+          <span class="pom-phase-label">Enfoque</span>
+        </div>
+      </div>
+
+      <div class="pom-controls">
+        <button class="pom-btn">↺</button>
+        <button class="pom-btn play">▶</button>
+        <button class="pom-btn">⏭</button>
+      </div>
+
+      <div class="pom-task">Sin misión activa</div>
+
+      <div class="pom-dots">
+        <div class="pom-dot"></div>
+        <div class="pom-dot"></div>
+        <div class="pom-dot"></div>
+        <div class="pom-dot empty"></div>
+        <div class="pom-dot empty"></div>
+        <span style="font-size:10px;color:var(--t3);font-family:var(--f-mono)">3/8</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPOTIFY -->
+  <div class="right-section">
+    <div class="r-label">Reproduciendo</div>
+    <div class="spotify-wrap">
+      <div class="spotify-track">
+        <div class="spotify-art">🎵</div>
+        <div class="spotify-info">
+          <div class="spotify-song">The Dragon's Throne</div>
+          <div class="spotify-artist">Two Steps From Hell</div>
+        </div>
+        <span class="spotify-badge">SPOTIFY</span>
+      </div>
+      <div class="spotify-bar-wrap">
+        <div class="spotify-bar"><div class="spotify-progress"></div></div>
+        <div class="spotify-times"><span>1:12</span><span>3:28</span></div>
+      </div>
+      <div class="spotify-controls">
+        <div class="sp-vol">
+          <span>🔈</span>
+          <div class="sp-vol-bar"><div class="sp-vol-fill"></div></div>
+        </div>
+        <button class="sp-btn">⏮</button>
+        <button class="sp-btn play">▶</button>
+        <button class="sp-btn">⏭</button>
+        <button class="sp-btn" style="font-size:11px;color:var(--t3)">🔀</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="right-section">
+    <div class="r-label">Semana</div>
+    <div class="stats-grid">
+      <div class="stat-cell">
+        <span class="stat-cell-val" style="color:var(--azure)">14</span>
+        <span class="stat-cell-lbl">Misiones</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-cell-val" style="color:var(--azure)">2840</span>
+        <span class="stat-cell-lbl">XP ganado</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-cell-val" style="color:var(--gold-l)">1164</span>
+        <span class="stat-cell-lbl">Oro</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-cell-val" style="color:#a6e3a1">12</span>
+        <span class="stat-cell-lbl">Poms hoy</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- META DIARIA -->
+  <div class="right-section">
+    <div class="r-label">Meta diaria</div>
+    <div class="goal-wrap">
+      <div class="goal-header">
+        <span class="goal-lbl">Progreso XP</span>
+        <span class="goal-pct">68%</span>
+      </div>
+      <div class="goal-bar">
+        <div class="goal-fill"></div>
+      </div>
+      <div class="goal-sub">
+        <span>0 / 300 XP</span>
+        <span style="color:var(--gold)">300 restantes</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HECHIZOS -->
+  <div class="right-section">
+    <div class="r-label">Hechizos</div>
+    <div class="spells-grid">
+      <div class="spell-ico"><span>⚡</span><span class="spell-mana">20</span></div>
+      <div class="spell-ico"><span>🔥</span><span class="spell-mana">30</span></div>
+      <div class="spell-ico"><span>❄️</span><span class="spell-mana">40</span></div>
+      <div class="spell-ico"><span>💀</span><span class="spell-mana">25</span></div>
+      <div class="spell-ico"><span>🐲</span><span class="spell-mana">60</span></div>
+    </div>
+  </div>
+
+  <!-- MASCOTA — respetada, la que le gusta -->
+  <div class="right-section" style="border-bottom:none">
+    <div class="r-label">Mascota</div>
+    <div class="pet-card">
+      <div class="pet-img">🦊</div>
+      <div class="pet-info">
+        <div class="pet-name">Zorro Gigante</div>
+        <div class="pet-rarity">Común</div>
+        <div class="pet-skill">+5 XP por misión diaria (pasivo)</div>
+      </div>
+    </div>
+  </div>
+
+</aside>
+
+</div>
+</body>
+</html>
