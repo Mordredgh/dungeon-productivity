@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v101';
+﻿const CACHE = 'dungeon-v102';
 const ASSETS = [
   '/',
   '/index.html',
@@ -129,6 +129,16 @@ const ASSETS = [
   '/images/spell_maldicion-abismal.png',
   '/images/spell_tormenta-hielo.png',
   '/images/spell_furia-dragon.png',
+  /* Dungeon rooms */
+  '/images/dungeon_sala1.png',
+  '/images/dungeon_sala2.png',
+  '/images/dungeon_sala3.png',
+  '/images/dungeon_sala4.png',
+  '/images/dungeon_sala5.png',
+  '/images/dungeon_sala6.png',
+  '/images/dungeon_sala7.png',
+  '/images/dungeon_sala8.png',
+  '/images/dungeon_sala9.png',
 ];
 
 self.addEventListener('install', e => {

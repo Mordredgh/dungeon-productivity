@@ -3952,29 +3952,231 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 /* ================================================================
    BLOQUE E — EL DUNGEON CRECE CONTIGO
    ================================================================ */
-.dg-header { margin-bottom:20px; }
-.dg-progress-text { font-size:13px; font-weight:600; margin-bottom:8px; }
-.dg-progress-bar  { height:8px; background:rgba(137,180,250,.1); border-radius:4px; overflow:hidden; }
-.dg-progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:4px; transition:width .4s ease; }
-.dg-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:14px; }
+/* ── Week progress panel ─────────────────────────────────── */
+.dg-week-panel {
+  background:color-mix(in srgb,var(--accent) 6%,var(--card2));
+  border:1px solid var(--border); border-radius:14px; padding:14px 16px; margin-bottom:18px;
+  transition:border-color .3s;
+}
+.dg-week-panel.dg-week-all-ok { border-color:#22c55e; background:color-mix(in srgb,#22c55e 6%,var(--card2)); }
+.dg-week-title { font-size:12px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:.07em; margin-bottom:10px; }
+.dg-week-row   { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.dg-week-cond  { display:flex; flex-direction:column; gap:4px; font-size:11px; color:var(--text3); }
+.dg-week-cond.ok  { color:var(--text); }
+.dg-week-cond.fail{ color:#f87171; }
+.dg-week-bar   { height:5px; background:rgba(255,255,255,.08); border-radius:3px; overflow:hidden; }
+.dg-week-fill  { height:100%; background:var(--accent); border-radius:3px; transition:width .4s cubic-bezier(.23,1,.32,1); }
+.dg-week-cond.ok .dg-week-fill { background:#22c55e; }
+.dg-week-footer{ display:flex; justify-content:space-between; font-size:11px; margin-top:10px; color:var(--text2); flex-wrap:wrap; gap:4px; }
+
+/* ── Room grid ───────────────────────────────────────────── */
+.dg-rooms-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; }
 .dg-room {
-  position:relative; overflow:hidden; border-radius:16px; padding:20px 18px;
+  position:relative; overflow:hidden; border-radius:18px; min-height:200px;
   border:1px solid color-mix(in srgb,var(--rc,#7c3aed) 25%,var(--border));
-  background:color-mix(in srgb,var(--rc,#7c3aed) 8%,var(--card));
-  transition:var(--transition); --rc:#7c3aed;
+  --rc:#7c3aed; display:flex; flex-direction:column; justify-content:flex-end;
+  opacity:0; transform:translateY(16px);
+  transition:opacity .35s ease, transform .35s cubic-bezier(.23,1,.32,1), border-color .2s, box-shadow .2s;
 }
+.dg-room.dg-room-in { opacity:1; transform:translateY(0); }
 .dg-room-open { cursor:pointer; }
-.dg-room-open:hover { transform:translateY(-3px); border-color:var(--rc); }
-.dg-room-locked { opacity:.45; }
-.dg-room-glow {
-  position:absolute; top:-40%; right:-20%; width:120px; height:120px; border-radius:50%;
-  background:radial-gradient(circle,color-mix(in srgb,var(--rc) 40%,transparent),transparent 70%);
-  pointer-events:none;
+.dg-room-open:hover { border-color:var(--rc); box-shadow:0 4px 24px color-mix(in srgb,var(--rc) 25%,transparent); transform:translateY(-3px) !important; }
+.dg-room-open:active { transform:translateY(-1px) !important; }
+
+/* Sala bloqueada */
+.dg-room-locked { opacity:.9; }
+.dg-room-locked-bg {
+  position:absolute; inset:0; background-size:cover; background-position:center;
+  filter:saturate(.2) brightness(.25); z-index:0;
 }
-.dg-room-icon  { font-size:32px; margin-bottom:10px; }
-.dg-room-name  { font-family:var(--font-head); font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px; }
-.dg-room-desc  { font-size:11px; color:var(--text2); line-height:1.5; }
-.dg-room-lock-lvl { font-size:11px; font-weight:700; color:var(--text3); margin-top:8px; }
+.dg-room-locked .dg-room-body { position:relative; z-index:1; background:rgba(0,0,0,.55); padding:18px 16px; }
+
+/* Sala próxima a desbloquear — glow pulsante */
+.dg-room-next {
+  border-color:color-mix(in srgb,var(--rc) 50%,var(--border)) !important;
+  animation:dg-next-pulse 2.5s ease-in-out infinite;
+}
+@keyframes dg-next-pulse {
+  0%,100% { box-shadow:0 0 0 0 color-mix(in srgb,var(--rc) 0%,transparent); }
+  50%      { box-shadow:0 0 16px 4px color-mix(in srgb,var(--rc) 30%,transparent); }
+}
+
+/* Glow radial en sala abierta */
+.dg-room-glow {
+  position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--rc) 30%,transparent) 0%,transparent 65%);
+}
+
+/* Contenido de la sala */
+.dg-room-body   { padding:16px; position:relative; z-index:2; background:linear-gradient(0deg,rgba(0,0,0,.78) 0%,rgba(0,0,0,.1) 100%); }
+.dg-room-header { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.dg-room-icon   { font-size:22px; flex-shrink:0; }
+.dg-room-name   { font-family:var(--font-head); font-size:13px; font-weight:700; color:#fff; line-height:1.2; }
+.dg-room-badge  { margin-left:auto; font-size:16px; }
+.dg-room-desc   { font-size:10px; color:rgba(255,255,255,.7); line-height:1.5; margin-bottom:6px; }
+.dg-room-stat   { font-size:10px; color:color-mix(in srgb,var(--rc) 90%,#fff); font-weight:600; }
+.dg-room-enter  { font-size:10px; color:rgba(255,255,255,.45); margin-top:4px; }
+.dg-room-bonus-preview { font-size:10px; color:rgba(255,255,255,.5); margin-top:4px; }
+.dg-room-unlock-req { margin-top:8px; }
+
+/* ── Partículas y efectos ambient ────────────────────────── */
+.dg-particles { position:absolute; inset:0; pointer-events:none; z-index:1; overflow:hidden; }
+
+/* Brasas — La Entrada, Sala de Misiones */
+.dg-ember {
+  position:absolute; width:3px; height:3px; border-radius:50%;
+  background:color-mix(in srgb,var(--rc) 80%,#fbbf24);
+  left:calc(15% + var(--i,0) * 13%); bottom:-6px;
+  animation:dg-rise calc(2.5s + var(--i,0) * .4s) ease-in infinite;
+  animation-delay:calc(var(--i,0) * .45s);
+  opacity:.7;
+}
+@keyframes dg-rise {
+  0%   { transform:translateY(0) scale(1); opacity:.7; }
+  70%  { opacity:.4; }
+  100% { transform:translateY(-180px) translateX(calc(var(--i,0) * 6px - 15px)) scale(.3); opacity:0; }
+}
+
+/* Chispas de fragua — La Forja */
+.dg-spark {
+  position:absolute; width:2px; height:2px; border-radius:50%;
+  background:#fbbf24;
+  left:calc(10% + var(--i,0) * 11%); bottom:20px;
+  animation:dg-spark calc(1.2s + var(--i,0) * .2s) ease-out infinite;
+  animation-delay:calc(var(--i,0) * .18s);
+}
+@keyframes dg-spark {
+  0%   { transform:translateY(0) translateX(0) scale(1.5); opacity:1; }
+  100% { transform:translateY(calc(-80px - var(--i,0)*10px)) translateX(calc(var(--i,0)*14px - 40px)) scale(.2); opacity:0; }
+}
+
+/* Destellos mágicos — Biblioteca */
+.dg-sparkle {
+  position:absolute; width:4px; height:4px; border-radius:50%;
+  background:#c4b5fd;
+  left:calc(10% + var(--i,0) * 12%); top:calc(10% + var(--i,0) * 8%);
+  animation:dg-twinkle calc(1.8s + var(--i,0) * .25s) ease-in-out infinite;
+  animation-delay:calc(var(--i,0) * .3s);
+}
+@keyframes dg-twinkle {
+  0%,100% { opacity:0; transform:scale(.5); }
+  50%     { opacity:.8; transform:scale(1.3); }
+}
+
+/* Bruma — El Jardín */
+.dg-mist { position:absolute; inset:0; pointer-events:none; z-index:1; }
+.dg-mist span {
+  position:absolute; bottom:0; width:100%; height:60px;
+  background:linear-gradient(0deg,color-mix(in srgb,#15803d 20%,transparent),transparent);
+  animation:dg-mist-float 4s ease-in-out infinite;
+}
+.dg-mist span:nth-child(2) { animation-delay:-2s; opacity:.6; }
+@keyframes dg-mist-float {
+  0%,100% { transform:translateX(0) scaleX(1); opacity:.4; }
+  50%     { transform:translateX(6px) scaleX(1.05); opacity:.7; }
+}
+
+/* Brillo dorado — Cámara del Tesoro */
+.dg-glitter {
+  position:absolute; width:3px; height:3px; border-radius:50%;
+  background:color-mix(in srgb,#fbbf24 85%,#fff);
+  left:calc(8% + var(--i,0) * 11%); top:calc(8% + var(--i,0) * 9%);
+  animation:dg-glitter calc(2s + var(--i,0) * .3s) ease-in-out infinite;
+  animation-delay:calc(var(--i,0) * .4s);
+}
+@keyframes dg-glitter {
+  0%,100% { opacity:0; transform:scale(.6) rotate(0deg); }
+  50%     { opacity:1; transform:scale(1.4) rotate(45deg); }
+}
+
+/* Estrellas — El Observatorio */
+.dg-star {
+  position:absolute; width:2px; height:2px; border-radius:50%;
+  background:#bfdbfe;
+  left:calc(5% + var(--i,0) * 9%); top:calc(5% + var(--i,0) * 7%);
+  animation:dg-star-pulse calc(1.5s + var(--i,0) * .3s) ease-in-out infinite;
+  animation-delay:calc(var(--i,0) * .22s);
+  box-shadow:0 0 4px 1px rgba(191,219,254,.5);
+}
+@keyframes dg-star-pulse {
+  0%,100% { opacity:.2; transform:scale(.8); }
+  50%     { opacity:1;  transform:scale(1.5); }
+}
+
+/* Relámpago — Arena del Boss */
+.dg-lightning {
+  position:absolute; top:8px; left:50%; width:2px; height:0;
+  background:linear-gradient(180deg,rgba(250,204,21,0),#fde68a,rgba(250,204,21,0));
+  animation:dg-bolt 3s ease-in-out infinite;
+  transform:translateX(-50%) skewX(-10deg);
+}
+@keyframes dg-bolt {
+  0%,85%,100% { height:0; opacity:0; }
+  87%          { height:60px; opacity:1; }
+  90%          { height:0; opacity:0; }
+  92%          { height:40px; opacity:.6; }
+  95%          { height:0; opacity:0; }
+}
+
+/* Partículas cósmicas — Santuario */
+.dg-cosmic {
+  position:absolute; width:2px; height:2px; border-radius:50%;
+  left:calc(4% + var(--i,0) * 8.5%); top:calc(4% + var(--i,0) * 7%);
+  animation:dg-cosmic-drift calc(3s + var(--i,0) * .25s) ease-in-out infinite;
+  animation-delay:calc(var(--i,0) * .28s);
+}
+.dg-cosmic:nth-child(3n)   { background:#a78bfa; }
+.dg-cosmic:nth-child(3n+1) { background:#fbbf24; }
+.dg-cosmic:nth-child(3n+2) { background:#67e8f9; }
+@keyframes dg-cosmic-drift {
+  0%,100% { opacity:0; transform:scale(.5) translate(0,0); }
+  30%     { opacity:1; transform:scale(1.4) translate(3px,-6px); }
+  70%     { opacity:.6; transform:scale(1) translate(-3px,-12px); }
+}
+
+/* ── Modal de sala nueva ─────────────────────────────────── */
+.room-unlock-overlay {
+  position:fixed; inset:0; z-index:9000;
+  background:rgba(0,0,0,.75); backdrop-filter:blur(6px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; transition:opacity .3s ease;
+}
+.room-unlock-overlay.room-unlock-visible { opacity:1; }
+.room-unlock-card {
+  position:relative; width:min(420px,90vw); border-radius:24px; overflow:hidden;
+  border:2px solid color-mix(in srgb,var(--rc,#7c3aed) 50%,transparent);
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+  animation:dg-card-in .45s cubic-bezier(.23,1,.32,1) both;
+}
+@keyframes dg-card-in {
+  from { transform:scale(.85) translateY(24px); opacity:0; }
+  to   { transform:scale(1)   translateY(0);    opacity:1; }
+}
+.room-unlock-bg {
+  position:absolute; inset:0; background-size:cover; background-position:center;
+  filter:brightness(.45);
+}
+.room-unlock-content {
+  position:relative; z-index:1; padding:36px 28px; text-align:center;
+  background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.75) 100%);
+}
+.room-unlock-label  { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:color-mix(in srgb,var(--rc) 85%,#fff); margin-bottom:10px; }
+.room-unlock-icon   { font-size:56px; margin-bottom:8px; animation:dg-icon-bounce .6s cubic-bezier(.34,1.56,.64,1) .2s both; }
+@keyframes dg-icon-bounce {
+  from { transform:scale(0) rotate(-10deg); } to { transform:scale(1) rotate(0); }
+}
+.room-unlock-name   { font-family:var(--font-head); font-size:22px; font-weight:800; color:#fff; margin-bottom:8px; }
+.room-unlock-flavor { font-size:12px; color:rgba(255,255,255,.65); font-style:italic; margin-bottom:14px; }
+.room-unlock-bonus  { display:inline-block; font-size:12px; font-weight:700; padding:5px 14px;
+                      background:color-mix(in srgb,var(--rc) 20%,rgba(0,0,0,.4));
+                      border:1px solid color-mix(in srgb,var(--rc) 40%,transparent);
+                      border-radius:20px; color:#fff; margin-bottom:20px; }
+.room-unlock-btn    { padding:11px 32px; font-size:14px; font-weight:700;
+                      background:color-mix(in srgb,var(--rc) 70%,var(--accent));
+                      border:none; border-radius:50px; color:#fff; cursor:pointer;
+                      transition:transform .15s; }
+.room-unlock-btn:hover  { transform:scale(1.04); }
+.room-unlock-btn:active { transform:scale(.97); }
 
 /* ================================================================
    BLOQUE E — RUNAS

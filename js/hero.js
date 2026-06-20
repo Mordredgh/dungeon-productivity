@@ -107,6 +107,7 @@ async function addXP(amount, type, sourceEl) {
   const nightRuneMult = (typeof getRuneBonus==='function' && (h >= 20 || h < 5)) ? (1 + getRuneBonus('night_xp')) : 1;
   let finalXP = Math.round(amount * classXPBonus(type || 'side') * xpMultiplier * todMult * skillMult * runeMult * weaponMult * mountAtkMult * seasonalMult * dungeonXPMult * nightRuneMult);
 
+  if (typeof trackWeekXP === 'function') trackWeekXP(finalXP);
   const prevLevel = calcLevel(hero.xp_total || 0);
   const newTotal = (hero.xp_total || 0) + finalXP;
   const newLevel = calcLevel(newTotal);

@@ -190,6 +190,7 @@ async function completeQuest(id, el) {
   const patch = { quests_done: (hero.quests_done || 0) + 1 };
   if (q.type === 'main') patch.main_done = (hero.main_done || 0) + 1;
   await saveHero(patch);
+  if (typeof trackWeekQuest === 'function') trackWeekQuest();
 
   // Secret class progress tracking
   if (typeof getSecretProgress === 'function') {

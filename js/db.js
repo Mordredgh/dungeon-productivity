@@ -22,6 +22,8 @@ async function initDB() {
   renderAll();
   scheduleRandomEvent();
   checkDailyStreak();
+  if (typeof checkWeeklyDungeonProgress === 'function') checkWeeklyDungeonProgress();
+  if (typeof _showRoomUnlockNotifs      === 'function') _showRoomUnlockNotifs();
 }
 
 /* POMODORO */
