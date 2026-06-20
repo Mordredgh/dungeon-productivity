@@ -69,6 +69,151 @@ button:not(.quest-check):not(.char-attr-btn):not(.sp-mplay):active {
 ::-webkit-scrollbar-thumb { background: rgba(137,180,250,.12); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(137,180,250,.22); }
 
+/* ─── HUD CHIPS ─────────────────────────────────────────────── */
+
+.hud-chips {
+  display: none; /* JS lo muestra al cargar el héroe */
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  border-left: 1px solid rgba(255,255,255,.05);
+  border-right: 1px solid rgba(255,255,255,.05);
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.hud-chip {
+  font-family: var(--v-mono) !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  padding: 3px 8px !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(255,255,255,.06) !important;
+  background: rgba(255,255,255,.03) !important;
+  color: #7f849c !important;
+  white-space: nowrap !important;
+  letter-spacing: .02em !important;
+  transition: border-color 150ms var(--ek-out) !important;
+}
+
+.hud-chip:hover { border-color: rgba(255,255,255,.12) !important; color: #cdd6f4 !important; }
+
+.hud-chip-hp     { border-color: rgba(243,139,168,.15) !important; color: #f38ba8 !important; }
+.hud-chip-gold   { border-color: rgba(240,180,41,.15)  !important; color: #f0b429 !important; }
+.hud-chip-mp     { border-color: rgba(137,180,250,.15) !important; color: #89b4fa !important; }
+.hud-chip-streak { border-color: rgba(250,179,135,.15) !important; color: #fab387 !important; }
+
+.hud-chip-sep {
+  width: 1px;
+  height: 14px;
+  background: rgba(255,255,255,.06);
+  margin: 0 2px;
+}
+
+/* ─── RIGHT PANEL — HERO SECTION ────────────────────────────── */
+
+.rp-hero {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 12px 8px !important;
+  background: linear-gradient(180deg, rgba(203,166,247,.05) 0%, transparent 100%) !important;
+  border-bottom: 1px solid rgba(255,255,255,.05) !important;
+  flex-shrink: 0;
+}
+
+.rp-hero .sb-avatar-ring {
+  flex-shrink: 0;
+  width: 64px !important;
+  height: 64px !important;
+  padding: 3px !important;
+  background: conic-gradient(#cba6f7,#f0b429,#89b4fa,#f5c2e7,#cba6f7) !important;
+  border-radius: 50% !important;
+  box-shadow: none !important;
+  animation: v2-ring-spin 8s linear infinite !important;
+}
+
+.rp-hero .hero-avatar-btn {
+  width: 58px !important;
+  height: 58px !important;
+  font-size: 28px !important;
+  border-radius: 50% !important;
+  background: #0f0f18 !important;
+  border: 3px solid #0f0f18 !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+.rp-hero .hero-avatar-btn .hero-avatar-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+}
+
+.rp-hero-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.rp-hero .hero-name {
+  font-family: var(--v-fantasy) !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  letter-spacing: .1em !important;
+  color: #cdd6f4 !important;
+  background: none !important;
+  -webkit-text-fill-color: #cdd6f4 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: block !important;
+}
+
+.rp-hero .hero-title {
+  font-family: var(--v-mono) !important;
+  font-size: 9px !important;
+  color: #45475a !important;
+  letter-spacing: .04em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: block !important;
+}
+
+/* Barras en right panel */
+.rp-bars {
+  padding: 8px 12px !important;
+  border-bottom: 1px solid rgba(255,255,255,.04) !important;
+}
+
+/* Mini stats en right panel */
+.rp-mini-stats {
+  padding: 7px 12px !important;
+  border-bottom: 1px solid rgba(255,255,255,.05) !important;
+}
+
+/* Sidebar — sin perfil, solo nav icons */
+.sidebar {
+  width: 64px !important;
+  min-width: 64px !important;
+  max-width: 64px !important;
+}
+
+/* right-panel más ancho al quitarle la sidebar */
+.right-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+}
+.right-panel::-webkit-scrollbar { display: none !important; }
+
+/* grid columns: sidebar estrecha | contenido | panel derecho */
+.main {
+  grid-template-columns: 64px 1fr 290px !important;
+}
+
 /* ─── HEADER / HUD ──────────────────────────────────────────── */
 
 .header {
