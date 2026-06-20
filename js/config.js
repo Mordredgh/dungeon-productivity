@@ -208,15 +208,15 @@ const FORGE_COOLDOWN_MS = {
 /* ── SHOP ────────────────────────────────────────────────── */
 const SHOP_ITEMS = [
   /* Consumibles */
-  { id:'potion',  name:'Poción de Concentración', icon:'⚗️', cost:80,  desc:'2× XP durante 30 minutos',                     category:'consumible' },
-  { id:'scroll',  name:'Pergamino de Prórroga',   icon:'📜', cost:60,  desc:'Extiende el deadline de la misión más urgente', category:'consumible' },
-  { id:'amulet',  name:'Amuleto de Protección',   icon:'🧿', cost:120, desc:'Bloquea la próxima pérdida de HP (1 uso)',      category:'consumible' },
-  { id:'xpstone', name:'Piedra de Sabiduría',     icon:'💠', cost:200, desc:'+150 XP instantáneos',                          category:'consumible' },
-  { id:'revival', name:'Poción de Resurrección',  icon:'💊', cost:150, desc:'HP restaurada al máximo al instante',           category:'consumible' },
-  { id:'hp_minor',     name:'Poción Menor de HP',       icon:'🧪', cost:35,  desc:'+25 HP al instante',                           category:'consumible' },
-  { id:'gold_rush',    name:'Monedas del Mercader',     icon:'💰', cost:80,  desc:'2× Oro en todas las misiones durante 1 hora',   category:'consumible' },
-  { id:'boss_shield',  name:'Escudo Anti-Boss',         icon:'🛡️', cost:150, desc:'Bloquea la penalización del Jefe esta semana', category:'consumible' },
-  { id:'xp_scroll_sm', name:'Pergamino de Poder',       icon:'📜', cost:70,  desc:'+75 XP instantáneos',                          category:'consumible' },
+  { id:'potion',       name:'Poción de Concentración', icon:'⚗️', img:'item_potion.png',       cost:80,  desc:'2× XP durante 30 minutos',                     category:'consumible' },
+  { id:'scroll',       name:'Pergamino de Prórroga',   icon:'📜', img:'item_scroll.png',        cost:60,  desc:'Extiende el deadline de la misión más urgente', category:'consumible' },
+  { id:'amulet',       name:'Amuleto de Protección',   icon:'🧿', img:'item_amulet.png',        cost:120, desc:'Bloquea la próxima pérdida de HP (1 uso)',      category:'consumible' },
+  { id:'xpstone',      name:'Piedra de Sabiduría',     icon:'💠', img:'item_xpstone.png',       cost:200, desc:'+150 XP instantáneos',                         category:'consumible' },
+  { id:'revival',      name:'Poción de Resurrección',  icon:'💊', img:'item_revival.png',       cost:150, desc:'HP restaurada al máximo al instante',           category:'consumible' },
+  { id:'hp_minor',     name:'Poción Menor de HP',      icon:'🧪', img:'item_hp_minor.png',      cost:35,  desc:'+25 HP al instante',                           category:'consumible' },
+  { id:'gold_rush',    name:'Monedas del Mercader',    icon:'💰', img:'item_gold_rush.png',     cost:80,  desc:'2× Oro en todas las misiones durante 1 hora',   category:'consumible' },
+  { id:'boss_shield',  name:'Escudo Anti-Boss',        icon:'🛡️', img:'item_boss_shield.png',   cost:150, desc:'Bloquea la penalización del Jefe esta semana', category:'consumible' },
+  { id:'xp_scroll_sm', name:'Pergamino de Poder',      icon:'📜', img:'item_xp_scroll_sm.png',  cost:70,  desc:'+75 XP instantáneos',                          category:'consumible' },
   /* Huevos de mascotas */
   { id:'egg_zorro-naturaleza',  name:'Huevo Zorro',   img:'pet_egg_zorro-naturaleza.png',  cost:200, desc:'Eclosiona con pociones de Zorro',    category:'egg' },
   { id:'egg_pantera-sombra',    name:'Huevo Pantera',  img:'pet_egg_pantera-sombra.png',    cost:300, desc:'Eclosiona con pociones de Pantera',  category:'egg' },

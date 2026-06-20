@@ -8,14 +8,17 @@
    Inventario de runas: dungeon_runes table.
    ─────────────────────────────────────────────────────────── */
 
+const RUNE_FRAG_COST = 5; // fragmentos para armar 1 runa completa
+
 const RUNE_DEFS = {
-  fuerza:    { icon:'⚔️', img:'runa_fuerza',    name:'Runa de Fuerza',    desc:'⚔️ +8% XP en épicas',         effect:'epic_xp',    val:0.08, color:'#ef4444' },
-  vigor:     { icon:'❤️', img:'runa_vida',      name:'Runa de Vigor',     desc:'❤️ +15 HP máximo',             effect:'hp_max',     val:15,   color:'#f43f5e' },
-  celeridad: { icon:'🏃', img:'runa_velocidad', name:'Runa de Celeridad', desc:'🏃 +8% Oro en misiones',       effect:'gold',       val:0.08, color:'#f59e0b' },
-  sabiduria: { icon:'📚', img:'runa_arcana',    name:'Runa de Sabiduría', desc:'📚 +6% XP en todas',          effect:'all_xp',     val:0.06, color:'#8b5cf6' },
-  suerte:    { icon:'🍀', img:'runa_xp',        name:'Runa de Suerte',    desc:'🍀 +10% probabilidad de drop', effect:'drop_rate',  val:0.10, color:'#22c55e' },
-  oscuridad: { icon:'🌑', img:'runa_sombra',    name:'Runa de Oscuridad', desc:'🌑 +12% XP de noche (20-05h)', effect:'night_xp',   val:0.12, color:'#6b7280' },
-  fuego:     { icon:'🔥', img:'runa_fuerza',    name:'Runa de Fuego',     desc:'🔥 +15% daño al Jefe Semanal', effect:'boss_dmg',   val:0.15, color:'#f97316' },
+  fuerza:     { icon:'⚔️', img:'runa_fuerza',     fragImg:'runa_fragmento_fuerza',     name:'Runa de Fuerza',      desc:'⚔️ +8% XP en épicas',          effect:'epic_xp',    val:0.08, color:'#ef4444' },
+  vigor:      { icon:'❤️', img:'runa_vida',        fragImg:'runa_fragmento_vida',       name:'Runa de Vigor',       desc:'❤️ +15 HP máximo',              effect:'hp_max',     val:15,   color:'#f43f5e' },
+  celeridad:  { icon:'🏃', img:'runa_velocidad',   fragImg:'runa_fragmento_velocidad',  name:'Runa de Celeridad',   desc:'🏃 +8% Oro en misiones',        effect:'gold',       val:0.08, color:'#f59e0b' },
+  sabiduria:  { icon:'📚', img:'runa_arcana',      fragImg:'runa_fragmento_arcana',     name:'Runa de Sabiduría',   desc:'📚 +6% XP en todas',            effect:'all_xp',     val:0.06, color:'#8b5cf6' },
+  suerte:     { icon:'🍀', img:'runa_xp',          fragImg:'runa_fragmento_xp',         name:'Runa de Suerte',      desc:'🍀 +10% probabilidad de drop',   effect:'drop_rate',  val:0.10, color:'#22c55e' },
+  oscuridad:  { icon:'🌑', img:'runa_sombra',      fragImg:'runa_fragmento_sombra',     name:'Runa de Oscuridad',   desc:'🌑 +12% XP de noche (20-05h)',  effect:'night_xp',   val:0.12, color:'#6b7280' },
+  fuego:      { icon:'🔥', img:'runa_mitica',      fragImg:'runa_fragmento_mitica',     name:'Runa de Fuego',       desc:'🔥 +15% daño al Jefe Semanal',  effect:'boss_dmg',   val:0.15, color:'#f97316' },
+  proteccion: { icon:'🛡️', img:'runa_proteccion', fragImg:'runa_fragmento_proteccion', name:'Runa de Protección',  desc:'🛡️ +10 HP máximo + -5% daño boss recibido', effect:'shield', val:10, color:'#3b82f6' },
 };
 
 const RUNE_SOCKET_COUNT = { comun:0, raro:1, epico:2, legendario:3, mitico:3 };
@@ -27,20 +30,42 @@ async function loadRunes() {
   runes = data || [];
 }
 
-/* Llamado solo desde rpg.js al derrotar un boss — el caller ya validó la probabilidad */
+/* Llamado solo desde rpg.js al derrotar un boss — droppea fragmento aleatorio */
 async function tryRuneDrop() {
   const keys = Object.keys(RUNE_DEFS);
   const key  = keys[Math.floor(Math.random() * keys.length)];
   const def  = RUNE_DEFS[key];
+  const invKey = 'rune_frag_' + key;
+  if (typeof grantInvItem === 'function') {
+    await grantInvItem(invKey, 1);
+  }
+  const have = typeof getInvCount === 'function' ? getInvCount(invKey) : 0;
+  toast(def.icon, `✨ ¡Fragmento de ${def.name}! (tienes ${have}/${RUNE_FRAG_COST})`);
+}
+
+async function craftRune(type) {
+  const def    = RUNE_DEFS[type];
+  if (!def) return;
+  const invKey = 'rune_frag_' + type;
+  const have   = typeof getInvCount === 'function' ? getInvCount(invKey) : 0;
+  if (have < RUNE_FRAG_COST) {
+    toast('❌', `Necesitas ${RUNE_FRAG_COST} fragmentos de ${def.name} (tienes ${have}).`);
+    return;
+  }
+  const ok = typeof consumeInvItem === 'function' ? await consumeInvItem(invKey, RUNE_FRAG_COST) : false;
+  if (!ok) { toast('❌', 'Error al consumir fragmentos.'); return; }
   const { data } = await db.from('dungeon_runes').insert({
     hero_id:   hero.id,
-    rune_type: key,
+    rune_type: type,
     rune_name: def.name,
     level:     1,
   }).select().single();
   if (data) {
     runes.push(data);
-    toast(def.icon, `✨ ¡El jefe dejó caer: ${def.name}!`);
+    toast(def.icon, `⚒️ ¡${def.name} forjada! Ve a Runas para engastarla.`);
+    if (typeof renderRunePanel === 'function') renderRunePanel();
+    if (typeof renderSmithy    === 'function') renderSmithy();
+    if (typeof renderInventoryView === 'function') renderInventoryView();
   }
 }
 
@@ -132,7 +157,7 @@ function renderRunePanel() {
             return `
               <div class="rune-inv-card" style="--rc:${def.color}" title="${def.desc}">
                 <div class="rune-inv-icon">
-                  ${def.img ? `<img src="${CDN}dungeon/${def.img}.png" class="rune-img" alt="${def.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${def.icon}</span>` : def.icon}
+                  ${def.img ? `<img src="images/${def.img}.png" class="rune-img" alt="${def.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${def.icon}</span>` : def.icon}
                 </div>
                 <div class="rune-inv-name">${def.name}</div>
                 <div class="rune-inv-desc">${def.desc}</div>
@@ -145,5 +170,21 @@ function renderRunePanel() {
               </div>`;
           }).join('')}
          </div>`
-      : `<div class="rune-empty">No tienes runas. Completa misiones para obtener runas como botín.</div>`}`;
+      : `<div class="rune-empty">No tienes runas. Vence jefes para conseguir fragmentos y fórjalas en el Herrero.</div>`}
+
+    <div class="rune-section-title" style="margin-top:16px">🧩 Fragmentos de Runa</div>
+    <div class="rune-frags-grid">
+      ${Object.entries(RUNE_DEFS).map(([type, def]) => {
+        const have = typeof getInvCount === 'function' ? getInvCount('rune_frag_' + type) : 0;
+        const ready = have >= RUNE_FRAG_COST;
+        return `
+          <div class="rune-frag-card ${ready ? 'rune-frag-ready' : ''}" style="--rc:${def.color}" title="${def.name}: ${def.desc}">
+            <img src="images/${def.fragImg}.png" class="rune-frag-img" alt="${def.name}"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+            <span class="rune-frag-fallback" style="display:none">${def.icon}</span>
+            <div class="rune-frag-count ${ready ? 'rune-frag-count-ok' : ''}">${have}/${RUNE_FRAG_COST}</div>
+            <div class="rune-frag-name">${def.name.replace('Runa de ','').replace('Runa ','')}</div>
+          </div>`;
+      }).join('')}
+    </div>`;
 }

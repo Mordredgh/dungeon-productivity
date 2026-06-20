@@ -52,7 +52,7 @@ function renderShopItems() {
   const rows = items.map(item => {
     const canBuy = gold >= item.cost;
     const imgHtml = item.img
-      ? `<img src="${CDN}dungeon/${item.img}" class="shop-item-img" alt="" onerror="this.style.display='none'">`
+      ? `<img src="images/${item.img}" class="shop-item-img" alt="" onerror="this.src='${CDN}dungeon/${item.img}';this.onerror=null">`
       : `<span class="shop-icon">${item.icon || '📦'}</span>`;
     const extraLabel = item.qty ? `<span class="shop-item-qty">×${item.qty}</span>` : '';
     return `

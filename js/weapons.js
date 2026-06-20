@@ -325,5 +325,36 @@ function renderSmithy() {
     ${forgingHtml}
     ${rows ? `<div class="smithy-section-title">⚔️ Armas</div><div class="smithy-recipes">${rows}</div>` : ''}
     ${armorRows ? `<div class="smithy-section-title" style="margin-top:18px">🛡️ Armaduras</div><div class="smithy-recipes">${armorRows}</div>` : ''}
+    ${typeof RUNE_DEFS !== 'undefined' ? _renderRuneCrafting() : ''}
   `;
+}
+
+function _renderRuneCrafting() {
+  const cost = typeof RUNE_FRAG_COST !== 'undefined' ? RUNE_FRAG_COST : 5;
+  const rows = Object.entries(RUNE_DEFS).map(([type, def]) => {
+    const have     = typeof getInvCount === 'function' ? getInvCount('rune_frag_' + type) : 0;
+    const canCraft = have >= cost;
+    return `
+      <div class="smithy-recipe ${canCraft ? 'smithy-ready' : 'smithy-locked'}">
+        <img src="images/${def.fragImg}.png" class="smithy-img" alt="" style="--wc:${def.color}"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="smithy-emoji" style="display:none">${def.icon}</div>
+        <div class="smithy-info">
+          <div class="smithy-name">${def.name}
+            <span class="inv-tier-badge" style="color:${def.color};border-color:${def.color}40;background:${def.color}18">Runa</span>
+          </div>
+          <div class="smithy-req">
+            <span style="color:var(--text2)">${cost}× Fragmento</span>
+            <span class="smithy-have ${canCraft ? 'smithy-have-ok' : 'smithy-have-no'}">tienes ${have}</span>
+          </div>
+          <div class="smithy-stats">${def.desc}</div>
+        </div>
+        <button class="smithy-btn ${canCraft ? '' : 'smithy-btn-locked'}"
+          onclick="craftRune('${type}')" ${canCraft ? '' : 'disabled'}>
+          ${canCraft ? '⚒️ Forjar' : '🔒'}
+        </button>
+      </div>`;
+  }).join('');
+  return `<div class="smithy-section-title" style="margin-top:18px">💎 Runas (${cost} fragmentos c/u)</div>
+          <div class="smithy-recipes">${rows}</div>`;
 }

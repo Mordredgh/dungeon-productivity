@@ -189,7 +189,7 @@ function renderSpells() {
     const hasMana  = !s.mana || curMana >= s.mana;
     const ready    = hasFrags && hasMana;
     const clr      = s.color || '#a855f7';
-    const imgUrl   = CDN + 'dungeon/spell_' + s.id + '.png';
+    const imgUrl   = 'images/spell_' + s.id + '.png';
     const manaBadge = s.mana
       ? `<div class="spell-orb-mana ${hasMana ? '' : 'spell-mana-low'}">💧${s.mana}</div>`
       : '';

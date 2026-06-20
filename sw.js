@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v100';
+﻿const CACHE = 'dungeon-v101';
 const ASSETS = [
   '/',
   '/index.html',
@@ -88,6 +88,47 @@ const ASSETS = [
   '/images/boss_slime-corrosivo.png',
   '/images/boss_titan-magma.png',
   '/images/boss_wyvern-hielo.png',
+  /* Rune fragments */
+  '/images/runa_fragmento_fuerza.png',
+  '/images/runa_fragmento_vida.png',
+  '/images/runa_fragmento_velocidad.png',
+  '/images/runa_fragmento_arcana.png',
+  '/images/runa_fragmento_xp.png',
+  '/images/runa_fragmento_sombra.png',
+  '/images/runa_fragmento_mitica.png',
+  '/images/runa_fragmento_proteccion.png',
+  /* Complete runes */
+  '/images/runa_fuerza.png',
+  '/images/runa_vida.png',
+  '/images/runa_velocidad.png',
+  '/images/runa_arcana.png',
+  '/images/runa_xp.png',
+  '/images/runa_sombra.png',
+  '/images/runa_mitica.png',
+  '/images/runa_proteccion.png',
+  /* Consumables */
+  '/images/item_potion.png',
+  '/images/item_scroll.png',
+  '/images/item_amulet.png',
+  '/images/item_xpstone.png',
+  '/images/item_revival.png',
+  '/images/item_hp_minor.png',
+  '/images/item_gold_rush.png',
+  '/images/item_boss_shield.png',
+  '/images/item_xp_scroll_sm.png',
+  /* Spell images */
+  '/images/spell_frenzy.png',
+  '/images/spell_speed.png',
+  '/images/spell_berserker.png',
+  '/images/spell_shield.png',
+  '/images/spell_modo-berserker.png',
+  '/images/spell_healing.png',
+  '/images/spell_mente-acero.png',
+  '/images/spell_rayo-arcano.png',
+  '/images/spell_bola-fuego.png',
+  '/images/spell_maldicion-abismal.png',
+  '/images/spell_tormenta-hielo.png',
+  '/images/spell_furia-dragon.png',
 ];
 
 self.addEventListener('install', e => {
