@@ -206,12 +206,6 @@ function renderSpells() {
   }).join('')}</div>`;
 }
 
-function formatCDTime(ms) {
-  const h = Math.floor(ms / 3600000);
-  const m = Math.floor((ms % 3600000) / 60000);
-  return h > 0 ? `${h}h ${m}m` : `${m}m`;
-}
-
 /* ACHIEVEMENTS */
 function checkAchievements() {
   if (!hero) return;

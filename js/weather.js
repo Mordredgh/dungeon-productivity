@@ -30,7 +30,7 @@ async function loadRealWeather() {
     const data = await res.json();
     _weatherData = data;
     const temp = Math.round(data.current.temperature_2m);
-    const icon = WEATHER_ICONS[data.current.weather_code] || '🌡️';
+    const icon = WEATHER[data.current.weather_code]?.i || '🌡️';
     chip.innerHTML = `${icon} ${temp}°C`;
     chip.title = '';
     chip.style.display = 'flex';
@@ -44,8 +44,8 @@ function renderWeatherDetail() {
   if (!panel || !_weatherData) return;
   const c = _weatherData.current;
   const d = _weatherData.daily;
-  const icon = WEATHER_ICONS[c.weather_code] || '🌡️';
-  const desc = WEATHER_DESC[c.weather_code] || 'Clima desconocido';
+  const icon = WEATHER[c.weather_code]?.i || '🌡️';
+  const desc = WEATHER[c.weather_code]?.d || 'Clima desconocido';
   panel.innerHTML = `
     <div class="weather-detail-head">
       <span class="weather-detail-icon">${icon}</span>

@@ -22,19 +22,19 @@ async function bootApp() {
   loadRealWeather();
   updateDungeonClock();
   setInterval(updateDungeonClock, 60 * 1000);
-  if (typeof handleGoogleFitCallback === 'function') await handleGoogleFitCallback();
+  await handleGoogleFitCallback();
   if (typeof handleGoogleCalCallback === 'function') await handleGoogleCalCallback();
-  if (typeof syncGoogleFitSteps      === 'function') syncGoogleFitSteps();
-  if (typeof renderFitWidget         === 'function') renderFitWidget();
-  if (typeof renderCalendarWidget    === 'function') renderCalendarWidget();
-  if (typeof renderDuolingoWidget    === 'function') renderDuolingoWidget();
-  if (typeof renderNightmareModeBtn  === 'function') renderNightmareModeBtn();
-  if (typeof renderComboChip         === 'function') renderComboChip();
+  syncGoogleFitSteps();
+  renderFitWidget();
+  if (typeof renderCalendarWidget === 'function') renderCalendarWidget();
+  renderDuolingoWidget();
+  renderNightmareModeBtn();
+  renderComboChip();
   await migrateRarity();
   await resetDailyQuests();
   await resetRepeatQuests();
   await checkOverdueHP();
-  if (typeof checkWagerExpiry === 'function') await checkWagerExpiry();
+  await checkWagerExpiry();
   updatePomGoalUI();
   restoreTimerState();
   checkStreakDanger();
@@ -49,25 +49,23 @@ async function bootApp() {
   checkDailySummary();
   checkWeeklyRetro();
   checkMorningBriefing();
-  if (typeof checkMorningReview    === 'function') checkMorningReview();
-  if (typeof renderDailyGoalBar    === 'function') renderDailyGoalBar();
-  if (typeof checkWeeklySummary    === 'function') checkWeeklySummary();
+  checkMorningReview();
+  renderDailyGoalBar();
+  checkWeeklySummary();
   checkDeadlineAlerts();
   checkNightlyDiary();
   checkProphecyVerdict();
-  if (typeof checkWeeklyPatternAnalysis === 'function') checkWeeklyPatternAnalysis();
-  if (typeof checkMonthlyReport         === 'function') checkMonthlyReport();
-  if (typeof checkHabitReminders   === 'function') checkHabitReminders();
-  if (typeof updateChallengeProgress === 'function') updateChallengeProgress();
+  checkWeeklyPatternAnalysis();
+  checkMonthlyReport();
+  checkHabitReminders();
+  updateChallengeProgress();
   setInterval(() => {
     checkDailySummary(); checkWeeklyRetro(); checkDeadlineAlerts(); checkNightlyDiary(); checkProphecyVerdict();
-    if (typeof checkWeeklyPatternAnalysis === 'function') checkWeeklyPatternAnalysis();
-    if (typeof checkHabitReminders === 'function') checkHabitReminders();
-    if (typeof checkBossDeadline   === 'function') checkBossDeadline();
-    if (typeof checkWagerExpiry    === 'function') checkWagerExpiry();
+    checkWeeklyPatternAnalysis();
+    checkHabitReminders();
+    checkBossDeadline();
+    checkWagerExpiry();
   }, 60 * 1000); // every minute for habit reminders
-  setInterval(() => {
-    if (typeof updateChallengeProgress === 'function') updateChallengeProgress();
-  }, 15 * 60 * 1000);
+  setInterval(updateChallengeProgress, 15 * 60 * 1000);
   updateFocusTodayChip();
 }

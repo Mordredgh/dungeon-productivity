@@ -92,7 +92,7 @@ function renderHeroUI() {
 
   const hp    = hero.hp || 100;
   const hpMax = (hero.hp_max || 100)
-    + (typeof getWeaponHPMaxBonus === 'function' ? getWeaponHPMaxBonus() : 0)
+    + getWeaponBonus('hpMax')
     + (typeof getPetMountStat     === 'function' ? Math.floor(getPetMountStat('def')) : 0)
     + (typeof getRuneBonus        === 'function' ? getRuneBonus('hp_max') : 0);
   const hpPct = Math.round((hp / hpMax) * 100);

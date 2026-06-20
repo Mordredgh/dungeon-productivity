@@ -11,25 +11,23 @@ const SPOTIFY_REDIRECT_URI = 'https://dungeon.mordredgh.com/';
 const SPOTIFY_PLAYLIST_URI = 'spotify:playlist:6zCID88oNjNv9zx6puDHKj';
 const SPOTIFY_SCOPES       = 'user-read-playback-state user-modify-playback-state user-read-currently-playing';
 
-const WEATHER_ICONS = {
-  0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',
-  51:'🌦️',53:'🌦️',55:'🌦️',56:'🌧️',57:'🌧️',
-  61:'🌧️',63:'🌧️',65:'🌧️',66:'🌧️',67:'🌧️',
-  71:'🌨️',73:'🌨️',75:'❄️',77:'❄️',
-  80:'🌦️',81:'🌧️',82:'⛈️',85:'🌨️',86:'❄️',
-  95:'⛈️',96:'⛈️',99:'⛈️'
-};
-const WEATHER_DESC = {
-  0:'Cielo despejado',1:'Mayormente despejado',2:'Parcialmente nublado',3:'Nublado',
-  45:'Niebla',48:'Niebla helada',
-  51:'Llovizna ligera',53:'Llovizna moderada',55:'Llovizna intensa',
-  56:'Llovizna helada',57:'Llovizna helada intensa',
-  61:'Lluvia ligera',63:'Lluvia moderada',65:'Lluvia intensa',
-  66:'Lluvia helada',67:'Lluvia helada intensa',
-  71:'Nevada ligera',73:'Nevada moderada',75:'Nevada intensa',77:'Granizo fino',
-  80:'Chubascos ligeros',81:'Chubascos moderados',82:'Chubascos violentos',
-  85:'Chubascos de nieve ligeros',86:'Chubascos de nieve intensos',
-  95:'Tormenta eléctrica',96:'Tormenta con granizo ligero',99:'Tormenta con granizo intenso'
+const WEATHER = {
+  0:{i:'☀️',d:'Cielo despejado'},      1:{i:'🌤️',d:'Mayormente despejado'},
+  2:{i:'⛅',d:'Parcialmente nublado'},  3:{i:'☁️',d:'Nublado'},
+  45:{i:'🌫️',d:'Niebla'},              48:{i:'🌫️',d:'Niebla helada'},
+  51:{i:'🌦️',d:'Llovizna ligera'},     53:{i:'🌦️',d:'Llovizna moderada'},
+  55:{i:'🌦️',d:'Llovizna intensa'},    56:{i:'🌧️',d:'Llovizna helada'},
+  57:{i:'🌧️',d:'Llovizna helada intensa'},
+  61:{i:'🌧️',d:'Lluvia ligera'},       63:{i:'🌧️',d:'Lluvia moderada'},
+  65:{i:'🌧️',d:'Lluvia intensa'},      66:{i:'🌧️',d:'Lluvia helada'},
+  67:{i:'🌧️',d:'Lluvia helada intensa'},
+  71:{i:'🌨️',d:'Nevada ligera'},       73:{i:'🌨️',d:'Nevada moderada'},
+  75:{i:'❄️',d:'Nevada intensa'},       77:{i:'❄️',d:'Granizo fino'},
+  80:{i:'🌦️',d:'Chubascos ligeros'},   81:{i:'🌧️',d:'Chubascos moderados'},
+  82:{i:'⛈️',d:'Chubascos violentos'}, 85:{i:'🌨️',d:'Chubascos de nieve ligeros'},
+  86:{i:'❄️',d:'Chubascos de nieve intensos'},
+  95:{i:'⛈️',d:'Tormenta eléctrica'},  96:{i:'⛈️',d:'Tormenta con granizo ligero'},
+  99:{i:'⛈️',d:'Tormenta con granizo intenso'},
 };
 
 const TITLES = [

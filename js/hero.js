@@ -47,12 +47,10 @@ async function saveHero(patch) {
   await db.from('dungeon_heroes').update(patch).eq('id', hero.id);
 }
 
-const _lvlCache = {};
 function calcLevel(totalXP) {
-  if (_lvlCache[totalXP] !== undefined) return _lvlCache[totalXP];
   let lvl = 1;
   while (lvl < 50 && totalXP >= xpForLevel(lvl)) lvl++;
-  return (_lvlCache[totalXP] = Math.min(lvl, 50));
+  return Math.min(lvl, 50);
 }
 
 function canPrestige() { return !!hero && (hero._level || 1) >= 50; }
@@ -60,7 +58,6 @@ function canPrestige() { return !!hero && (hero._level || 1) >= 50; }
 async function doPrestige() {
   if (!canPrestige()) return;
   const newPrestige = (hero.prestige || 0) + 1;
-  Object.keys(_lvlCache).forEach(k => delete _lvlCache[k]);
   await saveHero({ prestige: newPrestige, xp_total: 0, level: 1 });
   toast('⭐', `¡Ascensión ${newPrestige}! +${newPrestige * 5}% XP permanente. Nivel reiniciado.`);
   spawnConfetti();
@@ -75,21 +72,23 @@ function xpForLevel(lvl) {
   return total;
 }
 
+const _CLASS_XP = {
+  mago:     { _: 1.1 },
+  guerrero: { main: 1.1 },
+  picaro:   { side: 1.1 },
+  arquero:  { weekly: 1.1 },
+  clerigo:  { daily: 1.05 },
+  fundador: { _: 1.05 },
+};
 function classXPBonus(type) {
-  const cls = hero ? (hero.hero_class || 'guerrero') : 'guerrero';
-  let bonus = 1;
-  if (cls === 'mago') bonus = 1.1;
-  else if (cls === 'guerrero' && type === 'main') bonus = 1.1;
-  else if (cls === 'picaro' && type === 'side') bonus = 1.1;
-  else if (cls === 'arquero' && type === 'weekly') bonus = 1.1;
-  else if (cls === 'clerigo' && type === 'daily') bonus = 1.05;
-  else if (cls === 'fundador') bonus = 1.05;
-  const race = heroRace || 'humano';
-  if (race === 'humano') bonus *= 1.1;
+  const cls   = hero?.hero_class || 'guerrero';
+  const entry = _CLASS_XP[cls] || {};
+  let bonus   = entry[type] || entry['_'] || 1;
+  if ((heroRace || 'humano') === 'humano') bonus *= 1.1;
   if (hero) {
-    if (type === 'main' && hero.str)   bonus *= 1 + hero.str * 0.01;
+    if (type === 'main' && hero.str)                         bonus *= 1 + hero.str   * 0.01;
     if ((type === 'side' || type === 'daily') && hero.intel) bonus *= 1 + hero.intel * 0.01;
-    if (hero.prestige) bonus *= 1 + hero.prestige * 0.05;
+    if (hero.prestige)                                       bonus *= 1 + hero.prestige * 0.05;
   }
   return bonus;
 }
@@ -99,7 +98,7 @@ async function addXP(amount, type, sourceEl) {
   const todMult    = typeof getTODBonus  === 'function' ? getTODBonus().xpMult : 1;
   const skillMult  = typeof getSkillTreeXPBonus === 'function' ? (1 + getSkillTreeXPBonus(type || 'side')) : 1;
   const runeMult   = typeof getRuneBonus === 'function' ? (1 + getRuneBonus('all_xp')) : 1;
-  const weaponMult   = typeof getWeaponXPBonus  === 'function' ? (1 + getWeaponXPBonus()) : 1;
+  const weaponMult   = 1 + getWeaponBonus('xpBonus');
   const mountAtkMult   = typeof getPetMountStat    === 'function' ? (1 + getPetMountStat('atk') / 100) : 1;
   const seasonalMult   = typeof getSeasonalXPMult  === 'function' ? getSeasonalXPMult() : 1;
   const dungeonXPMult = typeof getDungeonBonus==='function' ? getDungeonBonus('xp') : 1;

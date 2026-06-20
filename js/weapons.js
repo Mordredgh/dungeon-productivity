@@ -9,28 +9,11 @@ async function loadWeapons() {
   weapons = data || [];
 }
 
-function _armorDef(weaponKey) {
-  return typeof ARMOR_DEFS !== 'undefined' ? ARMOR_DEFS.find(d => d.key === weaponKey) : null;
-}
-function getWeaponXPBonus() {
+function getWeaponBonus(stat) {
   return weapons.filter(w => w.is_equipped).reduce((sum, w) => {
-    const ad = _armorDef(w.weapon_key);
-    if (ad) return ad.statKey === 'xpBonus' ? sum + (ad.statBase[w.tier] || 0) : sum;
-    return sum + (WEAPON_TIERS[w.tier]?.xpBonus || 0);
-  }, 0);
-}
-function getWeaponGoldBonus() {
-  return weapons.filter(w => w.is_equipped).reduce((sum, w) => {
-    const ad = _armorDef(w.weapon_key);
-    if (ad) return ad.statKey === 'goldBonus' ? sum + (ad.statBase[w.tier] || 0) : sum;
-    return sum + (WEAPON_TIERS[w.tier]?.goldBonus || 0);
-  }, 0);
-}
-function getWeaponHPMaxBonus() {
-  return weapons.filter(w => w.is_equipped).reduce((sum, w) => {
-    const ad = _armorDef(w.weapon_key);
-    if (ad) return ad.statKey === 'hpMax' ? sum + (ad.statBase[w.tier] || 0) : sum;
-    return sum + (WEAPON_TIERS[w.tier]?.hpMax || 0);
+    const ad = typeof ARMOR_DEFS !== 'undefined' ? ARMOR_DEFS.find(d => d.key === w.weapon_key) : null;
+    if (ad) return ad.statKey === stat ? sum + (ad.statBase[w.tier] || 0) : sum;
+    return sum + (WEAPON_TIERS[w.tier]?.[stat] || 0);
   }, 0);
 }
 
@@ -244,7 +227,7 @@ function renderSmithy() {
 
   const buildRecipeRow = def => {
     let out = '';
-    const ad = _armorDef(def.key);
+    const ad = typeof ARMOR_DEFS !== 'undefined' ? ARMOR_DEFS.find(d => d.key === def.key) : null;
     tierOrder.forEach(targetTier => {
       const recipe  = CRAFT_RECIPES[targetTier];
       if (!recipe) return;
