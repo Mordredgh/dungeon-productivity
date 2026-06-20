@@ -85,7 +85,7 @@ function renderHeroUI() {
   const pct      = Math.min(100, Math.round((xpCur / xpNeeded) * 100));
   document.getElementById('xpLabel').textContent = `XP ${xpCur.toLocaleString()} / ${xpNeeded.toLocaleString()} (${pct}%)`;
   const fill = document.getElementById('xpBarFill');
-  fill.style.width = pct + '%';
+  if (typeof animXPBar === 'function') animXPBar(fill, pct); else fill.style.width = pct + '%';
   let pctEl = fill.querySelector('.xp-bar-pct');
   if (!pctEl) { pctEl = document.createElement('div'); pctEl.className = 'xp-bar-pct'; fill.appendChild(pctEl); }
   pctEl.textContent = pct + '%';
@@ -98,7 +98,7 @@ function renderHeroUI() {
   const hpPct = Math.round((hp / hpMax) * 100);
   document.getElementById('hpLabel').textContent = `${hp} / ${hpMax}`;
   const hpFill = document.getElementById('hpBarFill');
-  hpFill.style.width = hpPct + '%';
+  if (typeof animHPBar === 'function') animHPBar(hpFill, hpPct); else hpFill.style.width = hpPct + '%';
   hpFill.classList.toggle('hp-critical', hpPct < 25);
   hpFill.classList.toggle('hp-warning',  hpPct >= 25 && hpPct < 50);
 
@@ -108,7 +108,7 @@ function renderHeroUI() {
   const manaPct  = Math.min(100, Math.round((mana / manaMax) * 100));
   const manaFill = document.getElementById('manaBarFill');
   const manaLbl  = document.getElementById('manaLabel');
-  if (manaFill) manaFill.style.width  = manaPct + '%';
+  if (manaFill) { if (typeof animManaBar === 'function') animManaBar(manaFill, manaPct); else manaFill.style.width = manaPct + '%'; }
   if (manaLbl)  manaLbl.textContent   = `${mana} / ${manaMax}`;
 
   // Actualizar mobile hero button en header
@@ -747,6 +747,7 @@ function updateBossBanner() {
   if (grid && typeof getMultiBossState === 'function') {
     const state = getMultiBossState();
     grid.innerHTML = ['daily','weekly','monthly'].map(c => _bossCycleCardHtml(c, state[c])).join('');
+    if (typeof animBossCards === 'function') animBossCards();
   }
   // Effects bar
   if (typeof renderEffectsBar === 'function') renderEffectsBar();

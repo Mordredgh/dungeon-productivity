@@ -112,6 +112,7 @@ function renderSalaPersonal() {
     </div>`;
 
   _salaBindEvents();
+  if (typeof animSalaItems === 'function') animSalaItems();
 }
 
 function salaSelectFurniture(id) {

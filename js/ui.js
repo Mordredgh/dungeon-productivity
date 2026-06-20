@@ -73,8 +73,22 @@ function setActiveQuest(id) {
   toast('🍅', `Pomodoro vinculado: ${q.name}`);
 }
 
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openModal(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('open');
+  if (id === 'levelupModal') return; // animLevelUpModal se llama al final de showLevelUp
+  if (typeof animModalOpen === 'function') animModalOpen(id);
+}
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (!el || !el.classList.contains('open')) return;
+  if (typeof animModalClose === 'function') {
+    animModalClose(id, () => el.classList.remove('open'));
+  } else {
+    el.classList.remove('open');
+  }
+}
 
 function showLevelUp(lvl) {
   const dynTitle = typeof getDynamicTitle === 'function' && hero ? getDynamicTitle(hero) : TITLES[Math.min(lvl - 1, TITLES.length - 1)];
@@ -109,10 +123,10 @@ function showLevelUp(lvl) {
   }
 
   openModal('levelupModal');
+  if (typeof animLevelUpModal === 'function') animLevelUpModal();
   playLevelUpSound();
   spawnLevelUpParticles();
   spawnConfetti();
-  // Auto-cierre en 6s
   setTimeout(() => {
     const m = document.getElementById('levelupModal');
     if (m && m.classList.contains('open')) closeModal('levelupModal');
@@ -121,21 +135,33 @@ function showLevelUp(lvl) {
 
 function toast(icon, msg, duration) {
   const container = document.getElementById('toastContainer');
+  if (!container) return;
   const div = document.createElement('div');
   div.className = 'toast';
   div.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-msg">${escHtml(msg)}</span>`;
   container.appendChild(div);
-  setTimeout(() => div.remove(), duration || 4000);
+  if (typeof animToastIn === 'function') animToastIn(div);
+  const ms = duration || 4000;
+  setTimeout(() => {
+    if (typeof animToastOut === 'function') animToastOut(div, () => div.remove());
+    else div.remove();
+  }, ms - 280);
 }
 
 function toastAction(icon, msg, btnText, fn, duration) {
   const container = document.getElementById('toastContainer');
+  if (!container) return;
   const div = document.createElement('div');
   div.className = 'toast toast-action';
   div.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-msg">${escHtml(msg)}</span><button class="toast-btn">${escHtml(btnText)}</button>`;
   div.querySelector('.toast-btn').addEventListener('click', () => { fn(); div.remove(); });
   container.appendChild(div);
-  setTimeout(() => div.remove(), duration || 9000);
+  if (typeof animToastIn === 'function') animToastIn(div);
+  const _ms = duration || 9000;
+  setTimeout(() => {
+    if (typeof animToastOut === 'function') animToastOut(div, () => div.remove());
+    else div.remove();
+  }, _ms - 280);
 }
 
 function spawnParticle(text, sourceEl) {
@@ -221,45 +247,65 @@ const CHAR_HUB_TABS = { 'skill-tree':'skills', 'runes':'runes', 'bestiary':'best
 
 function switchView(v) {
   if (v === 'oracle') { if (typeof openOracle === 'function') openOracle(); return; }
-  // Redirect hub sub-views to character view with the right tab
   if (CHAR_HUB_TABS[v]) { switchCharTab(CHAR_HUB_TABS[v]); v = 'character'; }
-  document.querySelectorAll('.view-tab, .sidebar-item').forEach(t => t.classList.toggle('active', t.dataset.view === v));
-  document.querySelectorAll('.view').forEach(el => {
-    const active = el.id === `view-${v}`;
-    el.classList.toggle('active', active);
-    if (active) el.style.setProperty('--view-bg-url', `url(${CDN}dungeon/fondo_${v}.png)`);
-  });
-  const charHub = document.getElementById('charHubTabs');
-  if (charHub) charHub.style.display = v === 'character' ? 'flex' : 'none';
-  if (v === 'stats')        renderStats();
-  if (v === 'achievements') renderAchievements();
-  if (v === 'history')      { historyPage = 1; renderHistory(); }
-  if (v === 'calendar')     renderCalendar();
-  if (v !== 'pets' && typeof cleanupGarden === 'function') cleanupGarden();
-  if (v === 'pets')         { renderPets(); switchPetsTab('list'); }
-  if (v === 'shop')         renderShopView();
-  if (v === 'inventory')    { if (typeof renderInventory==='function') renderInventory(); }
-  if (v === 'character')    { if (typeof renderCharacterSheet==='function') renderCharacterSheet(); }
-  if (v === 'goals')        { if (typeof renderGoals==='function')        renderGoals(); }
-  if (v === 'dungeon-grows'){ if (typeof renderDungeonGrows==='function') renderDungeonGrows(); }
-  if (v === 'zones')        { if (typeof renderZones==='function')        renderZones(); }
-  if (v === 'worldmap')     { if (typeof renderWorldMap==='function')     renderWorldMap(); }
-  if (v === 'integrations') { renderIntegrations(); }
-  // Mobile nav: highlight "Más" button when active view isn't a primary tab
-  const moreBtn = document.getElementById('mobileNavMoreBtn');
-  if (moreBtn) {
-    const primaryViews = ['quests', 'character', 'stats'];
-    moreBtn.classList.toggle('mobile-nav-more-active', !primaryViews.includes(v));
+
+  const _currentEl = document.querySelector('.view.active');
+  const _newId     = `view-${v}`;
+
+  const _doSwitch = () => {
+    document.querySelectorAll('.view-tab, .sidebar-item').forEach(t => t.classList.toggle('active', t.dataset.view === v));
+    document.querySelectorAll('.view').forEach(el => {
+      const active = el.id === _newId;
+      el.classList.toggle('active', active);
+      if (active) el.style.setProperty('--view-bg-url', `url(${CDN}dungeon/fondo_${v}.png)`);
+    });
+    const charHub = document.getElementById('charHubTabs');
+    if (charHub) charHub.style.display = v === 'character' ? 'flex' : 'none';
+    if (v === 'stats')        renderStats();
+    if (v === 'achievements') renderAchievements();
+    if (v === 'history')      { historyPage = 1; renderHistory(); }
+    if (v === 'calendar')     renderCalendar();
+    if (v !== 'pets' && typeof cleanupGarden === 'function') cleanupGarden();
+    if (v === 'pets')         { renderPets(); switchPetsTab('list'); }
+    if (v === 'shop')         renderShopView();
+    if (v === 'inventory')    { if (typeof renderInventory==='function')    renderInventory(); }
+    if (v === 'character')    { if (typeof renderCharacterSheet==='function') renderCharacterSheet(); }
+    if (v === 'goals')        { if (typeof renderGoals==='function')         renderGoals(); }
+    if (v === 'dungeon-grows'){ if (typeof renderDungeonGrows==='function')  renderDungeonGrows(); }
+    if (v === 'zones')        { if (typeof renderZones==='function')         renderZones(); }
+    if (v === 'worldmap')     { if (typeof renderWorldMap==='function')      renderWorldMap(); }
+    if (v === 'integrations') { renderIntegrations(); }
+    const moreBtn = document.getElementById('mobileNavMoreBtn');
+    if (moreBtn) {
+      const primaryViews = ['quests', 'character', 'stats'];
+      moreBtn.classList.toggle('mobile-nav-more-active', !primaryViews.includes(v));
+    }
+    const newEl = document.getElementById(_newId);
+    if (newEl && typeof animViewIn === 'function') animViewIn(newEl, v);
+  };
+
+  if (_currentEl && _currentEl.id !== _newId && typeof animViewOut === 'function') {
+    animViewOut(_currentEl, _doSwitch);
+  } else {
+    _doSwitch();
   }
 }
 
 function openMobileMore() {
   document.getElementById('mobileNavMoreOverlay')?.classList.add('open');
   document.getElementById('mobileNavMoreSheet')?.classList.add('open');
+  if (typeof animMobileSheetOpen === 'function') animMobileSheetOpen();
 }
 function closeMobileMore() {
-  document.getElementById('mobileNavMoreOverlay')?.classList.remove('open');
-  document.getElementById('mobileNavMoreSheet')?.classList.remove('open');
+  if (typeof animMobileSheetClose === 'function') {
+    animMobileSheetClose(() => {
+      document.getElementById('mobileNavMoreOverlay')?.classList.remove('open');
+      document.getElementById('mobileNavMoreSheet')?.classList.remove('open');
+    });
+  } else {
+    document.getElementById('mobileNavMoreOverlay')?.classList.remove('open');
+    document.getElementById('mobileNavMoreSheet')?.classList.remove('open');
+  }
 }
 
 function switchCharTab(tab) {
@@ -281,6 +327,8 @@ function switchCharTab(tab) {
   const charView = document.getElementById('view-character');
   const tabFondo = { sheet:'character', skills:'skills', runes:'runes', bestiary:'bestiary', smithy:'smithy' };
   if (charView && tabFondo[tab]) charView.style.setProperty('--view-bg-url', `url(${CDN}dungeon/fondo_${tabFondo[tab]}.png)`);
+  const activePanel = document.getElementById(`ctab-${tab}`);
+  if (activePanel && typeof animCharTabIn === 'function') animCharTabIn(activePanel);
 }
 
 function renderIntegrations() {

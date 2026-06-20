@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v110';
+﻿const CACHE = 'dungeon-v111';
 const ASSETS = [
   '/',
   '/index.html',
@@ -48,6 +48,7 @@ const ASSETS = [
   '/js/hero_card.js',
   '/js/world_map.js',
   '/js/sala_personal.js',
+  '/js/animations.js',
   '/js/auth.js',
   '/js/main.js',
   '/images/boss-bg-comun-1.png',

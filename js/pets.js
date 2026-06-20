@@ -548,4 +548,5 @@ function renderPets() {
   }
 
   el.innerHTML = html;
+  if (typeof animPageItems === 'function') animPageItems('.pet-card', el);
 }

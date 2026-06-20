@@ -71,6 +71,7 @@ function renderShopItems() {
   }).join('');
 
   el.innerHTML = tabs + `<div class="shop-rows">${rows || '<p style="color:var(--text3);padding:16px;text-align:center">Sin artículos</p>'}</div>`;
+  if (typeof animPageItems === 'function') animPageItems('.shop-item-row', el);
 }
 
 async function buyItem(id, cost) {

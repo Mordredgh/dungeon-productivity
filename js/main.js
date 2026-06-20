@@ -68,4 +68,5 @@ async function bootApp() {
   }, 60 * 1000); // every minute for habit reminders
   setInterval(updateChallengeProgress, 15 * 60 * 1000);
   updateFocusTodayChip();
+  if (typeof animBootSequence === 'function') animBootSequence();
 }

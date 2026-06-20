@@ -89,6 +89,7 @@ function renderGoals() {
         ${g.notes ? `<div class="goal-card-notes">${escHtml(g.notes)}</div>` : ''}
       </div>`;
   }).join('')}</div>`;
+  if (typeof animPageItems === 'function') animPageItems('.goal-card', el);
 }
 
 document.getElementById('saveGoalBtn').addEventListener('click', saveGoal);

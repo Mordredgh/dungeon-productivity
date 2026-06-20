@@ -299,6 +299,7 @@ function renderAchievements() {
     <div class="ach-cat-header">🎖️ Otros</div>
     <div class="ach-cat-grid">${extraAchs.map(renderCard).join('')}</div>
   </div>` : '');
+  if (typeof animPageItems === 'function') animPageItems('.achievement-card', el);
 }
 
 /* RANDOM EVENTS */
