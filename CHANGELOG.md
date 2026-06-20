@@ -4,6 +4,19 @@ Todas las fechas en formato YYYY-MM-DD (hora Monterrey, CDT = UTC-5).
 
 ---
 
+## [v92] — 2026-06-19
+
+### HUD: Efectos Activos + Progreso Diario en header; Boss cards ancho completo
+
+- **Efectos Activos movidos al header** — chip compacto horizontal (pill con borde morado) entre el reloj y los botones de herramientas; oculto en móvil ≤768px
+- **Progreso Diario movido al header** — label + barra horizontal compacta junto a efectos
+- **Divisor visual** entre efectos y progreso
+- **boss-info-panel eliminado** del HTML — bosses toman todo el ancho del área
+- **Boss grid full-width** — CSS grid `auto-fill minmax(220px, 1fr)` para que las cards crezcan y llenen el espacio disponible
+- **SW** bump `dungeon-v91` → `dungeon-v92`
+
+---
+
 ## [v91] — 2026-06-19
 
 ### Revert diseño + capa de animaciones Emil Kowalski / Silao
