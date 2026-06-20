@@ -5,8 +5,9 @@
 function getGold()  { return hero ? (hero.gold || 0) : 0; }
 function setGold(n) { const g = Math.max(0, Math.round(n)); if (hero) { hero.gold = g; saveHero({ gold: g }); } renderGold(); }
 function addGold(n) {
-  const bonus = n > 0 && typeof getDungeonBonus==='function' ? getDungeonBonus('gold') : 1;
-  setGold(getGold() + Math.round(n * bonus));
+  const bonus    = n > 0 && typeof getDungeonBonus === 'function' ? getDungeonBonus('gold') : 1;
+  const agiBonus = n > 0 && hero?.agi ? 1 + hero.agi * 0.01 : 1;
+  setGold(getGold() + Math.round(n * bonus * agiBonus));
 }
 function spendGold(n) { if (getGold() < n) { toast('💸', 'Oro insuficiente.'); return false; } addGold(-n); return true; }
 

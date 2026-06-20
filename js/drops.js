@@ -50,8 +50,7 @@ function spawnLootDrop(xpAmt, goldAmt, rarity = 'common', originEl = null) {
 
   // Random item drop
   const chances = DROP_CHANCES[rarity] || DROP_CHANCES.common;
-  const roll = Math.random();
-  if (roll < chances.item) {
+  const _spawnItem = (delay) => {
     const item = DROP_ITEMS[Math.floor(Math.random() * DROP_ITEMS.length)];
     setTimeout(async () => {
       _spawnFloat(container, x + Math.random() * 40 - 20, y - 10, `
@@ -59,7 +58,11 @@ function spawnLootDrop(xpAmt, goldAmt, rarity = 'common', originEl = null) {
         <div class="loot-drop-label">${item.label}</div>
       `);
       await item.effect();
-    }, 300);
+    }, delay);
+  };
+  const roll = Math.random();
+  if (roll < chances.item) {
+    _spawnItem(300);
   } else if (roll < chances.frag) {
     setTimeout(() => {
       _spawnFloat(container, x + Math.random() * 40 - 20, y - 10, `
@@ -67,6 +70,12 @@ function spawnLootDrop(xpAmt, goldAmt, rarity = 'common', originEl = null) {
         <div class="loot-drop-label">Fragmento</div>
       `);
     }, 300);
+  }
+
+  // LCK: +1 extra item roll per 5 points
+  const lckExtra = Math.floor((hero?.lck || 0) / 5);
+  for (let i = 0; i < lckExtra; i++) {
+    if (Math.random() < chances.item) _spawnItem(500 + i * 250);
   }
 }
 

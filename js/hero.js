@@ -140,12 +140,16 @@ async function checkDailyStreak() {
   const lastDay = hero.last_active_date || null;
   if (lastDay === today) return;
 
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-  let newStreak = lastDay === yesterday ? (hero.streak || 0) + 1 : 1;
+  const yesterday        = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+  const dayBeforeYest    = new Date(Date.now() - 2*86400000).toISOString().split('T')[0];
+  const isOrco           = typeof heroRace !== 'undefined' && heroRace === 'orco';
+  const orcoForgives     = isOrco && lastDay === dayBeforeYest;
+
+  let newStreak = (lastDay === yesterday || orcoForgives) ? (hero.streak || 0) + 1 : 1;
   const longest = Math.max(newStreak, hero.longest_streak || 0);
 
   let newHp = hero.hp || 100;
-  if (lastDay && lastDay !== yesterday) {
+  if (lastDay && lastDay !== yesterday && !orcoForgives) {
     if (hero.amulet) {
       hero.amulet = false; saveHero({ amulet: false });
       toast('🧿', '¡Amuleto de Protección absorbió el daño del día sin actividad!');
@@ -157,6 +161,8 @@ async function checkDailyStreak() {
       }
       toast('💔', 'Perdiste HP por días sin actividad.');
     }
+  } else if (orcoForgives) {
+    toast('💪', '¡Resistencia Orca! La racha se mantiene.');
   }
 
   await saveHero({ streak: newStreak, longest_streak: longest, last_active_date: today, hp: newHp });

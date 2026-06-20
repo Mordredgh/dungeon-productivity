@@ -12,9 +12,14 @@ function pauseTimer() {
   document.getElementById('startBtn').textContent = '▶';
 }
 
+function _focusSeconds() {
+  const elfoBonus = (typeof heroRace !== 'undefined' && heroRace === 'elfo') ? 5 : 0;
+  return (timer.duration + elfoBonus) * 60;
+}
+
 function resetTimer() {
   pauseTimer();
-  timer.seconds = timer.duration * 60;
+  timer.seconds = _focusSeconds();
   timer.phase = 'focus';
   document.getElementById('timerPhase').textContent = 'Listo';
   updateTimerUI();
@@ -47,7 +52,7 @@ function advancePhase() {
     if (autoBreak) setTimeout(() => startTimer(), 700);
   } else {
     timer.phase = 'focus';
-    timer.seconds = timer.duration * 60;
+    timer.seconds = _focusSeconds();
     document.getElementById('timerPhase').textContent = '⚡ ¡A trabajar!';
     toast('⚡', '¡De vuelta al combate!');
     sendNotif('⚡ ¡A trabajar!', 'Nuevo pomodoro comenzando.');
