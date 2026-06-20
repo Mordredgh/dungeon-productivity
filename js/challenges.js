@@ -33,7 +33,8 @@ async function startChallenge(defId) {
   if (!def || !hero) return;
   const arr = _getChallenges();
   if (arr.find(c => c.id === defId)) { toast('⚠️', 'Ya tienes este reto activo.'); return; }
-  arr.push({ id: defId, started_at: new Date().toISOString(), progress: 0, completed: false, rewarded: false });
+  arr.push({ id: defId, started_at: new Date().toISOString(), progress: 0, completed: false, rewarded: false,
+             xp_at_start: def.type === 'xp' ? (hero?.xp_total || 0) : undefined });
   await _saveChallenges(arr);
   toast(def.icon, `¡Reto iniciado: ${def.name}!`);
   renderChallenges();

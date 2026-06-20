@@ -64,6 +64,7 @@ async function bootApp() {
     if (typeof checkWeeklyPatternAnalysis === 'function') checkWeeklyPatternAnalysis();
     if (typeof checkHabitReminders === 'function') checkHabitReminders();
     if (typeof checkBossDeadline   === 'function') checkBossDeadline();
+    if (typeof checkWagerExpiry    === 'function') checkWagerExpiry();
   }, 60 * 1000); // every minute for habit reminders
   setInterval(() => {
     if (typeof updateChallengeProgress === 'function') updateChallengeProgress();
