@@ -84,9 +84,9 @@ button:not(.quest-check):not(.char-attr-btn):not(.sp-mplay):active {
 
 .hud-chip {
   font-family: var(--v-mono) !important;
-  font-size: 10px !important;
-  font-weight: 600 !important;
-  padding: 3px 8px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  padding: 4px 10px !important;
   border-radius: 20px !important;
   border: 1px solid rgba(255,255,255,.06) !important;
   background: rgba(255,255,255,.03) !important;
@@ -131,7 +131,7 @@ button:not(.quest-check):not(.char-attr-btn):not(.sp-mplay):active {
   background: conic-gradient(#cba6f7,#f0b429,#89b4fa,#f5c2e7,#cba6f7) !important;
   border-radius: 50% !important;
   box-shadow: none !important;
-  animation: v2-ring-spin 8s linear infinite !important;
+  animation: v2-ring-hue 6s linear infinite !important;
   margin-bottom: 10px !important;
   flex-shrink: 0 !important;
 }
@@ -467,11 +467,12 @@ button:not(.quest-check):not(.char-attr-btn):not(.sp-mplay):active {
   padding: 3px !important;
   background: conic-gradient(#cba6f7,#f0b429,#89b4fa,#f5c2e7,#cba6f7) !important;
   box-shadow: none !important;
-  animation: v2-ring-spin 8s linear infinite !important;
+  animation: v2-ring-hue 6s linear infinite !important;
 }
 
-@keyframes v2-ring-spin {
-  to { transform: rotate(360deg); }
+/* hue-rotate cycling: el anillo cambia de color sin girar físicamente */
+@keyframes v2-ring-hue {
+  to { filter: hue-rotate(360deg); }
 }
 
 .sb-profile .hero-avatar-btn {
@@ -1089,7 +1090,7 @@ button:not(.quest-check):not(.char-attr-btn):not(.sp-mplay):active {
   background: conic-gradient(#cba6f7,#f0b429,#89b4fa,#f5c2e7,#cba6f7) !important;
   position: relative !important;
   margin-bottom: 12px !important;
-  animation: v2-ring-spin 8s linear infinite !important;
+  animation: v2-ring-hue 6s linear infinite !important;
 }
 
 .char-portrait-img {
@@ -1099,7 +1100,6 @@ button:not(.quest-check):not(.char-attr-btn):not(.sp-mplay):active {
   object-fit: cover !important;
   border: 3px solid #0f0f18 !important;
   display: block !important;
-  animation: v2-ring-spin-counter 8s linear infinite !important;
 }
 
 .char-portrait-emoji {
@@ -1112,13 +1112,10 @@ button:not(.quest-check):not(.char-attr-btn):not(.sp-mplay):active {
   align-items: center !important;
   justify-content: center !important;
   border: 3px solid #0f0f18 !important;
-  animation: v2-ring-spin-counter 8s linear infinite !important;
 }
 
-/* Counter-rotate interior so image stays upright */
-@keyframes v2-ring-spin-counter {
-  to { transform: rotate(-360deg); }
-}
+/* Sin contra-rotación — hue-rotate no gira físicamente */
+@keyframes v2-ring-spin-counter { to { transform: none; } }
 
 .char-name {
   font-family: var(--v-fantasy) !important;
@@ -2064,6 +2061,218 @@ button:not(.quest-check):not(.char-attr-btn):not(.sp-mplay):active {
   .sb-avatar-ring { animation: none !important; }
   .char-portrait-ring { animation: none !important; }
   .char-portrait-img, .char-portrait-emoji { animation: none !important; }
+}
+
+/* ─── HECHIZOS — ocultar del right panel (acceso via botón header) ── */
+.right-panel .panel-section:has(.spells-list) { display: none !important; }
+
+/* ─── POMODORO — timer ring más compacto ────────────────────── */
+.timer-ring {
+  width: 130px !important;
+  height: 130px !important;
+}
+
+.timer-ring svg {
+  width: 130px !important;
+  height: 130px !important;
+}
+
+.timer-time {
+  font-size: 22px !important;
+}
+
+.timer-phase {
+  font-size: 9px !important;
+}
+
+/* Duración buttons más compactos */
+.timer-duration-select {
+  gap: 3px !important;
+}
+
+.dur-btn {
+  font-size: 10px !important;
+  padding: 4px 8px !important;
+}
+
+/* ─── BOSS CARDS — estilo limpio como el widget ─────────────── */
+
+/* Contenedor de boss cards */
+.boss-scroll {
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+}
+.boss-scroll::-webkit-scrollbar { display: none !important; }
+
+.boss-grid {
+  display: flex !important;
+  gap: 8px !important;
+  padding: 10px 14px !important;
+  align-items: stretch !important;
+}
+
+.bcard {
+  background: #0f0f18 !important;
+  border: 1px solid rgba(255,255,255,.07) !important;
+  border-radius: 8px !important;
+  min-width: 160px !important;
+  max-width: 180px !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  position: relative !important;
+  transition: border-color 200ms var(--ek-out) !important;
+}
+
+.bcard:hover {
+  border-color: color-mix(in srgb, var(--rc, #89b4fa) 40%, transparent) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Fila superior: ciclo + rareza */
+.bcard-top-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 7px 8px 3px !important;
+}
+
+.bcard-cycle {
+  font-family: var(--v-mono) !important;
+  font-size: 8px !important;
+  font-weight: 700 !important;
+  color: #313244 !important;
+  letter-spacing: .1em !important;
+  text-transform: uppercase !important;
+}
+
+.bcard-rarity {
+  font-family: var(--v-mono) !important;
+  font-size: 8px !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+  color: var(--rc, #89b4fa) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* Imagen/emoji del boss — centrada */
+.bcard-portrait-wrap {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 6px !important;
+  flex: 1 !important;
+  min-height: 80px !important;
+}
+
+.bcard-img {
+  max-height: 90px !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+.bcard-emoji {
+  font-size: 44px !important;
+  line-height: 1 !important;
+}
+
+/* Nombre del boss */
+.bcard-name {
+  font-family: var(--v-fantasy) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #cdd6f4 !important;
+  text-align: center !important;
+  padding: 0 8px 4px !important;
+  line-height: 1.3 !important;
+}
+
+/* HP bar */
+.bcard-hp-bar {
+  height: 4px !important;
+  background: rgba(255,255,255,.06) !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  border: none !important;
+  margin: 0 !important;
+}
+
+.bcard-hp-fill {
+  height: 100% !important;
+  border-radius: 0 !important;
+  transition: width 600ms var(--ek-out) !important;
+}
+
+/* Fila inferior: HP texto + tiempo */
+.bcard-bottom {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 5px 8px !important;
+  background: rgba(0,0,0,.2) !important;
+}
+
+.bcard-hp-txt {
+  font-family: var(--v-mono) !important;
+  font-size: 9px !important;
+  color: #7f849c !important;
+}
+
+.bcard-time {
+  font-family: var(--v-mono) !important;
+  font-size: 9px !important;
+  color: #45475a !important;
+}
+
+/* Boss derrotado */
+.bcard-defeated {
+  opacity: .35 !important;
+}
+
+.bcard-defeated::after, .bcard-defeated::before {
+  opacity: .3 !important;
+}
+
+/* ─── BOSS INFO PANEL — efectos activos + progreso diario ───── */
+.boss-info-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  padding: 10px 14px !important;
+  background: rgba(8,8,13,.6) !important;
+  border-top: 1px solid rgba(255,255,255,.04) !important;
+}
+
+.bip-title {
+  font-family: var(--v-mono) !important;
+  font-size: 8px !important;
+  font-weight: 700 !important;
+  letter-spacing: .18em !important;
+  color: #313244 !important;
+  text-transform: uppercase !important;
+}
+
+/* ─── QUEST TYPE HEADERS — texto más legible ────────────────── */
+.quest-type-header {
+  font-size: 9px !important;
+  letter-spacing: .16em !important;
+  color: #45475a !important;
+}
+
+/* ─── RIGHT PANEL HERO — textos más grandes ─────────────────── */
+.rp-hero .hero-name {
+  font-size: 17px !important;
+  letter-spacing: .14em !important;
+}
+
+.rp-hero .hero-title {
+  font-size: 10px !important;
+  color: #45475a !important;
 }
 
 /* ─── MOBILE ─────────────────────────────────────────────────── */
