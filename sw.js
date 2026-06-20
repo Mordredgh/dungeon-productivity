@@ -1,9 +1,10 @@
-﻿const CACHE = 'dungeon-v86';
+﻿const CACHE = 'dungeon-v87';
 const ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/css/dungeon.css',
+  '/css/dungeon-v2.css',
   '/js/config.js',
   '/js/state.js',
   '/js/db.js',

@@ -4,6 +4,28 @@ Todas las fechas en formato YYYY-MM-DD (hora Monterrey, CDT = UTC-5).
 
 ---
 
+## [v87] — 2026-06-19
+
+### Rediseño UI — Dark Void + Emil Kowalski Animations
+
+- **Paleta void black** — tokens `--bg: #08080d`, `--bg2: #0f0f18`, `--bg3: #141420` aplicados vía `dungeon-v2.css` (override layer, no modifica `dungeon.css`)
+- **Header/HUD** — logo + weather chip + reloj en monospace + tools; sin avatar ni barras en header
+- **Sidebar** — portrait circular con conic-gradient animado (8s spin) + MORDRED + título + 3 barras HP/XP/Mana + mini stats
+- **Boss cards** — corner pips vía `::before`/`::after` con `var(--rc)` color de rareza
+- **Quest items** — stripe de prioridad con gradientes por rareza, hover translateX(2px)
+- **Quest type headers** — inscripción `─── ◆ ─── LABEL ─── ◆ ───` con flex lines
+- **Character Hub tabs** — monospace, pill activo con borde azul
+- **Character sheet** — portrait ring conic-gradient con contra-rotación del imagen interior
+- **Modales (Emil Kowalski)** — `scale(0.95) translateY(6px)` → `scale(1)`, ease-out 220ms (no spring)
+- **Toasts (Sonner-style)** — entrada desde abajo `translateY(8px) scale(0.95)`, 240ms ease-out
+- **Buttons** — `:active { transform: scale(0.97) }` en 100ms, consistent across all pressables
+- **Stagger quests** — 30-50ms delay entre ítems, animación `v2-quest-in`
+- **Runas, Bestiario, Herrero, Sala, Shop, Zonas** — corner pips, hover states, void background
+- **Reduced motion** — todas las animaciones desactivadas con `prefers-reduced-motion`
+- **SW** bump `dungeon-v86` → `dungeon-v87`, `/css/dungeon-v2.css` añadido a ASSETS
+
+---
+
 ## [v67] — 2026-06-17
 
 ### Arte completo wired (150+ assets CDN)
