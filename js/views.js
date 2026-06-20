@@ -719,7 +719,7 @@ function _bossCycleCardHtml(cycle, b) {
   }
 
   const imgHtml = b.key
-    ? `<img src="${CDN}dungeon/boss_${escHtml(b.key)}.png" class="bcard-img" alt=""
+    ? `<img src="images/boss_${escHtml(b.key)}.png" class="bcard-img" alt=""
            onerror="this.style.display='none';this.nextSibling.style.display='block'">
        <div class="bcard-emoji" style="display:none">👹</div>`
     : `<div class="bcard-emoji">👹</div>`;

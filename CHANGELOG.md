@@ -4,6 +4,18 @@ Todas las fechas en formato YYYY-MM-DD (hora Monterrey, CDT = UTC-5).
 
 ---
 
+## [v96] — 2026-06-20
+
+### Boss sprites locales (todos los 27 jefes)
+
+- **Sprites desde `images/`** — todos los bosses sirven imagen local en vez de CDN; soluciona Araña Gigante que daba HTTP 400 y cualquier boss nunca subido
+- **`js/bestiary.js`** — `const img = \`images/boss_${b.key}.png\`` (antes CDN)
+- **`js/views.js`** — `<img src="images/boss_${escHtml(b.key)}.png"` (antes CDN)
+- **SW** bump `dungeon-v95` → `dungeon-v96`, 27 rutas `/images/boss_*.png` añadidas a ASSETS
+- Los 27 archivos PNG copiados a `F:\PROYECTOS\dungeon\images\` desde `F:\Dungeon\JEFES\`
+
+---
+
 ## [v95] — 2026-06-20
 
 ### Sidebar compacta + fondos de boss cards + bug reset diario

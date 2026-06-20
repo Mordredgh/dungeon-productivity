@@ -37,7 +37,7 @@ function renderBestiary() {
   const renderCard = b => {
     const known = defeated.includes(b.key);
     const clr   = BESTIARY_RARITY_CLR[b.rarity] || '#9ca3af';
-    const img   = `${CDN}dungeon/boss_${b.key}.png`;
+    const img   = `images/boss_${b.key}.png`;
     return `<div class="bestiary-card ${known ? 'bestiary-known' : 'bestiary-unknown'}" style="--bc:${clr}">
       <div class="bestiary-img-wrap">
         <img src="${img}" class="bestiary-img${known ? '' : ' bestiary-locked'}" alt=""

@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v95';
+﻿const CACHE = 'dungeon-v96';
 const ASSETS = [
   '/',
   '/index.html',
@@ -61,6 +61,33 @@ const ASSETS = [
   '/images/boss-bg-mitico-2.png',
   '/images/boss-bg-cataclismo-1.png',
   '/images/boss-bg-cataclismo-2.png',
+  '/images/boss_arana-gigante.png',
+  '/images/boss_anio-nuevo.png',
+  '/images/boss_behemot-vacio.png',
+  '/images/boss_caballero-espectral.png',
+  '/images/boss_custodio-tiempo.png',
+  '/images/boss_devorador-constelaciones.png',
+  '/images/boss_dragon-tormentas.png',
+  '/images/boss_dragon-obsidiana.png',
+  '/images/boss_arquitecto-vacio.png',
+  '/images/boss_fenix-cenizas.png',
+  '/images/boss_golem-cristal.png',
+  '/images/boss_golem-piedra.png',
+  '/images/boss_halloween.png',
+  '/images/boss_hidra-pesadilla.png',
+  '/images/boss_kraken-abisal.png',
+  '/images/boss_la-que-susurra.png',
+  '/images/boss_demonio-sombras.png',
+  '/images/boss_liche-ancestral.png',
+  '/images/boss_liche-rey.png',
+  '/images/boss_navidad.png',
+  '/images/boss_caballero-esqueleto.png',
+  '/images/boss_ogro-cripta.png',
+  '/images/boss_quimera.png',
+  '/images/boss_serafin-caido.png',
+  '/images/boss_slime-corrosivo.png',
+  '/images/boss_titan-magma.png',
+  '/images/boss_wyvern-hielo.png',
 ];
 
 self.addEventListener('install', e => {
