@@ -1345,7 +1345,7 @@
 
 <!-- Challenges Modal -->
 <!-- HECHIZOS MODAL -->
-<div class="modal-overlay" id="spellsModal">
+<div class="modal-overlay" id="spellsModal" onclick="if(event.target===this)closeModal('spellsModal')">
   <div class="modal" style="max-width:560px;max-height:85vh;overflow-y:auto">
     <div class="modal-header">
       <div class="modal-title">⚡ Hechizos</div>
@@ -1357,7 +1357,7 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="challengesModal">
+<div class="modal-overlay" id="challengesModal" onclick="if(event.target===this)closeModal('challengesModal')">
   <div class="modal" style="max-width:520px;max-height:80vh;overflow-y:auto">
     <div class="modal-header">
       <div class="modal-title">🏆 Retos de 30 Días</div>
