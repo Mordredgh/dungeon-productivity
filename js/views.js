@@ -720,14 +720,14 @@ function _bossCycleCardHtml(cycle, b) {
 
   const imgHtml = b.key
     ? `<img src="images/boss_${escHtml(b.key)}.png" class="bcard-img" alt=""
-           onerror="this.style.display='none';this.nextSibling.style.display='block'">
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
        <div class="bcard-emoji" style="display:none">👹</div>`
     : `<div class="bcard-emoji">👹</div>`;
 
-  const variant   = (Math.floor(Date.now() / 86400000) % 2) + 1;
-  const bannerBg  = `url("images/boss-bg-${b.rarity}-${variant}.png") center bottom/cover no-repeat`;
+  const variant  = (Math.floor(Date.now() / 86400000) % 2) + 1;
+  const bgLayers = `linear-gradient(180deg,rgba(12,3,22,.45) 0%,rgba(6,6,18,.65) 55%,rgba(4,4,14,.88) 100%),url('images/boss-bg-${b.rarity}-${variant}.png') center bottom/cover no-repeat`;
 
-  return `<div class="bcard ${urgent}" style="--rc:${rarClr};--bcard-bg:${bannerBg}">
+  return `<div class="bcard ${urgent}" style="--rc:${rarClr};background:${bgLayers}">
     ${cycleTag}
     <div class="bcard-portrait-wrap">${imgHtml}</div>
     <div class="bcard-name">${escHtml(b.name)}</div>
