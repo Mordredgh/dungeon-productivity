@@ -218,8 +218,8 @@ function damageBoss(dmg) {
 }
 
 function checkBossDeadline() {
-  // Deprecated wrapper — la lógica de penalidad está en getMultiBossState()
   getMultiBossState();
+  if (typeof updateBossBanner === 'function') updateBossBanner();
 }
 
 /* ── RANDOM EVENTS ────────────────────────────────────────── */
