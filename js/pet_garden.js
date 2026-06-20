@@ -264,7 +264,7 @@ function _openReySanctuary() {
 
   let actionBtn = '';
   if (pet && !isMount) {
-    const potions = typeof getInvCount === 'function' ? getInvCount('pet_pocion_rey-tempestad') : 0;
+    const potions = typeof getInvCount === 'function' ? getInvCount('pet_potion_rey-tempestad') : 0;
     actionBtn = `<button class="pet-action-btn" style="margin-top:12px"
       onclick="_closeReySanctuary();feedPet('${pet.id}')">
       ${potions > 0 ? `🧪 Alimentar (${potions})` : '🧪 Sin pociones'}
@@ -276,7 +276,7 @@ function _openReySanctuary() {
       ${food > 0 ? `⚡ Alimentar (${food})` : '⚡ Sin alimento'}
     </button>`;
   } else if (hasEgg && !pet) {
-    const potions = typeof getInvCount === 'function' ? getInvCount('pet_pocion_rey-tempestad') : 0;
+    const potions = typeof getInvCount === 'function' ? getInvCount('pet_potion_rey-tempestad') : 0;
     const canHatch = def && potions >= (def.hatch || 0);
     if (canHatch) actionBtn = `<button class="pet-action-btn" style="margin-top:12px" onclick="_closeReySanctuary();hatchEgg('rey-tempestad')">🐣 Eclosionar</button>`;
   }
