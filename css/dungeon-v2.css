@@ -112,36 +112,42 @@ button:not(.quest-check):not(.char-attr-btn):not(.sp-mplay):active {
 
 /* ─── RIGHT PANEL — HERO SECTION ────────────────────────────── */
 
+/* Retrato CENTRADO arriba, nombre/título debajo — igual que el widget */
 .rp-hero {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 12px 8px !important;
-  background: linear-gradient(180deg, rgba(203,166,247,.05) 0%, transparent 100%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0 !important;
+  padding: 16px 12px 10px !important;
+  background: linear-gradient(180deg, rgba(203,166,247,.06) 0%, transparent 80%) !important;
   border-bottom: 1px solid rgba(255,255,255,.05) !important;
   flex-shrink: 0;
 }
 
 .rp-hero .sb-avatar-ring {
-  flex-shrink: 0;
-  width: 64px !important;
-  height: 64px !important;
+  width: 88px !important;
+  height: 88px !important;
   padding: 3px !important;
   background: conic-gradient(#cba6f7,#f0b429,#89b4fa,#f5c2e7,#cba6f7) !important;
   border-radius: 50% !important;
   box-shadow: none !important;
   animation: v2-ring-spin 8s linear infinite !important;
+  margin-bottom: 10px !important;
+  flex-shrink: 0 !important;
 }
 
 .rp-hero .hero-avatar-btn {
-  width: 58px !important;
-  height: 58px !important;
-  font-size: 28px !important;
+  width: 82px !important;
+  height: 82px !important;
+  font-size: 38px !important;
   border-radius: 50% !important;
   background: #0f0f18 !important;
   border: 3px solid #0f0f18 !important;
   box-shadow: none !important;
   overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .rp-hero .hero-avatar-btn .hero-avatar-img {
@@ -151,67 +157,118 @@ button:not(.quest-check):not(.char-attr-btn):not(.sp-mplay):active {
   border-radius: 50% !important;
 }
 
-.rp-hero-info {
-  flex: 1;
-  min-width: 0;
-}
+.rp-hero-info { text-align: center; width: 100%; }
 
 .rp-hero .hero-name {
   font-family: var(--v-fantasy) !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
   font-weight: 900 !important;
-  letter-spacing: .1em !important;
+  letter-spacing: .12em !important;
   color: #cdd6f4 !important;
   background: none !important;
   -webkit-text-fill-color: #cdd6f4 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  text-align: center !important;
   display: block !important;
+  margin-bottom: 2px !important;
 }
 
 .rp-hero .hero-title {
   font-family: var(--v-mono) !important;
   font-size: 9px !important;
   color: #45475a !important;
-  letter-spacing: .04em !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  letter-spacing: .05em !important;
+  text-align: center !important;
   display: block !important;
 }
 
 /* Barras en right panel */
 .rp-bars {
-  padding: 8px 12px !important;
+  padding: 10px 14px !important;
   border-bottom: 1px solid rgba(255,255,255,.04) !important;
+}
+
+/* Las barras necesitan altura visible */
+.rp-bars .sb-bar {
+  height: 6px !important;
+  background: rgba(255,255,255,.06) !important;
+  border-radius: 3px !important;
+  overflow: hidden !important;
+}
+
+.rp-bars .sb-bar-block {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  margin-bottom: 6px !important;
+}
+
+.rp-bars .sb-bar-block:last-child { margin-bottom: 0 !important; }
+
+.rp-bars .sb-bar-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.rp-bars .sb-bar-lbl {
+  font-size: 11px !important;
+  width: auto !important;
+}
+
+.rp-bars .sb-bar-val {
+  display: block !important;
+  width: auto !important;
+  font-family: var(--v-mono) !important;
+  font-size: 9px !important;
+  color: #45475a !important;
+  padding-left: 0 !important;
+  margin-top: 0 !important;
+  order: unset !important;
 }
 
 /* Mini stats en right panel */
 .rp-mini-stats {
-  padding: 7px 12px !important;
+  padding: 8px 14px !important;
   border-bottom: 1px solid rgba(255,255,255,.05) !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  display: grid !important;
+  gap: 5px !important;
 }
 
-/* Sidebar — sin perfil, solo nav icons */
+/* ─── SIDEBAR — icono único, sin perfil ─────────────────────── */
+
 .sidebar {
-  width: 64px !important;
-  min-width: 64px !important;
-  max-width: 64px !important;
+  width: 56px !important;
+  min-width: 56px !important;
+  max-width: 56px !important;
 }
 
-/* right-panel más ancho al quitarle la sidebar */
-.right-panel {
-  display: flex !important;
-  flex-direction: column !important;
-  overflow-y: auto !important;
-  scrollbar-width: none !important;
+/* Nav: columna única de iconos centrados */
+.sb-nav {
+  grid-template-columns: 1fr !important;
+  padding: 6px !important;
+  gap: 3px !important;
 }
-.right-panel::-webkit-scrollbar { display: none !important; }
 
-/* grid columns: sidebar estrecha | contenido | panel derecho */
+.sidebar-item {
+  height: 38px !important;
+  width: 100% !important;
+  border-radius: 6px !important;
+  justify-content: center !important;
+}
+
+.sidebar-item .si-icon { font-size: 16px !important; }
+
+/* Ocultar texto de logout, solo emoji */
+.sidebar-logout { width: 100% !important; justify-content: center !important; font-size: 16px !important; }
+
+/* Spotify en sidebar: ocultar — no cabe en 56px */
+.sidebar > div:last-child > #spotifyPlayer { display: none !important; }
+.sidebar .spotify-player { display: none !important; }
+
+/* grid columns actualizado */
 .main {
-  grid-template-columns: 64px 1fr 290px !important;
+  grid-template-columns: 56px 1fr 290px !important;
 }
 
 /* ─── HEADER / HUD ──────────────────────────────────────────── */
