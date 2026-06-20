@@ -12,11 +12,20 @@ const GARDEN_ZONES = {
   'rey-tempestad':   { xMin:37, xMax:63, yMin:32, yMax:68 },
 };
 
-let _gardenTimers   = [];
-let _gardenFS       = false;
-let _gardenActive   = false;
+let _gardenTimers       = [];
+let _gardenFS           = false;
+let _gardenActive       = false;
+let _gardenFSKeyHandler = null;
 
 function cleanupGarden() {
+  if (_gardenFS) {
+    _gardenFS = false;
+    if (_gardenFSKeyHandler) { document.removeEventListener('keydown', _gardenFSKeyHandler); _gardenFSKeyHandler = null; }
+    const portal = document.getElementById('gardenFSPortal');
+    const ph     = document.getElementById('gardenFSPlaceholder');
+    if (ph) ph.remove();
+    if (portal) portal.remove();
+  }
   _gardenTimers.forEach(id => clearInterval(id));
   _gardenTimers = [];
   _gardenActive = false;
@@ -121,10 +130,6 @@ function _renderGardenPets() {
     // Wander only for living pets (not eggs, not Rey in main garden)
     if (stage !== 'egg' && !isRey) {
       _startWander(el, zone, stage);
-    }
-    // Near-hatch wobble
-    if (stage === 'egg' && (ownedPet?.pet_xp || 0) > 100) {
-      el.classList.add('garden-egg-near-hatch');
     }
   }
 }
@@ -327,10 +332,12 @@ function _gardenToggleFS() {
     const btn = wrap.querySelector('.garden-fs-btn');
     if (btn) btn.textContent = '⊠';
 
-    const onKey = e => { if (e.key === 'Escape') { _gardenToggleFS(); document.removeEventListener('keydown', onKey); } };
-    document.addEventListener('keydown', onKey);
+    if (_gardenFSKeyHandler) document.removeEventListener('keydown', _gardenFSKeyHandler);
+    _gardenFSKeyHandler = e => { if (e.key === 'Escape') _gardenToggleFS(); };
+    document.addEventListener('keydown', _gardenFSKeyHandler);
   } else {
-    // Restaurar al lugar original
+    if (_gardenFSKeyHandler) { document.removeEventListener('keydown', _gardenFSKeyHandler); _gardenFSKeyHandler = null; }
+
     const portal = document.getElementById('gardenFSPortal');
     const ph     = document.getElementById('gardenFSPlaceholder');
     wrap.removeAttribute('style');
