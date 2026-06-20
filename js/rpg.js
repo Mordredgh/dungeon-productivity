@@ -204,7 +204,11 @@ function damageBoss(dmg) {
         toast('🏆', `¡${escHtml(b.name)} DERROTADO! +${reward.gold}🪙 +${reward.xp} XP`);
         if (typeof dungeonPush === 'function') dungeonPush('🏆 ¡Jefe Derrotado!', `${b.name} venció. +${reward.gold}🪙 +${reward.xp} XP`);
         if (typeof recordBossDefeat === 'function') recordBossDefeat(b.key);
-        if (typeof trackBossKill === 'function') trackBossKill();
+        if (typeof trackBossKill    === 'function') trackBossKill();
+        if (typeof addActivePetXP   === 'function') {
+          const _petXpMap = { daily: 30, weekly: 100, monthly: 250 };
+          addActivePetXP(_petXpMap[cycle] || 30);
+        }
         if (typeof tryRuneDrop === 'function' && Math.random() < (reward.runeChance || 0)) {
           setTimeout(() => tryRuneDrop('boss'), 1400);
         }

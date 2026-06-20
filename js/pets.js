@@ -10,11 +10,34 @@ async function loadPets() {
 
 function _petDef(key) { return PET_DEFS.find(p => p.key === key); }
 
-/* XP necesaria para subir al siguiente nivel (tiers: fácil→medio→difícil) */
+/* XP necesaria para subir al siguiente nivel de montura (Nv.1-50) */
 function _petXPForNextLevel(level) {
   if (level <= 10) return 100;
   if (level <= 25) return 200;
   return 400;
+}
+
+/* XP necesaria para subir de nivel bebé (Nv.1-15, siempre 150) */
+const PET_BABY_XP_PER_LEVEL = 150;
+
+/* Dar XP a la mascota bebé activa (llamado desde boss defeat y potiones) */
+async function addActivePetXP(xp) {
+  const active = pets.find(p => p.is_active && p.stage === 'baby');
+  if (!active) return;
+  const def = _petDef(active.pet_key);
+  if (!def) return;
+  const curLvl = active.pet_level || 1;
+  if (curLvl >= 15) return;
+  let newXP  = (active.pet_xp || 0) + xp;
+  let newLvl = curLvl;
+  while (newLvl < 15 && newXP >= PET_BABY_XP_PER_LEVEL) { newXP -= PET_BABY_XP_PER_LEVEL; newLvl++; }
+  await db.from('dungeon_pets').update({ pet_level: newLvl, pet_xp: newXP }).eq('id', active.id);
+  active.pet_level = newLvl; active.pet_xp = newXP;
+  if (newLvl > curLvl) {
+    const msg = newLvl === 15 ? ' ✨ ¡Lista para evolucionar!' : ` (${newXP}/${PET_BABY_XP_PER_LEVEL} XP)`;
+    toast(def.icon, `¡${def.name} subió a Nv.${newLvl}!${msg}`);
+  }
+  renderActivePet();
 }
 
 /* Stats de una montura a un nivel dado */
@@ -64,11 +87,11 @@ async function hatchEgg(petKey) {
   await consumeInvItem('pet_potion_' + petKey, def.hatch);
   const { data } = await db.from('dungeon_pets').insert({
     hero_id: hero.id, pet_key: petKey,
-    stage: 'baby', potions_fed: 0, is_active: false,
+    stage: 'baby', potions_fed: 0, pet_level: 1, pet_xp: 0, is_active: false,
     obtained_at: new Date().toISOString()
   }).select().single();
   if (data) pets.push(data);
-  toast('🐣', `¡${def.name} ha eclosionado!`);
+  toast('🐣', `¡${def.name} ha eclosionado! Nv.1 — derrota jefes y dale pociones para subirla.`);
   renderPets();
   renderActivePet();
 }
@@ -82,29 +105,38 @@ async function feedPet(petId) {
   const potions = getInvCount('pet_potion_' + pet.pet_key);
   if (potions < 1) { toast('🧪', `No tienes pociones de ${def.name}.`); return; }
   await consumeInvItem('pet_potion_' + pet.pet_key, 1);
-  const newFed    = (pet.potions_fed || 0) + 1;
-  const willEvo   = newFed >= def.evolve;
-  const heroLevel = hero?._level || 1;
-  const levelReq  = def.level_req || 15;
 
-  if (willEvo && heroLevel < levelReq) {
-    await db.from('dungeon_pets').update({ potions_fed: newFed }).eq('id', petId);
-    pet.potions_fed = newFed;
-    toast('⚠️', `Pociones listas pero necesitas nivel ${levelReq} para evolucionar. (Eres nivel ${heroLevel})`);
-    renderPets(); renderActivePet(); return;
+  const petLvl = pet.pet_level || 1;
+
+  if (petLvl < 15) {
+    // Fase leveling: poción da XP
+    const xpGain = 50;
+    let newXP  = (pet.pet_xp || 0) + xpGain;
+    let newLvl = petLvl;
+    while (newLvl < 15 && newXP >= PET_BABY_XP_PER_LEVEL) { newXP -= PET_BABY_XP_PER_LEVEL; newLvl++; }
+    await db.from('dungeon_pets').update({ pet_level: newLvl, pet_xp: newXP }).eq('id', petId);
+    pet.pet_level = newLvl; pet.pet_xp = newXP;
+    if (newLvl > petLvl) {
+      toast(def.icon, `¡${def.name} → Nv.${newLvl}!${newLvl === 15 ? ' ✨ ¡Lista para evolucionar!' : ''}`);
+    } else {
+      toast('🧪', `+${xpGain} XP → ${def.name} Nv.${newLvl} (${newXP}/${PET_BABY_XP_PER_LEVEL} XP)`);
+    }
+  } else {
+    // Fase evolución: pociones para convertir en Montura
+    const newFed = (pet.potions_fed || 0) + 1;
+    const willEvo = newFed >= def.evolve;
+    const updateObj = { potions_fed: newFed };
+    if (willEvo) { updateObj.stage = 'mount'; updateObj.pet_level = 1; updateObj.pet_xp = 0; }
+    await db.from('dungeon_pets').update(updateObj).eq('id', petId);
+    Object.assign(pet, updateObj);
+    if (willEvo) {
+      toast('🌟', `¡${def.name} evolucionó a Montura! Nv.1 — aliméntala para subir de nivel.`);
+      checkReyTempestad();
+    } else {
+      toast('✨', `Poción de evolución: ${newFed}/${def.evolve} — ${def.name} Nv.15`);
+    }
   }
-
-  const newStage  = willEvo ? 'mount' : 'baby';
-  const updateObj = { potions_fed: newFed, stage: newStage };
-  if (newStage === 'mount') { updateObj.pet_level = 1; updateObj.pet_xp = 0; }
-  await db.from('dungeon_pets').update(updateObj).eq('id', petId);
-  Object.assign(pet, updateObj);
-  if (newStage === 'mount') {
-    toast('🌟', `¡${def.name} evolucionó a Montura! Nv.1 — aliméntala para subir de nivel.`);
-    checkReyTempestad();
-  } else toast('🧪', `+1 poción a ${def.name}. Progreso: ${newFed}/${def.evolve}`);
-  renderPets();
-  renderActivePet();
+  renderPets(); renderActivePet();
 }
 
 async function feedPetFood(petId) {
@@ -215,7 +247,8 @@ function renderActivePet() {
   if (active && def) {
     const stage   = active.stage;
     const isMount = stage === 'mount';
-    const fedPct  = isMount ? 100 : Math.min(100, Math.round(((active.potions_fed||0)/def.evolve)*100));
+    const petLvl  = active.pet_level || 1;
+    const petXP   = active.pet_xp || 0;
     const potions = typeof getInvCount==='function' ? getInvCount('pet_potion_'+active.pet_key) : 0;
     const ab      = PET_ABILITIES?.[active.pet_key]?.[stage];
     const fondoUrl= `${CDN}dungeon/pet_fondo_${stage}_${active.pet_key}.png`;
@@ -235,14 +268,29 @@ function renderActivePet() {
             <div class="pet-rpanel-name">${escHtml(def.name)}</div>
             <div class="pet-rpanel-rarity">${def.rarity}</div>
             ${ab ? `<div class="pet-ability-tag" style="margin:4px 0">${ab.icon} ${escHtml(ab.desc)}</div>` : ''}
-            ${!isMount ? `
-            <div class="pet-evo-wrap" style="margin-top:4px">
-              <div class="pet-evo-bar"><div class="pet-evo-fill" style="width:${fedPct}%"></div></div>
-              <span class="pet-evo-label">${active.potions_fed||0}/${def.evolve} evo${(hero?._level||1)<(def.level_req||15)?` · Nv.${def.level_req||15} req`:''}</span>
-            </div>
-            <button class="pet-action-btn ${potions>0?'':'pet-btn-disabled'}" style="margin-top:4px"
-              onclick="feedPet('${active.id}')" ${potions>0?'':'disabled'}>🧪 Alimentar (${potions})</button>
-            ` : (() => {
+            ${!isMount ? (() => {
+              if (petLvl < 15) {
+                const xpPct = Math.round((petXP / PET_BABY_XP_PER_LEVEL) * 100);
+                return `
+                <div class="pet-level-badge">🐣 Nv. ${petLvl} / 15</div>
+                <div class="pet-evo-wrap" style="margin-top:4px">
+                  <div class="pet-evo-bar"><div class="pet-evo-fill" style="width:${xpPct}%"></div></div>
+                  <span class="pet-evo-label">${petXP}/${PET_BABY_XP_PER_LEVEL} XP · Pociones +50XP · Jefes +30/100/250</span>
+                </div>
+                <button class="pet-action-btn ${potions>0?'':'pet-btn-disabled'}" style="margin-top:4px"
+                  onclick="feedPet('${active.id}')" ${potions>0?'':'disabled'}>🧪 Poción +50 XP (${potions})</button>`;
+              } else {
+                const evoPct = Math.min(100, Math.round(((active.potions_fed||0)/def.evolve)*100));
+                return `
+                <div class="pet-level-badge" style="color:var(--yellow)">✨ Nv. 15 — ¡Lista para evolucionar!</div>
+                <div class="pet-evo-wrap" style="margin-top:4px">
+                  <div class="pet-evo-bar"><div class="pet-evo-fill" style="width:${evoPct}%;background:var(--yellow)"></div></div>
+                  <span class="pet-evo-label">${active.potions_fed||0}/${def.evolve} pociones de evolución</span>
+                </div>
+                <button class="pet-action-btn ${potions>0?'':'pet-btn-disabled'}" style="margin-top:4px"
+                  onclick="feedPet('${active.id}')" ${potions>0?'':'disabled'}>🌟 Evolucionar (${potions} pocs.)</button>`;
+              }
+            })() : (() => {
               const lvl   = active.pet_level || 1;
               const xp    = active.pet_xp || 0;
               const need  = _petXPForNextLevel(lvl);
@@ -436,15 +484,35 @@ function renderPets() {
           <div class="pet-card-name">${escHtml(def.name)}</div>
           <div class="pet-card-rarity">${isMount ? '🌟 Montura' : '🐣 Bebé'}</div>
           ${(() => { const ab = PET_ABILITIES?.[def.key]?.[pet.stage]; return ab ? `<div class="pet-ability-tag" style="font-size:9px">${ab.icon} ${escHtml(ab.desc)}</div>` : ''; })()}
-          ${!isMount ? `
-          <div class="pet-evo-wrap">
-            <div class="pet-evo-bar"><div class="pet-evo-fill" style="width:${fedPct}%"></div></div>
-            <span class="pet-evo-label">${pet.potions_fed||0}/${def.evolve}${(hero?._level||1)<(def.level_req||15)?` · Nv.${def.level_req||15} req`:''}</span>
-          </div>
-          <button class="pet-action-btn ${potions > 0 ? '' : 'pet-btn-disabled'}"
-            onclick="feedPet('${pet.id}')" ${potions > 0 ? '' : 'disabled'}>
-            🧪 Alimentar (${potions})
-          </button>` : (() => {
+          ${!isMount ? (() => {
+            const bLvl  = pet.pet_level || 1;
+            const bXP   = pet.pet_xp || 0;
+            if (bLvl < 15) {
+              const xpPct = Math.round((bXP / PET_BABY_XP_PER_LEVEL) * 100);
+              return `
+              <div class="pet-level-badge">🐣 Nv. ${bLvl} / 15</div>
+              <div class="pet-evo-wrap">
+                <div class="pet-evo-bar"><div class="pet-evo-fill" style="width:${xpPct}%"></div></div>
+                <span class="pet-evo-label">${bXP}/${PET_BABY_XP_PER_LEVEL} XP</span>
+              </div>
+              <button class="pet-action-btn ${potions > 0 ? '' : 'pet-btn-disabled'}"
+                onclick="feedPet('${pet.id}')" ${potions > 0 ? '' : 'disabled'}>
+                🧪 Poción +50 XP (${potions})
+              </button>`;
+            } else {
+              const evoPct = Math.min(100, Math.round(((pet.potions_fed||0)/def.evolve)*100));
+              return `
+              <div class="pet-level-badge" style="color:var(--yellow)">✨ Nv. 15 — ¡Lista!</div>
+              <div class="pet-evo-wrap">
+                <div class="pet-evo-bar"><div class="pet-evo-fill" style="width:${evoPct}%;background:var(--yellow)"></div></div>
+                <span class="pet-evo-label">${pet.potions_fed||0}/${def.evolve} pocs. evo.</span>
+              </div>
+              <button class="pet-action-btn ${potions > 0 ? '' : 'pet-btn-disabled'}"
+                onclick="feedPet('${pet.id}')" ${potions > 0 ? '' : 'disabled'}>
+                🌟 Evolucionar (${potions})
+              </button>`;
+            }
+          })() : (() => {
             const lvl  = pet.pet_level || 1;
             const xp   = pet.pet_xp || 0;
             const need = _petXPForNextLevel(lvl);
