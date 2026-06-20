@@ -4,6 +4,17 @@ Todas las fechas en formato YYYY-MM-DD (hora Monterrey, CDT = UTC-5).
 
 ---
 
+## [v95] — 2026-06-20
+
+### Sidebar compacta + fondos de boss cards + bug reset diario
+
+- **Sidebar reagrupada** — eliminados separadores excesivos; iconos en 4 filas compactas (3×4) + 1 sep + exploración; orden: dungeon/misiones/metas → retos/stats/logros → mascotas/tienda/inventario → hechizos/historial/integr. → zonas/mapa
+- **Fondos de boss cards** — 12 imágenes locales (`images/boss-bg-{rarity}-{1,2}.png`) aplicadas como background de cada card según rareza; alterna entre variante 1 y 2 por día
+- **Bug reset boss diario** — corregido `_bossPeriodKey()`: antes usaba `toISOString()` (UTC) → el daily no reseteaba a medianoche local sino a las 6-7am CDT. Ahora usa fecha local con `getFullYear/getMonth/getDate`
+- **SW** bump `dungeon-v94` → `dungeon-v95`, fondos de boss añadidos a ASSETS
+
+---
+
 ## [v94] — 2026-06-19
 
 ### Hechizos como modal + Bestiario mejorado

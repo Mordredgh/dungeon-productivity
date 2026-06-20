@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v94';
+﻿const CACHE = 'dungeon-v95';
 const ASSETS = [
   '/',
   '/index.html',
@@ -49,6 +49,18 @@ const ASSETS = [
   '/js/sala_personal.js',
   '/js/auth.js',
   '/js/main.js',
+  '/images/boss-bg-comun-1.png',
+  '/images/boss-bg-comun-2.png',
+  '/images/boss-bg-raro-1.png',
+  '/images/boss-bg-raro-2.png',
+  '/images/boss-bg-epico-1.png',
+  '/images/boss-bg-epico-2.png',
+  '/images/boss-bg-legendario-1.png',
+  '/images/boss-bg-legendario-2.png',
+  '/images/boss-bg-mitico-1.png',
+  '/images/boss-bg-mitico-2.png',
+  '/images/boss-bg-cataclismo-1.png',
+  '/images/boss-bg-cataclismo-2.png',
 ];
 
 self.addEventListener('install', e => {

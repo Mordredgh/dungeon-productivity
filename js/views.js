@@ -725,7 +725,7 @@ function _bossCycleCardHtml(cycle, b) {
     : `<div class="bcard-emoji">👹</div>`;
 
   const variant   = (Math.floor(Date.now() / 86400000) % 2) + 1;
-  const bannerBg  = `url("${CDN}dungeon/boss_banner_${b.rarity}_${variant}.png") center bottom/cover no-repeat`;
+  const bannerBg  = `url("images/boss-bg-${b.rarity}-${variant}.png") center bottom/cover no-repeat`;
 
   return `<div class="bcard ${urgent}" style="--rc:${rarClr};--bcard-bg:${bannerBg}">
     ${cycleTag}

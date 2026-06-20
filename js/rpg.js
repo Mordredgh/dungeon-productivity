@@ -94,13 +94,20 @@ const BOSS_CYCLE_ICONS  = { daily:'☀️', weekly:'📅', monthly:'🌙' };
 
 function _bossPeriodKey(cycle) {
   const d = new Date();
-  if (cycle === 'daily') return d.toISOString().split('T')[0];
+  // Usar fecha LOCAL para que el reset ocurra a medianoche del usuario, no en UTC
+  const y  = d.getFullYear();
+  const mo = d.getMonth();
+  const dy = d.getDate();
+  const dow = d.getDay(); // 0=Dom
+  if (cycle === 'daily') return `${y}-${String(mo+1).padStart(2,'0')}-${String(dy).padStart(2,'0')}`;
   if (cycle === 'weekly') {
-    const jan1 = new Date(d.getFullYear(), 0, 1);
-    const w    = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
-    return `${d.getFullYear()}-W${w}`;
+    // ISO week: lunes como primer día de semana
+    const jan1 = new Date(y, 0, 1);
+    const dayOfYear = Math.floor((d - jan1) / 86400000);
+    const w = Math.ceil((dayOfYear + jan1.getDay() + 1) / 7);
+    return `${y}-W${w}`;
   }
-  return `${d.getFullYear()}-${d.getMonth() + 1}`;
+  return `${y}-${mo + 1}`;
 }
 
 function _selectBossForCycle(cycle, periodKey) {
