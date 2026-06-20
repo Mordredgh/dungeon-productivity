@@ -301,18 +301,44 @@ function _closeReySanctuary() {
   if (o) o.style.display = 'none';
 }
 
-/* ── FULLSCREEN ──────────────────────────────────────────────── */
+/* ── FULLSCREEN (portal al body para escapar overflow/transform) ─ */
 function _gardenToggleFS() {
+  _gardenFS = !_gardenFS;
   const wrap = document.getElementById('gardenWrap');
   if (!wrap) return;
-  _gardenFS = !_gardenFS;
-  wrap.classList.toggle('garden-fullscreen', _gardenFS);
-  const btn = wrap.querySelector('.garden-fs-btn');
-  if (btn) btn.textContent = _gardenFS ? '⊠' : '⛶';
+
   if (_gardenFS) {
-    // Close on Escape
+    // Marcar el lugar original con un placeholder
+    const ph = document.createElement('div');
+    ph.id = 'gardenFSPlaceholder';
+    ph.style.display = 'none';
+    wrap.parentNode.insertBefore(ph, wrap);
+
+    // Crear portal en body
+    const portal = document.createElement('div');
+    portal.id = 'gardenFSPortal';
+    portal.style.cssText = 'position:fixed;inset:0;z-index:9000;background:#000;';
+    document.body.appendChild(portal);
+
+    // Forzar estilos fullscreen en el wrap
+    wrap.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;border-radius:0;';
+    portal.appendChild(wrap);
+
+    const btn = wrap.querySelector('.garden-fs-btn');
+    if (btn) btn.textContent = '⊠';
+
     const onKey = e => { if (e.key === 'Escape') { _gardenToggleFS(); document.removeEventListener('keydown', onKey); } };
     document.addEventListener('keydown', onKey);
+  } else {
+    // Restaurar al lugar original
+    const portal = document.getElementById('gardenFSPortal');
+    const ph     = document.getElementById('gardenFSPlaceholder');
+    wrap.removeAttribute('style');
+    if (ph) { ph.parentNode.insertBefore(wrap, ph); ph.remove(); }
+    if (portal) portal.remove();
+
+    const btn = wrap.querySelector('.garden-fs-btn');
+    if (btn) btn.textContent = '⛶';
   }
 }
 
