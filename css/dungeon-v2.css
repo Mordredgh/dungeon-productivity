@@ -341,19 +341,24 @@ input, textarea, select {
 .boss-layout {
   display: block !important;
 }
+/* Sin overflow-x para que el grid tome el ancho real del contenedor */
 .boss-scroll {
-  overflow-x: auto;
+  overflow-x: visible !important;
+  width: 100% !important;
 }
 .boss-scroll .boss-grid {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
   flex-wrap: unset !important;
   justify-content: unset !important;
   gap: 14px !important;
+  width: 100% !important;
 }
+/* Quitar el ancho fijo y el flex-shrink de bcard */
 .boss-scroll .bcard {
   width: auto !important;
   min-width: 0 !important;
+  flex-shrink: unset !important;
 }
 
 /* ─── REDUCED MOTION — respetar preferencia del OS ──────────── */
