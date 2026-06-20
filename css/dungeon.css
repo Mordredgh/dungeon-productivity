@@ -775,7 +775,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .bcard {
   width: 280px;
   height: auto;
-  background: linear-gradient(180deg, rgba(12,3,22,.82) 0%, rgba(6,6,18,.92) 55%, rgba(4,4,14,.97) 100%), var(--bcard-bg, none);
+  background: linear-gradient(180deg, rgba(12,3,22,.45) 0%, rgba(6,6,18,.65) 55%, rgba(4,4,14,.88) 100%), var(--bcard-bg, none);
   border: 1px solid rgba(251,113,133,.2);
   border-top: 2px solid var(--rc, #fb7185);
   border-radius: 14px;
