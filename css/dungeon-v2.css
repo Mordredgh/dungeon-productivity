@@ -33,6 +33,13 @@
   --v-fantasy: 'Cinzel', 'Georgia', serif;
 }
 
+/* ─── ELIMINAR AURORA Y ORBES — void black necesita negro puro ── */
+/* El body::before y .orb-layer añaden gradientes azul/morado que
+   convierten el negro en navy. Con void black los quitamos. */
+body::before { display: none !important; }
+.orb-layer   { display: none !important; }
+.orb         { display: none !important; }
+
 /* ─── BASE TOKENS OVERRIDE ───────────────────────────────────── */
 [data-theme="dark"] {
   --bg:    #08080d;
