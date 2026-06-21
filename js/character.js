@@ -15,21 +15,26 @@ const RACE_LABELS = {
   orco:   { name: 'Orco',   icon: '💪', bonus: 'Perdona 1 día' },
 };
 
-/* ── Selección visual de clase / raza ────────────────────── */
-function selectHeroClass(cls) {
+/* ── Selección visual de clase / raza (auto-save) ──────────── */
+async function selectHeroClass(cls) {
   const inp = document.getElementById('charEditClass');
   if (inp) inp.value = cls;
-  document.querySelectorAll('.csp-class-card').forEach(el =>
-    el.classList.toggle('csp-selected', el.dataset.cls === cls));
+  document.querySelectorAll('.chr-class-pill').forEach(el =>
+    el.classList.toggle('chr-selected', el.dataset.cls === cls));
   _charPreviewPortrait();
+  await saveHero({ hero_class: cls });
+  renderHeroUI();
+  if (typeof applyClassTheme === 'function') applyClassTheme();
 }
 
-function selectHeroRace(race) {
+async function selectHeroRace(race) {
   const inp = document.getElementById('charEditRace');
   if (inp) inp.value = race;
-  document.querySelectorAll('.csp-race-card').forEach(el =>
-    el.classList.toggle('csp-selected', el.dataset.race === race));
+  heroRace = race;
+  document.querySelectorAll('.chr-race-pill').forEach(el =>
+    el.classList.toggle('chr-selected', el.dataset.race === race));
   _charPreviewPortrait();
+  await saveHero({ race });
 }
 
 function _cspToggleNightmare() {
@@ -40,7 +45,7 @@ function _cspToggleNightmare() {
   if (tog) tog.classList.toggle('csp-on', cb.checked);
 }
 
-/* ── Atributos ───────────────────────────────────────────── */
+/* ── Atributos (legacy helper, usado por assignAttrPoint) ──── */
 function _cspAttrRowHtml(key, icon, name, eff) {
   const val    = hero[key] || 0;
   const canAdd = (hero.attr_points || 0) > 0;
@@ -76,7 +81,7 @@ async function assignAttrPoint(key) {
   renderCharacterSheet();
 }
 
-/* ── Slots de equipo ─────────────────────────────────────── */
+/* ── Slots de equipo (legacy — se mantienen para compatibilidad) */
 function _cspWeaponSlotHtml(label, icon, weapon) {
   if (!weapon) return `
     <div class="csp-eq-slot" onclick="switchView('inventory')" title="Equipar desde inventario">
@@ -130,7 +135,7 @@ function _cspArmorSlotHtml(slotKey, label, icon) {
     </div>`;
 }
 
-/* ── Grid de inventario ──────────────────────────────────── */
+/* ── Grid de inventario ──────────────────────────────────────── */
 function _cspInvGridHtml() {
   const bag = (typeof weapons !== 'undefined' ? weapons : []).filter(w => !w.is_equipped);
   const inv = typeof inventory !== 'undefined' ? inventory : [];
@@ -177,76 +182,41 @@ function _cspInvGridHtml() {
   return `<div class="csp-inv-grid">${cells.join('')}</div>`;
 }
 
-/* ── Clases secretas (sin cambios) ──────────────────────── */
+/* ── Clases secretas — siluetas (sin revelar condiciones) ────── */
 function _charSecretClassesHtml() {
   const defs = typeof SECRET_CLASS_DEFS !== 'undefined' ? SECRET_CLASS_DEFS : [];
   if (!defs.length) return '';
   const unlocked = (() => { try { return JSON.parse(hero.secret_classes || '[]'); } catch { return []; } })();
-  const prog = typeof getSecretProgress === 'function' ? getSecretProgress() : {};
-
-  const progressFor = key => {
-    if (key === 'crononauta')     return `${prog.midnight_total || 0}/100 misiones de madrugada`;
-    if (key === 'paladin')        return `${prog.health_total || 0}/50 misiones de salud`;
-    if (key === 'nigromante')     return `${prog.hp_zeros || 0}/3 veces al mínimo HP`;
-    if (key === 'titan')          return `${prog.total_active_days || 0}/500 días activos`;
-    if (key === 'druida')         return `${prog.midnight_streak || 0}/30 días madrugada consecutivos`;
-    if (key === 'estrella-caida') {
-      const base = ['crononauta', 'paladin', 'nigromante', 'titan', 'druida'];
-      return `${base.filter(k => unlocked.includes(k)).length}/5 clases secretas`;
-    }
-    return '';
-  };
 
   const cards = defs.map(d => {
     const isUnlocked  = unlocked.includes(d.key);
     const portraitUrl = `${CDN}dungeon/${d.portrait}`;
-    const progText    = progressFor(d.key);
-    const barPct = (() => {
-      const k = d.key;
-      if (k === 'crononauta')     return Math.min(100, Math.round((prog.midnight_total || 0) / 100 * 100));
-      if (k === 'paladin')        return Math.min(100, Math.round((prog.health_total || 0) / 50 * 100));
-      if (k === 'nigromante')     return Math.min(100, Math.round((prog.hp_zeros || 0) / 3 * 100));
-      if (k === 'titan')          return Math.min(100, Math.round((prog.total_active_days || 0) / 500 * 100));
-      if (k === 'druida')         return Math.min(100, Math.round((prog.midnight_streak || 0) / 30 * 100));
-      if (k === 'estrella-caida') {
-        const base = ['crononauta', 'paladin', 'nigromante', 'titan', 'druida'];
-        return Math.round(base.filter(x => unlocked.includes(x)).length / 5 * 100);
-      }
-      return 0;
-    })();
+    if (!isUnlocked) {
+      return `<div class="chr-secret-card chr-secret-locked" title="Clase secreta — aún no desbloqueada">
+                <span class="chr-secret-mystery">?</span>
+              </div>`;
+    }
     return `
-      <div class="secret-class-card ${isUnlocked ? 'secret-unlocked' : 'secret-locked'}">
-        <div class="secret-class-portrait">
-          ${isUnlocked
-            ? `<img src="${portraitUrl}" class="secret-portrait-img" alt="${escHtml(d.name)}"
-                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-               <div class="secret-portrait-emoji" style="display:none">${d.icon}</div>`
-            : `<div class="secret-portrait-emoji secret-portrait-mystery">?</div>`}
+      <div class="chr-secret-card chr-secret-unlocked" title="${escHtml(d.name)} — ${escHtml(d.bonus)}">
+        <img src="${portraitUrl}" alt="${escHtml(d.name)}"
+             onerror="this.style.display='none'">
+        <div class="chr-secret-overlay">
+          <div class="chr-secret-name">${escHtml(d.name)}</div>
         </div>
-        <div class="secret-class-info">
-          <div class="secret-class-name">${isUnlocked ? escHtml(d.name) : '??? Clase Secreta ???'}</div>
-          ${isUnlocked
-            ? `<div class="secret-class-bonus">✨ ${escHtml(d.bonus)}</div>
-               <button class="btn btn-primary" style="margin-top:6px;font-size:11px;padding:4px 12px"
-                 onclick="adoptSecretClass('${d.key}')">Adoptar Clase</button>`
-            : `<div class="secret-class-cond">${escHtml(d.condition)}</div>
-               <div class="secret-class-prog-bar"><div class="secret-class-prog-fill" style="width:${barPct}%"></div></div>
-               <div class="secret-class-prog-txt">${escHtml(progText)}</div>`}
-        </div>
+        <button class="chr-secret-adopt" onclick="adoptSecretClass('${d.key}')">Adoptar</button>
       </div>`;
   }).join('');
 
   return `
-    <div class="csp-section">
-      <div class="csp-section-hd"><span class="csp-section-hd-icon">🔮</span>Clases Secretas</div>
-      <div style="padding:14px 18px">
-        <p style="font-size:12px;color:var(--text3);margin:0 0 12px">Completa condiciones especiales para desbloquear clases únicas.</p>
-        <div class="secret-classes-grid">${cards}</div>
+    <div class="chr-section">
+      <div class="chr-section-hd">Clases secretas</div>
+      <div class="chr-secret-section">
+        <div class="chr-secret-grid">${cards}</div>
       </div>
     </div>`;
 }
 
-/* ── Retrato ─────────────────────────────────────────────── */
+/* ── Retrato ─────────────────────────────────────────────────── */
 function _charPortraitHtml() {
   const cls  = hero.hero_class || 'guerrero';
   const race = heroRace || hero.race || 'humano';
@@ -269,7 +239,78 @@ function _charPreviewPortrait() {
     <div class="char-portrait-emoji" style="display:none">${hero.avatar || '🧙'}</div>`;
 }
 
-/* ── renderCharacterSheet ─────────────────────────────────── */
+/* ── Helpers Chronicle B ─────────────────────────────────────── */
+function _chrAttrCardHtml(key, icon, name, eff) {
+  const val    = hero[key] || 0;
+  const canAdd = (hero.attr_points || 0) > 0;
+  return `
+    <div class="chr-attr-card">
+      <div class="chr-attr-top-row">
+        <span class="chr-attr-val">${val}</span>
+        <span class="chr-attr-ico">${icon}</span>
+      </div>
+      <div class="chr-attr-name">${name}</div>
+      <div class="chr-attr-eff">${eff}</div>
+      <button class="chr-attr-plus" ${canAdd ? '' : 'disabled'}
+              onclick="assignAttrPoint('${key}')" aria-label="+1 ${name}">+</button>
+    </div>`;
+}
+
+function _chrEqRowHtml(slotKey, label, icon, weapon, fallbackView) {
+  if (!weapon) return `
+    <div class="chr-eq-row" onclick="switchView('${fallbackView}')" title="Equipar">
+      <span class="chr-eq-icon">${icon}</span>
+      <div class="chr-eq-info">
+        <div class="chr-eq-vacant">Vacío</div>
+        <div class="chr-eq-slot-lbl">${label}</div>
+      </div>
+    </div>`;
+  const def  = WEAPON_DEFS.find(d => d.key === weapon.weapon_key) || { icon };
+  const tier = WEAPON_TIERS[weapon.tier] || { color: '#9ca3af', label: weapon.tier };
+  const glow = (weapon.tier === 'legendario' || weapon.tier === 'mitico') ? 'anim-pulse-glow' : '';
+  return `
+    <div class="chr-eq-row chr-eq-filled ${glow}" onclick="unequipWeapon('${weapon.id}')" title="Click para desequipar">
+      <span class="chr-eq-icon">${def.icon}</span>
+      <div class="chr-eq-info">
+        <div class="chr-eq-name">${escHtml(weapon.name)}</div>
+        <div class="chr-eq-tier" style="color:${tier.color}">${tier.label}</div>
+      </div>
+      <div class="chr-eq-slot-lbl">${label}</div>
+    </div>`;
+}
+
+function _chrArmorRowHtml(slotKey, label, icon) {
+  const eq = (typeof weapons !== 'undefined' ? weapons : [])
+    .find(w => w.is_equipped && w.slot === slotKey);
+  if (!eq) return `
+    <div class="chr-eq-row" onclick="switchView('smithy')" title="Forjar o comprar">
+      <span class="chr-eq-icon">${icon}</span>
+      <div class="chr-eq-info">
+        <div class="chr-eq-vacant">Vacío</div>
+        <div class="chr-eq-slot-lbl">${label}</div>
+      </div>
+    </div>`;
+  const tier     = WEAPON_TIERS[eq.tier] || { color: '#9ca3af', label: eq.tier };
+  const armorDef = typeof ARMOR_DEFS !== 'undefined'
+    ? ARMOR_DEFS.find(d => d.key === eq.weapon_key) : null;
+  const statLine = armorDef
+    ? (armorDef.statKey === 'hpMax'
+        ? `+${armorDef.statBase[eq.tier] || 0} HP`
+        : `+${Math.round((armorDef.statBase[eq.tier] || 0) * 100)}%`)
+    : '';
+  const glow = (eq.tier === 'legendario' || eq.tier === 'mitico') ? 'anim-pulse-glow' : '';
+  return `
+    <div class="chr-eq-row chr-eq-filled ${glow}" onclick="unequipWeapon('${eq.id}')" title="Click para desequipar">
+      <span class="chr-eq-icon">${icon}</span>
+      <div class="chr-eq-info">
+        <div class="chr-eq-name">${escHtml(eq.name)}</div>
+        <div class="chr-eq-tier" style="color:${tier.color}">${statLine || tier.label}</div>
+      </div>
+      <div class="chr-eq-slot-lbl">${label}</div>
+    </div>`;
+}
+
+/* ── renderCharacterSheet — Chronicle B (3 columnas) ─────────── */
 function renderCharacterSheet() {
   const el = document.getElementById('characterSheet');
   if (!el || !hero) return;
@@ -282,235 +323,217 @@ function renderCharacterSheet() {
   const mainHand = equipped.find(w => w.slot === 'main_hand');
   const offHand  = equipped.find(w => w.slot === 'off_hand');
   const gold     = typeof getGold === 'function' ? getGold() : 0;
-
-  const xpPrev = xpForLevel(lvl - 1);
-  const xpNext = xpForLevel(lvl);
-  const xpPct  = Math.min(100, Math.round(((hero.xp_total || 0) - xpPrev) / Math.max(1, xpNext - xpPrev) * 100));
-  const hpPct  = Math.round(((hero.hp || 0) / Math.max(1, hero.hp_max || 100)) * 100);
-
-  const clsDef  = CLASS_LABELS[cls]  || { name: cls,  icon: '⚔️', bonus: '' };
-  const raceDef = RACE_LABELS[race]  || { name: race, icon: '🧑', bonus: '' };
-
+  const xpPrev   = xpForLevel(lvl - 1);
+  const xpNext   = xpForLevel(lvl);
+  const xpPct    = Math.min(100, Math.round(((hero.xp_total || 0) - xpPrev) / Math.max(1, xpNext - xpPrev) * 100));
+  const hpPct    = Math.round(((hero.hp || 0) / Math.max(1, hero.hp_max || 100)) * 100);
   const ptsBadge = (hero.attr_points || 0) > 0
-    ? `<span class="csp-attr-hd-pts">${hero.attr_points} pto${(hero.attr_points || 0) === 1 ? '' : 's'}</span>`
+    ? `<span class="chr-pts-badge">${hero.attr_points} pts</span>`
     : '';
-
   const hist = (() => { try { return JSON.parse(hero.level_history || '[]'); } catch { return []; } })();
-  const histRows = hist.length
-    ? [...hist].reverse().slice(0, 12).map(e =>
-        `<div class="csp-hist-row"><span class="csp-hist-lvl">Nivel ${e.level}</span><span class="csp-hist-date">${e.date || ''}</span></div>`
-      ).join('')
-    : `<p style="color:var(--text3);font-size:12px;margin:6px 0">Sube de nivel para registrar el historial.</p>`;
 
-  el.innerHTML = `<div class="csp-layout">
+  el.innerHTML = `<div class="chr-layout">
 
-    <!-- IDENTITY -->
-    <div class="csp-identity">
-      <div class="csp-identity-top">
-        <div class="csp-portrait-wrap">${_charPortraitHtml()}</div>
-        <div class="csp-identity-info">
-          <h2 class="csp-hero-name">${escHtml(hero.name || 'Héroe')}</h2>
-          <div class="csp-hero-title">Nivel ${lvl} &middot; ${title}</div>
-          <div class="csp-badges">
-            <span class="csp-badge csp-badge--class">${clsDef.icon} ${clsDef.name}</span>
-            <span class="csp-badge csp-badge--race">${raceDef.icon} ${raceDef.name}</span>
-            ${(hero.prestige || 0) > 0
-              ? `<span class="csp-badge" style="color:var(--gold);border-color:rgba(249,226,175,.3);background:rgba(249,226,175,.07)">⭐ ×${hero.prestige}</span>`
-              : ''}
-          </div>
-          <div class="csp-bars">
-            <div class="csp-bar-row">
-              <span class="csp-bar-lbl">XP</span>
-              <div class="csp-bar-track"><div class="csp-bar-fill csp-bar-fill--xp" style="width:${xpPct}%"></div></div>
-              <span class="csp-bar-val">${(hero.xp_total || 0).toLocaleString()}</span>
-            </div>
-            <div class="csp-bar-row">
-              <span class="csp-bar-lbl">HP</span>
-              <div class="csp-bar-track"><div class="csp-bar-fill csp-bar-fill--hp" style="width:${hpPct}%"></div></div>
-              <span class="csp-bar-val">${hero.hp || 0}/${hero.hp_max || 100}</span>
-            </div>
-          </div>
+    <!-- COLUMNA IZQUIERDA: Retrato + Vitales -->
+    <div class="chr-col-left">
+
+      <div class="chr-portrait-card">
+        <div class="char-portrait-ring">
+          <img src="${CDN}dungeon/char_${cls}_${race}.png" class="char-portrait-img" alt=""
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="char-portrait-emoji" style="display:none">${hero.avatar || '🧙'}</div>
+        </div>
+        <div class="chr-portrait-overlay">
+          <div class="chr-hero-name">${escHtml(hero.name || 'Héroe')}</div>
+          <div class="chr-hero-sub">Nivel ${lvl} · ${title}${(hero.prestige || 0) > 0
+            ? ` <span class="chr-prestige-pill">⭐×${hero.prestige}</span>` : ''}</div>
         </div>
       </div>
-      <div class="csp-quick-stats">
-        <div class="csp-qstat">
-          <span class="csp-qstat-val">🪙 ${gold.toLocaleString()}</span>
-          <span class="csp-qstat-lbl">Oro</span>
+
+      <div class="chr-vitals">
+        <div class="chr-bar-row">
+          <span class="chr-bar-lbl">HP</span>
+          <div class="chr-bar-track"><div class="chr-bar-fill chr-bar-hp" style="width:${hpPct}%"></div></div>
+          <span class="chr-bar-val">${hero.hp || 0}/${hero.hp_max || 100}</span>
         </div>
-        <div class="csp-qstat">
-          <span class="csp-qstat-val">🔥 ${hero.streak || 0}</span>
-          <span class="csp-qstat-lbl">Racha</span>
-        </div>
-        <div class="csp-qstat">
-          <span class="csp-qstat-val">🏆 ${hero.longest_streak || 0}</span>
-          <span class="csp-qstat-lbl">Mejor</span>
-        </div>
-        <div class="csp-qstat">
-          <span class="csp-qstat-val">✅ ${hero.quests_done || 0}</span>
-          <span class="csp-qstat-lbl">Misiones</span>
+        <div class="chr-bar-row">
+          <span class="chr-bar-lbl">XP</span>
+          <div class="chr-bar-track"><div class="chr-bar-fill chr-bar-xp" style="width:${xpPct}%"></div></div>
+          <span class="chr-bar-val">${xpPct}%</span>
         </div>
       </div>
-      <div id="heroScoreWidget" class="hero-score-widget" style="margin-top:12px"></div>
-    </div>
 
-    <!-- CLASE -->
-    <div class="csp-section">
-      <div class="csp-section-hd"><span class="csp-section-hd-icon">⚔️</span>Clase del Héroe</div>
-      <div class="csp-class-picker">
-        ${Object.entries(CLASS_LABELS).map(([k, d]) => `
-          <div class="csp-class-card${k === cls ? ' csp-selected' : ''}" data-cls="${k}" onclick="selectHeroClass('${k}')">
-            <div class="csp-class-icon">${d.icon}</div>
-            <div class="csp-class-name">${d.name}</div>
-            <div class="csp-class-bonus">${d.bonus || ''}</div>
-          </div>`).join('')}
+      <div class="chr-quickstats">
+        <div class="chr-qs"><span class="chr-qs-v">🪙 ${gold.toLocaleString()}</span><span class="chr-qs-l">Oro</span></div>
+        <div class="chr-qs"><span class="chr-qs-v">🔥 ${hero.streak || 0}</span><span class="chr-qs-l">Racha</span></div>
+        <div class="chr-qs"><span class="chr-qs-v">✅ ${hero.quests_done || 0}</span><span class="chr-qs-l">Misiones</span></div>
+        <div class="chr-qs"><span class="chr-qs-v">🏆 ${hero.longest_streak || 0}</span><span class="chr-qs-l">Mejor racha</span></div>
       </div>
-      <input type="hidden" id="charEditClass" value="${cls}">
+
+      <div id="heroScoreWidget" class="hero-score-widget" style="margin-top:8px"></div>
     </div>
 
-    <!-- RAZA -->
-    <div class="csp-section">
-      <div class="csp-section-hd"><span class="csp-section-hd-icon">🧬</span>Raza</div>
-      <div class="csp-race-picker">
-        ${Object.entries(RACE_LABELS).map(([k, d]) => `
-          <div class="csp-race-card${k === race ? ' csp-selected' : ''}" data-race="${k}" onclick="selectHeroRace('${k}')">
-            <div class="csp-race-icon">${d.icon}</div>
-            <div class="csp-race-name">${d.name}</div>
-            <div class="csp-race-bonus">${d.bonus || ''}</div>
-          </div>`).join('')}
-      </div>
-      <input type="hidden" id="charEditRace" value="${race}">
-    </div>
+    <!-- COLUMNA CENTRO: Atributos + Clase + Clases Secretas -->
+    <div class="chr-col-center">
 
-    <!-- ATRIBUTOS -->
-    <div class="csp-section">
-      <div class="csp-section-hd"><span class="csp-section-hd-icon">📊</span>Atributos${ptsBadge}</div>
-      <div class="csp-attr-list">
-        ${_cspAttrRowHtml('str',   '💪', 'Fuerza',       '+1% XP épicas')}
-        ${_cspAttrRowHtml('intel', '🧠', 'Intelecto',    '+1% XP encargos')}
-        ${_cspAttrRowHtml('agi',   '🏃', 'Agilidad',     '+1% Oro')}
-        ${_cspAttrRowHtml('con',   '❤️', 'Constitución', '+2 HP máx')}
-        ${_cspAttrRowHtml('lck',   '🍀', 'Suerte',       '+1 botín c/5 pts')}
-      </div>
-    </div>
-
-    <!-- EQUIPO -->
-    <div class="csp-section">
-      <div class="csp-section-hd"><span class="csp-section-hd-icon">🗡️</span>Equipo</div>
-      <div class="csp-equip-body">
-        <div class="csp-equip-sublbl">Armas</div>
-        <div class="csp-weapon-row">
-          ${_cspWeaponSlotHtml('Arma principal',  '⚔️', mainHand)}
-          ${_cspWeaponSlotHtml('Arma secundaria', '🗡️', offHand)}
-        </div>
-        <div class="csp-equip-sublbl">Armadura</div>
-        <div class="csp-armor-row">
-          ${_cspArmorSlotHtml('head',  'Casco',   '⛑️')}
-          ${_cspArmorSlotHtml('body',  'Pecho',   '🧱')}
-          ${_cspArmorSlotHtml('hands', 'Guantes', '🧤')}
-          ${_cspArmorSlotHtml('legs',  'Grebas',  '🦵')}
-          ${_cspArmorSlotHtml('feet',  'Botas',   '👢')}
+      <div class="chr-section">
+        <div class="chr-section-hd">Atributos ${ptsBadge}</div>
+        <div class="chr-attr-grid">
+          ${_chrAttrCardHtml('str',   '💪', 'Fuerza',       '+1% XP épicas')}
+          ${_chrAttrCardHtml('intel', '🧠', 'Intelecto',    '+1% XP encargos')}
+          ${_chrAttrCardHtml('agi',   '🏃', 'Agilidad',     '+1% Oro')}
+          ${_chrAttrCardHtml('con',   '❤️', 'Constitución', '+2 HP máx')}
+          ${_chrAttrCardHtml('lck',   '🍀', 'Suerte',       '+1 botín /5')}
         </div>
       </div>
-    </div>
 
-    <!-- MOCHILA -->
-    <div class="csp-section">
-      <div class="csp-section-hd" style="justify-content:space-between">
-        <span style="display:flex;align-items:center;gap:8px">
-          <span class="csp-section-hd-icon">🎒</span>Mochila
-        </span>
-        <button onclick="switchView('inventory')"
-                style="font-size:10px;background:none;border:1px solid var(--border);border-radius:6px;padding:3px 10px;color:var(--text2);cursor:pointer;font-family:var(--font-body)">
-          Ver todo
-        </button>
+      <div class="chr-section">
+        <div class="chr-section-hd">Clase del héroe</div>
+        <div class="chr-class-grid">
+          ${Object.entries(CLASS_LABELS).map(([k, d]) => `
+            <div class="chr-class-pill${k === cls ? ' chr-selected' : ''}" data-cls="${k}" onclick="selectHeroClass('${k}')">
+              <span class="chr-pill-icon">${d.icon}</span>
+              <span class="chr-pill-name">${d.name}</span>
+              <span class="chr-pill-bonus">${d.bonus || ''}</span>
+            </div>`).join('')}
+        </div>
+        <input type="hidden" id="charEditClass" value="${cls}">
       </div>
-      <div class="csp-inv-wrap">${_cspInvGridHtml()}</div>
+
+      ${_charSecretClassesHtml()}
+
     </div>
 
-    <!-- CONFIGURACIÓN -->
-    <div class="csp-section">
-      <div class="csp-section-hd"><span class="csp-section-hd-icon">📝</span>Configuración</div>
-      <div class="csp-config-body">
-        <div class="csp-form-field">
-          <label class="csp-form-lbl" for="charEditName">Nombre del héroe</label>
-          <input class="csp-form-input" id="charEditName" type="text" value="${escHtml(hero.name || '')}">
+    <!-- COLUMNA DERECHA: Equipo + Raza + Historial + Carnet -->
+    <div class="chr-col-right">
+
+      <div class="chr-section">
+        <div class="chr-section-hd">Equipo</div>
+        <div class="chr-eq-list">
+          ${_chrEqRowHtml('main_hand', 'Arma principal',  '⚔️', mainHand, 'inventory')}
+          ${_chrEqRowHtml('off_hand',  'Arma secundaria', '🗡️', offHand,  'inventory')}
+          ${_chrArmorRowHtml('head',  'Casco',   '⛑️')}
+          ${_chrArmorRowHtml('body',  'Pecho',   '🧱')}
+          ${_chrArmorRowHtml('hands', 'Guantes', '🧤')}
+          ${_chrArmorRowHtml('legs',  'Grebas',  '🦵')}
+          ${_chrArmorRowHtml('feet',  'Botas',   '👢')}
         </div>
-        <div class="csp-form-field">
-          <label class="csp-form-lbl" for="charEditGuild">Nombre del gremio</label>
-          <input class="csp-form-input" id="charEditGuild" type="text"
-                 placeholder="Gremio del Caos Productivo" value="${escHtml(guildName || '')}">
-        </div>
-        <div class="csp-form-field">
-          <label class="csp-form-lbl" for="charEditWebhook">Webhook al subir de nivel</label>
-          <input class="csp-form-input" id="charEditWebhook" type="url"
-                 placeholder="https://n8n.tudominio.com/webhook/..." value="${escHtml(webhookUrl || '')}">
-        </div>
-        <div class="csp-nightmare-row" onclick="_cspToggleNightmare()">
-          <span style="font-size:20px;flex-shrink:0">🔥</span>
-          <span class="csp-nightmare-text">Modo Pesadilla — fallar una Daily duele el doble, pero XP y oro también son el doble</span>
-          <div class="csp-toggle${hero.nightmare_mode ? ' csp-on' : ''}"></div>
-          <input type="checkbox" id="charEditNightmare" ${hero.nightmare_mode ? 'checked' : ''} style="display:none">
-        </div>
-        <button class="csp-save-btn" onclick="saveCharacterSheet()">Guardar cambios</button>
       </div>
-    </div>
 
-    <!-- HISTORIAL DE NIVELES -->
-    <div class="csp-section">
-      <div class="csp-section-hd"><span class="csp-section-hd-icon">📅</span>Historial de Niveles</div>
-      ${(hero.prestige || 0) > 0
-        ? `<div class="csp-prestige-badge">⭐ Ascensiones: ${hero.prestige} · Bonus XP global: +${hero.prestige * 5}%</div>`
-        : ''}
-      <div class="csp-hist-body">${histRows}</div>
-      ${canPrestige()
-        ? `<button class="csp-prestige-btn" onclick="doPrestige()">⭐ Ascender — Reiniciar en Nivel 1 con +5% XP</button>`
-        : ''}
-    </div>
-
-    <!-- CARNET -->
-    <div class="csp-section">
-      <div class="csp-section-hd"><span class="csp-section-hd-icon">🪪</span>Carnet de Héroe</div>
-      <div class="csp-config-body">
-        <p style="font-size:12px;color:var(--text2);margin:0">Exporta tu ficha de personaje como imagen PNG.</p>
-        <button class="csp-save-btn" onclick="generateHeroCard()">⬇️ Descargar Carnet PNG</button>
+      <div class="chr-section">
+        <div class="chr-section-hd">Raza</div>
+        <div class="chr-race-grid">
+          ${Object.entries(RACE_LABELS).map(([k, d]) => `
+            <div class="chr-race-pill${k === race ? ' chr-selected' : ''}" data-race="${k}" onclick="selectHeroRace('${k}')">
+              <span class="chr-pill-icon">${d.icon}</span>
+              <span class="chr-pill-name">${d.name}</span>
+            </div>`).join('')}
+        </div>
+        <input type="hidden" id="charEditRace" value="${race}">
       </div>
-    </div>
 
-    ${_charSecretClassesHtml()}
+      ${hist.length ? `
+      <div class="chr-section">
+        <div class="chr-section-hd">Historial de nivel</div>
+        <div class="chr-hist-list">
+          ${[...hist].reverse().slice(0, 8).map(e =>
+            `<div class="chr-hist-row">
+               <span class="chr-hist-lv">Nv ${e.level}</span>
+               <span class="chr-hist-dt">${e.date || ''}</span>
+             </div>`).join('')}
+        </div>
+        ${canPrestige()
+          ? `<button class="chr-prestige-btn" onclick="doPrestige()">⭐ Ascender</button>`
+          : ''}
+      </div>` : ''}
+
+      <div class="chr-section">
+        <div class="chr-section-hd">Carnet del héroe</div>
+        <button class="chr-dl-btn" onclick="generateHeroCard()">⬇ Descargar PNG</button>
+      </div>
+
+    </div>
 
   </div>`;
 
   if (typeof renderHeroScoreWidget === 'function') renderHeroScoreWidget();
 }
 
-/* ── adoptSecretClass ────────────────────────────────────── */
+/* ── adoptSecretClass ─────────────────────────────────────────── */
 async function adoptSecretClass(key) {
   if (!hero) return;
   const unlocked = (() => { try { return JSON.parse(hero.secret_classes || '[]'); } catch { return []; } })();
   if (!unlocked.includes(key)) { toast('🔒', 'Primero debes desbloquear esa clase.'); return; }
   const def = (typeof SECRET_CLASS_DEFS !== 'undefined' ? SECRET_CLASS_DEFS : []).find(d => d.key === key);
   await saveHero({ hero_class: key });
-  applyClassTheme();
+  if (typeof applyClassTheme === 'function') applyClassTheme();
   toast(def?.icon || '🔮', `¡Adoptaste la clase ${def?.name || key}!`);
   renderHeroUI();
   renderCharacterSheet();
 }
 
-/* ── saveCharacterSheet ──────────────────────────────────── */
+/* ── saveCharacterSheet (clase + raza, por compatibilidad) ─────── */
 async function saveCharacterSheet() {
-  const name = document.getElementById('charEditName').value.trim();
+  const cls  = document.getElementById('charEditClass')?.value;
+  const race = document.getElementById('charEditRace')?.value;
+  if (cls)  { await saveHero({ hero_class: cls }); if (typeof applyClassTheme === 'function') applyClassTheme(); }
+  if (race) { heroRace = race; await saveHero({ race }); }
+  renderHeroUI();
+}
+
+/* ── Vista de Configuración ───────────────────────────────────── */
+function renderConfigView() {
+  const el = document.getElementById('configViewContent');
+  if (!el || !hero) return;
+
+  el.innerHTML = `
+    <div class="chr-config-view">
+      <div class="chr-config-hd">⚙️ Configuración</div>
+      <div class="chr-config-card">
+        <div class="chr-config-field">
+          <label class="chr-config-lbl" for="charEditName">Nombre del héroe</label>
+          <input class="chr-config-input" id="charEditName" type="text" value="${escHtml(hero.name || '')}">
+        </div>
+        <div class="chr-config-field">
+          <label class="chr-config-lbl" for="charEditGuild">Nombre del gremio</label>
+          <input class="chr-config-input" id="charEditGuild" type="text"
+                 placeholder="Gremio del Caos Productivo"
+                 value="${escHtml(hero.guild_name || guildName || '')}">
+        </div>
+        <div class="chr-config-field">
+          <label class="chr-config-lbl" for="charEditWebhook">Webhook al subir de nivel</label>
+          <input class="chr-config-input" id="charEditWebhook" type="url"
+                 placeholder="https://n8n.tudominio.com/webhook/..."
+                 value="${escHtml(hero.webhook_url || webhookUrl || '')}">
+        </div>
+        <div class="chr-nightmare-row" onclick="_cspToggleNightmare()">
+          <span style="font-size:20px;flex-shrink:0">🔥</span>
+          <span class="chr-nightmare-text">Modo Pesadilla — fallar una Daily duele el doble, pero XP y oro también son el doble</span>
+          <div class="csp-toggle${hero.nightmare_mode ? ' csp-on' : ''}"></div>
+          <input type="checkbox" id="charEditNightmare" ${hero.nightmare_mode ? 'checked' : ''} style="display:none">
+        </div>
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border)">
+          <button class="chr-config-save" onclick="saveConfigView()">Guardar cambios</button>
+        </div>
+        <div style="padding:14px 16px">
+          <p style="font-size:12px;color:var(--text2);margin:0 0 10px">Exporta tu ficha de personaje como imagen PNG.</p>
+          <button class="chr-dl-btn" style="width:100%;margin:0" onclick="generateHeroCard()">⬇ Descargar Carnet PNG</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function saveConfigView() {
+  const name = document.getElementById('charEditName')?.value.trim();
   if (!name) { toast('⚠️', 'El héroe necesita un nombre.'); return; }
-  const cls        = document.getElementById('charEditClass').value;
-  heroRace         = document.getElementById('charEditRace').value;
-  guildName        = document.getElementById('charEditGuild').value.trim();
-  webhookUrl       = document.getElementById('charEditWebhook').value.trim();
-  const nightmareMode = document.getElementById('charEditNightmare').checked;
-  const hpMaxBonus    = heroRace === 'enano' ? 110 : 100;
+  guildName  = document.getElementById('charEditGuild')?.value.trim() || '';
+  webhookUrl = document.getElementById('charEditWebhook')?.value.trim() || '';
+  const nightmareMode = document.getElementById('charEditNightmare')?.checked || false;
+  const hpMaxBonus    = (heroRace || hero.race || 'humano') === 'enano' ? 110 : 100;
   await saveHero({
-    name, hero_class: cls, race: heroRace,
-    hp_max: hpMaxBonus, guild_name: guildName,
-    webhook_url: webhookUrl, nightmare_mode: nightmareMode,
+    name, guild_name: guildName, webhook_url: webhookUrl,
+    nightmare_mode: nightmareMode, hp_max: hpMaxBonus,
   });
   renderHeroUI();
-  toast('🧙', 'Perfil actualizado.');
+  toast('🧙', 'Configuración guardada.');
 }

@@ -294,6 +294,7 @@ function switchView(v) {
     if (v === 'zones')        { if (typeof renderZones==='function')         renderZones(); }
     if (v === 'worldmap')     { if (typeof renderWorldMap==='function')      renderWorldMap(); }
     if (v === 'integrations') { renderIntegrations(); }
+    if (v === 'config')       { if (typeof renderConfigView === 'function') renderConfigView(); }
     const moreBtn = document.getElementById('mobileNavMoreBtn');
     if (moreBtn) {
       const primaryViews = ['quests', 'character', 'stats'];

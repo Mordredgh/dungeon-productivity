@@ -255,6 +255,7 @@
         <!-- Fila 5: exploración -->
         <button class="sidebar-item" data-view="zones" onclick="switchView('zones')" title="Zonas del Dungeon"><span class="si-icon">🗺️</span></button>
         <button class="sidebar-item" data-view="worldmap" onclick="switchView('worldmap')" title="Mapa del Mundo"><span class="si-icon">🌍</span></button>
+        <button class="sidebar-item" data-view="config" onclick="switchView('config')" title="Configuración"><span class="si-icon">⚙️</span></button>
       </div>
 
       <!-- LOGOUT -->
@@ -575,6 +576,11 @@
           </div>
         </div>
 
+        <!-- CONFIGURACIÓN -->
+        <div class="view" id="view-config">
+          <div id="configViewContent"></div>
+        </div>
+
         <!-- CHARACTER HUB — acceso desde el avatar -->
         <div class="view" id="view-character">
           <div class="char-tab-panel active" id="ctab-sheet">
@@ -773,6 +779,9 @@
     </button>
     <button class="mobile-more-item view-tab" data-view="integrations" onclick="closeMobileMore();switchView('integrations')">
       <span>🔗</span><span>Integrar</span>
+    </button>
+    <button class="mobile-more-item view-tab" data-view="config" onclick="closeMobileMore();switchView('config')">
+      <span>⚙️</span><span>Config</span>
     </button>
     <button class="mobile-more-item view-tab" data-view="goals" onclick="closeMobileMore();switchView('goals')">
       <span>🎯</span><span>Metas</span>
