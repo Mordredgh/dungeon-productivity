@@ -158,7 +158,6 @@ function renderInventory() {
       </div>`;
   };
 
-  const fragLabel = i => typeof spellFragLabel==='function' ? spellFragLabel(i.item_key.replace('spell_','')) : i.item_key;
   const potLabel  = i => { const p = (typeof PET_DEFS!=='undefined'?PET_DEFS:[]).find(p=>p.key===i.item_key.replace('pet_potion_','')); return p?`Poción de ${p.name}`:i.item_key; };
   const eggLabel  = i => { const p = (typeof PET_DEFS!=='undefined'?PET_DEFS:[]).find(p=>p.key===i.item_key.replace('pet_egg_','')); return p?`Huevo de ${p.name}`:i.item_key; };
 
@@ -169,6 +168,54 @@ function renderInventory() {
     </div>`;
 
   const empty = `<div class="inv-empty">Vacío</div>`;
+
+  /* RPG grid helpers for spells/potions */
+  const COLS = 5;
+  const spellOff = typeof _SPELL_OFFENSIVE !== 'undefined' ? _SPELL_OFFENSIVE : new Set();
+  const spellsOff = fragments.filter(r => spellOff.has(r.item_key.slice(6)));
+  const spellsDef = fragments.filter(r => !spellOff.has(r.item_key.slice(6)));
+
+  const rpgSlot = (item, catClass) => {
+    const meta = typeof _invItemMeta === 'function' ? _invItemMeta(item.item_key) : { name: item.item_key, icon: '🎁', color: '#94a3b8' };
+    const shortName = meta.name.split(' ').slice(-2).join(' ');
+    const badge = catClass === 'offense'
+      ? '<span class="inv-slot-badge inv-slot-badge--atk">ATK</span>'
+      : catClass === 'defense'
+        ? '<span class="inv-slot-badge inv-slot-badge--def">DEF</span>'
+        : '';
+    return `<button class="inv-slot" onclick="showInvItemDetail('${escHtml(item.item_key)}')"
+        title="${escHtml(meta.name)}" style="--inv-color:${meta.color}">
+      ${badge}
+      <div class="inv-slot-inner">
+        <img src="${CDN}dungeon/${item.item_key}.png" class="inv-slot-img" alt=""
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="inv-slot-emoji" style="display:none">${meta.icon}</div>
+        <div class="inv-slot-qty">×${item.quantity}</div>
+      </div>
+      <div class="inv-slot-name">${escHtml(shortName)}</div>
+    </button>`;
+  };
+
+  const rpgCat = (title, items, catClass, headerMod) => {
+    if (!items.length) return '';
+    const padded = [...items];
+    while (padded.length % COLS !== 0) padded.push(null);
+    const slots = padded.map(it => it ? rpgSlot(it, catClass) : '<div class="inv-slot inv-empty"></div>').join('');
+    return `<div class="inv-cat-header inv-cat-header--${headerMod}">${title}</div>
+            <div class="inv-grid">${slots}</div>`;
+  };
+
+  const eggSection = eggs.length ? section('🥚 Huevos',
+    `<div class="inv-items-grid">${eggs.map(i => {
+      const _iKey = i.item_key.replace(/^pet_egg_/, 'pet_egg_');
+      const img = CDN + 'dungeon/' + _iKey + '.png';
+      return `<div class="inv-item-row">
+        <img src="${img}" class="inv-item-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+        <span style="display:none;font-size:18px">🥚</span>
+        <span class="inv-item-name">${escHtml(eggLabel(i))}</span>
+        <span class="inv-item-qty">×${i.quantity}</span>
+      </div>`;
+    }).join('')}</div>`) : '';
 
   el.innerHTML = `
     <div class="inv-gold-banner">
@@ -188,17 +235,11 @@ function renderInventory() {
       `<div class="inv-weapons-list">${bag.map(weaponCard).join('')}</div>
        <button class="btn btn-ghost" style="font-size:12px;margin-top:8px" onclick="switchView('smithy')">⚒️ Ir al Herrero</button>`) : ''}
 
-    ${fragments.length ? section('✨ Fragmentos de Hechizo',
-      `<div class="inv-items-grid">${fragments.map(i=>itemRow(i,fragLabel)).join('')}</div>`) : ''}
-
-    ${potions.length ? section('🧪 Pociones de Mascota',
-      `<div class="inv-items-grid">${potions.map(i=>itemRow(i,potLabel)).join('')}</div>`) : ''}
-
-    ${eggs.length ? section('🥚 Huevos',
-      `<div class="inv-items-grid">${eggs.map(i=>itemRow(i,eggLabel)).join('')}</div>`) : ''}
-
-    ${consumables.length ? section('⚗️ Consumibles',
-      `<div class="inv-items-grid">${consumables.map(i=>itemRow(i,i2=>i2.item_key)).join('')}</div>`) : ''}
+    ${rpgCat('⚔️ Hechizos Ofensivos', spellsOff, 'offense', 'offense')}
+    ${rpgCat('🛡️ Hechizos Defensivos', spellsDef, 'defense', 'defense')}
+    ${rpgCat('🧪 Pociones de Mascota', potions, 'potion', 'potion')}
+    ${eggSection}
+    ${consumables.length ? rpgCat('⚗️ Consumibles', consumables, 'misc', 'misc') : ''}
 
     ${!weapons.length && !inv.length ? `<div class="inv-empty" style="margin-top:40px;font-size:15px">
       <div style="font-size:48px;margin-bottom:12px">🎒</div>
