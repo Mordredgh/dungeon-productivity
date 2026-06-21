@@ -253,7 +253,7 @@ const _VIEW_BG = {
 };
 const _CTAB_BG = {
   sheet:'fondo_character', skills:'fondo_habilidades', runes:'fondo_runas',
-  bestiary:'fondo_bestiario', smithy:'fondo_character', 'sala-personal':'fondo_character',
+  bestiary:'fondo_bestiario', smithy:'fondo_herrero', 'sala-personal':'fondo_character',
 };
 function _setPageBg(name) {
   const el = document.getElementById('dungeon-bg');
