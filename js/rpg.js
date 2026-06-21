@@ -574,7 +574,7 @@ function checkBossDeadline() {
   if (now.getDay() !== 0 || now.getHours() < 22) return;
   const state = getBossState();
   if (state.defeated) return;
-  const key = 'dungeon-boss-penalty-' + _bossWeekKey();
+  const key = 'dungeon-boss-penalty-' + _bossPeriodKey('weekly');
   if (localStorage.getItem(key)) return;
   localStorage.setItem(key, '1');
 

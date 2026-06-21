@@ -689,9 +689,11 @@ function _bossTimeLeft(cycle) {
     return `${h}h ${m}m`;
   }
   if (cycle === 'weekly') {
-    const dow = d.getDay(); // 0=Sun
-    const daysLeft = dow === 0 ? 0 : 7 - dow;
-    return daysLeft === 0 ? '¡Hoy!' : `${daysLeft}d`;
+    const dow = d.getDay(); // 0=Sun (start of week period)
+    // Period runs Sun–Sat. Sunday = boss just started (7 days ahead).
+    // Saturday = last day (period expires tonight at midnight).
+    const daysLeft = dow === 0 ? 7 : 7 - dow;
+    return daysLeft <= 1 ? '¡Hoy!' : `${daysLeft}d`;
   }
   // monthly
   const lastDay = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
