@@ -5514,3 +5514,31 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   .garden-wrap { aspect-ratio: 4/3; }
   .pets-tab-btn { font-size: 12px; padding: 6px 10px; }
 }
+
+/* ════════════════════════════════════════════════════════════
+   ZONA DE ANIMACIONES Y TRANSICIONES
+   ─────────────────────────────────────────────────────────
+   REGLAS:
+   1. TODO CSS nuevo de motion va AQUÍ — nunca disperso arriba.
+   2. Prefijo obligatorio: .anim-  (ej: .anim-fade-in, .anim-slide-up)
+   3. Nuevas clases de componente usan BEM-lite:
+        .{modulo}-{elemento}  y  .{modulo}-{elemento}--{mod}
+        ej: .quest-item--completing, .boss-banner--urgent
+   4. NUNCA uses !important en esta sección — resuelve con
+      especificidad de selector.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Utilidades de entrada/salida ──────────────────────────── */
+.anim-fade-in  { animation: _anim-fadeIn  0.28s ease-out both; }
+.anim-slide-up { animation: _anim-slideUp 0.28s ease-out both; }
+.anim-pop-in   { animation: _anim-popIn   0.32s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+@keyframes _anim-fadeIn  { from { opacity:0; }              to { opacity:1; } }
+@keyframes _anim-slideUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+@keyframes _anim-popIn   { from { opacity:0; transform:scale(0.88); }      to { opacity:1; transform:none; } }
+
+/* ── Modificadores de estado (BEM-lite, sin !important) ────── */
+/* Ejemplo: añadir .quest-item--completing en JS antes de remover el elemento */
+.quest-item--completing { pointer-events: none; }
+
+/* ── Nuevas animaciones y transiciones — agregar aquí abajo ── */

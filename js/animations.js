@@ -282,3 +282,47 @@ function animBootSequence() {
     animPageItems('.quest-item');
   }, [], 0.7);
 }
+
+/* ════════════════════════════════════════════════════════════
+   NAMESPACE  window.Anim
+   ─────────────────────────────────────────────────────────
+   TODO el código nuevo de animaciones/transiciones usa:
+     Anim.nombre()  en vez de agregar otro global animNombre()
+
+   Los alias animXxx() de arriba se mantienen para el código
+   existente — no los borres, solo deja de crear más.
+
+   Para agregar una animación nueva:
+     Anim.miNuevaAnim = function(el) { gsap.to(el, {...}); };
+   ════════════════════════════════════════════════════════════ */
+window.Anim = {
+  // Vistas
+  viewOut:          animViewOut,
+  viewIn:           animViewIn,
+  pageItems:        animPageItems,
+  // Toasts
+  toastIn:          animToastIn,
+  toastOut:         animToastOut,
+  // Misiones
+  questComplete:    animQuestComplete,
+  // Barras de recursos
+  xpBar:            animXPBar,
+  hpBar:            animHPBar,
+  manaBar:          animManaBar,
+  // Boss
+  bossCards:        animBossCards,
+  // Modales
+  levelUpModal:     animLevelUpModal,
+  modalOpen:        animModalOpen,
+  modalClose:       animModalClose,
+  // Character Hub tabs
+  charTabIn:        animCharTabIn,
+  // Mobile bottom sheet
+  mobileSheetOpen:  animMobileSheetOpen,
+  mobileSheetClose: animMobileSheetClose,
+  // Sala Personal
+  salaItems:        animSalaItems,
+  salaItemSelect:   animSalaItemSelect,
+  // Boot
+  bootSequence:     animBootSequence,
+};

@@ -147,6 +147,43 @@ Perfil:       name, hero_class, race, avatar, guild_name, webhook_url
 
 ---
 
+## Convenciones de código (anti-entropía)
+
+### JS — usar namespace `Anim`, no nuevos globals
+```js
+// ❌ MAL — agrega otro global al namespace de window
+function animNuevaCosa(el) { gsap.to(el, {...}); }
+
+// ✅ BIEN — se suma al namespace existente
+Anim.nuevaCosa = function(el) { gsap.to(el, {...}); };
+
+// Llamarlo desde otro archivo:
+if (window.Anim?.nuevaCosa) Anim.nuevaCosa(el);
+```
+- `window.Anim` está definido en `js/animations.js` al final del archivo
+- Los alias `animXxx()` existentes NO se borran — son backwards-compat
+- Para módulos nuevos (no de animación): `window.NombreModulo = { fn1, fn2 }` al final del archivo, en IIFE si tiene privados
+
+### CSS — zona de animaciones + prefijo `.anim-`
+```css
+/* ❌ MAL — añadir CSS de motion disperso en el archivo */
+.mi-cosa { animation: fadeIn 0.3s; }
+
+/* ✅ BIEN — ir al final de dungeon.css, en la ZONA DE ANIMACIONES */
+.anim-mi-cosa { animation: _anim-miCosa 0.3s ease-out both; }
+@keyframes _anim-miCosa { ... }
+```
+- Todo CSS nuevo de animación/transición va al **final de `dungeon.css`**, en la sección marcada
+- Prefijo `.anim-` obligatorio para clases de animación
+- Nuevas clases de componente usan BEM-lite: `.quest-item--completing`, `.boss-banner--urgent`
+- **Sin `!important` en la zona de animaciones** — usar especificidad de selector
+
+### Deploy
+Siempre usar `bash deploy.sh "mensaje"` en lugar de los pasos manuales.
+El script auto-bumpa SW version, todos los `?v=` en index.html, y verifica ASSETS.
+
+---
+
 ## Patrones y convenciones
 
 ### Completar una misión (`completeQuest`)
