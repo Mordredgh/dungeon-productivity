@@ -174,11 +174,13 @@ function animModalOpen(id) {
   if (typeof gsap === 'undefined') return;
   const overlay = document.getElementById(id);
   if (!overlay) return;
+  gsap.killTweensOf(overlay);
   const box = overlay.querySelector(
-    '.modal-box, .modal-content, .edit-modal, .quick-create-box, .shortcuts-box'
+    '.modal-box, .modal-content, .edit-modal, .quick-create-box, .shortcuts-box, .modal'
   );
-  gsap.fromTo(overlay, { opacity: 0 }, { opacity: 1, duration: 0.18, ease: 'none' });
-  if (box) gsap.fromTo(box, { scale: 0.92, y: 14, opacity: 0 }, { scale: 1, y: 0, opacity: 1, duration: 0.28, ease: 'back.out(1.3)' });
+  // clearProps after animation so no inline styles remain (CSS class takes over)
+  gsap.fromTo(overlay, { opacity: 0 }, { opacity: 1, duration: 0.18, ease: 'none', clearProps: 'opacity' });
+  if (box) { gsap.killTweensOf(box); gsap.fromTo(box, { scale: 0.92, y: 14, opacity: 0 }, { scale: 1, y: 0, opacity: 1, duration: 0.28, ease: 'back.out(1.3)', clearProps: 'transform,opacity' }); }
 }
 
 function animModalClose(id, cb) {

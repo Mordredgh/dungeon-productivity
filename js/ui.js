@@ -83,13 +83,14 @@ function openModal(id) {
 function closeModal(id) {
   const el = document.getElementById(id);
   if (!el || !el.classList.contains('open')) return;
-  el.style.pointerEvents = 'none';
-  if (typeof animModalClose === 'function') {
-    animModalClose(id, () => { el.classList.remove('open'); el.style.pointerEvents = ''; });
-  } else {
-    el.classList.remove('open');
-    el.style.pointerEvents = '';
+  // Kill any GSAP tweens and clear inline styles so CSS transition takes over
+  if (typeof gsap !== 'undefined') {
+    gsap.killTweensOf(el);
+    gsap.set(el, { clearProps: 'opacity,pointerEvents' });
+    const box = el.querySelector('.modal-box,.modal-content,.edit-modal,.quick-create-box,.shortcuts-box,.modal');
+    if (box) { gsap.killTweensOf(box); gsap.set(box, { clearProps: 'opacity,transform' }); }
   }
+  el.classList.remove('open'); // CSS transition: opacity .25s handles the visual fade
 }
 
 function showLevelUp(lvl) {
