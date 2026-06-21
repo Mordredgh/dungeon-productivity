@@ -39,7 +39,10 @@ function animViewOut(el, cb) {
 
 function animViewIn(el, viewId) {
   if (!el || typeof gsap === 'undefined') return;
-  gsap.fromTo(el, { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.28 });
+  // clearProps:'transform,opacity' es crítico: evita que GSAP deje un transform inline
+  // en el elemento padre, lo que crearía un stacking context que atrapa el ::before
+  // position:fixed y hace que el fondo se vea doble o mal posicionado.
+  gsap.fromTo(el, { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.28, clearProps: 'transform,opacity' });
 
   const sel = _ANIM_VIEW_SELECTORS[viewId];
   if (!sel) return;
