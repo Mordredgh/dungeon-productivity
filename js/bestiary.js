@@ -34,40 +34,48 @@ function renderBestiary() {
   const doneCount = all.filter(b => defeated.includes(b.key)).length;
   const pct       = total ? Math.round((doneCount / total) * 100) : 0;
 
+  const RARITY_LABEL = {
+    comun:'Común', raro:'Raro', epico:'Épico',
+    legendario:'Legendario', mitico:'Mítico', cataclismo:'Cataclismo'
+  };
+
   const renderCard = b => {
     const known = defeated.includes(b.key);
     const clr   = BESTIARY_RARITY_CLR[b.rarity] || '#9ca3af';
     const img   = `images/boss_${b.key}.png`;
-    return `<div class="bestiary-card ${known ? 'bestiary-known' : 'bestiary-unknown'}" style="--bc:${clr}">
-      <div class="bestiary-img-wrap">
-        <img src="${img}" class="bestiary-img${known ? '' : ' bestiary-locked'}" alt=""
+    return `<div class="bst-card ${known ? 'bst-known' : 'bst-unknown'}" style="--bc:${clr}">
+      <div class="bst-rarity-bar" style="background:${clr}22;border-top:2px solid ${clr}">
+        <span class="bst-rarity-label" style="color:${clr}">${RARITY_LABEL[b.rarity] || b.rarity}</span>
+      </div>
+      <div class="bst-img-wrap">
+        <img src="${img}" class="bst-img${known ? '' : ' bst-silhouette'}" alt=""
              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div class="bestiary-fallback" style="display:none">${known ? (b.emoji || '👹') : '❓'}</div>
-        ${known ? '' : '<div class="bestiary-lock-icon">🔒</div>'}
+        <div class="bst-img-fallback" style="display:none">${known ? (b.emoji || '👹') : '❓'}</div>
+        ${known ? '' : `<div class="bst-unknown-overlay"><span class="bst-q">?</span></div>`}
       </div>
-      <div class="bestiary-name" style="color:${known ? clr : 'var(--text3)'}">
-        ${known ? escHtml(b.name) : ''}
+      <div class="bst-name" style="color:${known ? clr : 'var(--text3)'}">
+        ${known ? escHtml(b.name) : '???'}
       </div>
-      <span class="bestiary-rarity" style="color:${clr}">${b.rarity}</span>
     </div>`;
   };
 
   const renderGroup = (label, bosses) => `
-    <div class="bestiary-group-label">${escHtml(label)}</div>
-    <div class="bestiary-grid">${bosses.map(renderCard).join('')}</div>`;
+    <div class="bst-group-label">${escHtml(label)}</div>
+    <div class="bst-grid">${bosses.map(renderCard).join('')}</div>`;
 
   const groups  = ['comun','raro','epico','legendario','mitico','cataclismo'];
   const seasonal = all.filter(b => b.seasonal);
 
   el.innerHTML = `
-    <div class="bestiary-header">
-      <span>Jefes derrotados: <strong>${doneCount} / ${total}</strong></span>
-      <div class="bestiary-prog-bar"><div class="bestiary-prog-fill" style="width:${pct}%"></div></div>
+    <div class="bst-header">
+      <div class="bst-count">📖 <strong>${doneCount}</strong> / ${total} jefes</div>
+      <div class="bst-prog-bar"><div class="bst-prog-fill" style="width:${pct}%"></div></div>
+      <div class="bst-pct">${pct}%</div>
     </div>
     ${groups.map(r => {
       const bosses = all.filter(b => !b.seasonal && b.rarity === r);
-      return bosses.length ? renderGroup(r.toUpperCase(), bosses) : '';
+      return bosses.length ? renderGroup(RARITY_LABEL[r] || r.toUpperCase(), bosses) : '';
     }).join('')}
-    ${seasonal.length ? renderGroup('ESTACIONALES', seasonal) : ''}
+    ${seasonal.length ? renderGroup('Estacionales', seasonal) : ''}
   `;
 }

@@ -83,10 +83,12 @@ function openModal(id) {
 function closeModal(id) {
   const el = document.getElementById(id);
   if (!el || !el.classList.contains('open')) return;
+  el.style.pointerEvents = 'none';
   if (typeof animModalClose === 'function') {
-    animModalClose(id, () => el.classList.remove('open'));
+    animModalClose(id, () => { el.classList.remove('open'); el.style.pointerEvents = ''; });
   } else {
     el.classList.remove('open');
+    el.style.pointerEvents = '';
   }
 }
 
@@ -372,7 +374,13 @@ document.addEventListener('keydown', e => {
   if (key === 'S') toggleSidebar();
   if (key === 'B') { bulkMode ? exitBulkMode() : enterBulkMode(); }
   if (e.key === '?') { e.preventDefault(); openModal('shortcutsModal'); }
-  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => {
+      if (typeof gsap !== 'undefined') { gsap.killTweensOf(m); gsap.set(m, { clearProps: 'opacity,pointerEvents' }); }
+      m.classList.remove('open');
+      m.style.pointerEvents = '';
+    });
+  }
   if (key === '1') switchView('quests');
   if (key === '2') switchView('character');
   if (key === '3') switchView('stats');

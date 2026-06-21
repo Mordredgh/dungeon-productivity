@@ -185,10 +185,13 @@ function animModalClose(id, cb) {
   if (typeof gsap === 'undefined') { cb && cb(); return; }
   const overlay = document.getElementById(id);
   if (!overlay) { cb && cb(); return; }
+  gsap.killTweensOf(overlay);
   const box = overlay.querySelector(
-    '.modal-box, .modal-content, .edit-modal, .quick-create-box, .shortcuts-box'
+    '.modal-box, .modal-content, .edit-modal, .quick-create-box, .shortcuts-box, .modal'
   );
-  const tl = gsap.timeline({ onComplete: cb });
+  if (box) gsap.killTweensOf(box);
+  const done = () => { gsap.set(overlay, { clearProps: 'opacity,pointerEvents' }); cb && cb(); };
+  const tl = gsap.timeline({ onComplete: done });
   if (box) tl.to(box, { scale: 0.92, y: 8, opacity: 0, duration: 0.18, ease: 'power2.in' });
   tl.to(overlay, { opacity: 0, duration: 0.14, ease: 'none' }, box ? '-=0.06' : 0);
 }

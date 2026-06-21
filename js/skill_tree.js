@@ -133,45 +133,95 @@ function getSkillMaxHP() {
 }
 
 /* ── RENDER ───────────────────────────────────────────────── */
+const _SKT_META = {
+  guerrero: { icon:'⚔️', label:'Guerrero',  color:'#ef4444' },
+  mago:     { icon:'🔮', label:'Mago',      color:'#a855f7' },
+  picaro:   { icon:'🗡️', label:'Pícaro',   color:'#60a5fa' },
+  clerigo:  { icon:'✝️', label:'Clérigo',  color:'#22c55e' },
+  arquero:  { icon:'🏹', label:'Arquero',  color:'#f59e0b' },
+  fundador: { icon:'🚀', label:'Fundador', color:'#06b6d4' },
+};
+
 function renderSkillTree() {
   const el = document.getElementById('skillTreeContent');
   if (!el || !hero) return;
 
-  const cls   = hero.hero_class || 'guerrero';
-  const defs  = SKILL_TREE_DEFS[cls] || [];
-  const pts   = hero.skill_points || 0;
-  const tiers = [1, 2, 3];
+  const cls  = hero.hero_class || 'guerrero';
+  const defs = SKILL_TREE_DEFS[cls] || [];
+  const pts  = hero.skill_points || 0;
+  const meta = _SKT_META[cls] || { icon:'⚡', label:cls, color:'var(--accent)' };
+
+  const t1 = defs.filter(s => s.tier === 1);
+  const t2 = defs.filter(s => s.tier === 2);
+  const t3 = defs.filter(s => s.tier === 3);
+
+  const connColor = (src, dst) => {
+    if (hasSkill(src?.id) && hasSkill(dst?.id)) return 'rgba(249,168,37,.65)';
+    if (hasSkill(src?.id)) return 'rgba(137,180,250,.45)';
+    return 'rgba(137,180,250,.15)';
+  };
+
+  const straightSVG = `<svg class="skt-svg" viewBox="0 0 228 36" preserveAspectRatio="none">
+    <line x1="45" y1="0" x2="45" y2="36" stroke="${connColor(t1[0],t2[0])}" stroke-width="2"/>
+    <line x1="183" y1="0" x2="183" y2="36" stroke="${connColor(t1[1],t2[1])}" stroke-width="2"/>
+  </svg>`;
+
+  const mergeSVG = `<svg class="skt-svg" viewBox="0 0 228 44" preserveAspectRatio="none">
+    <line x1="45" y1="44" x2="114" y2="0" stroke="${connColor(t2[0],t3[0])}" stroke-width="2"/>
+    <line x1="183" y1="44" x2="114" y2="0" stroke="${connColor(t2[1],t3[0])}" stroke-width="2"/>
+  </svg>`;
+
+  const nodeHtml = (s, isApex = false) => {
+    const learned   = hasSkill(s.id);
+    const learnable = canLearnSkill(s);
+    const state     = learned ? 'skt-learned' : learnable ? 'skt-available' : 'skt-locked';
+    const reqNames  = s.requires.map(r => defs.find(x => x.id === r)?.name || r).join(', ');
+    const shortDesc = s.desc.length > 32 ? s.desc.slice(0, 30) + '…' : s.desc;
+    return `
+      <div class="skt-node ${state}${isApex ? ' skt-apex' : ''}"
+           onclick="${learnable ? `learnSkill('${s.id}')` : ''}"
+           title="${escHtml(s.desc)}${reqNames ? ' — Requiere: ' + reqNames : ''}">
+        <div class="skt-ring">
+          <span class="skt-icon">${s.icon}</span>
+          ${learned ? '<div class="skt-check">✓</div>' : ''}
+          ${!learned && !learnable ? '<div class="skt-padlock">🔒</div>' : ''}
+        </div>
+        <div class="skt-name">${escHtml(s.name)}</div>
+        <div class="skt-eff">${escHtml(shortDesc)}</div>
+        ${learnable ? `<div class="skt-cta">★ Aprender</div>` : ''}
+      </div>`;
+  };
 
   el.innerHTML = `
-    <div class="skill-pts-bar">
-      <span>Puntos disponibles: <strong>${pts}</strong></span>
-      <span style="color:var(--text2);font-size:11px">+1 punto por nivel</span>
-    </div>
-    ${tiers.map(t => {
-      const skills = defs.filter(s => s.tier === t);
-      return `
-        <div class="skill-tier">
-          <div class="skill-tier-label">Tier ${t}</div>
-          <div class="skill-tier-row">
-            ${skills.map((s, si) => {
-              const learned   = hasSkill(s.id);
-              const learnable = canLearnSkill(s);
-              const branch    = t === 3 ? 'arcano' : si === 0 ? 'ofensivo' : 'defensivo';
-              const state     = learned ? 'desbloqueado' : learnable ? 'disponible' : 'bloqueado';
-              const nodeImg   = `${CDN}dungeon/skill_nodo_${branch}_${state}.png`;
-              return `
-                <div class="skill-card ${learned ? 'skill-learned' : learnable ? 'skill-available' : 'skill-locked'}"
-                     onclick="${learnable ? `learnSkill('${s.id}')` : ''}"
-                     title="${s.desc}${s.requires.length ? ' | Requiere: '+s.requires.map(r=>defs.find(x=>x.id===r)?.name||r).join(', ') : ''}">
-                  <img src="${nodeImg}" class="skill-node-img" alt=""
-                       onerror="this.style.display='none'">
-                  <div class="skill-icon">${s.icon}</div>
-                  <div class="skill-name">${s.name}</div>
-                  <div class="skill-desc">${s.desc}</div>
-                  ${learned ? '<div class="skill-badge">✓</div>' : learnable ? '<div class="skill-badge skill-badge-learn">+ Aprender</div>' : ''}
-                </div>`;
-            }).join('')}
-          </div>
-        </div>`;
-    }).join('')}`;
+    <div class="skt-wrap">
+      <div class="skt-header">
+        <div class="skt-class-badge" style="--skt-c:${meta.color}">
+          <span class="skt-class-icon">${meta.icon}</span>
+          <span class="skt-class-name">${meta.label}</span>
+        </div>
+        <div class="skt-pts ${pts > 0 ? 'skt-pts-glow' : ''}">
+          ★ ${pts} punto${pts !== 1 ? 's' : ''}
+        </div>
+      </div>
+
+      <div class="skt-tree">
+        <div class="skt-row skt-row-apex">
+          ${t3.map(s => nodeHtml(s, true)).join('')}
+        </div>
+        <div class="skt-conn-merge">${mergeSVG}</div>
+        <div class="skt-row">
+          ${t2.map(s => nodeHtml(s)).join('')}
+        </div>
+        <div class="skt-conn-straight">${straightSVG}</div>
+        <div class="skt-row">
+          ${t1.map(s => nodeHtml(s)).join('')}
+        </div>
+      </div>
+
+      <div class="skt-legend">
+        <span class="skt-leg skt-leg-learned">✓ Aprendida</span>
+        <span class="skt-leg skt-leg-avail">+ Disponible</span>
+        <span class="skt-leg skt-leg-locked">🔒 Bloqueada</span>
+      </div>
+    </div>`;
 }

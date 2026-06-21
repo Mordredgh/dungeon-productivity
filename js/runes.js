@@ -124,66 +124,71 @@ function renderRunePanel() {
   const unslotted = runes.filter(r => !r.weapon_id);
 
   el.innerHTML = `
-    <div class="rune-section-title">⚔️ Armas equipadas</div>
+    <div class="rp-section-hd">⚔️ Armas equipadas</div>
     ${equipped.length
       ? equipped.map(w => {
           const maxSlots = RUNE_SOCKET_COUNT[w.tier] || 0;
           const slots    = (() => { try { return w.rune_slots ? JSON.parse(w.rune_slots) : []; } catch(e) { return []; } })();
           const tier     = WEAPON_TIERS[w.tier] || { color:'#9ca3af' };
           return `
-            <div class="rune-weapon-row">
-              <div class="rune-weapon-name" style="color:${tier.color}">${escHtml(w.name)}</div>
-              <div class="rune-slots-row">
+            <div class="rp-weapon-row">
+              <div class="rp-weapon-name" style="color:${tier.color}">${escHtml(w.name)}
+                <span class="rp-weapon-tier" style="color:${tier.color}">${tier.label || w.tier}</span>
+              </div>
+              <div class="rp-slots-row">
                 ${Array.from({length:maxSlots},(_,i)=>{
                   const rid  = slots[i];
                   const rune = rid ? runes.find(r=>r.id===rid) : null;
                   const def  = rune ? RUNE_DEFS[rune.rune_type] : null;
-                  return `<div class="rune-slot ${rune?'rune-slot-filled':''}" style="${def?`--rc:${def.color}`:''}"
-                              ${rune?`onclick="unsocketRune('${rid}')" title="Click para extraer: ${def?.name||''}"`:''}>
-                    ${def ? def.icon : '+'}
+                  return `<div class="rp-socket ${rune?'rp-socket-filled':''}" style="${def?`--rc:${def.color}`:''}"
+                              ${rune?`onclick="unsocketRune('${rid}')" title="Extraer: ${def?.name||''}"`:''}>
+                    <div class="rp-socket-gem">${def ? (def.icon || '💎') : ''}</div>
+                    ${!rune ? '<div class="rp-socket-empty-icon">◇</div>' : ''}
                   </div>`;
                 }).join('')}
-                ${maxSlots===0?'<span style="color:var(--text3);font-size:11px">Sin ranuras (tier Común)</span>':''}
+                ${maxSlots===0?'<span class="rp-no-slots">Sin ranuras (tier Común)</span>':''}
               </div>
             </div>`;
         }).join('')
       : `<div class="rune-empty">No tienes armas equipadas.</div>`}
 
-    <div class="rune-section-title" style="margin-top:16px">💎 Runas en inventario (${unslotted.length})</div>
+    <div class="rp-section-hd" style="margin-top:18px">💎 Runas disponibles (${unslotted.length})</div>
     ${unslotted.length
-      ? `<div class="rune-inv-grid">
+      ? `<div class="rp-inv-grid">
           ${unslotted.map(r => {
             const def = RUNE_DEFS[r.rune_type] || { icon:'💎', name:r.rune_type, desc:'', color:'#9ca3af' };
             return `
-              <div class="rune-inv-card" style="--rc:${def.color}" title="${def.desc}">
-                <div class="rune-inv-icon">
-                  ${def.img ? `<img src="images/${def.img}.png" class="rune-img" alt="${def.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${def.icon}</span>` : def.icon}
+              <div class="rp-rune-card" style="--rc:${def.color}" title="${def.desc}">
+                <div class="rp-rune-gem">
+                  ${def.img ? `<img src="images/${def.img}.png" class="rune-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${def.icon}</span>` : `<span>${def.icon}</span>`}
                 </div>
-                <div class="rune-inv-name">${def.name}</div>
-                <div class="rune-inv-desc">${def.desc}</div>
-                ${equipped.length
-                  ? `<select class="rune-equip-sel" onchange="if(this.value)socketRune('${r.id}',this.value);this.value=''">
-                      <option value="">Engrastar en...</option>
+                <div class="rp-rune-name">${def.name}</div>
+                <div class="rp-rune-eff">${def.desc}</div>
+                ${equipped.filter(w=>RUNE_SOCKET_COUNT[w.tier]>0).length
+                  ? `<select class="rp-equip-sel" onchange="if(this.value)socketRune('${r.id}',this.value);this.value=''">
+                      <option value="">⊕ Engrastar en...</option>
                       ${equipped.filter(w=>RUNE_SOCKET_COUNT[w.tier]>0).map(w=>`<option value="${w.id}">${escHtml(w.name)}</option>`).join('')}
                      </select>`
                   : ''}
               </div>`;
           }).join('')}
          </div>`
-      : `<div class="rune-empty">No tienes runas. Vence jefes para conseguir fragmentos y fórjalas en el Herrero.</div>`}
+      : `<div class="rune-empty">No tienes runas. Derrota jefes, consigue fragmentos y fórjalos en el Herrero.</div>`}
 
-    <div class="rune-section-title" style="margin-top:16px">🧩 Fragmentos de Runa</div>
-    <div class="rune-frags-grid">
+    <div class="rp-section-hd" style="margin-top:18px">🧩 Fragmentos — Forjar en Herrero</div>
+    <div class="rp-frags-grid">
       ${Object.entries(RUNE_DEFS).map(([type, def]) => {
-        const have = typeof getInvCount === 'function' ? getInvCount('rune_frag_' + type) : 0;
+        const have  = typeof getInvCount === 'function' ? getInvCount('rune_frag_' + type) : 0;
         const ready = have >= RUNE_FRAG_COST;
+        const pct   = Math.min(100, Math.round((have / RUNE_FRAG_COST) * 100));
         return `
-          <div class="rune-frag-card ${ready ? 'rune-frag-ready' : ''}" style="--rc:${def.color}" title="${def.name}: ${def.desc}">
-            <img src="images/${def.fragImg}.png" class="rune-frag-img" alt="${def.name}"
+          <div class="rp-frag-card ${ready ? 'rp-frag-ready' : ''}" style="--rc:${def.color}" title="${def.name}: ${def.desc}">
+            <img src="images/${def.fragImg}.png" class="rune-frag-img" alt=""
                  onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
             <span class="rune-frag-fallback" style="display:none">${def.icon}</span>
-            <div class="rune-frag-count ${ready ? 'rune-frag-count-ok' : ''}">${have}/${RUNE_FRAG_COST}</div>
-            <div class="rune-frag-name">${def.name.replace('Runa de ','').replace('Runa ','')}</div>
+            <div class="rp-frag-bar"><div class="rp-frag-fill" style="width:${pct}%;background:${def.color}"></div></div>
+            <div class="rp-frag-count ${ready ? 'rp-frag-ok' : ''}">${have}/${RUNE_FRAG_COST}</div>
+            <div class="rp-frag-name">${def.name.replace('Runa de ','').replace('Runa ','')}</div>
           </div>`;
       }).join('')}
     </div>`;
