@@ -265,16 +265,16 @@ function animBootSequence() {
   const navItems = document.querySelectorAll('.sidebar-item');
   const viewTabs = document.querySelectorAll('.view-tab');
 
-  if (topBar)    tl.from(topBar,    { y: -36, opacity: 0, duration: 0.4 },                   0);
-  if (sidebar)   tl.from(sidebar,   { x: -32, opacity: 0, duration: 0.45, ease: 'power3.out' }, 0.05);
-  if (avatar)    tl.from(avatar,    { scale: 0.5, opacity: 0, duration: 0.5, ease: 'back.out(1.7)' }, 0.2);
-  if (heroName)  tl.from(heroName,  { x: -14, opacity: 0, duration: 0.3 },                   0.35);
-  if (heroTitle) tl.from(heroTitle, { x: -10, opacity: 0, duration: 0.28 },                  0.4);
-  if (xpWrap)    tl.from(xpWrap,    { scaleX: 0, transformOrigin: 'left', opacity: 0, duration: 0.4 }, 0.42);
-  if (hpWrap)    tl.from(hpWrap,    { scaleX: 0, transformOrigin: 'left', opacity: 0, duration: 0.38 }, 0.47);
-  if (manaWrap)  tl.from(manaWrap,  { scaleX: 0, transformOrigin: 'left', opacity: 0, duration: 0.36 }, 0.51);
-  if (navItems.length) tl.from(navItems, { x: -16, opacity: 0, stagger: 0.04, duration: 0.3 }, 0.28);
-  if (viewTabs.length) tl.from(viewTabs, { y: -12, opacity: 0, stagger: 0.04, duration: 0.3 }, 0.22);
+  if (topBar)    tl.from(topBar,    { y: -36, opacity: 0, duration: 0.4, clearProps: 'all' },                   0);
+  if (sidebar)   tl.from(sidebar,   { x: -32, opacity: 0, duration: 0.45, ease: 'power3.out', clearProps: 'all' }, 0.05);
+  if (avatar)    tl.from(avatar,    { scale: 0.5, opacity: 0, duration: 0.5, ease: 'back.out(1.7)', clearProps: 'all' }, 0.2);
+  if (heroName)  tl.from(heroName,  { x: -14, opacity: 0, duration: 0.3, clearProps: 'all' },                   0.35);
+  if (heroTitle) tl.from(heroTitle, { x: -10, opacity: 0, duration: 0.28, clearProps: 'all' },                  0.4);
+  if (xpWrap)    tl.from(xpWrap,    { scaleX: 0, transformOrigin: 'left', opacity: 0, duration: 0.4, clearProps: 'all' }, 0.42);
+  if (hpWrap)    tl.from(hpWrap,    { scaleX: 0, transformOrigin: 'left', opacity: 0, duration: 0.38, clearProps: 'all' }, 0.47);
+  if (manaWrap)  tl.from(manaWrap,  { scaleX: 0, transformOrigin: 'left', opacity: 0, duration: 0.36, clearProps: 'all' }, 0.51);
+  if (navItems.length) tl.from(navItems, { x: -16, opacity: 0, stagger: 0.04, duration: 0.3, clearProps: 'all' }, 0.28);
+  if (viewTabs.length) tl.from(viewTabs, { y: -12, opacity: 0, stagger: 0.04, duration: 0.3, clearProps: 'all' }, 0.22);
 
   // Boss banners y quests con delay extra (su render termina después del boot)
   tl.call(() => {

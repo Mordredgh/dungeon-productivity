@@ -4,6 +4,17 @@ Todas las fechas en formato YYYY-MM-DD (hora Monterrey, CDT = UTC-5).
 
 ---
 
+## [v113] — 2026-06-20
+
+### Fix: GSAP animations + cache busting
+
+- **Cache bust** — todas las `?v=` en index.html actualizadas a `?v=113` (forzar que el browser descargue los JS/CSS actualizados con GSAP hooks)
+- **`js/animations.js`** — añadido `clearProps: 'all'` a todos los tweens de `animBootSequence()` para que GSAP limpie estilos inline al terminar (evita que opacity/transform queden pegados si algo interrumpe la animación)
+- **`sw.js`** bump `dungeon-v112` → `dungeon-v113`
+- **Duplicado removido** — `checkBossDeadline` tenía definición muerta en rpg.js (ya commiteado en d992143)
+
+---
+
 ## [v96] — 2026-06-20
 
 ### Boss sprites locales (todos los 27 jefes)
