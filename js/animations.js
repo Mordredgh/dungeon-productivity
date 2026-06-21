@@ -198,7 +198,7 @@ function animModalClose(id, cb) {
 ──────────────────────────────────────────────────────────── */
 function animCharTabIn(panelEl) {
   if (!panelEl || typeof gsap === 'undefined') return;
-  gsap.fromTo(panelEl, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.22 });
+  gsap.fromTo(panelEl, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.22, clearProps: 'transform,opacity' });
   // Stagger children genérico
   const kids = panelEl.querySelectorAll(
     '.char-stat-card, .char-attr-row, .skill-node, .rune-card, ' +
