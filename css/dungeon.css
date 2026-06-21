@@ -3350,7 +3350,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 #view-pets         { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_pets.png'); }
 #view-dungeon-grows{ --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_dungeon-grows.png'); }
 #view-integrations { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_integrations.png'); }
-#view-character    { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_character.png'); }
+/* view-character no tiene fondo propio — sus tabs lo manejan */
 
 /* ============================================================
    ACTIVE PET DISPLAY (sidebar)
@@ -4317,9 +4317,12 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 .char-tab-panel > * { position: relative; z-index: 1; }
 
+#ctab-sheet    { --ctab-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_character.png'); }
 #ctab-skills   { --ctab-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_habilidades.png'); }
 #ctab-runes    { --ctab-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_runas.png'); }
 #ctab-bestiary { --ctab-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_bestiario.png'); }
+#ctab-smithy        { --ctab-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_character.png'); }
+#ctab-sala-personal { --ctab-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_character.png'); }
 
 
 /* ── ÍNDICE DEL HÉROE ───────────────────────────────────────── */
