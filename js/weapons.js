@@ -183,11 +183,14 @@ function renderInventory() {
       : catClass === 'defense'
         ? '<span class="inv-slot-badge inv-slot-badge--def">DEF</span>'
         : '';
+    const imgSrc = item.item_key.startsWith('spell_')
+      ? `/images/${item.item_key}.png`
+      : `${CDN}dungeon/${item.item_key}.png`;
     return `<button class="inv-slot" onclick="showInvItemDetail('${escHtml(item.item_key)}')"
         title="${escHtml(meta.name)}" style="--inv-color:${meta.color}">
       ${badge}
       <div class="inv-slot-inner">
-        <img src="${CDN}dungeon/${item.item_key}.png" class="inv-slot-img" alt=""
+        <img src="${imgSrc}" class="inv-slot-img" alt=""
              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <div class="inv-slot-emoji" style="display:none">${meta.icon}</div>
         <div class="inv-slot-qty">×${item.quantity}</div>
