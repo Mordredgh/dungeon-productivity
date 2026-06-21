@@ -3332,8 +3332,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   content:'';
   position:fixed;
   inset:0;
-  background: var(--view-bg-url, none) left center / cover no-repeat;
-  opacity:.07;
+  background: var(--view-bg-url, none) center / cover no-repeat;
+  opacity:.11;
   pointer-events:none;
   z-index:0;
 }
@@ -4310,8 +4310,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   content: '';
   position: fixed;
   inset: 0;
-  background: var(--ctab-bg-url, none) left center / cover no-repeat;
-  opacity: .07;
+  background: var(--ctab-bg-url, none) center / cover no-repeat;
+  opacity: .11;
   pointer-events: none;
   z-index: 0;
 }
