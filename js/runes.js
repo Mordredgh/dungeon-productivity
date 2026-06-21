@@ -128,7 +128,7 @@ function renderRunePanel() {
     ${equipped.length
       ? equipped.map(w => {
           const maxSlots = RUNE_SOCKET_COUNT[w.tier] || 0;
-          const slots    = w.rune_slots ? JSON.parse(w.rune_slots) : [];
+          const slots    = (() => { try { return w.rune_slots ? JSON.parse(w.rune_slots) : []; } catch(e) { return []; } })();
           const tier     = WEAPON_TIERS[w.tier] || { color:'#9ca3af' };
           return `
             <div class="rune-weapon-row">

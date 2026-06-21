@@ -323,10 +323,6 @@ function switchCharTab(tab) {
   if (tab === 'bestiary')       { if (typeof renderBestiary==='function')      renderBestiary(); }
   if (tab === 'smithy')         { if (typeof renderSmithy==='function')        renderSmithy(); }
   if (tab === 'sala-personal')  { if (typeof renderSalaPersonal==='function')  renderSalaPersonal(); }
-  // Set sub-tab background image
-  const charView = document.getElementById('view-character');
-  const tabFondo = { sheet:'character', skills:'skills', runes:'runes', bestiary:'bestiary', smithy:'smithy' };
-  if (charView && tabFondo[tab]) charView.style.setProperty('--view-bg-url', `url(${CDN}dungeon/fondo_${tabFondo[tab]}.png)`);
   const activePanel = document.getElementById(`ctab-${tab}`);
   if (activePanel && typeof animCharTabIn === 'function') animCharTabIn(activePanel);
 }
