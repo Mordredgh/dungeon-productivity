@@ -1274,17 +1274,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   flex-direction: column;
   position: relative;
 }
-.right-panel::before {
-  content: '';
-  position: fixed;
-  top: 0; right: 0;
-  width: inherit;
-  height: 100vh;
-  background: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_pets.png') center / cover no-repeat;
-  opacity: .06;
-  pointer-events: none;
-  z-index: 0;
-}
+
 .right-panel > * { position: relative; z-index: 1; }
 
 [data-theme="light"] .right-panel { background: rgba(250,248,255,.98); border-left-color: rgba(139,92,246,.12); }
@@ -3325,32 +3315,18 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .hero-avatar-emoji { font-size:22px; line-height:1; }
 
 /* ============================================================
-   VIEW BACKGROUNDS
+   VIEW BACKGROUNDS — un único #dungeon-bg controlado por JS
    ============================================================ */
-.view { position:relative; }
-.view.active::before {
-  content:'';
-  position:fixed;
-  inset:0;
-  background: var(--view-bg-url, none) center / cover no-repeat;
-  opacity:.11;
-  pointer-events:none;
-  z-index:0;
+#dungeon-bg {
+  position: fixed;
+  inset: 0;
+  background: none center / cover no-repeat;
+  opacity: .11;
+  pointer-events: none;
+  z-index: 0;
 }
-.view > * { position:relative; z-index:1; }
-
-/* ── FONDOS POR VISTA ───────────────────────────────────────── */
-#view-quests       { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_misiones.png'); }
-#view-goals        { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_metas.png'); }
-#view-stats        { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_stats.png'); }
-#view-achievements { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_logros.png'); }
-#view-history      { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_history.png'); }
-#view-shop         { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_shop.png'); }
-#view-inventory    { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_inventario.png'); }
-#view-pets         { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_pets.png'); }
-#view-dungeon-grows{ --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_dungeon-grows.png'); }
-#view-integrations { --view-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_integrations.png'); }
-/* view-character no tiene fondo propio — sus tabs lo manejan */
+.view { position: relative; }
+.view > * { position: relative; z-index: 1; }
 
 /* ============================================================
    ACTIVE PET DISPLAY (sidebar)
@@ -4306,23 +4282,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 
 .char-tab-panel        { display: none; position: relative; }
 .char-tab-panel.active { display: block; }
-.char-tab-panel.active::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: var(--ctab-bg-url, none) center / cover no-repeat;
-  opacity: .11;
-  pointer-events: none;
-  z-index: 0;
-}
 .char-tab-panel > * { position: relative; z-index: 1; }
-
-#ctab-sheet    { --ctab-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_character.png'); }
-#ctab-skills   { --ctab-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_habilidades.png'); }
-#ctab-runes    { --ctab-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_runas.png'); }
-#ctab-bestiary { --ctab-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_bestiario.png'); }
-#ctab-smithy        { --ctab-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_character.png'); }
-#ctab-sala-personal { --ctab-bg-url: url('https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/fondo_character.png'); }
 
 
 /* ── ÍNDICE DEL HÉROE ───────────────────────────────────────── */

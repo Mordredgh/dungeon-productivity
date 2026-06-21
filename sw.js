@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v121';
+﻿const CACHE = 'dungeon-v122';
 const ASSETS = [
   '/',
   '/index.html',
@@ -245,5 +245,6 @@ self.addEventListener('fetch', e => {
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );
 });
+
 
 

@@ -245,6 +245,22 @@ async function doImport() {
 /* VIEW NAV */
 const CHAR_HUB_TABS = { 'skill-tree':'skills', 'runes':'runes', 'bestiary':'bestiary', 'smithy':'smithy' };
 
+const _VIEW_BG = {
+  quests:'fondo_misiones', goals:'fondo_metas', stats:'fondo_stats',
+  achievements:'fondo_logros', history:'fondo_history', shop:'fondo_shop',
+  inventory:'fondo_inventario', pets:'fondo_pets',
+  'dungeon-grows':'fondo_dungeon-grows', integrations:'fondo_integrations',
+};
+const _CTAB_BG = {
+  sheet:'fondo_character', skills:'fondo_habilidades', runes:'fondo_runas',
+  bestiary:'fondo_bestiario', smithy:'fondo_character', 'sala-personal':'fondo_character',
+};
+function _setPageBg(name) {
+  const el = document.getElementById('dungeon-bg');
+  if (!el) return;
+  el.style.backgroundImage = name ? `url(${CDN}dungeon/${name}.png)` : 'none';
+}
+
 function switchView(v) {
   if (v === 'oracle') { if (typeof openOracle === 'function') openOracle(); return; }
   if (CHAR_HUB_TABS[v]) { switchCharTab(CHAR_HUB_TABS[v]); v = 'character'; }
@@ -254,11 +270,14 @@ function switchView(v) {
 
   const _doSwitch = () => {
     document.querySelectorAll('.view-tab, .sidebar-item').forEach(t => t.classList.toggle('active', t.dataset.view === v));
-    document.querySelectorAll('.view').forEach(el => {
-      const active = el.id === _newId;
-      el.classList.toggle('active', active);
-      if (active) el.style.setProperty('--view-bg-url', `url(${CDN}dungeon/fondo_${v}.png)`);
-    });
+    document.querySelectorAll('.view').forEach(el => el.classList.toggle('active', el.id === _newId));
+    if (v === 'character') {
+      const activeCtab = document.querySelector('.char-tab-panel.active');
+      const ctabId = activeCtab?.id?.replace('ctab-', '') || 'sheet';
+      _setPageBg(_CTAB_BG[ctabId] || null);
+    } else {
+      _setPageBg(_VIEW_BG[v] || null);
+    }
     const charHub = document.getElementById('charHubTabs');
     if (charHub) charHub.style.display = v === 'character' ? 'flex' : 'none';
     if (v === 'stats')        renderStats();
@@ -323,6 +342,7 @@ function switchCharTab(tab) {
   if (tab === 'bestiary')       { if (typeof renderBestiary==='function')      renderBestiary(); }
   if (tab === 'smithy')         { if (typeof renderSmithy==='function')        renderSmithy(); }
   if (tab === 'sala-personal')  { if (typeof renderSalaPersonal==='function')  renderSalaPersonal(); }
+  _setPageBg(_CTAB_BG[tab] || null);
   const activePanel = document.getElementById(`ctab-${tab}`);
   if (activePanel && typeof animCharTabIn === 'function') animCharTabIn(activePanel);
 }
