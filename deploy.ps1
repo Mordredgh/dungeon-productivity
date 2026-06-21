@@ -15,7 +15,7 @@ $sw = Get-Content $swPath -Raw
 if ($sw -match "dungeon-v(\d+)") {
     $old = [int]$Matches[1]; $new = $old + 1
     $sw = $sw -replace "dungeon-v$old", "dungeon-v$new"
-    Set-Content $swPath $sw -Encoding utf8NoBOM
+    [System.IO.File]::WriteAllText($swPath, $sw, [System.Text.UTF8Encoding]::new($false))
     Write-Host "SW: v$old -> v$new"
 }
 
