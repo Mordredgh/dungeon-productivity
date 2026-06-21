@@ -125,7 +125,7 @@ function renderInventory() {
           ${(() => {
             const maxSlots = (typeof RUNE_SOCKET_COUNT !== 'undefined' ? RUNE_SOCKET_COUNT[w.tier] : 0) || 0;
             if (!maxSlots) return '<div class="inv-rune-row" style="color:var(--text3);font-size:10px">Sin ranuras de runa</div>';
-            const filled = w.rune_slots ? JSON.parse(w.rune_slots) : [];
+            const filled = (() => { try { return w.rune_slots ? JSON.parse(w.rune_slots) : []; } catch(e) { return []; } })();
             const runeArr = typeof runes !== 'undefined' ? runes : [];
             const slots = Array.from({length: maxSlots}, (_, i) => {
               const rid = filled[i];
