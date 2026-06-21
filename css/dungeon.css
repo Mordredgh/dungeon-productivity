@@ -1736,30 +1736,48 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .habit-heat-btn { background: transparent; border: none; cursor: pointer; font-size: 14px; padding: 2px 4px; opacity: .7; }
 .habit-heat-btn:hover { opacity: 1; }
 
-/* ── Inventory Grid ─────────────────────────────────── */
+/* ── Inventory Grid (RPG) ────────────────────────────── */
 #inventoryView { padding: 4px 16px 20px; }
-.inv-summary { font-size: 12px; color: var(--text3); margin-bottom: 16px; }
-.inv-cat-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--text2); margin: 20px 0 8px; }
+.inv-summary { font-size: 12px; color: var(--text3); margin-bottom: 14px; }
+
+.inv-cat-header {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em;
+  color: var(--text2); margin: 22px 0 10px;
+}
+.inv-cat-header::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, rgba(137,180,250,.2), transparent);
+}
+.inv-cat-header--offense { color: #fb923c; }
+.inv-cat-header--offense::after { background: linear-gradient(to right, rgba(251,146,60,.3), transparent); }
+.inv-cat-header--defense { color: #60a5fa; }
+.inv-cat-header--defense::after { background: linear-gradient(to right, rgba(96,165,250,.3), transparent); }
+.inv-cat-header--potion { color: #4ade80; }
+.inv-cat-header--potion::after { background: linear-gradient(to right, rgba(74,222,128,.25), transparent); }
+
 .inv-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
 
 .inv-slot {
-  background: rgba(137,180,250,.06);
-  border: 1px solid rgba(137,180,250,.13);
-  border-radius: 10px;
+  background: color-mix(in srgb, var(--inv-color, #89b4fa) 6%, rgba(15,14,26,.96));
+  border: 1px solid color-mix(in srgb, var(--inv-color, #89b4fa) 18%, transparent);
+  border-radius: 8px;
   padding: 0;
   cursor: pointer;
-  transition: transform .15s, border-color .15s, box-shadow .15s;
+  transition: transform .15s ease-out, border-color .15s, box-shadow .15s, background .15s;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
 }
 .inv-slot:hover {
-  border-color: var(--inv-color, var(--accent));
-  background: rgba(127,90,240,.12);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0,0,0,.35), 0 0 12px var(--inv-color, var(--accent)), 0 0 0 1px var(--inv-color, var(--accent));
+  border-color: color-mix(in srgb, var(--inv-color, var(--accent)) 60%, transparent);
+  background: color-mix(in srgb, var(--inv-color, var(--accent)) 14%, rgba(15,14,26,.92));
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4),
+              0 0 18px color-mix(in srgb, var(--inv-color, var(--accent)) 40%, transparent);
 }
+.inv-slot:active { transform: translateY(-1px) scale(1.01); }
 .inv-slot-inner {
   aspect-ratio: 1;
   display: flex;
@@ -1773,18 +1791,25 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .inv-slot-qty {
   position: absolute; bottom: 3px; right: 4px;
   font-size: 10px; font-weight: 800; color: #fff;
-  background: rgba(0,0,0,.65); border-radius: 4px; padding: 1px 4px; line-height: 1.4;
+  background: rgba(0,0,0,.72); border-radius: 3px; padding: 1px 4px; line-height: 1.4;
 }
 .inv-slot-name {
   font-size: 9px; color: var(--text3); text-align: center;
   padding: 0 3px 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   width: 100%; box-sizing: border-box;
 }
+.inv-slot-badge {
+  position: absolute; top: 4px; left: 4px; z-index: 1; pointer-events: none;
+  font-size: 7px; font-weight: 800; letter-spacing: .05em;
+  padding: 1px 3px; border-radius: 2px; line-height: 1.5;
+}
+.inv-slot-badge--atk { background: rgba(239,68,68,.2); color: #fca5a5; border: 1px solid rgba(239,68,68,.25); }
+.inv-slot-badge--def { background: rgba(96,165,250,.18); color: #93c5fd; border: 1px solid rgba(96,165,250,.22); }
 .inv-empty {
-  border: 1px dashed rgba(137,180,250,.08);
+  border: 1px dashed rgba(137,180,250,.07);
   background: transparent;
   pointer-events: none;
-  opacity: .3;
+  opacity: .22;
 }
 .inv-detail-img-wrap { margin: 0 auto 4px; width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; }
 

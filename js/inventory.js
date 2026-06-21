@@ -65,10 +65,15 @@ function rollLoot(priority) {
 
 function spellFragLabel(spellKey) {
   const labels = {
-    frenzy: 'Fragmento de Frenesí', speed: 'Pluma de Velocidad',
+    frenzy: 'Fragmento de Frenesí',   speed: 'Pluma de Velocidad',
     berserker: 'Colmillo de Berserker', shield: 'Fragmento de Escudo',
     'modo-berserker': 'Esencia Berserker', healing: 'Hierba de Curación',
-    'mente-acero': 'Cristal de Mente de Acero',
+    'mente-acero':       'Cristal de Mente de Acero',
+    'rayo-arcano':       'Rayo Arcano',
+    'bola-fuego':        'Chispa de Fuego',
+    'maldicion-abismal': 'Esencia Abisal',
+    'tormenta-hielo':    'Cristal de Hielo',
+    'furia-dragon':      'Escama de Dragón',
   };
   return labels[spellKey] || spellKey;
 }
@@ -127,6 +132,12 @@ function _rmCountUp(el, target, ms) {
   requestAnimationFrame(tick);
 }
 
+/* ── Spell categorization ───────────────────────────── */
+const _SPELL_OFFENSIVE = new Set([
+  'frenzy','berserker','modo-berserker',
+  'rayo-arcano','bola-fuego','maldicion-abismal','tormenta-hielo','furia-dragon',
+]);
+
 /* ── Visual Inventory Grid ──────────────────────────── */
 function _invItemMeta(key) {
   if (key.startsWith('spell_')) {
@@ -151,16 +162,24 @@ function renderInventory() {
   const el = document.getElementById('inventoryView');
   if (!el) return;
 
-  const spells  = inventory.filter(r => r.item_key.startsWith('spell_')      && r.quantity > 0);
-  const potions = inventory.filter(r => r.item_key.startsWith('pet_potion_') && r.quantity > 0);
-  const misc    = inventory.filter(r => !r.item_key.startsWith('spell_') && !r.item_key.startsWith('pet_potion_') && r.quantity > 0);
+  const allSpells  = inventory.filter(r => r.item_key.startsWith('spell_')      && r.quantity > 0);
+  const spellsOff  = allSpells.filter(r =>  _SPELL_OFFENSIVE.has(r.item_key.slice(6)));
+  const spellsDef  = allSpells.filter(r => !_SPELL_OFFENSIVE.has(r.item_key.slice(6)));
+  const potions    = inventory.filter(r => r.item_key.startsWith('pet_potion_') && r.quantity > 0);
+  const misc       = inventory.filter(r => !r.item_key.startsWith('spell_') && !r.item_key.startsWith('pet_potion_') && r.quantity > 0);
   const COLS = 5;
 
-  function renderSlot(item) {
+  function renderSlot(item, catClass) {
     const meta = _invItemMeta(item.item_key);
     const shortName = meta.name.split(' ').slice(-2).join(' ');
+    const badge = catClass === 'offense'
+      ? '<span class="inv-slot-badge inv-slot-badge--atk">ATK</span>'
+      : catClass === 'defense'
+        ? '<span class="inv-slot-badge inv-slot-badge--def">DEF</span>'
+        : '';
     return `<button class="inv-slot" onclick="showInvItemDetail('${escHtml(item.item_key)}')"
         title="${escHtml(meta.name)}" style="--inv-color:${meta.color}">
+      ${badge}
       <div class="inv-slot-inner">
         <img src="${CDN}dungeon/${item.item_key}.png" class="inv-slot-img" alt=""
              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -171,26 +190,28 @@ function renderInventory() {
     </button>`;
   }
 
-  function renderCat(title, items) {
+  function renderCat(title, items, catClass, headerMod) {
     if (!items.length) return '';
     const padded = [...items];
     while (padded.length % COLS !== 0) padded.push(null);
     const slots = padded.map(it => it
-      ? renderSlot(it)
+      ? renderSlot(it, catClass)
       : `<div class="inv-slot inv-empty"></div>`
     ).join('');
-    return `<div class="inv-cat-header">${title}</div><div class="inv-grid">${slots}</div>`;
+    return `<div class="inv-cat-header inv-cat-header--${headerMod}">${title}</div>
+            <div class="inv-grid">${slots}</div>`;
   }
 
-  const totalTypes = spells.length + potions.length + misc.length;
+  const totalTypes = allSpells.length + potions.length + misc.length;
   const totalQty   = inventory.reduce((s, r) => s + (r.quantity || 0), 0);
 
   el.innerHTML = totalTypes === 0
     ? `<div class="empty-state">🎒 El inventario está vacío.<br><small>Completa misiones y pomodoros para obtener fragmentos y pociones.</small></div>`
     : `<div class="inv-summary">🎒 ${totalTypes} tipos · ${totalQty.toLocaleString()} items en total</div>
-       ${renderCat('🔮 Fragmentos de Hechizo', spells)}
-       ${renderCat('🧪 Pociones de Mascota', potions)}
-       ${renderCat('🎁 Consumibles', misc)}`;
+       ${renderCat('⚔️ Hechizos Ofensivos', spellsOff, 'offense', 'offense')}
+       ${renderCat('🛡️ Hechizos Defensivos', spellsDef, 'defense', 'defense')}
+       ${renderCat('🧪 Pociones de Mascota', potions, 'potion', 'potion')}
+       ${renderCat('🎁 Consumibles', misc, 'misc', 'misc')}`;
 }
 
 function showInvItemDetail(key) {
