@@ -6363,18 +6363,18 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .chr-eq-slot-lbl { font-size: 9px; color: var(--text3); }
 .chr-eq-vacant { font-size: 11px; color: var(--text3); font-style: italic; }
 
-/* Race picker */
+/* Race picker — columna única para caber en 190px */
 .chr-race-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  padding: 10px;
+  grid-template-columns: 1fr;
+  gap: 5px;
+  padding: 8px 10px;
 }
 .chr-race-pill {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 8px 10px;
+  gap: 8px;
+  padding: 7px 10px;
   border-radius: 8px;
   border: 1px solid var(--border);
   cursor: pointer;
@@ -6385,6 +6385,16 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .chr-race-pill.chr-selected {
   border-color: var(--accent2);
   background: rgba(137,180,250,.07);
+}
+.chr-race-pill .chr-pill-name { font-size: 11px; color: var(--text2); }
+
+/* Hero score widget card */
+.chr-col-left .hero-score-widget {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 10px 8px;
+  margin-top: 8px;
 }
 
 /* Level history */
