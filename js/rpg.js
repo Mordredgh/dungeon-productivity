@@ -221,11 +221,6 @@ function damageBoss(dmg) {
   updateBossBanner();
 }
 
-function checkBossDeadline() {
-  getMultiBossState();
-  if (typeof updateBossBanner === 'function') updateBossBanner();
-}
-
 /* ── RANDOM EVENTS ────────────────────────────────────────── */
 function checkRandomEvent() {
   const today = new Date().toISOString().split('T')[0];
