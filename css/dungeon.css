@@ -6798,3 +6798,386 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   transition: opacity .12s;
 }
 .inv-slot[data-glare='1']::after { opacity: 1; }
+
+/* ═══════════════════════════════════════════════════════════
+   PREMIUM EFFECTS — Batch 4 (catalog effects)
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Aurora Text ───────────────────────────────────────────── */
+.aurora-text {
+  background: linear-gradient(135deg,
+    #a855f7 0%, #818cf8 25%, #60a5fa 50%, #34d399 75%, #a855f7 100%
+  );
+  background-size: 300% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: aurora-flow 4s linear infinite;
+  display: inline-block;
+}
+@keyframes aurora-flow {
+  0%   { background-position: 0% center; }
+  100% { background-position: 300% center; }
+}
+
+/* ── Border Beam (sliding light on card edge) ──────────────── */
+.border-beam { position: relative; overflow: hidden; }
+.border-beam::before {
+  content: '';
+  position: absolute;
+  width: 60px; height: 100%;
+  top: 0; left: -60px;
+  background: linear-gradient(90deg, transparent, rgba(168,85,247,.75), transparent);
+  animation: beam-slide 3s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+@keyframes beam-slide { to { left: calc(100% + 60px); } }
+
+/* ── Shine Border (rotating gradient frame) ────────────────── */
+.shine-border {
+  position: relative;
+  isolation: isolate;
+}
+.shine-border::after {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  background: conic-gradient(from 0deg at 50% 50%,
+    transparent 0deg, transparent 280deg, #a855f7 310deg, #818cf8 340deg, transparent 360deg
+  );
+  animation: shine-spin 3s linear infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+@keyframes shine-spin { to { transform: rotate(360deg); } }
+
+/* ── Neon Gradient Card hover border ───────────────────────── */
+.neon-card { position: relative; }
+.neon-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--nc1, #a855f7), var(--nc2, #60a5fa));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity .25s;
+  pointer-events: none;
+}
+.neon-card:hover::before { opacity: 1; }
+
+/* ── Concentric Ripples (boss-active indicator) ────────────── */
+.ripple-rings { position: relative; }
+.ripple-rings::before,
+.ripple-rings::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  opacity: 0;
+  animation: ripple-out 2s ease-out infinite;
+  pointer-events: none;
+}
+.ripple-rings::after { animation-delay: 1s; }
+@keyframes ripple-out {
+  0%   { transform: scale(.85); opacity: .55; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* ── Blur Vignette (edge darkness for immersion) ───────────── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 58%, rgba(0,0,0,.32) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Badge Ping (notification pulse) ───────────────────────── */
+.badge-ping { position: relative; }
+.badge-ping::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .55;
+  animation: badge-ping 1.6s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes badge-ping {
+  0%   { transform: scale(1); opacity: .55; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* ── Stagger List (sequential entrance) ────────────────────── */
+.stagger-list > * {
+  animation: stagger-in .32s ease-out both;
+}
+.stagger-list > *:nth-child(1)  { animation-delay: .03s; }
+.stagger-list > *:nth-child(2)  { animation-delay: .07s; }
+.stagger-list > *:nth-child(3)  { animation-delay: .11s; }
+.stagger-list > *:nth-child(4)  { animation-delay: .15s; }
+.stagger-list > *:nth-child(5)  { animation-delay: .19s; }
+.stagger-list > *:nth-child(6)  { animation-delay: .23s; }
+.stagger-list > *:nth-child(7)  { animation-delay: .27s; }
+.stagger-list > *:nth-child(8)  { animation-delay: .31s; }
+.stagger-list > *:nth-child(n+9){ animation-delay: .34s; }
+@keyframes stagger-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Word Pull Up (text entrance word by word) ─────────────── */
+.word-pull-up span { display: inline-block; overflow: hidden; }
+.word-pull-up span em {
+  display: inline-block;
+  font-style: normal;
+  animation: word-up .45s cubic-bezier(.23,1,.32,1) both;
+}
+.word-pull-up span:nth-child(2) em { animation-delay: .06s; }
+.word-pull-up span:nth-child(3) em { animation-delay: .12s; }
+.word-pull-up span:nth-child(4) em { animation-delay: .18s; }
+.word-pull-up span:nth-child(5) em { animation-delay: .24s; }
+.word-pull-up span:nth-child(n+6) em { animation-delay: .30s; }
+@keyframes word-up {
+  from { transform: translateY(110%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ── Gradient Reveal (clip-path wipe) ──────────────────────── */
+.reveal-clip {
+  clip-path: inset(0 100% 0 0);
+  animation: reveal-right .65s cubic-bezier(.23,1,.32,1) forwards;
+}
+@keyframes reveal-right { to { clip-path: inset(0 0% 0 0); } }
+
+/* ── Text Reveal Blur ───────────────────────────────────────── */
+.reveal-blur {
+  opacity: 0;
+  filter: blur(8px);
+  animation: reveal-blur-in .55s ease-out forwards;
+}
+@keyframes reveal-blur-in { to { opacity: 1; filter: blur(0); } }
+
+/* ── Wave Text (letter sine wave) ──────────────────────────── */
+.wave-text span { display: inline-block; animation: wave-letter 1.5s ease-in-out infinite; }
+.wave-text span:nth-child(2n)   { animation-delay: .08s; }
+.wave-text span:nth-child(3n)   { animation-delay: .16s; }
+.wave-text span:nth-child(4n)   { animation-delay: .24s; }
+.wave-text span:nth-child(5n)   { animation-delay: .32s; }
+.wave-text span:nth-child(6n)   { animation-delay: .40s; }
+.wave-text span:nth-child(7n)   { animation-delay: .48s; }
+@keyframes wave-letter {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-5px); }
+}
+
+/* ── Skeleton Loader ────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--card) 25%, var(--card2) 50%, var(--card) 75%);
+  background-size: 300% 100%;
+  border-radius: 6px;
+  animation: skeleton-shimmer 1.4s infinite;
+}
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Flip Card ──────────────────────────────────────────────── */
+.flip-card { perspective: 800px; cursor: pointer; }
+.flip-card-inner {
+  transform-style: preserve-3d;
+  transition: transform .48s cubic-bezier(.23,1,.32,1);
+  position: relative;
+}
+.flip-card:hover .flip-card-inner,
+.flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+.flip-card-front, .flip-card-back { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.flip-card-back { transform: rotateY(180deg); position: absolute; inset: 0; }
+
+/* ── Hover 3D Tilt ──────────────────────────────────────────── */
+.tilt-card {
+  transition: transform .14s ease-out;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ── Tooltip Reveal ─────────────────────────────────────────── */
+.has-tooltip { position: relative; }
+.has-tooltip .tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) scale(.9) translateY(4px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .14s, transform .14s cubic-bezier(.23,1,.32,1);
+  z-index: 200;
+}
+.has-tooltip:hover .tip { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); }
+
+/* ── Material Ripple ────────────────────────────────────────── */
+.ripple-btn { position: relative; overflow: hidden; }
+.ripple-wave {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,.22);
+  transform: scale(0);
+  animation: ripple-expand .5s linear;
+  pointer-events: none;
+}
+@keyframes ripple-expand { to { transform: scale(4); opacity: 0; } }
+
+/* ── Orbiting Circles ───────────────────────────────────────── */
+.orbit-ring { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+.orbit-ring .orb {
+  position: absolute;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: orbit-spin 3s linear infinite;
+  transform-origin: 0 0;
+  top: 50%; left: 50%;
+  margin: -3.5px 0 0 -3.5px;
+}
+.orbit-ring .orb:nth-child(2) { animation-delay: -1s; background: #60a5fa; }
+.orbit-ring .orb:nth-child(3) { animation-delay: -2s; background: #34d399; }
+@keyframes orbit-spin {
+  0%   { transform: rotate(0deg)   translateX(20px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(20px) rotate(-360deg); }
+}
+
+/* ── Expanding Cards ────────────────────────────────────────── */
+.expand-card { overflow: hidden; transition: max-height .35s cubic-bezier(.23,1,.32,1); max-height: 72px; }
+.expand-card.open { max-height: 600px; }
+
+/* ── Animated Gradient Background ──────────────────────────── */
+.animated-bg {
+  background: linear-gradient(135deg, #1e1b4b, #312e81, #1e1b4b, #0f172a);
+  background-size: 400% 400%;
+  animation: bg-flow 8s ease infinite;
+}
+@keyframes bg-flow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── Spotlight Hero (cursor radial light on container) ─────── */
+.spotlight-hero {
+  background-image: radial-gradient(
+    circle at var(--sx, 50%) var(--sy, 50%),
+    rgba(168,85,247,.10) 0%, transparent 55%
+  );
+  transition: background-image .05s;
+}
+
+/* ── Typewriter cursor ──────────────────────────────────────── */
+.typewriter-cursor::after {
+  content: '|';
+  animation: cursor-blink .75s step-end infinite;
+}
+@keyframes cursor-blink { 50% { opacity: 0; } }
+
+/* ── Number Ticker ──────────────────────────────────────────── */
+.number-ticker {
+  display: inline-block;
+  overflow: hidden;
+  height: 1.2em;
+  vertical-align: bottom;
+  position: relative;
+}
+.number-ticker span {
+  display: block;
+  transition: transform .4s cubic-bezier(.23,1,.32,1);
+}
+
+/* ── Cursor Trail canvas ────────────────────────────────────── */
+#_cursor-trail {
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* ── HyperText Scramble char states ────────────────────────── */
+.hyper-text span { display: inline-block; transition: color .06s; }
+.hyper-text span.scrambling { color: var(--accent); }
+
+/* ── Magnetic Button (visual) ───────────────────────────────── */
+.magnetic { transition: transform .2s cubic-bezier(.23,1,.32,1); }
+
+/* ── Glitch Text ────────────────────────────────────────────── */
+.glitch-text { position: relative; display: inline-block; }
+.glitch-text::before, .glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.glitch-text.glitch-active::before {
+  color: #fb7185;
+  transform: translate(-2px, 0);
+  opacity: .8;
+  animation: glitch-a .14s steps(1) 3;
+}
+.glitch-text.glitch-active::after {
+  color: #34d399;
+  transform: translate(2px, 0);
+  opacity: .8;
+  animation: glitch-b .14s steps(1) 3;
+}
+@keyframes glitch-a {
+  0%   { clip-path: polygon(0 0%,100% 0%,100% 30%,0 30%); }
+  50%  { clip-path: polygon(0 50%,100% 50%,100% 70%,0 70%); }
+  100% { clip-path: polygon(0 10%,100% 10%,100% 40%,0 40%); }
+}
+@keyframes glitch-b {
+  0%   { clip-path: polygon(0 60%,100% 60%,100% 80%,0 80%); }
+  50%  { clip-path: polygon(0 30%,100% 30%,100% 50%,0 50%); }
+  100% { clip-path: polygon(0 70%,100% 70%,100% 90%,0 90%); }
+}
+
+/* ── Radial Progress SVG ────────────────────────────────────── */
+.radial-progress {
+  --rp: 0;
+  --rp-size: 60px;
+  --rp-stroke: 5px;
+  --rp-color: var(--accent);
+  width: var(--rp-size);
+  height: var(--rp-size);
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+.radial-progress svg { transform: rotate(-90deg); position: absolute; inset: 0; }
+.radial-progress circle.track { fill: none; stroke: var(--border); stroke-width: var(--rp-stroke); }
+.radial-progress circle.fill {
+  fill: none; stroke: var(--rp-color); stroke-width: var(--rp-stroke);
+  stroke-linecap: round;
+  stroke-dasharray: 100 100;
+  stroke-dashoffset: calc(100 - var(--rp));
+  transition: stroke-dashoffset .55s cubic-bezier(.23,1,.32,1);
+}
+.radial-progress .rp-label {
+  font-size: 11px; font-weight: 700; color: var(--text); z-index: 1;
+}
+
+/* ── Confetti / Particle burst canvas ──────────────────────── */
+.confetti-canvas {
+  position: fixed; top: 0; left: 0;
+  pointer-events: none; z-index: 9999;
+}
