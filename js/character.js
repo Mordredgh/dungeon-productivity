@@ -520,6 +520,39 @@ function renderConfigView() {
           <button class="chr-dl-btn" style="width:100%;margin:0" onclick="generateHeroCard()">⬇ Descargar Carnet PNG</button>
         </div>
       </div>
+
+      <div class="chr-config-card" style="margin-top:14px">
+        <div class="chr-config-section-hd">Preferencias</div>
+        <div class="chr-config-row" onclick="toggleCompact()">
+          <span class="chr-config-row-icon">⊟</span>
+          <span class="chr-config-row-lbl">Modo compacto</span>
+          <span class="chr-config-row-hint">Reduce el espaciado de las misiones</span>
+        </div>
+        <div class="chr-config-row" onclick="document.getElementById('notifBtn').click()">
+          <span class="chr-config-row-icon">🔔</span>
+          <span class="chr-config-row-lbl">Notificaciones</span>
+          <span class="chr-config-row-hint">Habilitar alertas del navegador</span>
+        </div>
+      </div>
+
+      <div class="chr-config-card" style="margin-top:14px">
+        <div class="chr-config-section-hd">Datos</div>
+        <div class="chr-config-row" onclick="openModal('importModal')">
+          <span class="chr-config-row-icon">📥</span>
+          <span class="chr-config-row-lbl">Importar</span>
+          <span class="chr-config-row-hint">Restaurar desde JSON</span>
+        </div>
+        <div class="chr-config-row" onclick="exportData()">
+          <span class="chr-config-row-icon">📤</span>
+          <span class="chr-config-row-lbl">Exportar JSON</span>
+          <span class="chr-config-row-hint">Copia de seguridad completa</span>
+        </div>
+        <div class="chr-config-row" onclick="exportCSV()">
+          <span class="chr-config-row-icon">📊</span>
+          <span class="chr-config-row-lbl">Exportar CSV</span>
+          <span class="chr-config-row-hint">Tabla de misiones para Excel</span>
+        </div>
+      </div>
     </div>`;
 }
 

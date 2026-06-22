@@ -17,8 +17,8 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png" type="image/png">
 <link rel="apple-touch-icon" href="https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png">
-<link rel="stylesheet" href="css/dungeon.css?v=150">
-<link rel="stylesheet" href="css/dungeon-v2.css?v=150">
+<link rel="stylesheet" href="css/dungeon.css?v=151">
+<link rel="stylesheet" href="css/dungeon-v2.css?v=151">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
 </head>
@@ -143,26 +143,31 @@
       </div>
     </div>
     <div class="header-tools">
-      <button class="icon-btn" id="diaryBtn"  onclick="openDiary()" title="Diario">📖</button>
-      <button class="icon-btn" id="oracleBtn" title="Oráculo IA">🔮</button>
-      <button class="icon-btn" id="d20Btn"    title="Tirar D20">🎲</button>
-      <button class="icon-btn" id="focusBtn"  title="Modo Focus (F)">🎯</button>
+      <!-- hidden on desktop (≥641px) — same actions live in the bottom dock -->
+      <button class="icon-btn header-dock-dup" id="diaryBtn"  onclick="openDiary()" title="Diario">📖</button>
+      <button class="icon-btn header-dock-dup" id="oracleBtn" title="Oráculo IA">🔮</button>
+      <button class="icon-btn header-dock-dup" id="d20Btn"    title="Tirar D20">🎲</button>
+      <button class="icon-btn header-dock-dup" id="focusBtn"  title="Modo Focus (F)">🎯</button>
       <button class="icon-btn" id="helpBtn"   title="Atajos (?)">⌨️</button>
       <div class="more-menu-wrap" id="moreMenuWrap">
         <button class="icon-btn" id="moreBtn" title="Más opciones">⋯</button>
         <div class="more-menu" id="moreMenu">
-          <button class="more-menu-item" onclick="openModal('quickNotesModal')">📝 Pergamino Rápido</button>
           <button class="more-menu-item" onclick="openTemplatesModal()">📋 Plantillas de misión</button>
           <button class="more-menu-item" onclick="openRuleta()">🎰 Ruleta del Dungeon</button>
-          <button class="more-menu-item" id="nightmareModeBtn" onclick="toggleNightmareMode()">💀 Modo Pesadilla</button>
           <button class="more-menu-item" id="bulkToggleBtn">☑️ Selección múltiple</button>
-          <button class="more-menu-item" id="compactToggle">⊟ Modo compacto</button>
-          <button class="more-menu-item" id="notifBtn">🔔 Notificaciones</button>
-          <button class="more-menu-item" id="importBtn">📥 Importar</button>
-          <button class="more-menu-item" id="exportBtn">📤 Exportar JSON</button>
-          <button class="more-menu-item" id="csvBtn">📊 Exportar CSV</button>
+          <hr class="more-menu-sep">
+          <button class="more-menu-item more-menu-cfg" onclick="switchView('config')">⚙️ Configuración</button>
         </div>
       </div>
+    </div>
+    <!-- IDs kept for JS addEventListener — visually hidden -->
+    <div hidden>
+      <button id="nightmareModeBtn" onclick="toggleNightmareMode()"></button>
+      <button id="compactToggle"></button>
+      <button id="notifBtn"></button>
+      <button id="importBtn"></button>
+      <button id="exportBtn"></button>
+      <button id="csvBtn"></button>
     </div>
     <div id="comboChip" class="combo-chip" style="display:none"></div>
     <div class="conn-dot" id="connDot" title="Conectando..."></div>
@@ -1317,54 +1322,54 @@
 <!-- Loot Drop Container -->
 <div id="lootDropContainer" style="position:fixed;inset:0;pointer-events:none;z-index:9000" aria-hidden="true"></div>
 
-<script src="js/config.js?v=150"></script>
-<script src="js/state.js?v=150"></script>
-<script src="js/db.js?v=150"></script>
-<script src="js/hero.js?v=150"></script>
-<script src="js/quests.js?v=150"></script>
-<script src="js/timer.js?v=150"></script>
-<script src="js/inventory.js?v=150"></script>
-<script src="js/spells.js?v=150"></script>
-<script src="js/views.js?v=150"></script>
-<script src="js/ui.js?v=150"></script>
-<script src="js/events.js?v=150"></script>
-<script src="js/oracle.js?v=150"></script>
-<script src="js/shop.js?v=150"></script>
-<script src="js/rpg.js?v=150"></script>
-<script src="js/pets.js?v=150"></script>
-<script src="js/weapons.js?v=150"></script>
-<script src="js/goals.js?v=150"></script>
-<script src="js/reputation.js?v=150"></script>
-<script src="js/patterns.js?v=150"></script>
-<script src="js/mechanics.js?v=150"></script>
-<script src="js/character.js?v=150"></script>
-<script src="js/spotify.js?v=150"></script>
-<script src="js/weather.js?v=150"></script>
-<script src="js/dungeon_clock.js?v=150"></script>
-<script src="js/skill_tree.js?v=150"></script>
-<script src="js/bestiary.js?v=150"></script>
-<script src="js/dungeon_grows.js?v=150"></script>
-<script src="js/runes.js?v=150"></script>
-<script src="js/google_fit.js?v=150"></script>
-<script src="js/hero_score.js?v=150"></script>
-<script src="js/push.js?v=150"></script>
-<script src="js/combos.js?v=150"></script>
-<script src="js/habits.js?v=150"></script>
-<script src="js/ruleta.js?v=150"></script>
-<script src="js/duolingo.js?v=150"></script>
-<script src="js/drops.js?v=150"></script>
-<script src="js/daily_goal.js?v=150"></script>
-<script src="js/weekly_summary.js?v=150"></script>
-<script src="js/challenges.js?v=150"></script>
-<script src="js/zones.js?v=150"></script>
-<script src="js/hero_card.js?v=150"></script>
-<script src="js/world_map.js?v=150"></script>
-<script src="js/sala_personal.js?v=150"></script>
-<script src="js/pet_garden.js?v=150"></script>
-<script src="js/animations.js?v=150"></script>
-<script src="js/effects.js?v=150"></script>
-<script src="js/auth.js?v=150"></script>
-<script src="js/main.js?v=150"></script>
+<script src="js/config.js?v=151"></script>
+<script src="js/state.js?v=151"></script>
+<script src="js/db.js?v=151"></script>
+<script src="js/hero.js?v=151"></script>
+<script src="js/quests.js?v=151"></script>
+<script src="js/timer.js?v=151"></script>
+<script src="js/inventory.js?v=151"></script>
+<script src="js/spells.js?v=151"></script>
+<script src="js/views.js?v=151"></script>
+<script src="js/ui.js?v=151"></script>
+<script src="js/events.js?v=151"></script>
+<script src="js/oracle.js?v=151"></script>
+<script src="js/shop.js?v=151"></script>
+<script src="js/rpg.js?v=151"></script>
+<script src="js/pets.js?v=151"></script>
+<script src="js/weapons.js?v=151"></script>
+<script src="js/goals.js?v=151"></script>
+<script src="js/reputation.js?v=151"></script>
+<script src="js/patterns.js?v=151"></script>
+<script src="js/mechanics.js?v=151"></script>
+<script src="js/character.js?v=151"></script>
+<script src="js/spotify.js?v=151"></script>
+<script src="js/weather.js?v=151"></script>
+<script src="js/dungeon_clock.js?v=151"></script>
+<script src="js/skill_tree.js?v=151"></script>
+<script src="js/bestiary.js?v=151"></script>
+<script src="js/dungeon_grows.js?v=151"></script>
+<script src="js/runes.js?v=151"></script>
+<script src="js/google_fit.js?v=151"></script>
+<script src="js/hero_score.js?v=151"></script>
+<script src="js/push.js?v=151"></script>
+<script src="js/combos.js?v=151"></script>
+<script src="js/habits.js?v=151"></script>
+<script src="js/ruleta.js?v=151"></script>
+<script src="js/duolingo.js?v=151"></script>
+<script src="js/drops.js?v=151"></script>
+<script src="js/daily_goal.js?v=151"></script>
+<script src="js/weekly_summary.js?v=151"></script>
+<script src="js/challenges.js?v=151"></script>
+<script src="js/zones.js?v=151"></script>
+<script src="js/hero_card.js?v=151"></script>
+<script src="js/world_map.js?v=151"></script>
+<script src="js/sala_personal.js?v=151"></script>
+<script src="js/pet_garden.js?v=151"></script>
+<script src="js/animations.js?v=151"></script>
+<script src="js/effects.js?v=151"></script>
+<script src="js/auth.js?v=151"></script>
+<script src="js/main.js?v=151"></script>
 
 <!-- Challenges Modal -->
 <!-- HECHIZOS MODAL -->

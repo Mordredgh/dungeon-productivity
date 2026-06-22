@@ -3066,6 +3066,12 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   transition:var(--transition); white-space:nowrap;
 }
 .more-menu-item:hover { background:var(--glass); color:var(--accent); }
+.more-menu-sep { border:none; border-top:1px solid var(--border); margin:4px 0; }
+.more-menu-cfg { color:var(--text3); font-size:11px; }
+.more-menu-cfg:hover { color:var(--text2); }
+
+/* Dock duplicates — hidden when dock is visible (≥641px) */
+@media (min-width: 641px) { .header-dock-dup { display:none !important; } }
 
 /* ── Oracle Chat Panel ─────────────────────────── */
 .oracle-overlay {
@@ -6543,6 +6549,23 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   transition: filter .14s;
 }
 .chr-config-save:hover { filter: brightness(1.1); }
+.chr-config-section-hd {
+  font-family: var(--font-head);
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text3); padding: 10px 14px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.chr-config-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px; cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background .15s;
+}
+.chr-config-row:last-child { border-bottom: none; }
+.chr-config-row:hover { background: var(--glass); }
+.chr-config-row-icon { font-size: 16px; flex-shrink: 0; }
+.chr-config-row-lbl { font-size: 13px; color: var(--text); font-weight: 500; flex: 1; }
+.chr-config-row-hint { font-size: 11px; color: var(--text3); }
 
 /* ═══════════════════════════════════════════════════════════
    SKILL TREE v2 — AC Odyssey style (skt-*)
