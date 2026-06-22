@@ -145,6 +145,11 @@ function openBossBattle(cycle) {
   if (overlay) {
     overlay.classList.add('bb-open');
     document.body.style.overflow = 'hidden';
+    const arena = overlay.querySelector('.bb-arena');
+    if (arena) {
+      arena.classList.add('bb-entering');
+      setTimeout(() => arena.classList.remove('bb-entering'), 700);
+    }
   }
 }
 

@@ -726,8 +726,10 @@ function _bossCycleCardHtml(cycle, b) {
        <div class="bcard-emoji" style="display:none">👹</div>`
     : `<div class="bcard-emoji">👹</div>`;
 
-  const variant  = (Math.floor(Date.now() / 86400000) % 2) + 1;
-  const bgLayers = `linear-gradient(180deg,rgba(12,3,22,.45) 0%,rgba(6,6,18,.65) 55%,rgba(4,4,14,.88) 100%),url('images/boss-bg-${b.rarity}-${variant}.png') center bottom/cover no-repeat`;
+  const variant    = (Math.floor(Date.now() / 86400000) % 2) + 1;
+  const bgLayers   = `linear-gradient(180deg,rgba(12,3,22,.45) 0%,rgba(6,6,18,.65) 55%,rgba(4,4,14,.88) 100%),url('images/boss-bg-${b.rarity}-${variant}.png') center bottom/cover no-repeat`;
+  const atkLeft    = typeof _bbLeft === 'function' ? _bbLeft(cycle) : 5;
+  const atkClass   = atkLeft === 0 ? ' exhausted' : atkLeft <= 2 ? ' low' : '';
 
   return `<div class="bcard ${urgent}" style="--rc:${rarClr};background:${bgLayers};cursor:pointer" onclick="openBossBattle('${cycle}')">
     <canvas class="bcard-plasma"></canvas>
@@ -740,6 +742,7 @@ function _bossCycleCardHtml(cycle, b) {
     </div>
     <div class="bcard-bottom">
       <span class="bcard-hp-txt">❤️ ${b.hp}/${b.maxHp}</span>
+      <span class="bcard-attacks${atkClass}">⚔️ ${atkLeft}/5</span>
       <span class="bcard-time">⏰ ${timeLeft}</span>
     </div>
   </div>`;
