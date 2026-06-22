@@ -729,7 +729,7 @@ function _bossCycleCardHtml(cycle, b) {
   const variant  = (Math.floor(Date.now() / 86400000) % 2) + 1;
   const bgLayers = `linear-gradient(180deg,rgba(12,3,22,.45) 0%,rgba(6,6,18,.65) 55%,rgba(4,4,14,.88) 100%),url('images/boss-bg-${b.rarity}-${variant}.png') center bottom/cover no-repeat`;
 
-  return `<div class="bcard ${urgent}" style="--rc:${rarClr};background:${bgLayers}">
+  return `<div class="bcard ${urgent}" style="--rc:${rarClr};background:${bgLayers};cursor:pointer" onclick="openBossBattle('${cycle}')">
     <canvas class="bcard-plasma"></canvas>
     ${cycleTag}
     <div class="bcard-portrait-wrap">${imgHtml}</div>

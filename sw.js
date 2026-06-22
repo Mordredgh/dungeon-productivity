@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v152';
+﻿const CACHE = 'dungeon-v153';
 const ASSETS = [
   '/',
   '/index.html',
@@ -152,6 +152,7 @@ const ASSETS = [
   '/images/map_cripta.png',
   /* Pet garden */
   '/js/pet_garden.js',
+  '/js/boss_battle.js',
   '/images/jardin_fondo.png',
   /* Pet eggs */
   '/images/pet_egg_zorro-naturaleza.png',
