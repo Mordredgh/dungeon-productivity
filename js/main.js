@@ -23,10 +23,8 @@ async function bootApp() {
   updateDungeonClock();
   setInterval(updateDungeonClock, 60 * 1000);
   await handleGoogleFitCallback();
-  if (typeof handleGoogleCalCallback === 'function') await handleGoogleCalCallback();
   syncGoogleFitSteps();
   renderFitWidget();
-  if (typeof renderCalendarWidget === 'function') renderCalendarWidget();
   renderDuolingoWidget();
   renderNightmareModeBtn();
   renderComboChip();

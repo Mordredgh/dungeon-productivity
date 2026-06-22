@@ -21,7 +21,6 @@ let webhookUrl = '';
 let bulkMode = false;
 let bulkSelected = new Set();
 let historyPage = 1;
-let calDate = new Date();
 let sidebarCollapsed = false;
 let breakDuration = parseInt(localStorage.getItem('dungeon-break-dur') || '5');
 let pomGoal = parseInt(localStorage.getItem('dungeon-pom-goal') || '8');

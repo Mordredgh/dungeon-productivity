@@ -286,7 +286,6 @@ function switchView(v) {
     if (v === 'stats')        renderStats();
     if (v === 'achievements') renderAchievements();
     if (v === 'history')      { historyPage = 1; renderHistory(); }
-    if (v === 'calendar')     renderCalendar();
     if (v !== 'pets' && typeof cleanupGarden === 'function') cleanupGarden();
     if (v === 'pets')         { renderPets(); switchPetsTab('list'); }
     if (v === 'shop')         renderShopView();
@@ -353,7 +352,6 @@ function switchCharTab(tab) {
 
 function renderIntegrations() {
   if (typeof renderFitWidget  === 'function') renderFitWidget();
-  if (typeof renderCalendarWidget === 'function') renderCalendarWidget();
 }
 
 function toggleCompact() {

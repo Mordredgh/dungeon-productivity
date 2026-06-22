@@ -179,8 +179,49 @@ if (window.Anim?.nuevaCosa) Anim.nuevaCosa(el);
 - **Sin `!important` en la zona de animaciones** — usar especificidad de selector
 
 ### Deploy
-Siempre usar `bash deploy.sh "mensaje"` en lugar de los pasos manuales.
-El script auto-bumpa SW version, todos los `?v=` en index.html, y verifica ASSETS.
+```bash
+# UN SOLO COMANDO — bump SW + verificar ASSETS + commit + push + Coolify redeploy
+bash deploy.sh "tipo: descripción"
+```
+- Requiere `COOLIFY_DUNGEON_TOKEN` en variables de entorno de usuario
+- **NUNCA** usar `git push` directo — no bumpea el SW ni triggerea Coolify
+- Si el token falta, solo hace git push (auto-deploy de Coolify puede tardar más)
+
+### Checklist para agregar un módulo nuevo
+1. Crear `js/mi_modulo.js` con `'use strict';`
+2. Añadir `<script src="js/mi_modulo.js?v=X">` en index.html **ANTES de `auth.js`**
+3. Añadir `/js/mi_modulo.js` en ASSETS de `sw.js`
+4. Añadir CSS al final de `dungeon.css` (sección PREMIUM EFFECTS)
+5. Ejecutar `bash deploy.sh "feat: descripción"`
+6. Actualizar la tabla "Elemento visual → archivo" en este CLAUDE.md
+
+---
+
+## Guía rápida — Elemento visual → archivo exacto
+
+| Elemento | CSS (dungeon.css línea) | JS responsable |
+|---|---|---|
+| Sidebar héroe (avatar, barras XP/HP) | L.376–681 `.sb-profile`, `.sb-bars` | `views.js renderHeroUI()` |
+| Quest item (misión en lista) | L.893–1119 `.quest-item`, `.quest-check` | `views.js renderQuestItem()` |
+| Boss banner / boss cards | L.682–892 `.boss-banner`, `.bcard-*` | `views.js updateBossBanner()` |
+| Stats view (heatmap, charts) | L.1120–1189 `.stat-block`, heatmap | `views.js renderStats()` |
+| Timer ring (pomodoro) | L.1264–1436 `.timer-ring`, `.pom-count` | `timer.js updateTimerUI()` |
+| Modals (todos) | L.1537–1905 `.modal-overlay`, `.modal` | `ui.js openModal()` |
+| Focus mode overlay | L.1906–2058 `.focus-overlay-*` | `events.js toggleFocusMode()` |
+| Mobile nav (barra inferior) | L.2243–2392 `#mobileNav`, `.more-sheet` | `ui.js` |
+| Dungeon clock chip | L.2599+ `.dungeon-clock-*` | `dungeon_clock.js` |
+| Toast notification | L.2800+ `.toast-*` | `ui.js toast()` |
+| Shop / Inventory / Smithy | L.2864+ `.shop-*`, `.inv-*`, `.smithy-*` | `shop.js`, `inventory.js` |
+| Character sheet premium | L.3640+ `.csp-*` | `character.js renderCharacterSheet()` |
+| Dungeon grows (mapa) | L.5340+ `.dg-*`, `.grows-room` | `dungeon_grows.js` |
+| Zones view | L.5340+ `.zone-*` | `zones.js renderZones()` |
+| Oracle chat panel | L.2672+ `.oracle-*` | **oracle.js** openOracle() |
+| Login overlay | L.2616+ `.login-*`, `.welcome-screen` | `auth.js doLogin()` |
+| Premium effects (shiny, glow, plasma) | L.6693+ `.shiny-text`, `.bcard-plasma` | `effects.js` |
+| Loot drop animación | `dungeon-v2.css` `.loot-drop-*` | `drops.js spawnLootDrop()` |
+| Combo chip | `dungeon-v2.css` | `combos.js renderComboChip()` |
+
+> **dungeon.css tiene índice al inicio** — Ctrl+G + número de línea para ir directo a la sección.
 
 ---
 

@@ -550,3 +550,7 @@ function renderPets() {
   el.innerHTML = html;
   if (typeof animPageItems === 'function') animPageItems('.pet-card', el);
 }
+
+// legacy familiar stub — reemplazado por mascotas
+function getFamiliarXPBonus() { return 0; }
+function renderFamiliar() {}

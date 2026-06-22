@@ -1,4 +1,30 @@
-﻿/* ============================================================
+/* ============================================================
+   ARCANUM CSS — INDICE DE SECCIONES
+   Ctrl+G (VSCode) o Ctrl+L (editor) para ir directo a la línea
+   ============================================================
+   L.1     DESIGN TOKENS / THEMES (:root, dark, light, cyber, sepia, forest)
+   L.100   BASE (reset, body, app shell)
+   L.188   LAYOUT (main, header, content-area, right-panel)
+   L.376   VIEW TABS + SIDEBAR (sb-profile, sb-bars, hero avatar)
+   L.682   BOSS BANNER (.boss-banner, .bcard-*)
+   L.893   QUESTS VIEW (.quest-item, .quest-check, filters)
+   L.1120  STATS VIEW (stat-block, heatmap, charts)
+   L.1190  ACHIEVEMENTS / HISTORY
+   L.1264  RIGHT PANEL + SPELLS + QUICK ADD
+   L.1537  MODALS (todos los modals: reward, level-up, boss, etc.)
+   L.1906  FOCUS MODE
+   L.2059  RESPONSIVE TABLET ≤900px
+   L.2072  MOBILE ≤600px + MOBILE NAV
+   L.2393  TEMAS: OLED, PERGAMINO, CYBER
+   L.2436  COMPONENTS: badge, guild, XP bar, HP crítico, skeleton, toast
+   L.2672  MISC: D20, FAB, CMD+K, banners, subtasks
+   L.2864  SHOP + INVENTORY + SMITHY + PETS + WEAPONS
+   L.3640+ CHARACTER SHEET PREMIUM (.csp-*)
+   L.5340+ DUNGEON GROWS / WORLD MAP / ZONES / SALA PERSONAL
+   L.6693  PREMIUM EFFECTS: shiny text, boss glow, plasma, dot field
+   ============================================================ */
+
+/* ============================================================
    DESIGN TOKENS / THEMES
    ============================================================ */
 :root {
@@ -2954,34 +2980,6 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   color:var(--text2); font-size:12px; cursor:pointer; text-align:center;
 }
 .load-more-btn:hover { border-color:var(--accent); color:var(--accent); }
-
-/* ── Calendar view ────────────────────────────────────── */
-.cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-.cal-month-title { font-family:var(--font-head); font-size:16px; color:var(--accent); text-transform:capitalize; }
-.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:12px; }
-.cal-header-cell { text-align:center; font-size:10px; color:var(--text3); padding:4px 0; font-weight:600; }
-.cal-day {
-  background:var(--card); border:1px solid var(--border); border-radius:6px;
-  padding:4px 3px; min-height:44px; cursor:pointer; transition:background .15s;
-}
-.cal-day:hover { background:var(--bg3); }
-.cal-day.empty { background:transparent; border-color:transparent; cursor:default; }
-.cal-day.today { border-color:var(--accent); background:rgba(137,180,250,.08); }
-.cal-day.has-quests { background:rgba(137,180,250,.05); }
-.cal-day-num { font-size:11px; font-weight:600; color:var(--text2); margin-bottom:3px; }
-.cal-day.today .cal-day-num { color:var(--accent); }
-.cal-dots { display:flex; flex-wrap:wrap; gap:2px; }
-.cal-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); }
-.cal-dot.done { background:var(--green); }
-.cal-dot.urgent { background:var(--red); }
-.cal-detail { margin-top:4px; }
-.cal-detail-title { font-family:var(--font-head); font-size:13px; color:var(--accent); margin-bottom:8px; text-transform:capitalize; }
-.cal-detail-item {
-  padding:6px 10px; background:var(--card); border-radius:6px; font-size:12px;
-  margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;
-  border:1px solid var(--border);
-}
-.cal-detail-item.done { opacity:.55; text-decoration:line-through; }
 
 /* ── Hourly chart ─────────────────────────────────────── */
 .hourly-bars { display:flex; align-items:flex-end; gap:2px; height:68px; padding-bottom:18px; }
