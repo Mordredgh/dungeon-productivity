@@ -218,3 +218,50 @@ function _rmSpawnSparkles() {
     setTimeout(() => s.remove(), 2200);
   }
 }
+
+/* ── RPG Inventory Grid ─────────────────────────────────── */
+function renderInventory() {
+  const el = document.getElementById('inventoryView');
+  if (!el) return;
+  if (!inventory.length) {
+    el.innerHTML = '<p style="color:var(--text3);padding:32px;text-align:center;font-size:13px">Tu inventario está vacío.<br>Completa misiones para obtener botín.</p>';
+    return;
+  }
+
+  const spells  = inventory.filter(r => r.item_key.startsWith('spell_'));
+  const potions = inventory.filter(r => r.item_key.startsWith('pet_potion_'));
+  const misc    = inventory.filter(r => !r.item_key.startsWith('spell_') && !r.item_key.startsWith('pet_potion_'));
+
+  const COLS = 6;
+  function slotsHtml(items, typeClass) {
+    const filled = items.map(r => {
+      const meta = _invItemMeta(r.item_key);
+      const imgUrl = `${CDN}dungeon/${r.item_key}.png`;
+      return `<div class="rpg-inv-slot ${typeClass}" onclick="showInvItemDetail('${r.item_key}')" title="${escHtml(meta.name)}">
+        <img src="${imgUrl}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <span class="rpg-inv-slot-emoji" style="display:none">${meta.icon}</span>
+        <span class="rpg-inv-qty">×${r.quantity}</span>
+      </div>`;
+    });
+    const empties = Math.ceil(items.length / COLS) * COLS - items.length;
+    const emptySlots = Array(Math.max(0, empties)).fill(
+      '<div class="rpg-inv-slot rpg-inv-empty"><div class="rpg-inv-empty-inner"></div></div>'
+    );
+    return [...filled, ...emptySlots].join('');
+  }
+
+  let html = '';
+  if (spells.length) {
+    html += `<div class="rpg-inv-section-label">✨ Fragmentos de Hechizo</div>
+             <div class="rpg-inv-grid">${slotsHtml(spells, 'rpg-inv-type-spell')}</div>`;
+  }
+  if (potions.length) {
+    html += `<div class="rpg-inv-section-label">🧪 Pociones de Mascota</div>
+             <div class="rpg-inv-grid">${slotsHtml(potions, 'rpg-inv-type-potion')}</div>`;
+  }
+  if (misc.length) {
+    html += `<div class="rpg-inv-section-label">🎒 Objetos</div>
+             <div class="rpg-inv-grid">${slotsHtml(misc, '')}</div>`;
+  }
+  el.innerHTML = html;
+}

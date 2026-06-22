@@ -28,6 +28,16 @@ function renderShopView() {
   renderGold();
 }
 
+function _shopRarity(cost) {
+  if (cost >= 1000) return 'legendary';
+  if (cost >= 500)  return 'epic';
+  if (cost >= 200)  return 'rare';
+  if (cost >= 80)   return 'uncommon';
+  return 'common';
+}
+const _RARITY_LABEL = { common:'COMÚN', uncommon:'POCO COMÚN', rare:'RARO', epic:'ÉPICO', legendary:'LEGENDARIO' };
+const _RARITY_COLOR = { common:'#6e7280', uncommon:'#4ade80', rare:'#60a5fa', epic:'#c084fc', legendary:'#f9e2af' };
+
 function renderShopItems() {
   const el = document.getElementById('shopItems');
   if (!el) return;
@@ -43,35 +53,33 @@ function renderShopItems() {
     { id: 'alimento',   label: '🍖 Alimento'     },
   ];
 
-  const tabs = `<div class="shop-tabs">${cats.map(c =>
-    `<button class="shop-tab ${shopCategory === c.id ? 'active' : ''}"
+  const tabs = `<div class="rpg-shop-tabs">${cats.map(c =>
+    `<button class="rpg-shop-tab ${shopCategory === c.id ? 'active' : ''}"
        onclick="shopCategory='${c.id}';renderShopItems()">${c.label}</button>`
   ).join('')}</div>`;
 
   const items = SHOP_ITEMS.filter(i => i.category === shopCategory);
 
-  const rows = items.map(item => {
-    const canBuy = gold >= item.cost;
+  const cards = items.map(item => {
+    const canBuy  = gold >= item.cost;
+    const rarity  = item.rarity || _shopRarity(item.cost);
     const imgHtml = item.img
-      ? `<img src="images/${item.img}" class="shop-item-img" alt="" onerror="this.src='${CDN}dungeon/${item.img}';this.onerror=null">`
-      : `<span class="shop-icon">${item.icon || '📦'}</span>`;
-    const extraLabel = item.qty ? `<span class="shop-item-qty">×${item.qty}</span>` : '';
+      ? `<img src="images/${item.img}" alt="" onerror="this.src='${CDN}dungeon/${item.img}';this.onerror=null">`
+      : `<span class="rpg-item-emoji">${item.icon || '📦'}</span>`;
+    const qtyBadge = item.qty ? `<div class="rpg-item-qty-badge">×${item.qty}</div>` : '';
     return `
-    <div class="shop-item">
-      <div class="shop-item-visual">${imgHtml}${extraLabel}</div>
-      <div class="shop-info">
-        <div class="shop-name">${escHtml(item.name)}</div>
-        <div class="shop-desc">${escHtml(item.desc)}</div>
-      </div>
-      <button class="shop-buy-btn ${canBuy ? '' : 'shop-buy-disabled'}"
-        onclick="buyItem('${item.id}',${item.cost})" ${canBuy ? '' : 'disabled'}>
+    <div class="rpg-shop-card rpg-rarity-${rarity}">
+      <div class="rpg-rarity-tag" style="color:${_RARITY_COLOR[rarity]}">${_RARITY_LABEL[rarity]}</div>
+      <div class="rpg-item-visual">${imgHtml}${qtyBadge}</div>
+      <div class="rpg-shop-item-name">${escHtml(item.name)}</div>
+      <div class="rpg-shop-item-desc">${escHtml(item.desc)}</div>
+      <button class="rpg-buy-btn" onclick="buyItem('${item.id}',${item.cost})" ${canBuy ? '' : 'disabled'}>
         🪙 ${item.cost}
       </button>
     </div>`;
   }).join('');
 
-  el.innerHTML = tabs + `<div class="shop-rows">${rows || '<p style="color:var(--text3);padding:16px;text-align:center">Sin artículos</p>'}</div>`;
-  if (typeof animPageItems === 'function') animPageItems('.shop-item-row', el);
+  el.innerHTML = tabs + `<div class="rpg-shop-grid">${cards || '<p style="color:var(--text3);padding:24px;text-align:center">Sin artículos en esta categoría</p>'}</div>`;
 }
 
 async function buyItem(id, cost) {

@@ -7389,3 +7389,189 @@ body::after {
   margin: 0 3px;
 }
 .boss-step.done + .boss-step-line { background: var(--text2); }
+
+/* ============================================================
+   RPG SHOP — GRID DE CARDS CON RAREZA
+   ============================================================ */
+#view-shop .view-header,
+#view-inventory .view-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#view-shop .view-title,
+#view-inventory .view-title {
+  font-family: var(--font-head);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: .06em;
+}
+.rpg-shop-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.rpg-shop-tab {
+  padding: 5px 11px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text2);
+  font-size: 11px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.rpg-shop-tab:hover { border-color: var(--gold); color: var(--gold); }
+.rpg-shop-tab.active {
+  background: rgba(249,226,175,.1);
+  border-color: var(--gold);
+  color: var(--gold);
+  font-weight: 600;
+}
+.rpg-shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 10px;
+}
+.rpg-shop-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  transition: var(--transition);
+  position: relative;
+}
+.rpg-shop-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+}
+.rpg-rarity-common    { border-top-color: #6e7280 !important; }
+.rpg-rarity-uncommon  { border-top-color: #4ade80 !important; }
+.rpg-rarity-rare      { border-top-color: #60a5fa !important; }
+.rpg-rarity-epic      { border-top-color: #c084fc !important; }
+.rpg-rarity-legendary {
+  border-top-color: var(--gold) !important;
+  background: linear-gradient(180deg, rgba(249,226,175,.06) 0%, var(--card) 40%);
+}
+.rpg-rarity-tag {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  opacity: .75;
+}
+.rpg-item-visual {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg4);
+  border-radius: 8px;
+  position: relative;
+  flex-shrink: 0;
+  margin: 2px 0;
+}
+.rpg-item-visual img { width: 46px; height: 46px; object-fit: contain; }
+.rpg-item-emoji { font-size: 28px; line-height: 1; }
+.rpg-item-qty-badge {
+  position: absolute;
+  bottom: -3px; right: -3px;
+  background: var(--accent);
+  color: #fff; font-size: 9px; font-weight: 700;
+  border-radius: 6px; padding: 1px 5px;
+}
+.rpg-shop-item-name {
+  font-size: 12px; font-weight: 600;
+  color: var(--text); text-align: center; line-height: 1.3;
+}
+.rpg-shop-item-desc {
+  font-size: 10px; color: var(--text2);
+  text-align: center; line-height: 1.4; flex: 1;
+}
+.rpg-buy-btn {
+  width: 100%;
+  background: rgba(249,226,175,.1);
+  border: 1px solid rgba(249,226,175,.28);
+  border-radius: 5px;
+  padding: 6px 0;
+  font-size: 12px; font-weight: 700;
+  color: var(--gold);
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: 2px;
+}
+.rpg-buy-btn:hover:not(:disabled) {
+  background: rgba(249,226,175,.18);
+  border-color: var(--gold);
+}
+.rpg-buy-btn:disabled {
+  background: var(--bg3);
+  border-color: var(--border);
+  color: var(--text3);
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   RPG INVENTORY — SLOTS TIPO DIABLO
+   ============================================================ */
+.rpg-inv-section-label {
+  font-family: var(--font-head);
+  font-size: 11px; color: var(--text2);
+  letter-spacing: .08em; text-transform: uppercase;
+  margin: 14px 0 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.rpg-inv-section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.rpg-inv-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+@media (max-width: 500px) { .rpg-inv-grid { grid-template-columns: repeat(5, 1fr); } }
+.rpg-inv-slot {
+  aspect-ratio: 1;
+  background: var(--bg4);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  position: relative;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.rpg-inv-slot:not(.rpg-inv-empty):hover {
+  border-color: var(--accent);
+  transform: scale(1.06);
+  z-index: 2;
+  box-shadow: 0 4px 16px rgba(0,0,0,.55);
+}
+.rpg-inv-slot img { width: 72%; height: 72%; object-fit: contain; }
+.rpg-inv-slot-emoji { font-size: 22px; }
+.rpg-inv-qty {
+  position: absolute; bottom: 2px; right: 4px;
+  font-size: 10px; font-weight: 700;
+  color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.9);
+}
+.rpg-inv-empty {
+  opacity: .2; cursor: default; pointer-events: none;
+}
+.rpg-inv-type-spell  { border-color: rgba(192,132,252,.35) !important; }
+.rpg-inv-type-potion { border-color: rgba(74,222,128,.3) !important; }
+.rpg-inv-type-spell:hover  { border-color: #c084fc !important; box-shadow: 0 0 14px rgba(192,132,252,.3) !important; }
+.rpg-inv-type-potion:hover { border-color: #4ade80 !important; box-shadow: 0 0 14px rgba(74,222,128,.25) !important; }
+.rpg-inv-empty-inner { width: 60%; height: 60%; border: 1px dashed var(--border); border-radius: 4px; }
