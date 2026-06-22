@@ -17,8 +17,8 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png" type="image/png">
 <link rel="apple-touch-icon" href="https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png">
-<link rel="stylesheet" href="css/dungeon.css?v=143">
-<link rel="stylesheet" href="css/dungeon-v2.css?v=143">
+<link rel="stylesheet" href="css/dungeon.css?v=144">
+<link rel="stylesheet" href="css/dungeon-v2.css?v=144">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
 </head>
@@ -733,7 +733,14 @@
   </div>
   <button class="btn btn-primary" style="width:100%;margin-top:14px;padding:14px" onclick="submitMobileAdd()">⚔️ Agregar Misión</button>
 </div>
-<button class="mobile-fab" id="mobileFab" onclick="openMobileAdd()" aria-label="Nueva misión">+</button>
+<button class="mobile-fab" id="mobileFab" onclick="toggleFabDial()" aria-label="Acciones rápidas">+</button>
+
+<!-- ── FAB Speed-Dial sub-actions (mobile) ─────────────────── -->
+<div id="fabDial" class="fab-dial">
+  <button class="fab-action" onclick="openMobileAdd();closeFabDial()" data-label="Nueva Misión">⚔️</button>
+  <button class="fab-action" onclick="openOracle();closeFabDial()" data-label="Oráculo">🔮</button>
+  <button class="fab-action" onclick="document.getElementById('d20Btn').click();closeFabDial()" data-label="Tirar D20">🎲</button>
+</div>
 
 <!-- MOBILE NAV (≤600px) — 4 tabs + Más sheet -->
 <nav id="mobileNav" class="mobile-nav" aria-label="Navegación móvil">
@@ -1310,54 +1317,54 @@
 <!-- Loot Drop Container -->
 <div id="lootDropContainer" style="position:fixed;inset:0;pointer-events:none;z-index:9000" aria-hidden="true"></div>
 
-<script src="js/config.js?v=143"></script>
-<script src="js/state.js?v=143"></script>
-<script src="js/db.js?v=143"></script>
-<script src="js/hero.js?v=143"></script>
-<script src="js/quests.js?v=143"></script>
-<script src="js/timer.js?v=143"></script>
-<script src="js/inventory.js?v=143"></script>
-<script src="js/spells.js?v=143"></script>
-<script src="js/views.js?v=143"></script>
-<script src="js/ui.js?v=143"></script>
-<script src="js/events.js?v=143"></script>
-<script src="js/oracle.js?v=143"></script>
-<script src="js/shop.js?v=143"></script>
-<script src="js/rpg.js?v=143"></script>
-<script src="js/pets.js?v=143"></script>
-<script src="js/weapons.js?v=143"></script>
-<script src="js/goals.js?v=143"></script>
-<script src="js/reputation.js?v=143"></script>
-<script src="js/patterns.js?v=143"></script>
-<script src="js/mechanics.js?v=143"></script>
-<script src="js/character.js?v=143"></script>
-<script src="js/spotify.js?v=143"></script>
-<script src="js/weather.js?v=143"></script>
-<script src="js/dungeon_clock.js?v=143"></script>
-<script src="js/skill_tree.js?v=143"></script>
-<script src="js/bestiary.js?v=143"></script>
-<script src="js/dungeon_grows.js?v=143"></script>
-<script src="js/runes.js?v=143"></script>
-<script src="js/google_fit.js?v=143"></script>
-<script src="js/hero_score.js?v=143"></script>
-<script src="js/push.js?v=143"></script>
-<script src="js/combos.js?v=143"></script>
-<script src="js/habits.js?v=143"></script>
-<script src="js/ruleta.js?v=143"></script>
-<script src="js/duolingo.js?v=143"></script>
-<script src="js/drops.js?v=143"></script>
-<script src="js/daily_goal.js?v=143"></script>
-<script src="js/weekly_summary.js?v=143"></script>
-<script src="js/challenges.js?v=143"></script>
-<script src="js/zones.js?v=143"></script>
-<script src="js/hero_card.js?v=143"></script>
-<script src="js/world_map.js?v=143"></script>
-<script src="js/sala_personal.js?v=143"></script>
-<script src="js/pet_garden.js?v=143"></script>
-<script src="js/animations.js?v=143"></script>
-<script src="js/effects.js?v=143"></script>
-<script src="js/auth.js?v=143"></script>
-<script src="js/main.js?v=143"></script>
+<script src="js/config.js?v=144"></script>
+<script src="js/state.js?v=144"></script>
+<script src="js/db.js?v=144"></script>
+<script src="js/hero.js?v=144"></script>
+<script src="js/quests.js?v=144"></script>
+<script src="js/timer.js?v=144"></script>
+<script src="js/inventory.js?v=144"></script>
+<script src="js/spells.js?v=144"></script>
+<script src="js/views.js?v=144"></script>
+<script src="js/ui.js?v=144"></script>
+<script src="js/events.js?v=144"></script>
+<script src="js/oracle.js?v=144"></script>
+<script src="js/shop.js?v=144"></script>
+<script src="js/rpg.js?v=144"></script>
+<script src="js/pets.js?v=144"></script>
+<script src="js/weapons.js?v=144"></script>
+<script src="js/goals.js?v=144"></script>
+<script src="js/reputation.js?v=144"></script>
+<script src="js/patterns.js?v=144"></script>
+<script src="js/mechanics.js?v=144"></script>
+<script src="js/character.js?v=144"></script>
+<script src="js/spotify.js?v=144"></script>
+<script src="js/weather.js?v=144"></script>
+<script src="js/dungeon_clock.js?v=144"></script>
+<script src="js/skill_tree.js?v=144"></script>
+<script src="js/bestiary.js?v=144"></script>
+<script src="js/dungeon_grows.js?v=144"></script>
+<script src="js/runes.js?v=144"></script>
+<script src="js/google_fit.js?v=144"></script>
+<script src="js/hero_score.js?v=144"></script>
+<script src="js/push.js?v=144"></script>
+<script src="js/combos.js?v=144"></script>
+<script src="js/habits.js?v=144"></script>
+<script src="js/ruleta.js?v=144"></script>
+<script src="js/duolingo.js?v=144"></script>
+<script src="js/drops.js?v=144"></script>
+<script src="js/daily_goal.js?v=144"></script>
+<script src="js/weekly_summary.js?v=144"></script>
+<script src="js/challenges.js?v=144"></script>
+<script src="js/zones.js?v=144"></script>
+<script src="js/hero_card.js?v=144"></script>
+<script src="js/world_map.js?v=144"></script>
+<script src="js/sala_personal.js?v=144"></script>
+<script src="js/pet_garden.js?v=144"></script>
+<script src="js/animations.js?v=144"></script>
+<script src="js/effects.js?v=144"></script>
+<script src="js/auth.js?v=144"></script>
+<script src="js/main.js?v=144"></script>
 
 <!-- Challenges Modal -->
 <!-- HECHIZOS MODAL -->
@@ -1454,6 +1461,24 @@
       <button class="btn btn-ghost" onclick="closeModal('invDetailModal')">Cerrar</button>
       <button class="btn btn-primary" id="invDetailUseBtn">Usar</button>
     </div>
+  </div>
+</div>
+
+<!-- ── Desktop Dock (Magnify) ───────────────────────────────── -->
+<div id="dungeonDock" class="dungeon-dock" role="toolbar" aria-label="Acciones rápidas">
+  <button class="dock-item" onclick="openModal('quickAddModal')" data-label="Nueva Misión"><span class="dock-icon">⚔️</span></button>
+  <button class="dock-item" onclick="document.getElementById('focusBtn').click()" data-label="Modo Focus"><span class="dock-icon">⏱️</span></button>
+  <button class="dock-item" onclick="openOracle()" data-label="Oráculo Arcano"><span class="dock-icon">🔮</span></button>
+  <button class="dock-item" onclick="document.getElementById('d20Btn').click()" data-label="Tirar D20"><span class="dock-icon">🎲</span></button>
+  <button class="dock-item" onclick="openDiary()" data-label="Diario"><span class="dock-icon">📖</span></button>
+  <button class="dock-item" onclick="openModal('quickNotesModal')" data-label="Pergamino"><span class="dock-icon">📝</span></button>
+</div>
+
+<!-- ── Quest Detail Drawer ───────────────────────────────────── -->
+<div id="questDrawer" class="quest-drawer" onclick="if(event.target===this)closeQuestDrawer()">
+  <div class="quest-drawer-panel">
+    <button class="quest-drawer-close" onclick="closeQuestDrawer()">✕</button>
+    <div id="questDrawerContent" class="quest-drawer-content"></div>
   </div>
 </div>
 

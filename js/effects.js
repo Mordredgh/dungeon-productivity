@@ -567,3 +567,145 @@ window.confettiCannon   = confettiCannon;
 window.initFlickerGrid  = initFlickerGrid;
 window.numberTicker     = numberTicker;
 window.initCursorTrail  = initCursorTrail;
+
+/* ═══════════════════════════════════════════════════════════
+   BATCH 4b — Dock · FAB Speed-Dial · Quest Drawer · Boss Steps
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Desktop Dock Magnify ──────────────────────────────────── */
+function initDockMagnify() {
+  const dock = document.getElementById('dungeonDock');
+  if (!dock) return;
+  const items = Array.from(dock.querySelectorAll('.dock-item'));
+
+  dock.addEventListener('mousemove', e => {
+    const dockRect = dock.getBoundingClientRect();
+    const mx = e.clientX;
+    items.forEach(item => {
+      const r = item.getBoundingClientRect();
+      const center = r.left + r.width / 2;
+      const dist = Math.abs(mx - center);
+      item.classList.remove('dock-near', 'dock-far');
+      if (dist < 40)       item.classList.add('dock-near');
+      else if (dist < 80)  item.classList.add('dock-far');
+    });
+  });
+
+  dock.addEventListener('mouseleave', () => {
+    items.forEach(item => item.classList.remove('dock-near', 'dock-far'));
+  });
+}
+
+/* ── FAB Speed-Dial ────────────────────────────────────────── */
+function toggleFabDial() {
+  const dial = document.getElementById('fabDial');
+  const fab  = document.getElementById('mobileFab');
+  if (!dial || !fab) return;
+  const open = dial.classList.toggle('open');
+  fab.classList.toggle('open', open);
+  fab.textContent = open ? '✕' : '+';
+}
+function closeFabDial() {
+  const dial = document.getElementById('fabDial');
+  const fab  = document.getElementById('mobileFab');
+  if (!dial || !fab) return;
+  dial.classList.remove('open');
+  fab.classList.remove('open');
+  fab.textContent = '+';
+}
+// Close dial when clicking outside
+document.addEventListener('click', e => {
+  const dial = document.getElementById('fabDial');
+  const fab  = document.getElementById('mobileFab');
+  if (dial && dial.classList.contains('open') && !dial.contains(e.target) && e.target !== fab) {
+    closeFabDial();
+  }
+});
+
+/* ── Quest Detail Drawer ───────────────────────────────────── */
+function openQuestDrawer(questId) {
+  const allQuests = (typeof quests !== 'undefined') ? quests : [];
+  const q = allQuests.find(x => x.id === questId);
+  if (!q) return;
+
+  const pct = q.hp_total > 0 ? Math.max(0, ((q.hp_total - (q.hp || 0)) / q.hp_total * 100)).toFixed(0) : 0;
+  const hpBar = q.hp_total > 0 ? `
+    <div style="margin:10px 0 6px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px">
+        <span>Progreso</span><span>${pct}%</span>
+      </div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:var(--rc,#a855f7);border-radius:3px;transition:width .4s"></div>
+      </div>
+    </div>` : '';
+
+  const tags = (q.tags || []).map(t =>
+    `<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:var(--card2);color:var(--text2)">${t}</span>`
+  ).join('');
+
+  const meta = [
+    q.difficulty && `<span style="font-size:11px;color:var(--text2)">Dificultad: ${q.difficulty}</span>`,
+    q.type       && `<span style="font-size:11px;color:var(--text2)">Tipo: ${q.type}</span>`,
+    q.xp         && `<span style="font-size:11px;color:var(--gold)">+${q.xp} XP</span>`,
+  ].filter(Boolean).join(' · ');
+
+  const safeTitle = (q.title || '').replace(/</g, '&lt;');
+  const safeDesc  = (q.description || '').replace(/</g, '&lt;');
+
+  document.getElementById('questDrawerContent').innerHTML = `
+    <div style="font-size:28px;margin-bottom:6px;line-height:1">${q.icon || '⚔️'}</div>
+    <h3 style="font-size:16px;font-weight:600;margin:0 0 6px;line-height:1.3">${safeTitle}</h3>
+    ${meta ? `<div style="margin-bottom:8px">${meta}</div>` : ''}
+    ${safeDesc ? `<p style="font-size:12px;color:var(--text2);margin:0 0 10px;line-height:1.6">${safeDesc}</p>` : ''}
+    ${hpBar}
+    ${tags ? `<div style="display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 14px">${tags}</div>` : ''}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+      <button class="btn btn-primary" style="flex:1;font-size:13px"
+        onclick="completeQuest('${q.id}');closeQuestDrawer()">✅ Completar</button>
+      <button class="btn btn-secondary" style="font-size:13px"
+        onclick="openEditQuestModal('${q.id}');closeQuestDrawer()">✏️ Editar</button>
+    </div>`;
+
+  document.getElementById('questDrawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeQuestDrawer() {
+  document.getElementById('questDrawer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+// ESC closes drawer
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeQuestDrawer();
+});
+
+/* ── Boss Progress Steps ───────────────────────────────────── */
+function renderBossSteps(boss) {
+  const hp    = boss.hp    != null ? boss.hp    : (boss.hp_total || 100);
+  const total = boss.hp_total || 100;
+  const pct   = hp / total;
+  const stage = pct > .6 ? 0 : pct > .3 ? 1 : hp > 0 ? 2 : 3;
+  const steps = ['💪 Activo', '⚠️ Peligroso', '🔥 Crítico', '☠️ Derrotado'];
+  return '<div class="boss-steps">' + steps.map((s, i) => {
+    const cls = i < stage ? 'done' : i === stage ? 'active' : '';
+    return `<div class="boss-step ${cls}">
+      <div class="boss-step-dot"></div>
+      <span style="font-size:9px">${s}</span>
+    </div>${i < steps.length - 1 ? '<div class="boss-step-line"></div>' : ''}`;
+  }).join('') + '</div>';
+}
+
+/* ── Auto-wire Batch 4b ────────────────────────────────────── */
+function _initBatch4b() {
+  initDockMagnify();
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _initBatch4b);
+} else {
+  setTimeout(_initBatch4b, 80);
+}
+
+window.toggleFabDial     = toggleFabDial;
+window.closeFabDial      = closeFabDial;
+window.openQuestDrawer   = openQuestDrawer;
+window.closeQuestDrawer  = closeQuestDrawer;
+window.renderBossSteps   = renderBossSteps;

@@ -7181,3 +7181,211 @@ body::after {
   position: fixed; top: 0; left: 0;
   pointer-events: none; z-index: 9999;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   BATCH 4b — Dock · FAB Speed-Dial · Quest Drawer · Progress Steps
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Desktop Dock (Magnify) ─────────────────────────────────── */
+.dungeon-dock {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 10px 14px;
+  background: rgba(15,12,30,.80);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 22px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  z-index: 480;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+}
+@media (max-width: 640px) { .dungeon-dock { display: none; } }
+
+.dock-item {
+  background: none;
+  border: none;
+  padding: 4px 5px;
+  cursor: pointer;
+  position: relative;
+  transform-origin: bottom center;
+  transition: transform .01s;
+}
+.dock-icon {
+  font-size: 24px;
+  display: block;
+  transition: transform .18s cubic-bezier(.23,1,.32,1), filter .18s;
+  transform-origin: bottom center;
+  filter: drop-shadow(0 0 0 transparent);
+  line-height: 1;
+}
+.dock-item:hover .dock-icon {
+  transform: scale(1.55) translateY(-6px);
+  filter: drop-shadow(0 4px 10px rgba(168,85,247,.55));
+}
+/* Neighbour magnification via JS (class added by dock JS) */
+.dock-item.dock-near .dock-icon  { transform: scale(1.28) translateY(-3px); }
+.dock-item.dock-far  .dock-icon  { transform: scale(1.12) translateY(-1px); }
+
+.dock-item::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px) scale(.88);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 10px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .14s, transform .14s cubic-bezier(.23,1,.32,1);
+}
+.dock-item:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* ── FAB Speed-Dial ─────────────────────────────────────────── */
+.fab-dial {
+  position: fixed;
+  bottom: 88px;
+  right: 20px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  z-index: 600;
+}
+@media (min-width: 641px) { .fab-dial { display: none; } }
+
+.fab-action {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  opacity: 0;
+  transform: translateY(16px) scale(.85);
+  transition: opacity .2s, transform .2s cubic-bezier(.23,1,.32,1);
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,.35);
+}
+.fab-action::before {
+  content: attr(data-label);
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 9px;
+  font-size: 11px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  opacity: 0;
+  transition: opacity .15s .1s;
+  pointer-events: none;
+}
+.fab-dial.open .fab-action {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.fab-dial.open .fab-action::before { opacity: 1; }
+.fab-dial.open .fab-action:nth-child(1) { transition-delay: .04s; }
+.fab-dial.open .fab-action:nth-child(2) { transition-delay: .08s; }
+.fab-dial.open .fab-action:nth-child(3) { transition-delay: .12s; }
+.mobile-fab { transition: transform .25s cubic-bezier(.23,1,.32,1); }
+.mobile-fab.open { transform: rotate(45deg); }
+
+/* ── Quest Detail Drawer ────────────────────────────────────── */
+.quest-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 800;
+  pointer-events: none;
+  visibility: hidden;
+}
+.quest-drawer.open {
+  pointer-events: all;
+  visibility: visible;
+}
+.quest-drawer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  opacity: 0;
+  transition: opacity .25s;
+}
+.quest-drawer.open::before { opacity: 1; }
+.quest-drawer-panel {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: min(380px, 92vw);
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  padding: 20px 18px 24px;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform .3s cubic-bezier(.32,.72,0,1);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.quest-drawer.open .quest-drawer-panel { transform: translateX(0); }
+.quest-drawer-close {
+  position: absolute; top: 12px; right: 12px;
+  background: none; border: none;
+  color: var(--text2); font-size: 18px; cursor: pointer;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 6px;
+  transition: background .12s;
+}
+.quest-drawer-close:hover { background: var(--card); }
+.quest-drawer-content { padding-top: 6px; }
+
+/* ── Boss Progress Steps ────────────────────────────────────── */
+.boss-steps {
+  display: flex;
+  align-items: center;
+  margin: 4px 0 8px;
+  font-size: 10px;
+}
+.boss-step {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--text3);
+  flex-shrink: 0;
+}
+.boss-step.active { color: var(--rc, #a855f7); font-weight: 700; }
+.boss-step.done   { color: var(--text2); }
+.boss-step-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  flex-shrink: 0;
+}
+.boss-step.active .boss-step-dot { background: currentColor; box-shadow: 0 0 5px currentColor; }
+.boss-step.done   .boss-step-dot { background: var(--text2); border-color: var(--text2); }
+.boss-step-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  min-width: 12px;
+  max-width: 28px;
+  margin: 0 3px;
+}
+.boss-step.done + .boss-step-line { background: var(--text2); }
