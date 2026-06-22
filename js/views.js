@@ -730,10 +730,11 @@ function _bossCycleCardHtml(cycle, b) {
   const bgLayers = `linear-gradient(180deg,rgba(12,3,22,.45) 0%,rgba(6,6,18,.65) 55%,rgba(4,4,14,.88) 100%),url('images/boss-bg-${b.rarity}-${variant}.png') center bottom/cover no-repeat`;
 
   return `<div class="bcard ${urgent}" style="--rc:${rarClr};background:${bgLayers}">
+    <canvas class="bcard-plasma"></canvas>
     ${cycleTag}
     <div class="bcard-portrait-wrap">${imgHtml}</div>
-    <div class="bcard-name">${escHtml(b.name)}</div>
-    <div class="bcard-rarity" style="color:${rarClr}">${rarLbl}</div>
+    <div class="bcard-name shiny-text" style="--shiny-c:${rarClr}">${escHtml(b.name)}</div>
+    <div class="bcard-rarity shiny-text" style="--shiny-c:${rarClr};font-size:10px">${rarLbl}</div>
     <div class="bcard-hp-bar">
       <div class="bcard-hp-fill" style="width:${pct}%;background:${hpClr}"></div>
     </div>
@@ -750,6 +751,8 @@ function updateBossBanner() {
     const state = getMultiBossState();
     grid.innerHTML = ['daily','weekly','monthly'].map(c => _bossCycleCardHtml(c, state[c])).join('');
     if (typeof animBossCards === 'function') animBossCards();
+    if (typeof destroyPlasmaWaves === 'function') destroyPlasmaWaves();
+    if (typeof initPlasmaWave === 'function') document.querySelectorAll('.bcard-plasma').forEach(initPlasmaWave);
   }
   // Effects bar
   if (typeof renderEffectsBar === 'function') renderEffectsBar();

@@ -6712,3 +6712,91 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .rp-frag-count { font-size: 11px; font-weight: 700; color: var(--text3); }
 .rp-frag-ok { color: var(--rc); }
 .rp-frag-name { font-size: 9px; color: var(--text3); }
+
+/* ═══════════════════════════════════════════════════════════
+   PREMIUM EFFECTS — Batch 1 / 2 / 3
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── BATCH 1: Shiny Text ───────────────────────────────────── */
+.shiny-text {
+  background: linear-gradient(
+    105deg,
+    var(--shiny-c, #f8fafc) 0%,
+    var(--shiny-c, #f8fafc) 28%,
+    rgba(255,255,255,.95) 50%,
+    var(--shiny-c, #f8fafc) 72%,
+    var(--shiny-c, #f8fafc) 100%
+  );
+  background-size: 250% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shiny-sweep 2.8s linear infinite;
+  display: inline-block;
+}
+@keyframes shiny-sweep {
+  0%   { background-position: -250% center; }
+  100% { background-position: 250% center; }
+}
+
+/* ── BATCH 1: Boss Card Electric Glow ────────────────────── */
+.bcard:not(.bcard-empty):not(.bcard-defeated) {
+  animation: boss-glow 3s ease-in-out infinite;
+}
+@keyframes boss-glow {
+  0%, 100% {
+    box-shadow:
+      0 4px 32px rgba(0,0,0,.4),
+      0 0 8px  color-mix(in srgb, var(--rc, #a855f7) 30%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 4px 32px rgba(0,0,0,.4),
+      0 0 20px color-mix(in srgb, var(--rc, #a855f7) 65%, transparent),
+      0 0 45px color-mix(in srgb, var(--rc, #a855f7) 25%, transparent);
+  }
+}
+
+/* Override urgent pulse with stronger version */
+.bcard-urgent { animation: boss-glow-urgent 1.3s ease-in-out infinite !important; }
+@keyframes boss-glow-urgent {
+  0%, 100% { box-shadow: 0 4px 32px rgba(0,0,0,.4), 0 0 14px rgba(251,113,133,.45); }
+  50%       { box-shadow: 0 4px 32px rgba(0,0,0,.4), 0 0 32px rgba(251,113,133,.85), 0 0 55px rgba(251,113,133,.28); }
+}
+
+/* Boss plasma canvas layer */
+.bcard-plasma {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: .38;
+  z-index: 0;
+}
+/* All bcard direct content sits above the plasma canvas */
+.bcard-cycle, .bcard-portrait-wrap, .bcard-name,
+.bcard-rarity, .bcard-hp-bar, .bcard-bottom {
+  position: relative;
+  z-index: 1;
+}
+.bcard::before { z-index: 2; } /* keep the radial top-glow on top too */
+
+/* ── BATCH 2: Glare Hover on inventory slots ─────────────── */
+.inv-slot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--gx, 50%) var(--gy, 50%),
+    rgba(255,255,255,.18) 0%,
+    rgba(255,255,255,.04) 45%,
+    transparent 70%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .12s;
+}
+.inv-slot[data-glare='1']::after { opacity: 1; }

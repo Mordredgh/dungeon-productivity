@@ -122,10 +122,12 @@ function showRewardModal(questName, questType, xpAmt, goldAmt, items) {
 
 function _rmCountUp(el, target, ms) {
   const start = Date.now();
+  const from  = parseInt(el.textContent) || 0;
   const tick = () => {
     const p = Math.min((Date.now() - start) / ms, 1);
-    const eased = 1 - Math.pow(1 - p, 3);
-    el.textContent = Math.round(eased * target);
+    // expo ease-out — fast start, smooth landing
+    const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+    el.textContent = Math.round(from + (target - from) * eased);
     if (p < 1) requestAnimationFrame(tick);
     else el.textContent = target;
   };
@@ -162,7 +164,15 @@ function showInvItemDetail(key) {
   if (!item) return;
   const meta = _invItemMeta(key);
 
-  document.getElementById('invDetailTitle').textContent = meta.name;
+  const _titleEl = document.getElementById('invDetailTitle');
+  _titleEl.textContent = meta.name;
+  if (meta.color && meta.color !== '#94a3b8') {
+    _titleEl.classList.add('shiny-text');
+    _titleEl.style.setProperty('--shiny-c', meta.color);
+  } else {
+    _titleEl.classList.remove('shiny-text');
+    _titleEl.style.removeProperty('--shiny-c');
+  }
   const img   = document.getElementById('invDetailImg');
   const emoji = document.getElementById('invDetailEmoji');
   img.src = `${CDN}dungeon/${key}.png`;
