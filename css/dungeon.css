@@ -7577,6 +7577,103 @@ body::after {
 .rpg-inv-empty-inner { width: 60%; height: 60%; border: 1px dashed var(--border); border-radius: 4px; }
 
 /* ============================================================
+   RPG REDESIGN — STATS (tablero del reino)
+   ============================================================ */
+.stats-card {
+  border-radius: 8px;
+  border-top: 3px solid rgba(249,226,175,.12);
+}
+.stats-card:hover {
+  border-top-color: rgba(249,226,175,.3);
+  box-shadow: 0 4px 20px rgba(0,0,0,.4);
+}
+.mini-bar {
+  background: linear-gradient(180deg, var(--gold), rgba(249,226,175,.5));
+  box-shadow: 0 -4px 10px rgba(249,226,175,.2);
+}
+.dist-bar-bg { background: rgba(249,226,175,.06); }
+.oraculo-text {
+  font-style: italic;
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+  border-left: 2px solid rgba(249,226,175,.25);
+  padding-left: 12px;
+}
+
+/* ============================================================
+   RPG REDESIGN — CHARACTER SHEET (ficha D&D)
+   ============================================================ */
+.chr-section {
+  border-top: 3px solid rgba(249,226,175,.12);
+  border-radius: 8px;
+}
+.chr-section:hover { border-top-color: rgba(249,226,175,.25); }
+.chr-attr-card {
+  border-top: 2px solid rgba(80,80,100,.4);
+  border-radius: 8px;
+}
+.chr-attr-val { color: var(--gold); }
+.chr-class-pill.chr-selected {
+  border-top: 2px solid var(--gold);
+  box-shadow: 0 2px 12px rgba(249,226,175,.12);
+}
+.chr-race-pill.chr-selected {
+  border-top: 2px solid var(--gold);
+  box-shadow: 0 2px 12px rgba(249,226,175,.12);
+}
+
+/* ============================================================
+   RPG REDESIGN — LOGIN (puerta del dungeon: oro arcano)
+   ============================================================ */
+
+/* Orbs: primer orbe azul → ámbar, tercer orbe teal → naranja */
+.lob-1 { background: rgba(249,200,100,.08); }
+.lob-2 { background: rgba(140,60,200,.07); }
+.lob-3 { background: rgba(220,120,40,.06); }
+
+/* Emblem: borde dorado */
+.login-emblem {
+  background: linear-gradient(135deg, rgba(249,226,175,.12), rgba(168,85,247,.12));
+  border-color: rgba(249,226,175,.3);
+}
+.login-emblem-glow {
+  background: radial-gradient(circle, rgba(249,226,175,.12) 0%, transparent 70%);
+}
+
+/* Título: degradado dorado */
+.login-title {
+  background: linear-gradient(135deg, #e2e8f0 0%, var(--gold) 50%, #c4b5fd 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Input focus: glow dorado */
+.login-field:focus-within {
+  border-color: rgba(249,226,175,.4);
+  background: rgba(249,226,175,.04);
+  box-shadow: 0 0 0 3px rgba(249,226,175,.07), 0 2px 12px rgba(249,226,175,.1);
+}
+
+/* Separador: tinte dorado */
+.login-sep::before, .login-sep::after {
+  background: linear-gradient(90deg, transparent, rgba(249,226,175,.15), transparent);
+}
+
+/* Botón principal: arcano oscuro con borde dorado */
+.login-btn {
+  background: linear-gradient(135deg, rgba(249,226,175,.18) 0%, rgba(180,140,60,.14) 100%);
+  border: 1px solid rgba(249,226,175,.35);
+  color: var(--gold);
+  box-shadow: 0 4px 24px rgba(249,226,175,.12), 0 1px 0 rgba(255,255,255,.06) inset;
+}
+.login-btn:hover:not(:disabled) {
+  box-shadow: 0 8px 32px rgba(249,226,175,.2);
+  border-color: rgba(249,226,175,.55);
+}
+
+/* ============================================================
    RPG REDESIGN — ACHIEVEMENTS (trofeos dorados, no verde)
    ============================================================ */
 .ach-cat-section .ach-cat-header {
