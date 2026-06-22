@@ -207,9 +207,12 @@ async function resetDailyQuests() {
     (q.type === 'daily' || q.type === 'habit') && q.done && q.done_at && !q.done_at.startsWith(today)
   );
   for (const q of toReset) {
-    await db.from('dungeon_quests').update({ done: false, done_at: null }).eq('id', q.id);
+    const patch = { done: false, done_at: null };
+    if (q.deadline && q.deadline < today) patch.deadline = today;
+    await db.from('dungeon_quests').update(patch).eq('id', q.id);
     q.done = false;
     q.done_at = null;
+    if (patch.deadline) q.deadline = today;
   }
   if (toReset.length) {
     toast('🌅', `${toReset.length} misiones diarias reseteadas para hoy.`);
