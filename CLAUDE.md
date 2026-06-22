@@ -312,13 +312,12 @@ Solo para datos no críticos (se puede perder sin consecuencias):
 
 ## Deploy
 ```bash
-# 1. Bumpar sw.js: dungeon-vXX → dungeon-v(XX+1)
-# 2. Anotar en CHANGELOG.md
-# 3. Deploy:
-git add -A
-git commit -m "tipo: descripción"
-git push origin main
+# UN SOLO COMANDO — hace todo: bump SW, verificar ASSETS, commit, push y Coolify redeploy
+bash deploy.sh "tipo: descripción"
 ```
+- `deploy.sh` requiere la variable de entorno `COOLIFY_DUNGEON_TOKEN`
+- Si falta el token, solo hace git push (Coolify auto-deploy puede tardar más)
+- **NUNCA usar** `git push` directo sin pasar por deploy.sh — no bumpea el SW
 
 ## Supabase migrations
 ```javascript
