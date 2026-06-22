@@ -116,10 +116,11 @@ async function addXP(amount, type, sourceEl) {
 
   if (newLevel > prevLevel) {
     const gainedPoints = newLevel - prevLevel;
-    hero.attr_points = (hero.attr_points || 0) + gainedPoints;
+    hero.attr_points  = (hero.attr_points  || 0) + gainedPoints;
+    hero.skill_points = (hero.skill_points || 0) + gainedPoints;
     const hist = JSON.parse(hero.level_history || '[]');
     hist.push({ level: newLevel, date: new Date().toISOString().split('T')[0], xp_total: newTotal });
-    saveHero({ attr_points: hero.attr_points, level_history: JSON.stringify(hist) });
+    await saveHero({ attr_points: hero.attr_points, skill_points: hero.skill_points, level_history: JSON.stringify(hist) });
     showLevelUp(newLevel);
     checkAchievements();
     if (typeof dungeonPush === 'function') dungeonPush('⭐ ¡Subiste de nivel!', `${hero.name} alcanzó el nivel ${newLevel}. El dungeon tiembla.`);
