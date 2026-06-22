@@ -23,7 +23,7 @@ async function initDB() {
   scheduleRandomEvent();
   checkDailyStreak();
   if (typeof checkWeeklyDungeonProgress === 'function') checkWeeklyDungeonProgress();
-  if (typeof _showRoomUnlockNotifs      === 'function') _showRoomUnlockNotifs();
+  if (typeof _showRoomUnlockNotifs      === 'function') setTimeout(_showRoomUnlockNotifs, 2000);
 }
 
 /* POMODORO */

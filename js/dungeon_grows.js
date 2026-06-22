@@ -198,6 +198,8 @@ function _showRoomUnlockModal(room, cb) {
   const existing = document.getElementById('roomUnlockModal');
   if (existing) existing.remove();
 
+  window._dungeonRoomDismiss = cb;
+
   const modal = document.createElement('div');
   modal.id = 'roomUnlockModal';
   modal.className = 'room-unlock-overlay';
@@ -210,7 +212,7 @@ function _showRoomUnlockModal(room, cb) {
         <div class="room-unlock-name">${room.name}</div>
         <div class="room-unlock-flavor">${room.flavor}</div>
         ${room.bonus ? `<div class="room-unlock-bonus">${room.bonus.icon} ${room.bonus.label}</div>` : ''}
-        <button class="btn room-unlock-btn" onclick="document.getElementById('roomUnlockModal').remove();(${cb})()">
+        <button class="btn room-unlock-btn" onclick="document.getElementById('roomUnlockModal').remove();const _fn=window._dungeonRoomDismiss;window._dungeonRoomDismiss=null;if(_fn)_fn();">
           ¡Explorar!
         </button>
       </div>

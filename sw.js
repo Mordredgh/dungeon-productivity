@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v149';
+﻿const CACHE = 'dungeon-v150';
 const ASSETS = [
   '/',
   '/index.html',
