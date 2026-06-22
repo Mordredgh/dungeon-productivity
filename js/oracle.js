@@ -3,6 +3,7 @@
    ORACLE — Oráculo Arcano (extracted from events.js)
    ============================================================ */
 
+/* ============================================================
    ORÁCULO ARCANO — OpenClaw via proxy
    ============================================================ */
 let _oracleLoaded = false;
@@ -304,5 +305,3 @@ document.getElementById('oracleSend').addEventListener('click', oracleSend);
 document.getElementById('oracleInput').addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); oracleSend(); }
 });
-
-/* ============================================================
