@@ -214,8 +214,17 @@ async function resetDailyQuests() {
     q.done_at = null;
     if (patch.deadline) q.deadline = today;
   }
-  if (toReset.length) {
-    toast('🌅', `${toReset.length} misiones diarias reseteadas para hoy.`);
+  // Also fix already-undone dailies with a stale deadline (no done_at to trigger above)
+  const staleDeadline = quests.filter(q =>
+    (q.type === 'daily' || q.type === 'habit') && !q.done && q.deadline && q.deadline < today
+  );
+  for (const q of staleDeadline) {
+    await db.from('dungeon_quests').update({ deadline: today }).eq('id', q.id);
+    q.deadline = today;
+  }
+
+  if (toReset.length || staleDeadline.length) {
+    if (toReset.length) toast('🌅', `${toReset.length} misiones diarias reseteadas para hoy.`);
     renderQuestList();
   }
 }
