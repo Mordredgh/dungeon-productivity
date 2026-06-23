@@ -114,7 +114,6 @@ async function syncGoogleFitSteps(force = false) {
     fitSteps = 0;
     data.bucket?.forEach(b => b.dataset?.forEach(ds => ds.point?.forEach(p =>
       p.value?.forEach(v => { fitSteps += v.intVal || 0; }))));
-    console.log('Fit steps:', fitSteps, '| bucket[0]:', JSON.stringify(data.bucket?.[0]));
     await saveHero({ fit_sync_date: today });
     fitSynced = true;
     await _applyFitXP(today);
