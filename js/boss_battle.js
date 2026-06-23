@@ -239,7 +239,15 @@ function _bbRender() {
   const attacksLeft = _bbLeft(_bbCycle);
 
   /* ─ Pet sprite ─ */
-  if (petSpriteEl) petSpriteEl.innerHTML = `<div class="bb-pet-emoji">${_bbPetDef.icon}</div>`;
+  /* ─ Pet sprite: imagen real si baby/mount, emoji si huevo ─ */
+  const _petStage = _bbPet.stage || 'baby';
+  const _petKey   = escHtml(_bbPet.pet_key || '');
+  const _petIcon  = escHtml(_bbPetDef.icon || '🐾');
+  if (petSpriteEl) petSpriteEl.innerHTML = (_petStage === 'egg')
+    ? `<div class="bb-pet-emoji">${_petIcon}</div>`
+    : `<img class="bb-pet-img" src="images/pet_${_petStage}_${_petKey}.png" alt="${escHtml(_bbPetDef.name)}"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+       <div class="bb-pet-emoji" style="display:none">${_petIcon}</div>`;
 
   /* ─ Pet info ─ */
   if (petInfoEl) petInfoEl.innerHTML = `
