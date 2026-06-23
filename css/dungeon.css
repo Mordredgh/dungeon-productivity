@@ -7904,46 +7904,46 @@ body::after {
   min-height: 0;
 }
 
-/* Info boxes: glass cards estilo Pokémon */
+/* Info boxes: glass cards compactos, pegados a los bordes exteriores */
 .bb-boss-info {
   grid-area: boss-info;
+  align-self: start;        /* solo ocupa el espacio de su contenido */
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 12px 14px;
-  background: rgba(0,0,0,.52);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 14px;
-  margin: 8px 0 4px 0;
+  padding: 10px 12px 11px;
+  background: rgba(0,0,0,.62);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 12px;
+  margin: 10px 0 0 0;
 }
 .bb-boss-sprite {
   grid-area: boss-sprite;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-end;    /* sprite sentado en el suelo de su celda */
   justify-content: center;
-  padding-bottom: 0;
+  padding-bottom: 4px;
 }
 .bb-pet-sprite {
   grid-area: pet-sprite;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-end;    /* emoji sentado en el suelo de su celda */
   justify-content: center;
-  padding-bottom: 0;
+  padding-bottom: 4px;
 }
 .bb-pet-info {
   grid-area: pet-info;
+  align-self: end;          /* solo ocupa el espacio de su contenido, pegado abajo */
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 12px 14px;
-  background: rgba(0,0,0,.52);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 14px;
-  margin: 4px 0 8px 0;
+  padding: 10px 12px 11px;
+  background: rgba(0,0,0,.62);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 12px;
+  margin: 0 0 10px 0;
 }
 
 /* Nombres y chips */
@@ -7994,16 +7994,16 @@ body::after {
 }
 .bb-hp-track {
   flex: 1;
-  height: 7px;
-  background: rgba(255,255,255,.12);
-  border-radius: 4px;
+  height: 10px;
+  background: rgba(255,255,255,.22);
+  border-radius: 5px;
   overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.4);
 }
 .bb-hp-fill {
   height: 100%;
-  border-radius: 4px;
+  border-radius: 5px;
   transition: width .55s cubic-bezier(.4,0,.2,1);
-  box-shadow: 0 0 6px currentColor;
 }
 .bb-hp-val { font-size: 9px; color: var(--text3); flex-shrink: 0; min-width: 44px; text-align: right; }
 .bb-stat-row { font-size: 9px; color: var(--text3); margin-top: 5px; letter-spacing: .02em; }
@@ -8011,10 +8011,10 @@ body::after {
 /* Sprites */
 .bb-boss-img {
   width: auto;
-  max-height: 190px;
-  max-width: 190px;
+  max-height: 230px;
+  max-width: 230px;
   object-fit: contain;
-  filter: drop-shadow(0 6px 28px rgba(0,0,0,.7));
+  filter: drop-shadow(0 8px 32px rgba(0,0,0,.8));
   display: block;
 }
 /* Emoji fallback: oculto por defecto, JS lo muestra vía onerror */
@@ -8027,7 +8027,7 @@ body::after {
   filter: drop-shadow(0 4px 16px rgba(0,0,0,.5));
 }
 .bb-pet-emoji {
-  font-size: 130px;
+  font-size: 155px;
   line-height: 1;
   display: block;
   filter: drop-shadow(0 8px 24px rgba(0,0,0,.7));
@@ -8204,11 +8204,12 @@ body::after {
 
 /* ── Responsive mobile ────────────────────────────────────── */
 @media (max-width: 480px) {
-  .bb-boss-img     { max-height: 160px; max-width: 160px; }
+  .bb-boss-img     { max-height: 175px; max-width: 175px; }
   .bb-sprite-emoji { font-size: 100px; }
-  .bb-pet-emoji    { font-size: 100px; }
+  .bb-pet-emoji    { font-size: 120px; }
   .bb-entity-name  { font-size: 12px; }
-  .bb-boss-info, .bb-pet-info { padding: 9px 10px; border-radius: 10px; }
+  .bb-boss-info, .bb-pet-info { padding: 8px 10px 9px; border-radius: 10px; margin-top: 8px; margin-bottom: 8px; }
+  .bb-hp-track     { height: 9px; }
   .bb-moves-grid   { gap: 5px; }
   .bb-move-btn     { padding: 7px 8px; }
   .bb-move-name    { font-size: 10px; }
