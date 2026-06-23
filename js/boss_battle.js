@@ -237,7 +237,7 @@ function _bbRender() {
   const attacksLeft = _bbLeft(_bbCycle);
 
   /* ─ Pet sprite ─ */
-  if (petSpriteEl) petSpriteEl.innerHTML = `<div class="bb-sprite-emoji bb-pet-emoji">${_bbPetDef.icon}</div>`;
+  if (petSpriteEl) petSpriteEl.innerHTML = `<div class="bb-pet-emoji">${_bbPetDef.icon}</div>`;
 
   /* ─ Pet info ─ */
   if (petInfoEl) petInfoEl.innerHTML = `

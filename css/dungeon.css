@@ -8027,11 +8027,22 @@ body::after {
   filter: drop-shadow(0 4px 16px rgba(0,0,0,.5));
 }
 .bb-pet-emoji {
-  font-size: 110px;
+  font-size: 130px;
   line-height: 1;
   display: block;
-  filter: drop-shadow(0 6px 20px rgba(0,0,0,.6));
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,.7));
   transition: transform .15s cubic-bezier(.4,0,.2,1);
+  position: relative;
+}
+/* Sombra de plataforma bajo la mascota */
+.bb-pet-emoji::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 14px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,.45) 0%, transparent 70%);
+  margin: -4px auto 0;
+  border-radius: 50%;
 }
 
 /* Boss hit shake */
@@ -8193,9 +8204,9 @@ body::after {
 
 /* ── Responsive mobile ────────────────────────────────────── */
 @media (max-width: 480px) {
-  .bb-boss-img     { max-height: 150px; max-width: 150px; }
-  .bb-sprite-emoji { font-size: 90px; }
-  .bb-pet-emoji    { font-size: 90px; }
+  .bb-boss-img     { max-height: 160px; max-width: 160px; }
+  .bb-sprite-emoji { font-size: 100px; }
+  .bb-pet-emoji    { font-size: 100px; }
   .bb-entity-name  { font-size: 12px; }
   .bb-boss-info, .bb-pet-info { padding: 9px 10px; border-radius: 10px; }
   .bb-moves-grid   { gap: 5px; }
