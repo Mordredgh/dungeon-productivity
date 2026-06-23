@@ -8239,25 +8239,25 @@ body::after {
   from { transform: translateY(12px); opacity: 0; }
   to   { transform: translateY(0);    opacity: 1; }
 }
-.bb-entering .bb-boss-sprite {
+.anim-bb-entering .bb-boss-sprite {
   animation: bb-slide-in-right 0.40s cubic-bezier(0.23,1,0.32,1) both;
 }
-.bb-entering .bb-boss-info {
+.anim-bb-entering .bb-boss-info {
   animation: bb-slide-in-left 0.38s cubic-bezier(0.23,1,0.32,1) 0.06s both;
 }
-.bb-entering .bb-pet-sprite {
+.anim-bb-entering .bb-pet-sprite {
   animation: bb-slide-in-left 0.40s cubic-bezier(0.23,1,0.32,1) 0.12s both;
 }
-.bb-entering .bb-pet-info {
+.anim-bb-entering .bb-pet-info {
   animation: bb-slide-in-right 0.38s cubic-bezier(0.23,1,0.32,1) 0.18s both;
 }
-.bb-entering .bb-move-panel {
+.anim-bb-entering .bb-move-panel {
   animation: bb-fade-in-up 0.32s cubic-bezier(0.23,1,0.32,1) 0.22s both;
 }
 @media (prefers-reduced-motion: reduce) {
-  .bb-entering .bb-boss-sprite,
-  .bb-entering .bb-boss-info,
-  .bb-entering .bb-pet-sprite,
-  .bb-entering .bb-pet-info,
-  .bb-entering .bb-move-panel { animation: none; }
+  .anim-bb-entering .bb-boss-sprite,
+  .anim-bb-entering .bb-boss-info,
+  .anim-bb-entering .bb-pet-sprite,
+  .anim-bb-entering .bb-pet-info,
+  .anim-bb-entering .bb-move-panel { animation: none; }
 }

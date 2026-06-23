@@ -67,10 +67,11 @@ function _bbMoveUnlocked(move, pet) {
 }
 
 /* ── Estado local de la batalla ───────────────────────────── */
-let _bbCycle     = null;
-let _bbPet       = null;
-let _bbPetDef    = null;
-let _bbAnimating = false;
+let _bbCycle        = null;
+let _bbPet          = null;
+let _bbPetDef       = null;
+let _bbAnimating    = false;
+let _bbEnteringTimer = null;
 
 /* ── Límite de 5 ataques por día por ciclo ────────────────── */
 function _bbStorageKey() { return 'dungeon-bb-' + new Date().toISOString().split('T')[0]; }
@@ -147,8 +148,9 @@ function openBossBattle(cycle) {
     document.body.style.overflow = 'hidden';
     const arena = overlay.querySelector('.bb-arena');
     if (arena) {
-      arena.classList.add('bb-entering');
-      setTimeout(() => arena.classList.remove('bb-entering'), 700);
+      if (_bbEnteringTimer) clearTimeout(_bbEnteringTimer);
+      arena.classList.add('anim-bb-entering');
+      _bbEnteringTimer = setTimeout(() => { arena.classList.remove('anim-bb-entering'); _bbEnteringTimer = null; }, 700);
     }
   }
 }

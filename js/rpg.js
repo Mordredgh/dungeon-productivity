@@ -249,7 +249,7 @@ async function resolveEvent(evId, effect) {
   if (effect === 'doubleNext') { if (hero) { hero.double_next = true; saveHero({ double_next: true }); } toast('✨', '¡Próxima misión con 2× XP!'); }
   if (effect === 'streak1')   { const ns = (hero.streak||0)+1; await saveHero({streak:ns}); hero.streak=ns; renderHeroUI(); toast('🔮', '+1 día de racha mística.'); }
   if (effect === 'hp20')      { const h = Math.min((hero.hp||100)+20, hero.hp_max||100); hero.hp=h; await saveHero({hp:h}); renderHeroUI(); toast('🍺', '+20 HP en la taberna.'); }
-  if (effect === 'bossHP50')  { const _ms=getMultiBossState(); if(_ms.weekly&&!_ms.weekly.defeated){_ms.weekly.hp=Math.min(_ms.weekly.hp+50,_ms.weekly.maxHp);saveMultiBossState(_ms);updateBossBanner();} toast('🐉', '¡El Jefe absorbe poder dracónico! +50 HP al jefe semanal.'); }
+  if (effect === 'bossHP50')  { const _ms=getMultiBossState(); if(_ms.weekly&&!_ms.weekly.defeated){_ms.weekly.hp=Math.min(_ms.weekly.hp+50,_ms.weekly.maxHp);saveMultiBossState(_ms);updateBossBanner();toast('🐉', '¡El Jefe absorbe poder dracónico! +50 HP al jefe semanal.');} }
   if (effect === 'mainBonus') { if (hero) { hero.main_bonus_date = today; saveHero({ main_bonus_date: today }); } toast('📜', 'Las misiones principales dan +20 XP hoy.'); }
   if (effect === 'curse')     { if (hero) { hero.curse_date = today; saveHero({ curse_date: today }); } toast('💀', '¡Maldición activa! Completa 2 misiones o pierdes HP.'); }
   if (effect === 'potion')    { const _e = Date.now()+30*60*1000; if (hero) { hero.potion_exp = _e; saveHero({ potion_exp: _e }); } toast('⚡', '¡2× XP por 30 minutos!'); }
