@@ -105,7 +105,7 @@ function renderInventory() {
   const weaponCard = w => {
     const def  = WEAPON_DEFS.find(d => d.key === w.weapon_key) || { icon:'⚔️' };
     const tier = WEAPON_TIERS[w.tier] || { color:'#9ca3af', label:w.tier };
-    const img  = CDN + 'dungeon/arma_' + w.weapon_key + '_' + w.tier + '.png';
+    const img  = 'images/arma_' + w.weapon_key + '_' + w.tier + '.png';
     const forging = isForging(w);
     const stats = [
       tier.xpBonus  ? `✨ +${Math.round(tier.xpBonus*100)}% XP`   : '',
@@ -279,7 +279,7 @@ function renderSmithy() {
       const canCraft= have >= recipe.count;
       const srcT    = WEAPON_TIERS[recipe.from];
       const dstT    = WEAPON_TIERS[targetTier];
-      const img     = CDN + 'dungeon/arma_' + def.key + '_' + targetTier + '.png';
+      const img     = 'images/arma_' + def.key + '_' + targetTier + '.png';
       let stats = '';
       if (ad) {
         const val = ad.statBase[targetTier] || 0;

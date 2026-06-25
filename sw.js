@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v162';
+﻿const CACHE = 'dungeon-v163';
 const ASSETS = [
   '/',
   '/index.html',
@@ -194,6 +194,38 @@ const ASSETS = [
   '/images/pet_alimento_dragon-fuego.png',
   '/images/pet_alimento_fenix-mitico.png',
   '/images/pet_alimento_rey-tempestad.png',
+  /* Weapons & armor */
+  '/images/arma_espada_comun.png','/images/arma_espada_raro.png','/images/arma_espada_epico.png','/images/arma_espada_legendario.png','/images/arma_espada_mitico.png',
+  '/images/arma_mazo_comun.png','/images/arma_mazo_raro.png','/images/arma_mazo_epico.png','/images/arma_mazo_legendario.png','/images/arma_mazo_mitico.png',
+  '/images/arma_baculo_comun.png','/images/arma_baculo_raro.png','/images/arma_baculo_epico.png','/images/arma_baculo_legendario.png','/images/arma_baculo_mitico.png',
+  '/images/arma_arco_comun.png','/images/arma_arco_raro.png','/images/arma_arco_epico.png','/images/arma_arco_legendario.png','/images/arma_arco_mitico.png',
+  '/images/arma_dagas_comun.png','/images/arma_dagas_raro.png','/images/arma_dagas_epico.png','/images/arma_dagas_legendario.png','/images/arma_dagas_mitico.png',
+  '/images/arma_pecho_comun.png','/images/arma_pecho_raro.png','/images/arma_pecho_epico.png','/images/arma_pecho_legendario.png','/images/arma_pecho_mitico.png',
+  '/images/arma_casco_comun.png','/images/arma_casco_raro.png','/images/arma_casco_epico.png','/images/arma_casco_legendario.png','/images/arma_casco_mitico.png',
+  '/images/arma_botas_comun.png','/images/arma_botas_raro.png','/images/arma_botas_epico.png','/images/arma_botas_legendario.png','/images/arma_botas_mitico.png',
+  '/images/arma_guantes_comun.png','/images/arma_guantes_raro.png','/images/arma_guantes_epico.png','/images/arma_guantes_legendario.png','/images/arma_guantes_mitico.png',
+  '/images/arma_grebas_comun.png','/images/arma_grebas_raro.png','/images/arma_grebas_epico.png','/images/arma_grebas_legendario.png','/images/arma_grebas_mitico.png',
+  /* Character portraits */
+  '/images/char_guerrero_humano.png','/images/char_guerrero_elfo.png',
+  '/images/char_mago_humano.png','/images/char_mago_elfo.png',
+  '/images/char_arquero_humano.png','/images/char_arquero_elfo.png',
+  '/images/char_clerigo_humano.png','/images/char_clerigo_elfo.png',
+  '/images/char_picaro_humano.png','/images/char_picaro_elfo.png',
+  '/images/char_fundador_humano.png','/images/char_fundador_elfo.png',
+  /* Secret class portraits */
+  '/images/char_secreto_crononauta.png','/images/char_secreto_paladin.png',
+  '/images/char_secreto_nigromante.png','/images/char_secreto_titan.png',
+  '/images/char_secreto_druida.png','/images/char_secreto_estrella-caida.png',
+  /* Pet fondos */
+  '/images/pet_fondo_baby_zorro-naturaleza.png','/images/pet_fondo_baby_pantera-sombra.png','/images/pet_fondo_baby_lobo-tormenta.png','/images/pet_fondo_baby_grifo.png','/images/pet_fondo_baby_dragon-fuego.png','/images/pet_fondo_baby_fenix-mitico.png','/images/pet_fondo_baby_rey-tempestad.png',
+  '/images/pet_fondo_mount_zorro-naturaleza.png','/images/pet_fondo_mount_pantera-sombra.png','/images/pet_fondo_mount_lobo-tormenta.png','/images/pet_fondo_mount_grifo.png','/images/pet_fondo_mount_dragon-fuego.png','/images/pet_fondo_mount_fenix-mitico.png','/images/pet_fondo_mount_rey-tempestad.png',
+  '/images/pet_fondo_egg_zorro-naturaleza.png','/images/pet_fondo_egg_pantera-sombra.png','/images/pet_fondo_egg_lobo-tormenta.png','/images/pet_fondo_egg_grifo.png','/images/pet_fondo_egg_dragon-fuego.png','/images/pet_fondo_egg_fenix-mitico.png','/images/pet_fondo_egg_rey-tempestad.png',
+  /* View backgrounds */
+  '/images/fondo_misiones.png','/images/fondo_metas.png','/images/fondo_stats.png',
+  '/images/fondo_logros.png','/images/fondo_history.png','/images/fondo_shop.png',
+  '/images/fondo_inventario.png','/images/fondo_pets.png','/images/fondo_dungeon-grows.png',
+  '/images/fondo_integrations.png','/images/fondo_character.png','/images/fondo_habilidades.png',
+  '/images/fondo_runas.png','/images/fondo_bestiario.png','/images/fondo_herrero.png',
 ];
 
 self.addEventListener('install', e => {

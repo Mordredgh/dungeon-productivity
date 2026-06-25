@@ -261,7 +261,7 @@ const _CTAB_BG = {
 function _setPageBg(name) {
   const el = document.getElementById('dungeon-bg');
   if (!el) return;
-  el.style.backgroundImage = name ? `url(${CDN}dungeon/${name}.png)` : 'none';
+  el.style.backgroundImage = name ? `url(images/${name}.png)` : 'none';
 }
 
 function switchView(v) {

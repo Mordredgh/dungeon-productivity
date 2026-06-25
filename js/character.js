@@ -92,7 +92,7 @@ function _cspWeaponSlotHtml(label, icon, weapon) {
   const slugMap  = { daga: 'dagas' };
   const def  = WEAPON_DEFS.find(d => d.key === weapon.weapon_key) || { icon };
   const tier = WEAPON_TIERS[weapon.tier] || { color: '#9ca3af', label: weapon.tier };
-  const img  = `${CDN}dungeon/arma_${slugMap[weapon.weapon_key] || weapon.weapon_key}_${weapon.tier}.png`;
+  const img  = `images/arma_${slugMap[weapon.weapon_key] || weapon.weapon_key}_${weapon.tier}.png`;
   const glow = (weapon.tier === 'legendario' || weapon.tier === 'mitico') ? 'anim-pulse-glow' : '';
   return `
     <div class="csp-eq-slot csp-equipped ${glow}" style="--wc:${tier.color}"
@@ -115,7 +115,7 @@ function _cspArmorSlotHtml(slotKey, label, icon) {
       <span class="csp-eq-slot-label">${label}</span>
     </div>`;
   const tier     = WEAPON_TIERS[equipped.tier] || { color: '#9ca3af', label: equipped.tier };
-  const img      = `${CDN}dungeon/arma_${equipped.weapon_key}_${equipped.tier}.png`;
+  const img      = `images/arma_${equipped.weapon_key}_${equipped.tier}.png`;
   const armorDef = typeof ARMOR_DEFS !== 'undefined'
     ? ARMOR_DEFS.find(d => d.key === equipped.weapon_key) : null;
   const statLine = armorDef
@@ -144,7 +144,7 @@ function _cspInvGridHtml() {
   bag.forEach(w => {
     const def  = WEAPON_DEFS.find(d => d.key === w.weapon_key) || { icon: '⚔️' };
     const tier = WEAPON_TIERS[w.tier] || { color: '#9ca3af' };
-    const img  = `${CDN}dungeon/arma_${w.weapon_key}_${w.tier}.png`;
+    const img  = `images/arma_${w.weapon_key}_${w.tier}.png`;
     cells.push(`
       <div class="csp-inv-cell csp-weapon-cell" style="--wc:${tier.color}"
            onclick="equipWeapon('${w.id}')" title="${escHtml(w.name)} · ${tier.label} — Click para equipar">
@@ -190,7 +190,7 @@ function _charSecretClassesHtml() {
 
   const cards = defs.map(d => {
     const isUnlocked  = unlocked.includes(d.key);
-    const portraitUrl = `${CDN}dungeon/${d.portrait}`;
+    const portraitUrl = `images/${d.portrait}`;
     if (!isUnlocked) {
       return `<div class="chr-secret-card chr-secret-locked" title="Clase secreta — aún no desbloqueada">
                 <span class="chr-secret-mystery">?</span>
@@ -222,7 +222,7 @@ function _charPortraitHtml() {
   const race = heroRace || hero.race || 'humano';
   return `
     <div class="char-portrait-ring">
-      <img src="${CDN}dungeon/char_${cls}_${race}.png" class="char-portrait-img" alt=""
+      <img src="images/char_${cls}_${race}.png" class="char-portrait-img" alt=""
            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="char-portrait-emoji" style="display:none">${hero.avatar || '🧙'}</div>
     </div>`;
@@ -234,7 +234,7 @@ function _charPreviewPortrait() {
   const ring = document.querySelector('.char-portrait-ring');
   if (!ring) return;
   ring.innerHTML = `
-    <img src="${CDN}dungeon/char_${cls}_${race}.png" class="char-portrait-img" alt=""
+    <img src="images/char_${cls}_${race}.png" class="char-portrait-img" alt=""
          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
     <div class="char-portrait-emoji" style="display:none">${hero.avatar || '🧙'}</div>`;
 }
@@ -339,7 +339,7 @@ function renderCharacterSheet() {
 
       <div class="chr-portrait-card">
         <div class="char-portrait-ring">
-          <img src="${CDN}dungeon/char_${cls}_${race}.png" class="char-portrait-img" alt=""
+          <img src="images/char_${cls}_${race}.png" class="char-portrait-img" alt=""
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="char-portrait-emoji" style="display:none">${hero.avatar || '🧙'}</div>
         </div>

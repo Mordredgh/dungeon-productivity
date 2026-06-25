@@ -250,7 +250,7 @@ function renderActivePet() {
     const petXP   = active.pet_xp || 0;
     const potions = typeof getInvCount==='function' ? getInvCount('pet_potion_'+active.pet_key) : 0;
     const ab      = PET_ABILITIES?.[active.pet_key]?.[stage];
-    const fondoUrl= `${CDN}dungeon/pet_fondo_${stage}_${active.pet_key}.png`;
+    const fondoUrl= `images/pet_fondo_${stage}_${active.pet_key}.png`;
     const stageLabel = isMount ? '🌟 Montura' : '🐣 Bebé';
 
     section.querySelector('.panel-title').textContent = `🐾 Mascota — ${stageLabel}`;
@@ -330,7 +330,7 @@ function renderActivePet() {
     const petKey  = eggItem.item_key.replace('pet_egg_', '');
     const eDef    = _petDef(petKey);
     const ab      = PET_ABILITIES?.[petKey]?.egg;
-    const fondoUrl= `${CDN}dungeon/pet_fondo_egg_${petKey}.png`;
+    const fondoUrl= `images/pet_fondo_egg_${petKey}.png`;
 
     section.querySelector('.panel-title').textContent = '🥚 Mascota — Huevo';
     panel.innerHTML = `
