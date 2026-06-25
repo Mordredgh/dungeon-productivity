@@ -257,7 +257,7 @@ function renderActivePet() {
     panel.innerHTML = `
       <div class="pet-rpanel">
         <div class="pet-rpanel-imgwrap">
-          <div class="pet-rpanel-bg" style="background-image:url('${fondoUrl}')"></div>
+          <img src="${fondoUrl}" class="pet-rpanel-bg" alt="">
           <img src="images/pet_${stage}_${active.pet_key}.png" class="pet-rpanel-img ${isMount?'anim-bounce':'anim-float'}" alt=""
                onerror="this.src='${CDN}dungeon/pet_${stage}_${active.pet_key}.png';this.onerror=null">
           <div class="pet-rpanel-emoji" style="display:none">${def.icon}</div>
@@ -336,7 +336,7 @@ function renderActivePet() {
     panel.innerHTML = `
       <div class="pet-rpanel">
         <div class="pet-rpanel-imgwrap">
-          <div class="pet-rpanel-bg" style="background-image:url('${fondoUrl}')"></div>
+          <img src="${fondoUrl}" class="pet-rpanel-bg" alt="">
           <img src="images/pet_egg_${petKey}.png" class="pet-rpanel-img anim-shake" alt=""
                onerror="this.src='${CDN}dungeon/pet_egg_${petKey}.png';this.onerror=null">
           <div class="pet-rpanel-emoji" style="display:none">${eDef?.icon||'🥚'}</div>

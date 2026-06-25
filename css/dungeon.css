@@ -3606,9 +3606,10 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 .pet-rpanel-bg {
   position: absolute; inset: 0;
-  background-image: var(--pet-fondo);
-  background-position: center; background-size: cover; background-repeat: no-repeat;
+  width: 100%; height: 100%;
+  object-fit: cover;
   pointer-events: none;
+  z-index: 0;
 }
 .pet-rpanel-img {
   position: relative; z-index: 1;
