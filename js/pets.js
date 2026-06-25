@@ -255,9 +255,9 @@ function renderActivePet() {
 
     section.querySelector('.panel-title').textContent = `🐾 Mascota — ${stageLabel}`;
     panel.innerHTML = `
-      <div class="pet-rpanel" style="--pet-fondo:url('${fondoUrl}')">
+      <div class="pet-rpanel">
         <div class="pet-rpanel-imgwrap">
-          <div class="pet-rpanel-bg"></div>
+          <div class="pet-rpanel-bg" style="background-image:url('${fondoUrl}')"></div>
           <img src="images/pet_${stage}_${active.pet_key}.png" class="pet-rpanel-img ${isMount?'anim-bounce':'anim-float'}" alt=""
                onerror="this.src='${CDN}dungeon/pet_${stage}_${active.pet_key}.png';this.onerror=null">
           <div class="pet-rpanel-emoji" style="display:none">${def.icon}</div>
@@ -334,9 +334,9 @@ function renderActivePet() {
 
     section.querySelector('.panel-title').textContent = '🥚 Mascota — Huevo';
     panel.innerHTML = `
-      <div class="pet-rpanel" style="--pet-fondo:url('${fondoUrl}')">
+      <div class="pet-rpanel">
         <div class="pet-rpanel-imgwrap">
-          <div class="pet-rpanel-bg"></div>
+          <div class="pet-rpanel-bg" style="background-image:url('${fondoUrl}')"></div>
           <img src="images/pet_egg_${petKey}.png" class="pet-rpanel-img anim-shake" alt=""
                onerror="this.src='${CDN}dungeon/pet_egg_${petKey}.png';this.onerror=null">
           <div class="pet-rpanel-emoji" style="display:none">${eDef?.icon||'🥚'}</div>
