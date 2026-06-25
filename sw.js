@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v163';
+﻿const CACHE = 'dungeon-v164';
 const ASSETS = [
   '/',
   '/index.html',
@@ -220,6 +220,11 @@ const ASSETS = [
   '/images/pet_fondo_baby_zorro-naturaleza.png','/images/pet_fondo_baby_pantera-sombra.png','/images/pet_fondo_baby_lobo-tormenta.png','/images/pet_fondo_baby_grifo.png','/images/pet_fondo_baby_dragon-fuego.png','/images/pet_fondo_baby_fenix-mitico.png','/images/pet_fondo_baby_rey-tempestad.png',
   '/images/pet_fondo_mount_zorro-naturaleza.png','/images/pet_fondo_mount_pantera-sombra.png','/images/pet_fondo_mount_lobo-tormenta.png','/images/pet_fondo_mount_grifo.png','/images/pet_fondo_mount_dragon-fuego.png','/images/pet_fondo_mount_fenix-mitico.png','/images/pet_fondo_mount_rey-tempestad.png',
   '/images/pet_fondo_egg_zorro-naturaleza.png','/images/pet_fondo_egg_pantera-sombra.png','/images/pet_fondo_egg_lobo-tormenta.png','/images/pet_fondo_egg_grifo.png','/images/pet_fondo_egg_dragon-fuego.png','/images/pet_fondo_egg_fenix-mitico.png','/images/pet_fondo_egg_rey-tempestad.png',
+  /* Sala personal furniture */
+  '/images/mueble_sillon.png','/images/mueble_candelabro.png','/images/mueble_cofre.png',
+  '/images/mueble_espejo.png','/images/mueble_estanteria.png','/images/mueble_bola-cristal.png',
+  '/images/mueble_cuadro.png','/images/mueble_planta.png','/images/mueble_rack-armas.png',
+  '/images/mueble_vasija.png',
   /* View backgrounds */
   '/images/fondo_misiones.png','/images/fondo_metas.png','/images/fondo_stats.png',
   '/images/fondo_logros.png','/images/fondo_history.png','/images/fondo_shop.png',

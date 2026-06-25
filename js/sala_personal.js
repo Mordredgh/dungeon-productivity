@@ -70,7 +70,7 @@ function renderSalaPersonal() {
                        data-idx="${item._orig}"
                        style="left:${item.x}%;top:${item.y}%;z-index:${Math.round(item.y + 1)};--s:${finalScale.toFixed(3)}">
             <div class="sala-shadow"></div>
-            <img src="${CDN}dungeon/${escHtml(def.img)}" alt="${escHtml(def.name)}" draggable="false">
+            <img src="images/${escHtml(def.img)}" alt="${escHtml(def.name)}" draggable="false">
           </div>`;
         }).join('')}
         <div class="sala-hint" id="salaHint">
@@ -86,7 +86,7 @@ function renderSalaPersonal() {
         ${selItem && selDef ? `
           <div class="sala-props-panel">
             <div class="sala-props-name">${escHtml(selDef.name)}</div>
-            <img class="sala-props-preview" src="${CDN}dungeon/${escHtml(selDef.img)}" alt="">
+            <img class="sala-props-preview" src="images/${escHtml(selDef.img)}" alt="">
             <label class="sala-props-label">Tamaño</label>
             <input type="range" class="sala-size-slider" id="salaSizeSlider"
                    min="30" max="230" step="5"
@@ -102,7 +102,7 @@ function renderSalaPersonal() {
             ${SALA_FURNITURE.map(f => `
               <div class="sala-picker-item${_salaSelected === f.id ? ' sala-selected' : ''}"
                    onclick="salaSelectFurniture('${f.id}')" title="${escHtml(f.name)}">
-                <img src="${CDN}dungeon/${escHtml(f.img)}" alt="" onerror="this.style.display='none'">
+                <img src="images/${escHtml(f.img)}" alt="" onerror="this.style.display='none'">
                 <span class="sala-picker-label">${escHtml(f.name)}</span>
               </div>`).join('')}
           </div>
