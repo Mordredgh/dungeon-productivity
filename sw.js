@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v166';
+﻿const CACHE = 'dungeon-v167';
 const ASSETS = [
   '/',
   '/index.html',
@@ -143,6 +143,8 @@ const ASSETS = [
   '/images/dungeon_sala7.png',
   '/images/dungeon_sala8.png',
   '/images/dungeon_sala9.png',
+  /* World map */
+  '/images/mapa_mundo.png',
   /* World map icons */
   '/images/map_ciudadela.png',
   '/images/map_campo.png',

@@ -40,7 +40,7 @@ function renderWorldMap() {
     </button>`;
   }).join('');
 
-  const mapSrc = (typeof CDN !== 'undefined' ? CDN : '') + 'dungeon/mapa_mundo.png';
+  const mapSrc = 'images/mapa_mundo.png';
 
   el.innerHTML = `
     <div class="wm-wrap">
