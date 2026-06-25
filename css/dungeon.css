@@ -8270,3 +8270,104 @@ body::after {
   .anim-bb-entering .bb-pet-info,
   .anim-bb-entering .bb-move-panel { animation: none; }
 }
+
+/* ── Pantalla de Victoria ──────────────────────────────────── */
+.bb-victory-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, rgba(250,204,21,.18) 0%, rgba(6,6,18,.97) 70%);
+  backdrop-filter: blur(8px);
+}
+.bb-victory-content {
+  position: relative;
+  text-align: center;
+  padding: 28px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 320px;
+  width: 90%;
+}
+.bb-victory-sparks {
+  position: absolute;
+  inset: -20px;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 16px;
+}
+.bb-spark {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: bb-spark-fly 1.4s ease-out both infinite;
+}
+@keyframes bb-spark-fly {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  60%  { opacity: .8; }
+  100% { transform: translateY(-55px) scale(.3); opacity: 0; }
+}
+.bb-victory-title {
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  color: #facc15;
+  text-shadow: 0 0 32px rgba(250,204,21,.7), 0 2px 8px rgba(0,0,0,.8);
+  line-height: 1;
+}
+.bb-victory-boss-name {
+  font-size: 15px;
+  color: var(--text2);
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+.bb-victory-rewards {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 6px 0 4px;
+  width: 100%;
+}
+.bb-vr-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 9px 16px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+}
+.bb-vr-gold { color: #facc15; border-color: rgba(250,204,21,.25); background: rgba(250,204,21,.08); }
+.bb-vr-xp   { color: #60a5fa; border-color: rgba(96,165,250,.25); background: rgba(96,165,250,.08); }
+.bb-vr-rune { color: #c084fc; border-color: rgba(192,132,252,.25); background: rgba(192,132,252,.08); }
+.bb-victory-btn {
+  margin-top: 6px;
+  padding: 12px 28px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #facc15, #fb923c);
+  color: #0c0c18;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .03em;
+  border: none;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  box-shadow: 0 4px 20px rgba(250,204,21,.35);
+}
+.bb-victory-btn:active { transform: scale(.97); }
+.bb-victory-btn:hover  { box-shadow: 0 6px 28px rgba(250,204,21,.5); }
+
+/* ── Daño flotante en lado de la mascota ─────────────────── */
+.bb-dmg-float.bb-pet-side { color: #f87171; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bb-spark { animation: none; }
+}

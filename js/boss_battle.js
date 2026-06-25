@@ -67,18 +67,32 @@ function _bbMoveUnlocked(move, pet) {
 }
 
 /* ── Estado local de la batalla ───────────────────────────── */
-let _bbCycle        = null;
-let _bbPet          = null;
-let _bbPetDef       = null;
-let _bbAnimating    = false;
+let _bbCycle         = null;
+let _bbPet           = null;
+let _bbPetDef        = null;
+let _bbAnimating     = false;
 let _bbEnteringTimer = null;
+let _bbPetHp         = 100;
+let _bbPetMaxHp      = 100;
 
-/* ── Límite de 5 ataques por día por ciclo ────────────────── */
-function _bbStorageKey() { return 'dungeon-bb-' + new Date().toISOString().split('T')[0]; }
-function _bbGetUsed()    { try { return JSON.parse(localStorage.getItem(_bbStorageKey()) || '{}'); } catch { return {}; } }
-function _bbSetUsed(d)   { localStorage.setItem(_bbStorageKey(), JSON.stringify(d)); }
-function _bbLeft(cycle)  { return Math.max(0, 5 - (_bbGetUsed()[cycle] || 0)); }
-function _bbUse(cycle)   { const d = _bbGetUsed(); d[cycle] = (d[cycle] || 0) + 1; _bbSetUsed(d); }
+/* ── Ataques: clave por ciclo+periodo (no solo fecha) ─────── */
+/* Esto garantiza 5 ataques frescos cuando se genera un boss nuevo */
+function _bbAttackKey(cycle) {
+  const period = typeof _bossPeriodKey === 'function' ? _bossPeriodKey(cycle) : new Date().toISOString().split('T')[0];
+  return 'dungeon-bb-atk-' + cycle + '-' + period;
+}
+function _bbLeft(cycle) { try { return Math.max(0, 5 - parseInt(localStorage.getItem(_bbAttackKey(cycle)) || '0', 10)); } catch { return 5; } }
+function _bbUse(cycle)  { try { const k = _bbAttackKey(cycle); localStorage.setItem(k, String((parseInt(localStorage.getItem(k)||'0',10))+1)); } catch {} }
+
+/* ── Daño del boss al contra-atacar ──────────────────────── */
+function _bbBossDmg() {
+  const state = getMultiBossState();
+  const boss  = state[_bbCycle];
+  if (!boss || !_bbPetDef) return 3;
+  const petDef    = getPetStatAtLevel(_bbPetDef, _bbPet?.pet_level || 1).def || 0;
+  const rarMult   = { comun:0.4, raro:0.7, epico:1.1, legendario:1.5, mitico:2.0, cataclismo:2.8 }[boss.rarity] || 1;
+  return Math.max(1, Math.ceil(boss.maxHp * 0.005 * rarMult) - Math.floor(petDef * 0.4));
+}
 
 /* ── Daño solo al ciclo objetivo ──────────────────────────── */
 function _damageBossCycle(cycle, baseDmg) {
@@ -140,6 +154,19 @@ function openBossBattle(cycle) {
   _bbPetDef  = _bbPet ? PET_DEFS.find(d => d.key === _bbPet.pet_key) : null;
   _bbAnimating = false;
 
+  /* Inicializar HP de combate de la mascota */
+  if (_bbPet && _bbPetDef) {
+    const st    = getPetStatAtLevel(_bbPetDef, _bbPet.pet_level || 1);
+    _bbPetMaxHp = Math.max(20, 40 + Math.round(st.atk * 4));
+    _bbPetHp    = _bbPetMaxHp;
+  } else {
+    _bbPetMaxHp = 40; _bbPetHp = 40;
+  }
+
+  /* Ocultar pantalla de victoria si quedó de batalla anterior */
+  const vs = document.getElementById('bbVictoryScreen');
+  if (vs) { vs.style.display = 'none'; vs.style.opacity = ''; }
+
   _bbRender();
 
   const overlay = document.getElementById('bossBattleOverlay');
@@ -161,6 +188,8 @@ function closeBossBattle() {
   document.body.style.overflow = '';
   _bbCycle = null;
   _bbAnimating = false;
+  const vs = document.getElementById('bbVictoryScreen');
+  if (vs) { vs.style.display = 'none'; vs.style.opacity = ''; }
 }
 
 /* ── Seleccionar mascota en batalla ───────────────────────── */
@@ -250,12 +279,15 @@ function _bbRender() {
        <div class="bb-pet-emoji" style="display:none">${_petIcon}</div>`;
 
   /* ─ Pet info ─ */
+  const petHpPct = Math.max(0, Math.round((_bbPetHp / _bbPetMaxHp) * 100));
+  const petHpClr = petHpPct > 50 ? '#4ade80' : petHpPct > 25 ? '#facc15' : '#f87171';
   if (petInfoEl) petInfoEl.innerHTML = `
     <div class="bb-entity-name">${escHtml(_bbPetDef.name)}</div>
     <div class="bb-level-chip">Nv.${_bbPet.pet_level || 1} · ${_bbPet.stage}</div>
     <div class="bb-hp-row">
       <span class="bb-hp-lbl">HP</span>
-      <div class="bb-hp-track"><div class="bb-hp-fill" style="width:100%;background:#4ade80"></div></div>
+      <div class="bb-hp-track"><div id="bbPetHpFill" class="bb-hp-fill" style="width:${petHpPct}%;background:${petHpClr}"></div></div>
+      <span class="bb-hp-val">${_bbPetHp}/${_bbPetMaxHp}</span>
     </div>
     <div class="bb-stat-row">⚔️ ATK ${petSt.atk.toFixed(1)} · 🛡️ DEF +${petSt.def.toFixed(0)}</div>`;
 
@@ -335,14 +367,42 @@ async function executeBattleAttack(moveIdx) {
   await _bbDelay(350);
   if (bossSpriteEl) bossSpriteEl.classList.remove('bb-hit');
 
-  await _bbDelay(180);
-  _bbAnimating = false;
-
-  /* ─ Verificar derrota ─ */
+  /* ─ Verificar derrota del boss ─ */
   const bossState = getMultiBossState();
   const boss = bossState[_bbCycle];
   if (boss?.defeated) {
-    await _bbDelay(700);
+    await _bbDelay(600);
+    _bbAnimating = false;
+    _bbShowVictory(boss);
+    return;
+  }
+
+  /* ─ Counter-attack del boss ──────────────────────────────── */
+  await _bbDelay(260);
+
+  const bossSpriteEl2 = document.getElementById('bbBossSprite');
+  if (bossSpriteEl2) {
+    bossSpriteEl2.style.transition = 'transform .14s cubic-bezier(.4,0,.2,1)';
+    bossSpriteEl2.style.transform  = 'translateX(-22px) scale(1.07)';
+  }
+  await _bbDelay(150);
+  if (bossSpriteEl2) bossSpriteEl2.style.transform = '';
+
+  const bossDmg    = _bbBossDmg();
+  _bbPetHp         = Math.max(0, _bbPetHp - bossDmg);
+  const petSpriteEl2 = document.getElementById('bbPetSprite');
+  if (petSpriteEl2) petSpriteEl2.classList.add('bb-hit');
+  _bbSpawnPetDmgFloat(bossDmg, petSpriteEl2);
+
+  await _bbDelay(380);
+  if (petSpriteEl2) petSpriteEl2.classList.remove('bb-hit');
+
+  await _bbDelay(180);
+  _bbAnimating = false;
+
+  if (_bbPetHp <= 0) {
+    toast('💀', `${_bbPetDef?.name || 'Tu mascota'} se debilitó en batalla...`);
+    await _bbDelay(800);
     closeBossBattle();
     return;
   }
@@ -355,15 +415,73 @@ function _bbDelay(ms) { return new Promise(r => setTimeout(r, ms)); }
 function _bbSpawnDmgFloat(dmg, anchorEl) {
   const floater = document.getElementById('bbDmgFloat');
   if (!floater) return;
-
   floater.textContent = '-' + dmg;
   floater.className   = 'bb-dmg-float bb-dmg-active';
-
   if (anchorEl) {
     const rect = anchorEl.getBoundingClientRect();
     floater.style.left = (rect.left + rect.width  / 2 - 30) + 'px';
     floater.style.top  = (rect.top  + rect.height / 3)      + 'px';
   }
-
   setTimeout(() => { floater.className = 'bb-dmg-float'; }, 900);
+}
+
+function _bbSpawnPetDmgFloat(dmg, anchorEl) {
+  const floater = document.getElementById('bbPetDmgFloat');
+  if (!floater) return;
+  floater.textContent = '-' + dmg;
+  floater.className   = 'bb-dmg-float bb-pet-side bb-dmg-active';
+  if (anchorEl) {
+    const rect = anchorEl.getBoundingClientRect();
+    floater.style.left = (rect.left + rect.width  / 2 - 30) + 'px';
+    floater.style.top  = (rect.top  + rect.height / 3)      + 'px';
+  }
+  setTimeout(() => { floater.className = 'bb-dmg-float bb-pet-side'; }, 900);
+}
+
+/* ── Pantalla de victoria con GSAP ───────────────────────── */
+function _bbShowVictory(boss) {
+  const screen = document.getElementById('bbVictoryScreen');
+  if (!screen) { closeBossBattle(); return; }
+
+  const reward = (typeof BOSS_DEFEAT_REWARDS !== 'undefined' && BOSS_DEFEAT_REWARDS[boss.rarity]) || { gold:50, xp:100, runeChance:0 };
+  const runeWon = Math.random() < (reward.runeChance || 0);
+
+  document.getElementById('bbVictoryBossName').textContent = boss.name;
+  document.getElementById('bbVictoryRewards').innerHTML = `
+    <div class="bb-vr-item bb-vr-gold">🪙 +${reward.gold} Oro</div>
+    <div class="bb-vr-item bb-vr-xp">⭐ +${reward.xp} XP</div>
+    ${runeWon ? '<div class="bb-vr-item bb-vr-rune">💎 ¡Fragmento de Runa!</div>' : ''}`;
+
+  screen.style.display = 'flex';
+
+  /* ── Partículas de fondo ─ */
+  const sparks = document.getElementById('bbVictorySparks');
+  if (sparks) {
+    sparks.innerHTML = '';
+    const colors = ['#facc15','#fb923c','#4ade80','#c084fc','#60a5fa'];
+    for (let i = 0; i < 22; i++) {
+      const s = document.createElement('span');
+      s.className = 'bb-spark';
+      s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;background:${colors[i%colors.length]};animation-delay:${(Math.random()*0.8).toFixed(2)}s;animation-duration:${(1+Math.random()*1.2).toFixed(2)}s`;
+      sparks.appendChild(s);
+    }
+  }
+
+  if (typeof gsap === 'undefined') return;
+
+  const title   = screen.querySelector('.bb-victory-title');
+  const bname   = screen.querySelector('.bb-victory-boss-name');
+  const items   = screen.querySelectorAll('.bb-vr-item');
+  const btn     = screen.querySelector('.bb-victory-btn');
+
+  gsap.set([title, bname, items, btn], { opacity: 0, y: 24 });
+  gsap.set(screen, { opacity: 0 });
+  gsap.to(screen, { opacity: 1, duration: 0.35, ease: 'power2.out' });
+
+  const tl = gsap.timeline({ delay: 0.25 });
+  tl.to(title, { opacity: 1, y: 0, scale: 1.18, duration: 0.45, ease: 'back.out(1.9)' })
+    .to(title,  { scale: 1, duration: 0.28, ease: 'power2.out' }, '+=0.05')
+    .to(bname,  { opacity: 1, y: 0, duration: 0.3,  ease: 'power2.out' }, '-=0.1')
+    .to(items,  { opacity: 1, y: 0, duration: 0.25, stagger: 0.11, ease: 'power2.out' }, '-=0.05')
+    .to(btn,    { opacity: 1, y: 0, duration: 0.3,  ease: 'power2.out' }, '-=0.05');
 }

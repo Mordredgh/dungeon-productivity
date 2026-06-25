@@ -231,6 +231,15 @@ function checkRandomEvent() {
   const ev = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
   setTimeout(() => showEventModal(ev), 3500);
 }
+/* Alias usado por timer.js al terminar un pomodoro (20% chance) */
+function triggerRandomEvent() {
+  const today = new Date().toISOString().split('T')[0];
+  const key   = 'dungeon-event-pom-' + today;
+  if (localStorage.getItem(key)) return; /* un encuentro por pom-día */
+  localStorage.setItem(key, '1');
+  const ev = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
+  showEventModal(ev);
+}
 function showEventModal(ev) {
   document.getElementById('eventIcon').textContent  = ev.icon;
   document.getElementById('eventTitle').textContent = ev.title;
@@ -570,28 +579,51 @@ Datos reales de la semana: ${wQuests.length} misiones completadas, ${wXP} XP gan
 /* ── BOSS WEEKLY PENALTY ──────────────────────────────── */
 function checkBossDeadline() {
   if (!hero) return;
-  const now = new Date();
-  if (now.getDay() !== 0 || now.getHours() < 22) return;
-  const state = getBossState();
-  if (state.defeated) return;
-  const key = 'dungeon-boss-penalty-' + _bossPeriodKey('weekly');
+  const now   = new Date();
+  const h     = now.getHours();
+  if (h < 22) return; /* Solo aplica penalización después de las 10 pm */
+
+  const state = getMultiBossState();
+  const isSunday      = now.getDay() === 0;
+  const isLastDayOfMonth = (() => {
+    const d = new Date(now); d.setDate(d.getDate() + 1); return d.getDate() === 1;
+  })();
+
+  /* Diario — cada noche */
+  _applyBossDeadlinePenalty('daily', state.daily);
+  /* Semanal — solo el domingo */
+  if (isSunday) _applyBossDeadlinePenalty('weekly', state.weekly);
+  /* Mensual — solo el último día del mes */
+  if (isLastDayOfMonth) _applyBossDeadlinePenalty('monthly', state.monthly);
+}
+
+function _applyBossDeadlinePenalty(cycle, b) {
+  if (!b || b.defeated) return;
+  const key = 'dungeon-boss-penalty-' + cycle + '-' + _bossPeriodKey(cycle);
   if (localStorage.getItem(key)) return;
   localStorage.setItem(key, '1');
 
   if (hero.boss_shield) {
     hero.boss_shield = false; saveHero({ boss_shield: false });
-    toast('🛡️', 'Escudo Anti-Boss absorbio la penalizacion. ' + state.name + ' huye.');
-    if (typeof dungeonPush === 'function') dungeonPush('Escudo activado', state.name + ' fue bloqueado por tu escudo.');
+    toast('🛡️', `Escudo absorbió la penalización de ${b.name}.`);
+    if (typeof dungeonPush === 'function') dungeonPush('Escudo activado', b.name + ' fue bloqueado por tu escudo.');
     return;
   }
-  const hpLoss  = Math.max(5, Math.round((state.hp / state.maxHp) * 25));
-  const newHp   = Math.max(10, (hero.hp || 100) - hpLoss);
-  const goldLoss = Math.floor((hero.gold || 0) * 0.08);
+
+  const maxPenalty = { daily:10, weekly:25, monthly:45 }[cycle] || 15;
+  const goldRate   = { daily:0.02, weekly:0.08, monthly:0.15 }[cycle] || 0.05;
+  const cycleLabel = { daily:'☀️ Diario', weekly:'📅 Semanal', monthly:'🌙 Mensual' }[cycle] || cycle;
+
+  const hpLoss   = Math.max(3, Math.round((b.hp / b.maxHp) * maxPenalty));
+  const newHp    = Math.max(10, (hero.hp || 100) - hpLoss);
+  const goldLoss = Math.floor((hero.gold || 0) * goldRate);
+
   hero.hp = newHp; saveHero({ hp: newHp });
   if (goldLoss > 0 && typeof addGold === 'function') addGold(-goldLoss);
-  renderHeroUI();
-  toast('🐉', state.name + ' escapó esta semana! -' + hpLoss + ' HP' + (goldLoss ? ' · -' + goldLoss + '🪙' : ''));
-  if (typeof dungeonPush === 'function') dungeonPush('El Jefe escapó', state.name + ' sobrevivió. -' + hpLoss + ' HP.');
+  if (typeof renderHeroUI === 'function') renderHeroUI();
+
+  toast('🐉', `${cycleLabel}: ${b.name} escapó! -${hpLoss} HP${goldLoss ? ' · -'+goldLoss+'🪙' : ''}`);
+  if (typeof dungeonPush === 'function') dungeonPush(`Jefe ${cycleLabel} escapó`, `${b.name} sobrevivió. -${hpLoss} HP.`);
 }
 
 function initRPGSystems() {
