@@ -35,6 +35,13 @@ async function completeQuest(id, el) {
 
   let xpAmt = calcQuestXP(q);
 
+  // Tag-based class bonus (guerrero×2 en #ejercicio, mago×2 en #estudio, etc.)
+  const _tagMult = _getTagClassBonus(q);
+  if (_tagMult > 1) {
+    xpAmt = Math.round(xpAmt * _tagMult);
+    toast('🎯', `¡Bonus ${hero?.hero_class || ''}! ×${_tagMult} XP por tag`);
+  }
+
   // Pivot boost (+50% XP si esta misión fue marcada con Pivot hoy)
   const today = new Date().toISOString().split('T')[0];
   const _pivotData = (() => { try { return JSON.parse(localStorage.getItem('dungeon-pivot-' + (hero?.id||'')) || '{}'); } catch { return {}; } })();
@@ -323,4 +330,26 @@ async function _checkMissionShield(type) {
       localStorage.setItem('dungeon-type-history', '[]');
     }
   }
+}
+
+
+/* ── Tag-based class XP bonus ──────────────────────────────────
+   Misiones cuyo tag coincide con la especialidad de la clase
+   reciben un multiplicador de XP adicional.
+   ─────────────────────────────────────────────────────────── */
+function _getTagClassBonus(q) {
+  if (!hero || !q.tags) return 1;
+  const tags = q.tags.toLowerCase();
+  const cls  = hero.hero_class || '';
+  const MAP = {
+    guerrero: { mult: 2.0, keys: ['ejercicio', 'gym', 'deporte', 'fitness', 'entrena', 'fisico', 'físico'] },
+    mago:     { mult: 2.0, keys: ['estudio', 'lectura', 'aprender', 'mental', 'focus', 'leer', 'curso'] },
+    clerigo:  { mult: 2.0, keys: ['salud', 'meditacion', 'meditación', 'meditar', 'yoga', 'descanso', 'dormir'] },
+    picaro:   { mult: 1.5, keys: ['dinero', 'negocio', 'venta', 'cliente', 'money', 'cobrar', 'ingreso'] },
+    arquero:  { mult: 1.5, keys: ['habito', 'hábito', 'habit', 'rutina', 'diario', 'consistencia'] },
+    fundador: { mult: 1.3, keys: ['meta', 'objetivo', 'proyecto', 'startup', 'emprender', 'lanzar'] },
+  };
+  const bonus = MAP[cls];
+  if (!bonus) return 1;
+  return bonus.keys.some(k => tags.includes(k)) ? bonus.mult : 1;
 }

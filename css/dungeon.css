@@ -8372,3 +8372,70 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   .bb-spark { animation: none; }
 }
+
+/* ── Loot chest opening animation ─────────────────────────── */
+.loot-chest {
+  position: fixed;
+  font-size: 2.2rem;
+  transform: translate(-50%, -50%);
+  z-index: 9998;
+  pointer-events: none;
+  animation: lootChestShake 0.75s cubic-bezier(.36,.07,.19,.97) forwards;
+}
+.loot-chest-rare      { filter: drop-shadow(0 0 8px #60a5fa); }
+.loot-chest-epic      { filter: drop-shadow(0 0 10px #a855f7); }
+.loot-chest-legendary { filter: drop-shadow(0 0 14px #f59e0b); }
+.loot-chest-burst {
+  animation: lootChestBurst 0.25s ease-out forwards !important;
+}
+@keyframes lootChestShake {
+  0%   { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  18%  { transform: translate(-50%, -50%) scale(1.25) rotate(-8deg); opacity: 1; }
+  36%  { transform: translate(-50%, -50%) scale(1) rotate(8deg); }
+  54%  { transform: translate(-50%, -50%) scale(1.1) rotate(-6deg); }
+  72%  { transform: translate(-50%, -50%) scale(1.05) rotate(6deg); }
+  100% { transform: translate(-50%, -50%) scale(1.1) rotate(0deg); opacity: 1; }
+}
+@keyframes lootChestBurst {
+  0%   { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loot-chest, .loot-chest-burst { animation: none !important; opacity: 0; }
+}
+
+/* ── Daily progress ring around avatar ─────────────────────── */
+.sb-avatar-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.daily-ring-svg {
+  position: absolute;
+  inset: -5px;
+  width: calc(100% + 10px);
+  height: calc(100% + 10px);
+  pointer-events: none;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+.daily-ring-track {
+  fill: none;
+  stroke: rgba(255,255,255,.10);
+  stroke-width: 3.5;
+}
+.daily-ring-progress {
+  fill: none;
+  stroke: var(--accent, #7f5af0);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  transition: stroke-dashoffset .7s cubic-bezier(.4,0,.2,1);
+}
+.daily-ring-complete .daily-ring-progress {
+  stroke: #22c55e;
+  filter: drop-shadow(0 0 4px #22c55e88);
+}
+@media (prefers-reduced-motion: reduce) {
+  .daily-ring-progress { transition: none; }
+}

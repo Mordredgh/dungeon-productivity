@@ -34,10 +34,17 @@ function spawnLootDrop(xpAmt, goldAmt, rarity = 'common', originEl = null) {
     y = rect.top + rect.height / 2;
   }
 
+  // Rare+ get a chest-opening suspense animation before loot reveals
+  const highRarity = ['rare', 'epic', 'legendary'].includes(rarity);
+  const revealDelay = highRarity ? 1000 : 0;
+  if (highRarity) _spawnChestOpen(container, x, y, rarity);
+
   // XP float
-  _spawnFloat(container, x + Math.random() * 30 - 15, y, `
-    <div class="loot-drop-xp">+${xpAmt} XP</div>
-  `);
+  setTimeout(() => {
+    _spawnFloat(container, x + Math.random() * 30 - 15, y, `
+      <div class="loot-drop-xp">+${xpAmt} XP</div>
+    `);
+  }, revealDelay);
 
   // Gold float (offset)
   if (goldAmt > 0) {
@@ -45,7 +52,7 @@ function spawnLootDrop(xpAmt, goldAmt, rarity = 'common', originEl = null) {
       _spawnFloat(container, x + Math.random() * 30 - 15, y + 10, `
         <div class="loot-drop-label">🪙 +${goldAmt}</div>
       `);
-    }, 120);
+    }, revealDelay + 120);
   }
 
   // Random item drop
@@ -62,21 +69,35 @@ function spawnLootDrop(xpAmt, goldAmt, rarity = 'common', originEl = null) {
   };
   const roll = Math.random();
   if (roll < chances.item) {
-    _spawnItem(300);
+    _spawnItem(revealDelay + 300);
   } else if (roll < chances.frag) {
     setTimeout(() => {
       _spawnFloat(container, x + Math.random() * 40 - 20, y - 10, `
         <div class="loot-drop-icon">🔮</div>
         <div class="loot-drop-label">Fragmento</div>
       `);
-    }, 300);
+    }, revealDelay + 300);
   }
 
   // LCK: +1 extra item roll per 5 points
   const lckExtra = Math.floor((hero?.lck || 0) / 5);
   for (let i = 0; i < lckExtra; i++) {
-    if (Math.random() < chances.item) _spawnItem(500 + i * 250);
+    if (Math.random() < chances.item) _spawnItem(revealDelay + 500 + i * 250);
   }
+}
+
+function _spawnChestOpen(container, x, y, rarity) {
+  const chest = document.createElement('div');
+  chest.className = `loot-chest loot-chest-${rarity}`;
+  chest.textContent = rarity === 'legendary' ? '🏆' : rarity === 'epic' ? '💎' : '📦';
+  chest.style.left = `${x}px`;
+  chest.style.top  = `${y}px`;
+  container.appendChild(chest);
+  // After shake, burst open
+  setTimeout(() => {
+    chest.classList.add('loot-chest-burst');
+    setTimeout(() => chest.remove(), 250);
+  }, 750);
 }
 
 function _spawnFloat(container, x, y, innerHTML) {

@@ -156,7 +156,49 @@ function renderHeroUI() {
   if (stLvl) stLvl.textContent = lvl;
   const stXP = document.getElementById('st-total-xp');
   if (stXP) stXP.textContent = (hero.xp_total || 0).toLocaleString();
+
+  // Daily completion ring around avatar (Apple Watch–style closure drive)
+  _updateDailyRing();
 }
+
+function _updateDailyRing() {
+  const ringWrapper = document.getElementById('sbAvatarRing');
+  if (!ringWrapper) return;
+  const today = new Date().toISOString().split('T')[0];
+  const allQ  = typeof quests !== 'undefined' ? quests : [];
+  const trackable = allQ.filter(q => q.type === 'daily' || q.type === 'habit');
+  const done  = trackable.filter(q => q.done && q.done_at?.startsWith(today)).length;
+  const total = trackable.length;
+
+  let svg = ringWrapper.querySelector('.daily-ring-svg');
+  if (!svg) {
+    svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'daily-ring-svg');
+    svg.setAttribute('viewBox', '0 0 52 52');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.innerHTML = `
+      <circle class="daily-ring-track" cx="26" cy="26" r="23"/>
+      <circle class="daily-ring-progress" cx="26" cy="26" r="23"/>
+    `;
+    ringWrapper.appendChild(svg);
+  }
+
+  const circumference = 2 * Math.PI * 23;
+  const pct = total > 0 ? Math.min(1, done / total) : 0;
+  const progressCircle = svg.querySelector('.daily-ring-progress');
+  progressCircle.style.strokeDasharray  = circumference;
+  progressCircle.style.strokeDashoffset = circumference * (1 - pct);
+  svg.classList.toggle('daily-ring-complete', pct >= 1 && total > 0);
+  svg.style.display = total > 0 ? '' : 'none';
+
+  // One-per-day celebration toast when all dailies done
+  if (pct >= 1 && total > 0) {
+    const key = 'dungeon-daily-ring-celebrated';
+    if (localStorage.getItem(key) !== today) {
+      localStorage.setItem(key, today);
+      setTimeout(() => toast('🌟', '¡Misiones diarias completadas! Racha asegurada.'), 600);
+    }
+  }
 
 function renderQuestList() {
   const el = document.getElementById('questList');
