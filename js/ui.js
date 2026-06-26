@@ -287,7 +287,7 @@ function switchView(v) {
     if (v === 'achievements') renderAchievements();
     if (v === 'history')      { historyPage = 1; renderHistory(); }
     if (v !== 'pets' && typeof cleanupGarden === 'function') cleanupGarden();
-    if (v === 'pets')         { renderPets(); switchPetsTab('list'); }
+    if (v === 'pets')         { renderPets(); if (typeof renderActivePet === 'function') renderActivePet(); switchPetsTab('list'); }
     if (v === 'shop')         renderShopView();
     if (v === 'inventory')    { if (typeof renderInventory==='function')    renderInventory(); }
     if (v === 'character')    { if (typeof renderCharacterSheet==='function') renderCharacterSheet(); }

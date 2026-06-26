@@ -156,6 +156,7 @@ async function buyItem(id, cost) {
     const petKey = id.replace('food_', '');
     await addInvItem('pet_food_' + petKey, 'pet_food', 1);
     if (typeof renderPets === 'function') renderPets();
+    if (typeof renderActivePet === 'function') renderActivePet();
     toast('🍖', `Alimento adquirido. Ve a Mascotas → montura para dárselo.`);
 
   /* ── Armas y Armaduras ───────────────────────────── */
