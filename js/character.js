@@ -330,7 +330,7 @@ function renderCharacterSheet() {
   const ptsBadge = (hero.attr_points || 0) > 0
     ? `<span class="chr-pts-badge">${hero.attr_points} pts</span>`
     : '';
-  const hist = (() => { try { return JSON.parse(hero.level_history || '[]'); } catch { return []; } })();
+  const hist = Array.isArray(hero.level_history) ? hero.level_history : (() => { try { return JSON.parse(hero.level_history || '[]'); } catch { return []; } })();
 
   el.innerHTML = `<div class="chr-layout">
 
