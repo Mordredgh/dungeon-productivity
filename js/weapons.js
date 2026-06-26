@@ -91,8 +91,9 @@ function renderInventory() {
   const inv        = typeof inventory !== 'undefined' ? inventory : [];
   const fragments  = inv.filter(i => i.item_type === 'spell_fragment');
   const potions    = inv.filter(i => i.item_type === 'pet_potion');
-  const consumables= inv.filter(i => !['spell_fragment','pet_potion','pet_egg'].includes(i.item_type));
   const eggs       = inv.filter(i => i.item_type === 'pet_egg');
+  const foods      = inv.filter(i => i.item_type === 'pet_food');
+  const consumables= inv.filter(i => !['spell_fragment','pet_potion','pet_egg','pet_food'].includes(i.item_type));
   const equipped   = weapons.filter(w => w.is_equipped);
   const bag        = weapons.filter(w => !w.is_equipped);
 
@@ -185,7 +186,9 @@ function renderInventory() {
         : '';
     const imgSrc = item.item_key.startsWith('spell_')
       ? `/images/${item.item_key}.png`
-      : `${CDN}dungeon/${item.item_key}.png`;
+      : item.item_key.startsWith('pet_food_')
+        ? `${CDN}dungeon/${item.item_key.replace('pet_food_', 'pet_alimento_')}.png`
+        : `${CDN}dungeon/${item.item_key}.png`;
     return `<button class="inv-slot" onclick="showInvItemDetail('${escHtml(item.item_key)}')"
         title="${escHtml(meta.name)}" style="--inv-color:${meta.color}">
       ${badge}
@@ -208,17 +211,8 @@ function renderInventory() {
             <div class="inv-grid">${slots}</div>`;
   };
 
-  const eggSection = eggs.length ? section('🥚 Huevos',
-    `<div class="inv-items-grid">${eggs.map(i => {
-      const _iKey = i.item_key.replace(/^pet_egg_/, 'pet_egg_');
-      const img = CDN + 'dungeon/' + _iKey + '.png';
-      return `<div class="inv-item-row">
-        <img src="${img}" class="inv-item-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
-        <span style="display:none;font-size:18px">🥚</span>
-        <span class="inv-item-name">${escHtml(eggLabel(i))}</span>
-        <span class="inv-item-qty">×${i.quantity}</span>
-      </div>`;
-    }).join('')}</div>`) : '';
+  const eggSection  = rpgCat('🥚 Huevos',       eggs,  'egg',  'egg');
+  const foodSection = rpgCat('🍖 Alimento',      foods, 'food', 'food');
 
   el.innerHTML = `
     <div class="inv-gold-banner">
@@ -242,6 +236,7 @@ function renderInventory() {
     ${rpgCat('🛡️ Hechizos Defensivos', spellsDef, 'defense', 'defense')}
     ${rpgCat('🧪 Pociones de Mascota', potions, 'potion', 'potion')}
     ${eggSection}
+    ${foodSection}
     ${consumables.length ? rpgCat('⚗️ Consumibles', consumables, 'misc', 'misc') : ''}
 
     ${!weapons.length && !inv.length ? `<div class="inv-empty" style="margin-top:40px;font-size:15px">

@@ -155,6 +155,21 @@ function _invItemMeta(key) {
              desc: `Poción especial para ${pet?.name || 'mascota'}. Úsala en la vista de Mascotas.`,
              cat: 'pet_potion', cost: 0, spellId: null };
   }
+  if (key.startsWith('pet_egg_')) {
+    const petKey = key.slice(8);
+    const pet = (typeof PET_DEFS !== 'undefined' ? PET_DEFS : []).find(p => p.key === petKey);
+    return { name: `Huevo: ${pet?.name || petKey}`, icon: '🥚', color: '#fbbf24',
+             desc: `Huevo de ${pet?.name || 'mascota'}. Ve a Mascotas para eclosionarlo.`,
+             cat: 'pet_egg', cost: 0, spellId: null };
+  }
+  if (key.startsWith('pet_food_')) {
+    const petKey = key.slice(9);
+    const pet = (typeof PET_DEFS !== 'undefined' ? PET_DEFS : []).find(p => p.key === petKey);
+    const def = (typeof PET_MOUNT_DEFS !== 'undefined' ? PET_MOUNT_DEFS : []).find(d => d.key === petKey);
+    return { name: `Alimento: ${pet?.name || petKey}`, icon: '🍖', color: '#f97316',
+             desc: `Alimento para ${pet?.name || 'montura'}. Ve a Mascotas → Montura para dárselo.`,
+             cat: 'pet_food', cost: 0, spellId: null };
+  }
   return { name: key, icon: '🎁', color: '#94a3b8', desc: '', cat: 'misc', cost: 0, spellId: null };
 }
 
