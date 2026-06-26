@@ -8439,3 +8439,17 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   .daily-ring-progress { transition: none; }
 }
+
+/* ── Boss time-urgent chip ──────────────────────────────────── */
+.bcard-time-urgent {
+  color: #fb7185 !important;
+  font-weight: 700;
+  animation: bossTimeFlash 1.2s ease-in-out infinite alternate;
+}
+@keyframes bossTimeFlash {
+  from { opacity: 1; }
+  to   { opacity: .55; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bcard-time-urgent { animation: none; }
+}

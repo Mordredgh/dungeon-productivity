@@ -1348,3 +1348,18 @@ function openTemplatesModal() {
   renderTemplatesModal();
   openModal('templatesModal');
 }
+
+/* ── Gold spend nudge ──────────────────────────────────────────
+   Si el oro acumulado supera 500 y ya pasó un día desde el
+   último aviso, recordar al jugador que hay items que comprar.
+   ─────────────────────────────────────────────────────────── */
+function checkGoldNudge() {
+  if (!hero) return;
+  const gold = hero.gold || 0;
+  if (gold < 500) return;
+  const today = new Date().toISOString().split('T')[0];
+  const key   = 'dungeon-gold-nudge';
+  if (localStorage.getItem(key) === today) return;
+  localStorage.setItem(key, today);
+  setTimeout(() => toast('💰', `Tienes ${gold.toLocaleString()} 🪙 sin gastar. ¡Visita la Tienda o la Herrería!`), 5000);
+}

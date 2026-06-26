@@ -56,6 +56,7 @@ async function bootApp() {
   checkWeeklyPatternAnalysis();
   checkMonthlyReport();
   checkHabitReminders();
+  checkGoldNudge();
   updateChallengeProgress();
   setInterval(() => {
     checkDailySummary(); checkWeeklyRetro(); checkDeadlineAlerts(); checkNightlyDiary(); checkProphecyVerdict();

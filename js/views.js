@@ -731,27 +731,42 @@ function _bossTimeLeft(cycle) {
     return `${h}h ${m}m`;
   }
   if (cycle === 'weekly') {
-    const dow = d.getDay(); // 0=Sun (start of week period)
-    // Period runs Sun–Sat. Sunday = boss just started (7 days ahead).
-    // Saturday = last day (period expires tonight at midnight).
+    const dow = d.getDay();
     const daysLeft = dow === 0 ? 7 : 7 - dow;
     return daysLeft <= 1 ? '¡Hoy!' : `${daysLeft}d`;
   }
   // monthly
   const lastDay = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
-  return `${lastDay - d.getDate()}d`;
+  const dLeft = lastDay - d.getDate();
+  return dLeft <= 0 ? '¡Hoy!' : `${dLeft}d`;
+}
+
+function _isTimeUrgent(cycle) {
+  const d = new Date();
+  if (cycle === 'daily') {
+    const secsLeft = 86400 - (d.getHours()*3600 + d.getMinutes()*60 + d.getSeconds());
+    return secsLeft < 4 * 3600; // less than 4 hours
+  }
+  if (cycle === 'weekly') {
+    const dow = d.getDay();
+    return dow === 6 || (dow === 0 && d.getHours() < 6); // Saturday or late Sunday start
+  }
+  // monthly — last 2 days
+  const lastDay = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+  return (lastDay - d.getDate()) <= 2;
 }
 
 function _bossCycleCardHtml(cycle, b) {
   const cycleTag = `<div class="bcard-cycle">${_BOSS_CYCLE_ICON[cycle]} ${_BOSS_CYCLE_LABEL[cycle]}</div>`;
   if (!b) return `<div class="bcard bcard-empty">${cycleTag}<div class="bcard-no-boss">👻<br><span>Sin jefe</span></div></div>`;
 
-  const pct      = Math.round((b.hp / b.maxHp) * 100);
-  const hpClr    = pct > 60 ? '#fb7185' : pct > 30 ? '#facc15' : '#4ade80';
-  const rarClr   = _BOSS_RARITY_CLR[b.rarity]   || '#9ca3af';
-  const rarLbl   = _BOSS_RARITY_LABEL[b.rarity] || b.rarity;
-  const timeLeft = _bossTimeLeft(cycle);
-  const urgent   = pct <= 30 ? 'bcard-urgent' : '';
+  const pct        = Math.round((b.hp / b.maxHp) * 100);
+  const hpClr      = pct > 60 ? '#fb7185' : pct > 30 ? '#facc15' : '#4ade80';
+  const rarClr     = _BOSS_RARITY_CLR[b.rarity]   || '#9ca3af';
+  const rarLbl     = _BOSS_RARITY_LABEL[b.rarity] || b.rarity;
+  const timeLeft   = _bossTimeLeft(cycle);
+  const timeUrgent = !b.defeated && _isTimeUrgent(cycle);
+  const urgent     = (pct <= 30 || timeUrgent) ? 'bcard-urgent' : '';
 
   if (b.defeated) {
     return `<div class="bcard bcard-defeated">
@@ -785,7 +800,7 @@ function _bossCycleCardHtml(cycle, b) {
     <div class="bcard-bottom">
       <span class="bcard-hp-txt">❤️ ${b.hp}/${b.maxHp}</span>
       <span class="bcard-attacks${atkClass}">⚔️ ${atkLeft}/5</span>
-      <span class="bcard-time">⏰ ${timeLeft}</span>
+      <span class="bcard-time${timeUrgent ? ' bcard-time-urgent' : ''}">⏰ ${timeLeft}</span>
     </div>
   </div>`;
 }
