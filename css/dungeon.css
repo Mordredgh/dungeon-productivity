@@ -747,6 +747,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   align-items: stretch;
   margin-bottom: 12px;
   overflow: hidden;
+  flex-shrink: 0;
 }
 .boss-scroll {
   flex: 1;
