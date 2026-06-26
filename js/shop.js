@@ -155,6 +155,7 @@ async function buyItem(id, cost) {
   } else if (id.startsWith('food_')) {
     const petKey = id.replace('food_', '');
     await addInvItem('pet_food_' + petKey, 'pet_food', 1);
+    if (typeof renderPets === 'function') renderPets();
     toast('🍖', `Alimento adquirido. Ve a Mascotas → montura para dárselo.`);
 
   /* ── Armas y Armaduras ───────────────────────────── */
@@ -166,6 +167,7 @@ async function buyItem(id, cost) {
   }
 
   renderShopItems();
+  if (typeof renderInventory === 'function') renderInventory();
 }
 
 function getPotionMult() {
