@@ -202,6 +202,8 @@ function showInvItemDetail(key) {
     useBtn.style.display = 'none';
   }
 
+  const _modal = document.getElementById('invDetailModal');
+  if (_modal) _modal.dataset.rarity = meta.cat;
   openModal('invDetailModal');
 }
 
@@ -219,12 +221,15 @@ function _rmSpawnSparkles() {
   }
 }
 
-/* ── RPG Inventory Grid ─────────────────────────────────── */
+/* ── RPG Inventory Grid — Diablo Vault ──────────────────── */
 function renderInventory() {
   const el = document.getElementById('inventoryView');
   if (!el) return;
   if (!inventory.length) {
-    el.innerHTML = '<p style="color:var(--text3);padding:32px;text-align:center;font-size:13px">Tu inventario está vacío.<br>Completa misiones para obtener botín.</p>';
+    el.innerHTML = `<div class="rpg-inv-empty-state">
+      <span style="font-size:32px;display:block;margin-bottom:12px;opacity:.3">⚔️</span>
+      Bóveda vacía. Completa misiones para obtener botín.
+    </div>`;
     return;
   }
 
@@ -233,11 +238,11 @@ function renderInventory() {
   const misc    = inventory.filter(r => !r.item_key.startsWith('spell_') && !r.item_key.startsWith('pet_potion_'));
 
   const COLS = 6;
-  function slotsHtml(items, typeClass) {
+  function slotsHtml(items, typeClass, typeKey) {
     const filled = items.map(r => {
       const meta = _invItemMeta(r.item_key);
       const imgUrl = `${CDN}dungeon/${r.item_key}.png`;
-      return `<div class="rpg-inv-slot ${typeClass}" onclick="showInvItemDetail('${r.item_key}')" title="${escHtml(meta.name)}">
+      return `<div class="rpg-inv-slot ${typeClass}" data-inv-type="${typeKey}" onclick="showInvItemDetail('${r.item_key}')" title="${escHtml(meta.name)}">
         <img src="${imgUrl}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <span class="rpg-inv-slot-emoji" style="display:none">${meta.icon}</span>
         <span class="rpg-inv-qty">×${r.quantity}</span>
@@ -252,16 +257,69 @@ function renderInventory() {
 
   let html = '';
   if (spells.length) {
-    html += `<div class="rpg-inv-section-label">✨ Fragmentos de Hechizo</div>
-             <div class="rpg-inv-grid">${slotsHtml(spells, 'rpg-inv-type-spell')}</div>`;
+    html += `<div class="rpg-inv-section-label">Fragmentos de Hechizo</div>
+             <div class="rpg-inv-grid">${slotsHtml(spells, 'rpg-inv-type-spell', 'spell')}</div>`;
   }
   if (potions.length) {
-    html += `<div class="rpg-inv-section-label">🧪 Pociones de Mascota</div>
-             <div class="rpg-inv-grid">${slotsHtml(potions, 'rpg-inv-type-potion')}</div>`;
+    html += `<div class="rpg-inv-section-label">Pociones de Mascota</div>
+             <div class="rpg-inv-grid">${slotsHtml(potions, 'rpg-inv-type-potion', 'potion')}</div>`;
   }
   if (misc.length) {
-    html += `<div class="rpg-inv-section-label">🎒 Objetos</div>
-             <div class="rpg-inv-grid">${slotsHtml(misc, '')}</div>`;
+    html += `<div class="rpg-inv-section-label">Objetos</div>
+             <div class="rpg-inv-grid">${slotsHtml(misc, '', 'misc')}</div>`;
   }
   el.innerHTML = html;
+  _initInventoryGSAP(el);
+}
+
+function _initInventoryGSAP(el) {
+  if (typeof gsap === 'undefined') return;
+  const slots = el.querySelectorAll('.rpg-inv-slot:not(.rpg-inv-empty)');
+  if (!slots.length) return;
+
+  // Stone bevel shadow — preserved across all hover/leave states
+  const STONE = [
+    'inset 0 1px 0 rgba(255,255,255,.06)',
+    'inset 0 -1px 0 rgba(0,0,0,.6)',
+    'inset 1px 0 0 rgba(255,255,255,.025)',
+    'inset -1px 0 0 rgba(0,0,0,.45)',
+    '0 2px 5px rgba(0,0,0,.5)',
+  ].join(',');
+
+  const GLOW = { spell: '192,132,252', potion: '74,222,128', misc: '137,180,250' };
+
+  // Entrance stagger
+  gsap.fromTo(slots,
+    { scale: 0.82, opacity: 0 },
+    {
+      scale: 1, opacity: 1,
+      duration: 0.38,
+      stagger: { each: 0.038, from: 'start' },
+      ease: 'power3.out',
+      clearProps: 'scale,opacity',
+    }
+  );
+
+  // Per-slot hover + click wiring
+  slots.forEach(slot => {
+    const rgb = GLOW[slot.dataset.invType] || GLOW.misc;
+    const hoverShadow =
+      `0 0 0 1px rgba(${rgb},.50),` +
+      `0 0 20px rgba(${rgb},.28),` +
+      `inset 0 0 12px rgba(${rgb},.09),` +
+      STONE;
+
+    slot.addEventListener('mouseenter', () => {
+      gsap.to(slot, { duration: 0.14, boxShadow: hoverShadow, ease: 'power2.out' });
+    });
+    slot.addEventListener('mouseleave', () => {
+      gsap.to(slot, { duration: 0.30, boxShadow: STONE, ease: 'power2.out' });
+    });
+    slot.addEventListener('pointerdown', () => {
+      gsap.to(slot, { duration: 0.08, scale: 0.90, ease: 'power2.in' });
+    });
+    slot.addEventListener('pointerup', () => {
+      gsap.to(slot, { duration: 0.18, scale: 1, ease: 'power2.out' });
+    });
+  });
 }
