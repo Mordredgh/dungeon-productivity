@@ -89,11 +89,11 @@ function renderInventory() {
 
   const gold       = typeof getGold === 'function' ? getGold() : 0;
   const inv        = typeof inventory !== 'undefined' ? inventory : [];
-  const fragments  = inv.filter(i => i.item_type === 'spell_fragment');
-  const potions    = inv.filter(i => i.item_type === 'pet_potion');
-  const eggs       = inv.filter(i => i.item_type === 'pet_egg');
-  const foods      = inv.filter(i => i.item_type === 'pet_food');
-  const consumables= inv.filter(i => !['spell_fragment','pet_potion','pet_egg','pet_food'].includes(i.item_type));
+  const fragments  = inv.filter(i => i.item_type === 'spell_fragment' && i.quantity > 0);
+  const potions    = inv.filter(i => i.item_type === 'pet_potion'    && i.quantity > 0);
+  const eggs       = inv.filter(i => i.item_type === 'pet_egg'       && i.quantity > 0);
+  const foods      = inv.filter(i => i.item_type === 'pet_food'      && i.quantity > 0);
+  const consumables= inv.filter(i => !['spell_fragment','pet_potion','pet_egg','pet_food'].includes(i.item_type) && i.quantity > 0);
   const equipped   = weapons.filter(w => w.is_equipped);
   const bag        = weapons.filter(w => !w.is_equipped);
 
@@ -186,9 +186,13 @@ function renderInventory() {
         : '';
     const imgSrc = item.item_key.startsWith('spell_')
       ? `/images/${item.item_key}.png`
-      : item.item_key.startsWith('pet_food_')
-        ? `${CDN}dungeon/${item.item_key.replace('pet_food_', 'pet_alimento_')}.png`
-        : `${CDN}dungeon/${item.item_key}.png`;
+      : item.item_key.startsWith('pet_egg_')
+        ? `/images/pet_egg_${item.item_key.slice(8)}.png`
+        : item.item_key.startsWith('pet_food_')
+          ? `${CDN}dungeon/${item.item_key.replace('pet_food_', 'pet_alimento_')}.png`
+          : item.item_key.startsWith('pet_potion_')
+            ? `${CDN}dungeon/${item.item_key.replace('pet_potion_', 'pet_pocion_')}.png`
+            : `${CDN}dungeon/${item.item_key}.png`;
     return `<button class="inv-slot" onclick="showInvItemDetail('${escHtml(item.item_key)}')"
         title="${escHtml(meta.name)}" style="--inv-color:${meta.color}">
       ${badge}

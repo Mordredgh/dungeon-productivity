@@ -1782,6 +1782,12 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .inv-cat-header--defense::after { background: linear-gradient(to right, rgba(96,165,250,.3), transparent); }
 .inv-cat-header--potion { color: #4ade80; }
 .inv-cat-header--potion::after { background: linear-gradient(to right, rgba(74,222,128,.25), transparent); }
+.inv-cat-header--egg  { color: #fbbf24; }
+.inv-cat-header--egg::after  { background: linear-gradient(to right, rgba(251,191,36,.25), transparent); }
+.inv-cat-header--food { color: #f97316; }
+.inv-cat-header--food::after { background: linear-gradient(to right, rgba(249,115,22,.25), transparent); }
+.inv-cat-header--misc { color: #a78bfa; }
+.inv-cat-header--misc::after { background: linear-gradient(to right, rgba(167,139,250,.25), transparent); }
 
 .inv-grid {
   display: grid;
