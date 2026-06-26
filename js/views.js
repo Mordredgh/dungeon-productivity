@@ -199,6 +199,7 @@ function _updateDailyRing() {
       setTimeout(() => toast('🌟', '¡Misiones diarias completadas! Racha asegurada.'), 600);
     }
   }
+}
 
 function renderQuestList() {
   const el = document.getElementById('questList');
