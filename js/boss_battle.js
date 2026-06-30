@@ -74,6 +74,7 @@ let _bbAnimating     = false;
 let _bbEnteringTimer = null;
 let _bbPetHp         = 100;
 let _bbPetMaxHp      = 100;
+let _bbHeroSkillUsed = false;
 
 /* ── Ataques: clave por ciclo+periodo (no solo fecha) ─────── */
 /* Esto garantiza 5 ataques frescos cuando se genera un boss nuevo */
@@ -129,7 +130,16 @@ function _damageBossCycle(cycle, baseDmg) {
   return finalDmg;
 }
 
-/* ── Calcular daño de un movimiento ───────────────────────── */
+/* ── Elemento del jefe activo ──────────────────────────────── */
+function _bbBossElement() {
+  const bossState = getMultiBossState();
+  const boss      = bossState[_bbCycle];
+  if (!boss) return 'Normal';
+  const def = typeof BOSS_DEFS !== 'undefined' ? BOSS_DEFS.find(d => d.key === boss.key) : null;
+  return def?.element || 'Normal';
+}
+
+/* ── Calcular daño de un movimiento (con efectividad elemental) ── */
 function _bbCalcDmg(move) {
   const bossState = getMultiBossState();
   const boss      = bossState[_bbCycle];
@@ -137,7 +147,8 @@ function _bbCalcDmg(move) {
   const petSt  = getPetStatAtLevel(_bbPetDef, _bbPet.pet_level || 1);
   const base   = Math.ceil(boss.maxHp * 0.04 * move.power);
   const bonus  = Math.floor(petSt.atk * 2);
-  return Math.max(1, base + bonus);
+  const mult   = typeof getElementMultiplier === 'function' ? getElementMultiplier(_bbBossElement(), move.type) : 1;
+  return Math.max(1, Math.round((base + bonus) * mult));
 }
 
 /* ── Abrir pantalla de batalla ────────────────────────────── */
@@ -153,6 +164,7 @@ function openBossBattle(cycle) {
                || null;
   _bbPetDef  = _bbPet ? PET_DEFS.find(d => d.key === _bbPet.pet_key) : null;
   _bbAnimating = false;
+  _bbHeroSkillUsed = false;
 
   /* Inicializar HP de combate de la mascota */
   if (_bbPet && _bbPetDef) {
@@ -229,10 +241,13 @@ function _bbRender() {
   if (badge) { badge.textContent = cycleLabel; badge.style.background = rarClr + '22'; badge.style.color = rarClr; }
 
   /* ─ Boss info ─ */
+  const bossEl    = _bbBossElement();
+  const elemIcon  = { Fuego:'🔥', Elemental:'🌿', Eléctrico:'⚡', Aéreo:'💨', Oscuro:'🌑', Mágico:'✨', Cataclismo:'🌀', Normal:'⚪' }[bossEl] || '⚪';
   const bossInfoEl = document.getElementById('bbBossInfo');
   if (bossInfoEl) bossInfoEl.innerHTML = `
     <div class="bb-entity-name" style="color:${rarClr}">${escHtml(boss.name)}</div>
     <div class="bb-rarity-chip" style="color:${rarClr};border-color:${rarClr}44">${rarLbl}</div>
+    <div class="bb-rarity-chip" style="margin-left:4px">${elemIcon} ${escHtml(bossEl)}</div>
     <div class="bb-hp-row">
       <span class="bb-hp-lbl">HP</span>
       <div class="bb-hp-track"><div id="bbBossHpFill" class="bb-hp-fill" style="width:${hpPct}%;background:${hpClr}"></div></div>
@@ -307,23 +322,38 @@ function _bbRender() {
     const unlocked = _bbMoveUnlocked(mv, _bbPet);
     const disabled = !unlocked || attacksLeft === 0;
     const dmg      = unlocked ? _bbCalcDmg(mv) : '?';
+    const elMult   = unlocked && typeof getElementMultiplier === 'function' ? getElementMultiplier(bossEl, mv.type) : 1;
+    const elTag     = elMult > 1 ? ' <span style="color:#4ade80">▲</span>' : elMult < 1 ? ' <span style="color:#f87171">▼</span>' : '';
     const typeClass = 'bb-type-' + mv.type.toLowerCase().replace(/[^a-z]/g,'');
     return `<button class="bb-move-btn${unlocked ? '' : ' bb-move-locked'}${attacksLeft === 0 ? ' bb-move-exhausted' : ''}"
       onclick="${disabled ? '' : `executeBattleAttack(${i})`}"
       ${disabled ? 'disabled' : ''}
-      title="${unlocked ? mv.name + ' · ~' + dmg + ' daño' : '🔒 Requiere Nv.' + mv.reqLevel}">
+      title="${unlocked ? mv.name + ' · ~' + dmg + ' daño' + (elMult > 1 ? ' (súper efectivo)' : elMult < 1 ? ' (poco efectivo)' : '') : '🔒 Requiere Nv.' + mv.reqLevel}">
       <span class="bb-move-icon">${mv.icon}</span>
       <span class="bb-move-name">${mv.name}</span>
       <span class="bb-move-type ${typeClass}">${unlocked ? mv.type : '🔒 Nv.' + mv.reqLevel}</span>
-      ${unlocked ? `<span class="bb-move-dmg">~${dmg}</span>` : ''}
+      ${unlocked ? `<span class="bb-move-dmg">~${dmg}${elTag}</span>` : ''}
     </button>`;
   }).join('');
 
   const resetMsg = { daily:'Reinicia mañana', weekly:'Reinicia el lunes', monthly:'Reinicia el 1ro del mes' }[_bbCycle] || '';
 
+  /* ─ Skill de héroe (1 uso por batalla, independiente de los ataques de mascota) ─ */
+  const heroSkill = (typeof HERO_BATTLE_SKILLS !== 'undefined') ? HERO_BATTLE_SKILLS[hero?.hero_class] : null;
+  const heroSkillHtml = heroSkill ? `
+    <button class="bb-move-btn bb-hero-skill${_bbHeroSkillUsed ? ' bb-move-exhausted' : ''}"
+      onclick="${_bbHeroSkillUsed ? '' : 'useHeroBattleSkill()'}" ${_bbHeroSkillUsed || _bbAnimating ? 'disabled' : ''}
+      title="${heroSkill.desc}">
+      <span class="bb-move-icon">${heroSkill.icon}</span>
+      <span class="bb-move-name">${heroSkill.name}</span>
+      <span class="bb-move-type">Habilidad de Héroe</span>
+      <span class="bb-move-dmg">${_bbHeroSkillUsed ? 'Usada' : '1×/batalla'}</span>
+    </button>` : '';
+
   if (movePanelEl) movePanelEl.innerHTML = `
     ${petChipsHtml}
     <div class="bb-moves-grid">${movesHtml}</div>
+    ${heroSkillHtml}
     <div class="bb-attacks-counter${attacksLeft === 0 ? ' exhausted' : ''}">
       ⚔️ ${attacksLeft}/5 ataques hoy · <span>${resetMsg}</span>
     </div>`;
@@ -361,6 +391,11 @@ async function executeBattleAttack(moveIdx) {
   /* ─ Flotar número de daño ─ */
   _bbSpawnDmgFloat(actualDmg, bossSpriteEl);
 
+  /* ─ Feedback de efectividad elemental ─ */
+  const _elMult = typeof getElementMultiplier === 'function' ? getElementMultiplier(_bbBossElement(), move.type) : 1;
+  if (_elMult > 1)      toast('🔥', '¡Súper efectivo!', 1200);
+  else if (_elMult < 1) toast('🛡️', 'Poco efectivo...', 1200);
+
   await _bbDelay(120);
   if (petEl) { petEl.style.transform = ''; }
 
@@ -378,8 +413,24 @@ async function executeBattleAttack(moveIdx) {
   }
 
   /* ─ Counter-attack del boss ──────────────────────────────── */
-  await _bbDelay(260);
+  await _bbBossCounterAttack();
 
+  await _bbDelay(180);
+  _bbAnimating = false;
+
+  if (_bbPetHp <= 0) {
+    toast('💀', `${_bbPetDef?.name || 'Tu mascota'} se debilitó en batalla...`);
+    await _bbDelay(800);
+    closeBossBattle();
+    return;
+  }
+
+  _bbRender();
+}
+
+/* ── Contraataque del jefe — reusable (ataque de mascota y skill de héroe) ── */
+async function _bbBossCounterAttack() {
+  await _bbDelay(260);
   const bossSpriteEl2 = document.getElementById('bbBossSprite');
   if (bossSpriteEl2) {
     bossSpriteEl2.style.transition = 'transform .14s cubic-bezier(.4,0,.2,1)';
@@ -388,16 +439,85 @@ async function executeBattleAttack(moveIdx) {
   await _bbDelay(150);
   if (bossSpriteEl2) bossSpriteEl2.style.transform = '';
 
-  const bossDmg    = _bbBossDmg();
-  _bbPetHp         = Math.max(0, _bbPetHp - bossDmg);
-  const petSpriteEl2 = document.getElementById('bbPetSprite');
+  const bossDmg      = _bbBossDmg();
+  _bbPetHp            = Math.max(0, _bbPetHp - bossDmg);
+  const petSpriteEl2  = document.getElementById('bbPetSprite');
   if (petSpriteEl2) petSpriteEl2.classList.add('bb-hit');
   _bbSpawnPetDmgFloat(bossDmg, petSpriteEl2);
 
   await _bbDelay(380);
   if (petSpriteEl2) petSpriteEl2.classList.remove('bb-hit');
+}
 
-  await _bbDelay(180);
+/* ── Habilidad de héroe en combate — 1 uso por batalla ────── */
+async function useHeroBattleSkill() {
+  if (_bbAnimating || _bbHeroSkillUsed || !_bbCycle || !hero) return;
+  const skill = typeof HERO_BATTLE_SKILLS !== 'undefined' ? HERO_BATTLE_SKILLS[hero.hero_class] : null;
+  if (!skill) return;
+
+  _bbAnimating = true;
+  _bbHeroSkillUsed = true;
+
+  const bossSpriteEl = document.getElementById('bbBossSprite');
+  const moves        = _bbPet ? _bbMoves(_bbPet.pet_key) : [];
+  const baseMove      = moves[0];
+
+  if (skill.type === 'heal') {
+    /* Clérigo: restaura HP de la mascota, no ataca */
+    const healAmt = Math.round(_bbPetMaxHp * skill.power);
+    _bbPetHp = Math.min(_bbPetMaxHp, _bbPetHp + healAmt);
+    const petSpriteEl = document.getElementById('bbPetSprite');
+    const floater = document.getElementById('bbPetDmgFloat');
+    if (floater && petSpriteEl) {
+      floater.textContent = '+' + healAmt;
+      floater.className   = 'bb-dmg-float bb-pet-side bb-dmg-active bb-heal-float';
+      const rect = petSpriteEl.getBoundingClientRect();
+      floater.style.left = (rect.left + rect.width  / 2 - 30) + 'px';
+      floater.style.top  = (rect.top  + rect.height / 3)      + 'px';
+      setTimeout(() => { floater.className = 'bb-dmg-float bb-pet-side'; }, 900);
+    }
+    toast(skill.icon, `${skill.name}: +${healAmt} HP a tu mascota.`);
+    await _bbDelay(500);
+  } else {
+    let dmg;
+    if (skill.type === 'crit' && baseMove) {
+      const bestDmg = Math.max(...moves.filter(m => _bbMoveUnlocked(m, _bbPet)).map(m => _bbCalcDmg(m)));
+      dmg = Math.round(bestDmg * skill.power);
+    } else if (skill.type === 'double' && baseMove) {
+      dmg = _bbCalcDmg(baseMove) * 2;
+    } else {
+      const bossState = getMultiBossState();
+      const boss       = bossState[_bbCycle];
+      const base       = boss ? Math.ceil(boss.maxHp * skill.power) : 1;
+      const mult       = typeof getElementMultiplier === 'function' ? getElementMultiplier(_bbBossElement(), skill.type) : 1;
+      dmg = Math.max(1, Math.round(base * mult));
+    }
+
+    const actualDmg = _damageBossCycle(_bbCycle, dmg);
+    if (bossSpriteEl) bossSpriteEl.classList.add('bb-hit');
+    _bbSpawnDmgFloat(actualDmg, bossSpriteEl);
+    toast(skill.icon, `${skill.name}! ${actualDmg} de daño.`);
+
+    if (skill.type === 'Normal' && hero.hero_class === 'fundador' && typeof addGold === 'function') {
+      const bonusGold = Math.round(actualDmg * 0.5);
+      addGold(bonusGold);
+      toast('💰', `Visión Estratégica convierte daño en +${bonusGold} 🪙`);
+    }
+
+    await _bbDelay(350);
+    if (bossSpriteEl) bossSpriteEl.classList.remove('bb-hit');
+  }
+
+  const bossState = getMultiBossState();
+  const boss = bossState[_bbCycle];
+  if (boss?.defeated) {
+    await _bbDelay(600);
+    _bbAnimating = false;
+    _bbShowVictory(boss);
+    return;
+  }
+
+  await _bbBossCounterAttack();
   _bbAnimating = false;
 
   if (_bbPetHp <= 0) {

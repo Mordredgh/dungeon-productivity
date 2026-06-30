@@ -334,40 +334,80 @@ const PET_DEFS = [
 /* ── JEFES ───────────────────────────────────────────────── */
 const BOSS_DEFS = [
   // ── COMÚN ──────────────────────────────────────────────────
-  { key:'caballero-esqueleto', name:'Caballero Esqueleto',         rarity:'comun',      hp:80,  seasonal:null, emoji:'💀' },
-  { key:'golem-piedra',        name:'Gólem de Piedra',             rarity:'comun',      hp:80,  seasonal:null, emoji:'🗿' },
-  { key:'ogro-cripta',         name:'Ogro de la Cripta',           rarity:'comun',      hp:100, seasonal:null, emoji:'👹' },
-  { key:'slime-corrosivo',     name:'Slime Corrosivo',             rarity:'comun',      hp:60,  seasonal:null, emoji:'🟢' },
-  { key:'arana-gigante',       name:'Araña Gigante de Cueva',      rarity:'comun',      hp:70,  seasonal:null, emoji:'🕷️' },
+  { key:'caballero-esqueleto', name:'Caballero Esqueleto',         rarity:'comun',      hp:80,  seasonal:null, emoji:'💀', element:'Oscuro' },
+  { key:'golem-piedra',        name:'Gólem de Piedra',             rarity:'comun',      hp:80,  seasonal:null, emoji:'🗿', element:'Elemental' },
+  { key:'ogro-cripta',         name:'Ogro de la Cripta',           rarity:'comun',      hp:100, seasonal:null, emoji:'👹', element:'Normal' },
+  { key:'slime-corrosivo',     name:'Slime Corrosivo',             rarity:'comun',      hp:60,  seasonal:null, emoji:'🟢', element:'Elemental' },
+  { key:'arana-gigante',       name:'Araña Gigante de Cueva',      rarity:'comun',      hp:70,  seasonal:null, emoji:'🕷️', element:'Oscuro' },
   // ── RARO ───────────────────────────────────────────────────
-  { key:'caballero-espectral', name:'Caballero Espectral',         rarity:'raro',       hp:150, seasonal:null, emoji:'👻' },
-  { key:'quimera',             name:'Quimera de Tres Cabezas',     rarity:'raro',       hp:160, seasonal:null, emoji:'🐲' },
-  { key:'wyvern-hielo',        name:'Wyvern de Hielo',             rarity:'raro',       hp:140, seasonal:null, emoji:'🐉' },
+  { key:'caballero-espectral', name:'Caballero Espectral',         rarity:'raro',       hp:150, seasonal:null, emoji:'👻', element:'Oscuro' },
+  { key:'quimera',             name:'Quimera de Tres Cabezas',     rarity:'raro',       hp:160, seasonal:null, emoji:'🐲', element:'Fuego' },
+  { key:'wyvern-hielo',        name:'Wyvern de Hielo',             rarity:'raro',       hp:140, seasonal:null, emoji:'🐉', element:'Aéreo' },
   // ── ÉPICO ──────────────────────────────────────────────────
-  { key:'golem-cristal',       name:'Gólem de Cristal Arcano',     rarity:'epico',      hp:220, seasonal:null, emoji:'💎' },
-  { key:'dragon-obsidiana',    name:'Dragón de Obsidiana',         rarity:'epico',      hp:250, seasonal:null, emoji:'🖤' },
-  { key:'hidra-pesadilla',     name:'Hidra de Pesadilla',          rarity:'epico',      hp:270, seasonal:null, emoji:'🐍' },
-  { key:'behemot-vacio',       name:'Behemot del Vacío',           rarity:'epico',      hp:280, seasonal:null, emoji:'🌑' },
-  { key:'custodio-tiempo',     name:'Custodio del Tiempo Roto',    rarity:'epico',      hp:260, seasonal:null, emoji:'⏳' },
+  { key:'golem-cristal',       name:'Gólem de Cristal Arcano',     rarity:'epico',      hp:220, seasonal:null, emoji:'💎', element:'Mágico' },
+  { key:'dragon-obsidiana',    name:'Dragón de Obsidiana',         rarity:'epico',      hp:250, seasonal:null, emoji:'🖤', element:'Fuego' },
+  { key:'hidra-pesadilla',     name:'Hidra de Pesadilla',          rarity:'epico',      hp:270, seasonal:null, emoji:'🐍', element:'Oscuro' },
+  { key:'behemot-vacio',       name:'Behemot del Vacío',           rarity:'epico',      hp:280, seasonal:null, emoji:'🌑', element:'Cataclismo' },
+  { key:'custodio-tiempo',     name:'Custodio del Tiempo Roto',    rarity:'epico',      hp:260, seasonal:null, emoji:'⏳', element:'Mágico' },
   // ── LEGENDARIO ─────────────────────────────────────────────
-  { key:'demonio-sombras',     name:'Demonio de Sombras',          rarity:'legendario', hp:350, seasonal:null, emoji:'😈' },
-  { key:'liche-rey',           name:'Liche Rey Coronado',          rarity:'legendario', hp:400, seasonal:null, emoji:'👑' },
-  { key:'serafin-caido',       name:'Serafín Caído',               rarity:'legendario', hp:380, seasonal:null, emoji:'🪽' },
-  { key:'titan-magma',         name:'Titán de Magma Ancestral',    rarity:'legendario', hp:420, seasonal:null, emoji:'🌋' },
-  { key:'devorador-constelaciones', name:'Devorador de Constelaciones', rarity:'legendario', hp:450, seasonal:null, emoji:'🌌' },
+  { key:'demonio-sombras',     name:'Demonio de Sombras',          rarity:'legendario', hp:350, seasonal:null, emoji:'😈', element:'Oscuro' },
+  { key:'liche-rey',           name:'Liche Rey Coronado',          rarity:'legendario', hp:400, seasonal:null, emoji:'👑', element:'Oscuro' },
+  { key:'serafin-caido',       name:'Serafín Caído',               rarity:'legendario', hp:380, seasonal:null, emoji:'🪽', element:'Aéreo' },
+  { key:'titan-magma',         name:'Titán de Magma Ancestral',    rarity:'legendario', hp:420, seasonal:null, emoji:'🌋', element:'Fuego' },
+  { key:'devorador-constelaciones', name:'Devorador de Constelaciones', rarity:'legendario', hp:450, seasonal:null, emoji:'🌌', element:'Cataclismo' },
   // ── MÍTICO ─────────────────────────────────────────────────
-  { key:'liche-ancestral',     name:'Liche Ancestral',             rarity:'mitico',     hp:500, seasonal:null, emoji:'☠️' },
-  { key:'fenix-cenizas',       name:'Fénix de Cenizas Eternas',    rarity:'mitico',     hp:550, seasonal:null, emoji:'🔥' },
-  { key:'kraken-abisal',       name:'Kraken Abisal',               rarity:'mitico',     hp:600, seasonal:null, emoji:'🐙' },
-  { key:'dragon-tormentas',    name:'Dragón Anciano de las Tormentas', rarity:'mitico', hp:580, seasonal:null, emoji:'⛈️' },
+  { key:'liche-ancestral',     name:'Liche Ancestral',             rarity:'mitico',     hp:500, seasonal:null, emoji:'☠️', element:'Oscuro' },
+  { key:'fenix-cenizas',       name:'Fénix de Cenizas Eternas',    rarity:'mitico',     hp:550, seasonal:null, emoji:'🔥', element:'Fuego' },
+  { key:'kraken-abisal',       name:'Kraken Abisal',               rarity:'mitico',     hp:600, seasonal:null, emoji:'🐙', element:'Oscuro' },
+  { key:'dragon-tormentas',    name:'Dragón Anciano de las Tormentas', rarity:'mitico', hp:580, seasonal:null, emoji:'⛈️', element:'Eléctrico' },
   // ── CATACLISMO ─────────────────────────────────────────────
-  { key:'arquitecto-vacio',    name:'El Arquitecto del Vacío',     rarity:'cataclismo', hp:800, seasonal:null, emoji:'🌀' },
-  { key:'la-que-susurra',      name:'La Que Susurra entre Eones',  rarity:'cataclismo', hp:900, seasonal:null, emoji:'👁️' },
+  { key:'arquitecto-vacio',    name:'El Arquitecto del Vacío',     rarity:'cataclismo', hp:800, seasonal:null, emoji:'🌀', element:'Cataclismo' },
+  { key:'la-que-susurra',      name:'La Que Susurra entre Eones',  rarity:'cataclismo', hp:900, seasonal:null, emoji:'👁️', element:'Cataclismo' },
   // ── ESTACIONALES ───────────────────────────────────────────
-  { key:'halloween',           name:'Señor de las Sombras',        rarity:'mitico',     hp:500, seasonal:{ month:9,  dayStart:24, dayEnd:31 }, emoji:'🎃' },
-  { key:'navidad',             name:'Krampus Arcano',              rarity:'mitico',     hp:500, seasonal:{ month:11, dayStart:20, dayEnd:26 }, emoji:'🎄' },
-  { key:'anio-nuevo',          name:'Dragón del Tiempo',           rarity:'mitico',     hp:500, seasonal:{ month:11, dayStart:28, dayEnd:31 }, emoji:'🎆' },
+  { key:'halloween',           name:'Señor de las Sombras',        rarity:'mitico',     hp:500, seasonal:{ month:9,  dayStart:24, dayEnd:31 }, emoji:'🎃', element:'Oscuro' },
+  { key:'navidad',             name:'Krampus Arcano',              rarity:'mitico',     hp:500, seasonal:{ month:11, dayStart:20, dayEnd:26 }, emoji:'🎄', element:'Mágico' },
+  { key:'anio-nuevo',          name:'Dragón del Tiempo',           rarity:'mitico',     hp:500, seasonal:{ month:11, dayStart:28, dayEnd:31 }, emoji:'🎆', element:'Mágico' },
 ];
+
+/* ── MATRIZ DE EFECTIVIDAD ELEMENTAL — combate de jefes ──────
+   Cada elemento de jefe es débil a 1 tipo de ataque (×1.5) y
+   resiste a 1-2 tipos (×0.67). 'Normal' y 'Especial' (ultimates)
+   son siempre neutros — no participan de la matriz. */
+const BOSS_ELEMENT_CHART = {
+  'Fuego':      { weakTo: ['Cataclismo'],            resists: ['Elemental'] },
+  'Elemental':  { weakTo: ['Fuego'],                 resists: ['Eléctrico'] },
+  'Eléctrico':  { weakTo: ['Cataclismo'],            resists: ['Aéreo'] },
+  'Aéreo':      { weakTo: ['Eléctrico'],             resists: ['Elemental'] },
+  'Oscuro':     { weakTo: ['Mágico'],                resists: ['Aéreo'] },
+  'Mágico':     { weakTo: ['Oscuro'],                resists: ['Normal'] },
+  'Cataclismo': { weakTo: ['Mágico'],                resists: ['Fuego', 'Eléctrico'] },
+  'Normal':     { weakTo: [],                        resists: [] },
+};
+function getElementMultiplier(bossElement, moveType) {
+  const chart = BOSS_ELEMENT_CHART[bossElement];
+  if (!chart || moveType === 'Normal' || moveType === 'Especial') return 1;
+  if (chart.weakTo.includes(moveType))   return 1.5;
+  if (chart.resists.includes(moveType))  return 0.67;
+  return 1;
+}
+
+/* ── HABILIDADES DE HÉROE EN COMBATE — 1 uso por batalla ─────
+   Independiente de useClassSkill() (esa es maná, fuera de combate).
+   power: fracción de boss.maxHp como daño base (antes de elemento). */
+const HERO_BATTLE_SKILLS = {
+  guerrero: { name:'Golpe Brutal',        icon:'⚔️', type:'Normal', power:0.06,
+              desc:'Golpe físico puro — ignora elemento del jefe' },
+  mago:     { name:'Ráfaga Arcana',       icon:'🔮', type:'Mágico', power:0.05,
+              desc:'Daño mágico — nunca es resistido' },
+  clerigo:  { name:'Bendición Curativa',  icon:'✝️', type:'heal',   power:0.30,
+              desc:'Restaura 30% del HP máx de tu mascota en vez de atacar' },
+  picaro:   { name:'Golpe Certero',       icon:'🗡️', type:'crit',   power:2.0,
+              desc:'Crítico garantizado — duplica el daño de tu mejor movimiento' },
+  arquero:  { name:'Tiro Preciso',        icon:'🏹', type:'double', power:1.0,
+              desc:'Golpea dos veces con tu movimiento básico' },
+  fundador: { name:'Visión Estratégica',  icon:'🚀', type:'Normal', power:0.05,
+              desc:'Daño normal + convierte la mitad en oro extra' },
+};
 
 /* ── EVENTOS ESTACIONALES ───────────────────────────────── */
 // month: 0-11 (enero=0). dayStart/dayEnd inclusivos. xpBonus: fracción adicional (0.20 = +20%).
