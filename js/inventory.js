@@ -51,7 +51,8 @@ function rollLoot(priority) {
   const lckBonus     = Math.floor((hero?.lck || 0) / 5);
   const runeDropMult = typeof getRuneBonus === 'function' ? (1 + getRuneBonus('drop_rate')) : 1;
   const upgradeDropMult = typeof hasGoldUpgrade === 'function' && hasGoldUpgrade('drop_rate') ? 1.05 : 1;
-  const fragQty = Math.round((Math.floor(Math.random() * (table.max - table.min + 1)) + table.min + lckBonus) * runeDropMult * upgradeDropMult);
+  const masteryDropMult = typeof getMasteryBonus === 'function' ? 1 + getMasteryBonus('suerte') : 1;
+  const fragQty = Math.round((Math.floor(Math.random() * (table.max - table.min + 1)) + table.min + lckBonus) * runeDropMult * upgradeDropMult * masteryDropMult);
   const potQty  = Math.max(1, Math.ceil(fragQty / 2));
 
   const fragKey = SPELL_FRAGMENT_KEYS[Math.floor(Math.random() * SPELL_FRAGMENT_KEYS.length)];

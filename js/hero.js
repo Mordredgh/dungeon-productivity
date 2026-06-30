@@ -55,14 +55,38 @@ function calcLevel(totalXP) {
 
 function canPrestige() { return !!hero && (hero._level || 1) >= 50; }
 
+/* Curva de diminishing returns — lineal +5%/prestige hasta el 10,
+   luego se aplana asintóticamente hacia +100% adicional (nunca lo alcanza). */
+function getPrestigeXPBonus(prestige) {
+  if (!prestige) return 0;
+  if (prestige <= 10) return prestige * 0.05;
+  return 0.5 + (1 - Math.exp(-(prestige - 10) * 0.04)) * 0.5;
+}
+
 async function doPrestige() {
   if (!canPrestige()) return;
-  const newPrestige = (hero.prestige || 0) + 1;
-  await saveHero({ prestige: newPrestige, xp_total: 0, level: 1 });
-  toast('⭐', `¡Ascensión ${newPrestige}! +${newPrestige * 5}% XP permanente. Nivel reiniciado.`);
+  const newPrestige  = (hero.prestige || 0) + 1;
+  const newMastery   = (hero.mastery_points || 0) + 1;
+  await saveHero({ prestige: newPrestige, mastery_points: newMastery, xp_total: 0, level: 1 });
+  const pct = Math.round(getPrestigeXPBonus(newPrestige) * 100);
+  toast('⭐', `¡Ascensión ${newPrestige}! +${pct}% XP permanente · +1 punto de Maestría. Nivel reiniciado.`);
   spawnConfetti();
   renderHeroUI();
   if (typeof renderCharacterSheet === 'function') renderCharacterSheet();
+}
+
+async function spendMasteryPoint(nodeId) {
+  if (!hero || (hero.mastery_points || 0) <= 0) return;
+  const node = typeof MASTERY_TREE !== 'undefined' ? MASTERY_TREE.find(n => n.id === nodeId) : null;
+  if (!node) return;
+  const ranks = (() => { try { return JSON.parse(hero.mastery_ranks || '{}'); } catch { return {}; } })();
+  const current = ranks[nodeId] || 0;
+  if (current >= node.maxRank) { toast('✅', `${node.name} ya está al máximo.`); return; }
+  ranks[nodeId] = current + 1;
+  await saveHero({ mastery_points: (hero.mastery_points || 0) - 1, mastery_ranks: JSON.stringify(ranks) });
+  toast(node.icon, `${node.name} mejorado a rango ${current + 1}/${node.maxRank}.`);
+  if (typeof renderCharacterSheet === 'function') renderCharacterSheet();
+  renderHeroUI();
 }
 
 function xpForLevel(lvl) {
@@ -88,7 +112,7 @@ function classXPBonus(type) {
   if (hero) {
     if (type === 'main' && hero.str)                         bonus *= 1 + hero.str   * 0.01;
     if ((type === 'side' || type === 'daily') && hero.intel) bonus *= 1 + hero.intel * 0.01;
-    if (hero.prestige)                                       bonus *= 1 + hero.prestige * 0.05;
+    if (hero.prestige)                                       bonus *= 1 + getPrestigeXPBonus(hero.prestige);
   }
   // Bono de set Estrella Caída: +10% a todos los multiplicadores de XP
   if (typeof isSecretSetComplete === 'function' && isSecretSetComplete('estrella-caida')) bonus *= 1.10;
@@ -236,8 +260,10 @@ async function checkSecretClassUnlocks() {
 /* addHP — helper global para modificar HP y rastrear mínimos */
 async function addHP(amount) {
   if (!hero) return;
-  const runeHpMax = typeof getRuneBonus === 'function' ? getRuneBonus('hp_max') : 0;
-  let newHp = Math.max(0, Math.min((hero.hp || 0) + amount, (hero.hp_max || 100) + runeHpMax));
+  const runeHpMax    = typeof getRuneBonus === 'function' ? getRuneBonus('hp_max') : 0;
+  const masteryHpMult = 1 + (typeof getMasteryBonus === 'function' ? getMasteryBonus('vigor') : 0);
+  const effMax        = Math.round(((hero.hp_max || 100) + runeHpMax) * masteryHpMult);
+  let newHp = Math.max(0, Math.min((hero.hp || 0) + amount, effMax));
 
   // Bono de set Nigromante: revive automático 1×/semana al llegar a 0 HP
   if (newHp === 0 && typeof isSecretSetComplete === 'function' && isSecretSetComplete('nigromante')) {

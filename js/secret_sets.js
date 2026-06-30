@@ -130,7 +130,8 @@ async function craftSecretPiece(classKey, pieceKey) {
   const ok = await consumeInvItem(matDef.key, piece.matCost);
   if (!ok) { addGold(piece.goldCost); return; }
 
-  const readyAt = new Date(Date.now() + piece.forgeHours * 3600000).toISOString();
+  const masteryForgeMult = 1 - (typeof getMasteryBonus === 'function' ? getMasteryBonus('persistencia') : 0);
+  const readyAt = new Date(Date.now() + piece.forgeHours * 3600000 * masteryForgeMult).toISOString();
   queue.push({ classKey, pieceKey, readyAt });
   await _saveForgeQueue(queue);
 

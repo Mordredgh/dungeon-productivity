@@ -6,6 +6,11 @@ function getDynamicTitle(h) {
   const streak    = h.streak || 0;
   const qDone     = h.quests_done || 0;
   const mainDone  = h.main_done || 0;
+  if (prestige >= 50) return '☀️×50 Señor del Dungeon Eterno';
+  if (prestige >= 30) return '🌌×30 Trascendido';
+  if (prestige >= 20) return '👑×20 Soberano de las Ascensiones';
+  if (prestige >= 10) return '⭐×10 Leyenda Viva';
+  if (prestige >= 5)  return '⭐⭐⭐⭐⭐ El Inquebrantable';
   if (prestige >= 3) return '⭐⭐⭐ El Ascendido';
   if (prestige >= 2) return '⭐⭐ El Renacido';
   if (prestige >= 1) return '⭐ Ascendido del Dungeon';

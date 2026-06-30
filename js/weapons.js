@@ -72,7 +72,8 @@ async function craftWeapon(weaponKey, targetTier) {
   const { error } = await db.from('dungeon_weapons').delete().in('id', toDelete);
   if (error) { toast('❌', 'Error al forjar.'); return; }
   weapons = weapons.filter(w => !toDelete.includes(w.id));
-  const cooldownMs = FORGE_COOLDOWN_MS[targetTier];
+  const masteryForgeMult = 1 - (typeof getMasteryBonus === 'function' ? getMasteryBonus('persistencia') : 0);
+  const cooldownMs = FORGE_COOLDOWN_MS[targetTier] ? Math.round(FORGE_COOLDOWN_MS[targetTier] * masteryForgeMult) : 0;
   const readyAt = cooldownMs ? new Date(Date.now() + cooldownMs).toISOString() : null;
   const newW = await addWeapon(weaponKey, targetTier, readyAt);
   if (newW) {

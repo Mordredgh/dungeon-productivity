@@ -216,6 +216,26 @@ const SECRET_SET_BONUSES = {
   'estrella-caida': '+10% a TODOS los stats simultáneamente',
 };
 
+/* ── ÁRBOL DE MAESTRÍA — gastado con puntos de prestige ──────
+   1 punto de maestría por cada Ascensión. Cada nodo escala por rango. */
+const MASTERY_TREE = [
+  { id:'vigor',         name:'Vigor Ancestral',  icon:'❤️', maxRank:5, effectPerRank:0.02, desc:'+2% HP máx por rango' },
+  { id:'fortuna',       name:'Fortuna Eterna',   icon:'💰', maxRank:5, effectPerRank:0.02, desc:'+2% oro ganado por rango' },
+  { id:'persistencia',  name:'Persistencia',     icon:'⏳', maxRank:5, effectPerRank:0.05, desc:'-5% tiempo de forja por rango' },
+  { id:'fuerza_bruta',  name:'Fuerza Bruta',     icon:'💪', maxRank:5, effectPerRank:0.03, desc:'+3% daño de mascota en jefes por rango' },
+  { id:'suerte',        name:'Suerte del Gremio', icon:'🍀', maxRank:5, effectPerRank:0.02, desc:'+2% drop rate por rango' },
+  { id:'voluntad',      name:'Voluntad de Hierro', icon:'🗲', maxRank:3, effectPerRank:1,    desc:'+1 ataque diario contra jefes por rango' },
+];
+function getMasteryRank(nodeId) {
+  if (!hero) return 0;
+  try { return JSON.parse(hero.mastery_ranks || '{}')[nodeId] || 0; } catch { return 0; }
+}
+function getMasteryBonus(nodeId) {
+  const node = MASTERY_TREE.find(n => n.id === nodeId);
+  if (!node) return 0;
+  return getMasteryRank(nodeId) * node.effectPerRank;
+}
+
 /* ── MEJORAS PERMANENTES (sumidero de oro funcional) ─────────
    Compra única por id, persistida en hero.gold_upgrades (jsonb array de ids) */
 const GOLD_UPGRADES = [

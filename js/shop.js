@@ -11,7 +11,9 @@ function addGold(n) {
   const starBonus = n > 0 && typeof isSecretSetComplete === 'function' && isSecretSetComplete('estrella-caida') ? 1.10 : 1;
   // Mejora permanente: Pacto del Mercader +10% oro
   const upgradeBonus = n > 0 && typeof hasGoldUpgrade === 'function' && hasGoldUpgrade('gold_boost') ? 1.10 : 1;
-  setGold(getGold() + Math.round(n * bonus * agiBonus * starBonus * upgradeBonus));
+  // Maestría: Fortuna Eterna +2%/rango
+  const masteryGoldMult = n > 0 && typeof getMasteryBonus === 'function' ? 1 + getMasteryBonus('fortuna') : 1;
+  setGold(getGold() + Math.round(n * bonus * agiBonus * starBonus * upgradeBonus * masteryGoldMult));
 }
 function spendGold(n) { if (getGold() < n) { toast('💸', 'Oro insuficiente.'); return false; } addGold(-n); return true; }
 

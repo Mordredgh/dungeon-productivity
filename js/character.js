@@ -447,6 +447,27 @@ function renderCharacterSheet() {
           : ''}
       </div>` : ''}
 
+      ${(hero.prestige || 0) > 0 || (hero.mastery_points || 0) > 0 ? `
+      <div class="chr-section">
+        <div class="chr-section-hd">🌟 Árbol de Maestría — ${hero.mastery_points || 0} punto${(hero.mastery_points || 0) === 1 ? '' : 's'} disponible${(hero.mastery_points || 0) === 1 ? '' : 's'}</div>
+        <div class="chr-mastery-grid">
+          ${MASTERY_TREE.map(node => {
+            const rank = getMasteryRank(node.id);
+            const maxed = rank >= node.maxRank;
+            const canSpend = !maxed && (hero.mastery_points || 0) > 0;
+            return `
+            <div class="chr-mastery-node${maxed ? ' chr-mastery-maxed' : ''}">
+              <div class="chr-mastery-icon">${node.icon}</div>
+              <div class="chr-mastery-name">${escHtml(node.name)} <span class="chr-mastery-rank">${rank}/${node.maxRank}</span></div>
+              <div class="chr-mastery-desc">${escHtml(node.desc)}</div>
+              <button class="chr-mastery-btn" onclick="spendMasteryPoint('${node.id}')" ${canSpend ? '' : 'disabled'}>
+                ${maxed ? '✅ Máximo' : '+1 punto'}
+              </button>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>` : ''}
+
       <div class="chr-section">
         <div class="chr-section-hd">Carnet del héroe</div>
         <button class="chr-dl-btn" onclick="generateHeroCard()">⬇ Descargar PNG</button>

@@ -325,9 +325,50 @@ Solo para datos no críticos (se puede perder sin consecuencias):
 ---
 
 ## Service Worker
-- Versión actual: `dungeon-v181`
+- Versión actual: `dungeon-v184`
 - **Siempre bumpar** al modificar cualquier JS/CSS — lo hace `deploy.sh` automáticamente
 - Estrategia: cache-first con skipWaiting + clients.claim
+
+---
+
+## Combate de jefes — debilidades elementales + skills de héroe (v183)
+- **Elemento por jefe:** `BOSS_DEFS[].element` (config.js) — 7 elementos reales (Fuego/Elemental/
+  Eléctrico/Aéreo/Oscuro/Mágico/Cataclismo) + Normal neutro. Matriz `BOSS_ELEMENT_CHART` y
+  `getElementMultiplier(bossElement, moveType)` — ×1.5 débil, ×0.67 resiste, ×1 normal
+- Aplicado en `boss_battle.js _bbCalcDmg()`; feedback visual ▲/▼ en cada botón de movimiento +
+  toast "¡Súper efectivo!"/"Poco efectivo..." al golpear + chip de elemento del jefe en `_bbRender()`
+- **Skills de héroe en combate:** `HERO_BATTLE_SKILLS` (config.js) — 1 por clase, 1 uso por batalla
+  (`_bbHeroSkillUsed`, reset en `openBossBattle()`), independiente de `useClassSkill()` (esa es maná,
+  fuera de combate). `useHeroBattleSkill()` en boss_battle.js maneja 4 tipos: ataque normal/mágico,
+  `heal` (clérigo cura mascota), `crit` (pícaro dobla mejor movimiento), `double` (arquero golpea 2×)
+- Contraataque del boss extraído a `_bbBossCounterAttack()` reusable (antes duplicado)
+
+## Sumideros de oro (v184)
+- **Mejoras permanentes** (`GOLD_UPGRADES` en config.js, compra única, `hero.gold_upgrades` jsonb):
+  cola de forja +1/+2 (`getForgeQueueMax()`), +5% drop rate, +10% oro permanente — tab "📈 Mejoras" en
+  Tienda, lógica en `shop.js _renderGoldUpgrades()`/`buyGoldUpgrade()`
+- **Marcos de avatar cosméticos** (`AVATAR_FRAMES`, `hero.owned_frames`/`equipped_frame`): 4 marcos
+  (bronce/plata/oro/arcano), tab "🖼️ Marcos", aplicados como clase CSS en `renderHeroUI()`
+
+## Retención diaria (v184)
+- **Misión del Día:** `DAILY_SPECIAL_QUESTS` (14 plantillas), elegida por seed de fecha
+  (`_dayOfYearSeed()`), creada 1×/día por `checkDailySpecialQuest()` (events.js, llamado en boot) con
+  tag `mision-del-dia`, recompensa fija 60 XP/30 oro (override en `completeQuest()` antes de la cadena
+  de multiplicadores, así sigue beneficiándose de combos/runas/etc.)
+- **Hitos de racha con recompensa real:** `STREAK_REWARD_MILESTONES` (3 a 365 días), otorgados por
+  `checkStreakRewards()` (events.js), dedup en `hero.streak_rewards_claimed` — complementa (no
+  reemplaza) los logros cosméticos de racha que ya existían
+
+## Progresión 50+ (v184)
+- **Curva de diminishing returns:** `getPrestigeXPBonus(prestige)` en hero.js — lineal +5%/prestige
+  hasta el 10, luego se aplana asintóticamente hacia +50% adicional máximo. Reemplaza el cálculo lineal
+  sin tope que tenía `classXPBonus()`
+- **Árbol de Maestría:** `MASTERY_TREE` (config.js) — 6 nodos, 1 punto de maestría por Ascensión
+  (`hero.mastery_points`, otorgado en `doPrestige()`), ranks en `hero.mastery_ranks` (jsonb). UI en
+  `character.js` (sección debajo del botón Ascender), `spendMasteryPoint()` en hero.js. Nodos:
+  vigor (+HP máx), fortuna (+oro), persistencia (-tiempo forja), fuerza_bruta (+daño mascota en
+  jefes), suerte (+drop rate), voluntad (+ataques diarios contra jefes)
+- **Rangos de prestige en título:** `getDynamicTitle()` (views.js) — escalera completa 1/2/3/5/10/20/30/50
 
 ---
 

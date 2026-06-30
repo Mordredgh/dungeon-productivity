@@ -82,7 +82,8 @@ function _bbAttackKey(cycle) {
   const period = typeof _bossPeriodKey === 'function' ? _bossPeriodKey(cycle) : new Date().toISOString().split('T')[0];
   return 'dungeon-bb-atk-' + cycle + '-' + period;
 }
-function _bbLeft(cycle) { try { return Math.max(0, 5 - parseInt(localStorage.getItem(_bbAttackKey(cycle)) || '0', 10)); } catch { return 5; } }
+function _bbMaxAttacks() { return 5 + (typeof getMasteryBonus === 'function' ? getMasteryBonus('voluntad') : 0); }
+function _bbLeft(cycle) { try { return Math.max(0, _bbMaxAttacks() - parseInt(localStorage.getItem(_bbAttackKey(cycle)) || '0', 10)); } catch { return _bbMaxAttacks(); } }
 function _bbUse(cycle)  { try { const k = _bbAttackKey(cycle); localStorage.setItem(k, String((parseInt(localStorage.getItem(k)||'0',10))+1)); } catch {} }
 
 /* ── Daño del boss al contra-atacar ──────────────────────── */
@@ -148,7 +149,8 @@ function _bbCalcDmg(move) {
   const base   = Math.ceil(boss.maxHp * 0.04 * move.power);
   const bonus  = Math.floor(petSt.atk * 2);
   const mult   = typeof getElementMultiplier === 'function' ? getElementMultiplier(_bbBossElement(), move.type) : 1;
-  return Math.max(1, Math.round((base + bonus) * mult));
+  const masteryMult = 1 + (typeof getMasteryBonus === 'function' ? getMasteryBonus('fuerza_bruta') : 0);
+  return Math.max(1, Math.round((base + bonus) * mult * masteryMult));
 }
 
 /* ── Abrir pantalla de batalla ────────────────────────────── */
@@ -355,7 +357,7 @@ function _bbRender() {
     <div class="bb-moves-grid">${movesHtml}</div>
     ${heroSkillHtml}
     <div class="bb-attacks-counter${attacksLeft === 0 ? ' exhausted' : ''}">
-      ⚔️ ${attacksLeft}/5 ataques hoy · <span>${resetMsg}</span>
+      ⚔️ ${attacksLeft}/${_bbMaxAttacks()} ataques hoy · <span>${resetMsg}</span>
     </div>`;
 }
 
