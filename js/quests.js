@@ -23,6 +23,9 @@ async function completeQuest(id, el) {
   const q = quests.find(x => x.id === id);
   if (!q || q.done) return;
 
+  // Ensure streak is up-to-date even if app was left open overnight
+  if (typeof checkDailyStreak === 'function') await checkDailyStreak();
+
   // Habits use their own simpler flow
   if (q.type === 'habit') {
     if (typeof completeHabitQuest === 'function') await completeHabitQuest(q);
