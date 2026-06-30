@@ -180,6 +180,20 @@ async function _checkSecretSetComplete(classKey) {
       toast('⛰️', `¡Set del Titán! HP máx permanente: ${newHpMax}.`);
     }
   }
+
+  // Bono de set Druida: mascota no cae en batalla durante 48h tras equipar
+  if (classKey === 'druida') {
+    const prog = getSecretProgress();
+    prog.druida_protection_until = Date.now() + 48 * 3600000;
+    await saveSecretProgress(prog);
+    toast('🌑', '¡Set de la Druida! Tu mascota no caerá en batalla durante 48h.');
+  }
+}
+
+function isDruidaProtectionActive() {
+  if (!hero) return false;
+  const prog = getSecretProgress();
+  return (prog.druida_protection_until || 0) > Date.now();
 }
 
 function isSecretSetComplete(classKey) {

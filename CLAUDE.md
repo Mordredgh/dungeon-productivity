@@ -429,12 +429,19 @@ también corre al inicio de `completeQuest()`, no solo al boot).
     (flag `secret_progress.titan_hp_bonus_applied`), igual al patrón de boost permanente de
     `character.js assignAttrPoint()`
   - **Estrella Caída** → +10% en `hero.js classXPBonus()` (todo XP) y `shop.js addGold()` (todo oro)
-  - **Paladín y Druida quedaron sin implementar** — sus bonos ("+1 cura gratis/día", "mascotas sin
-    hambre 48h") dependen de mecánicas que **no existen en el código**: no hay sistema de "usos
-    gratuitos por día" para hechizos (el Escudo Arcano se paga con maná, sin límite diario), ni
-    sistema de hambre/decay para mascotas (solo XP de alimento para subir nivel). Construir esas
-    mecánicas desde cero es scope nuevo, no "conectar bono a sistema existente" — pendiente decisión
-    de Gerardo: ¿construir las mecánicas base, o reescribir esos 2 bonos a algo que sí exista?
+  - **Paladín — implementado 2026-06-30**: en vez de construir un sistema de "usos gratis por día"
+    desde cero, se agregó un flag con fecha (`secret_progress.paladin_free_heal_date`, mismo patrón
+    que Nigromante/Druida). `spells.js castSpell()` detecta `_paladinFreeHealAvailable()` y permite
+    castear Escudo Arcano (`id:'shield'`) una vez al día sin gastar fragmentos ni maná; UI en
+    `renderSpells()` muestra "✝️ Gratis" en el orbe cuando está disponible
+  - **Druida — implementado 2026-06-30**: el bono original pedía "mascotas sin hambre" pero esa
+    mecánica (decay/hambre) no existe ni se justificaba construirla solo para esto. Se reescribió a
+    **"tu mascota no puede caer en batalla durante 48h tras equipar el set"** — reutiliza el check
+    `_bbPetHp <= 0` que ya existía en `boss_battle.js`. Temporizador en
+    `secret_progress.druida_protection_until` (Date.now()+48h), verificado por
+    `isDruidaProtectionActive()` (secret_sets.js) y aplicado en `_bbBossCounterAttack()` (HP nunca
+    baja de 1 mientras esté activo)
+  - **Las 6 clases tienen su bono de set completo conectado a mecánica real.**
 - **UI:** `_renderSecretSmithy()` se inserta al final de `renderSmithy()` en weapons.js
 
 ---

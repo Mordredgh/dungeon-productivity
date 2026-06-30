@@ -442,7 +442,9 @@ async function _bbBossCounterAttack() {
   if (bossSpriteEl2) bossSpriteEl2.style.transform = '';
 
   const bossDmg      = _bbBossDmg();
-  _bbPetHp            = Math.max(0, _bbPetHp - bossDmg);
+  // Bono de set Druida: mascota no cae en batalla durante 48h tras equipar
+  const druidaShield = typeof isDruidaProtectionActive === 'function' && isDruidaProtectionActive();
+  _bbPetHp            = Math.max(druidaShield ? 1 : 0, _bbPetHp - bossDmg);
   const petSpriteEl2  = document.getElementById('bbPetSprite');
   if (petSpriteEl2) petSpriteEl2.classList.add('bb-hit');
   _bbSpawnPetDmgFloat(bossDmg, petSpriteEl2);

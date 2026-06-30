@@ -144,28 +144,50 @@ const SPELL_DEFS = [
   },
 ];
 
+/* Bono de set Paladín: 1 uso gratis de Escudo Arcano (curación) por día */
+function _paladinFreeHealAvailable() {
+  if (typeof isSecretSetComplete !== 'function' || !isSecretSetComplete('paladin')) return false;
+  const today = new Date().toISOString().split('T')[0];
+  const prog  = getSecretProgress();
+  return prog.paladin_free_heal_date !== today;
+}
+async function _usePaladinFreeHeal() {
+  const today = new Date().toISOString().split('T')[0];
+  const prog  = getSecretProgress();
+  prog.paladin_free_heal_date = today;
+  await saveSecretProgress(prog);
+}
+
 async function castSpell(spellId) {
   const spell = SPELL_DEFS.find(s => s.id === spellId);
   if (!spell) return;
+
+  const freeHeal = spellId === 'shield' && _paladinFreeHealAvailable();
   const cost = SPELL_FRAG_COST[spellId] || 10;
   const have = getInvCount('spell_' + spellId);
-  if (have < cost) {
+  if (!freeHeal && have < cost) {
     toast('❌', `Necesitas ${cost} fragmentos de ${spell.name} (tienes ${have}).`);
     return;
   }
-  const manaCost = spell.mana ? Math.floor(spell.mana * (typeof getDungeonBonus==='function' ? getDungeonBonus('mana') : 1)) : 0;
+  const manaCost = (!freeHeal && spell.mana) ? Math.floor(spell.mana * (typeof getDungeonBonus==='function' ? getDungeonBonus('mana') : 1)) : 0;
   if (manaCost && (hero.mana || 0) < manaCost) {
     toast('💧', `Maná insuficiente (necesitas ${manaCost}, tienes ${hero.mana || 0}).`);
     return;
   }
-  const ok = await consumeInvItem('spell_' + spellId, cost);
-  if (!ok) { toast('❌', 'No se pudo consumir los fragmentos.'); return; }
+  if (!freeHeal) {
+    const ok = await consumeInvItem('spell_' + spellId, cost);
+    if (!ok) { toast('❌', 'No se pudo consumir los fragmentos.'); return; }
+  }
   if (manaCost) {
     hero.mana = (hero.mana || 0) - manaCost;
     saveHero({ mana: hero.mana });
     if (typeof renderHeroUI === 'function') renderHeroUI();
   }
   spell.cast();
+  if (freeHeal) {
+    await _usePaladinFreeHeal();
+    toast('✝️', '¡Set del Paladín! Curación gratuita usada hoy.');
+  }
   saveHero({ spells_cast: (hero.spells_cast || 0) + 1 });
   renderSpells();
   updateSpellBadge();
@@ -185,22 +207,23 @@ function renderSpells() {
   el.innerHTML = `<div class="spell-orbs-grid">${SPELL_DEFS.map(s => {
     const cost     = SPELL_FRAG_COST[s.id] || 10;
     const have     = getInvCount('spell_' + s.id);
-    const hasFrags = have >= cost;
-    const hasMana  = !s.mana || curMana >= s.mana;
+    const freeHeal = s.id === 'shield' && typeof _paladinFreeHealAvailable === 'function' && _paladinFreeHealAvailable();
+    const hasFrags = have >= cost || freeHeal;
+    const hasMana  = !s.mana || curMana >= s.mana || freeHeal;
     const ready    = hasFrags && hasMana;
-    const clr      = s.color || '#a855f7';
+    const clr      = freeHeal ? '#fde68a' : (s.color || '#a855f7');
     const imgUrl   = 'images/spell_' + s.id + '.png';
     const manaBadge = s.mana
-      ? `<div class="spell-orb-mana ${hasMana ? '' : 'spell-mana-low'}">💧${s.mana}</div>`
+      ? `<div class="spell-orb-mana ${hasMana ? '' : 'spell-mana-low'}">${freeHeal ? '✝️ Gratis' : '💧' + s.mana}</div>`
       : '';
     return `<button class="spell-orb ${ready ? '' : 'cd'}" onclick="castSpell('${s.id}')"
-        title="${escHtml(s.name)}: ${escHtml(s.desc)} | ${cost} frags · ${s.mana || 0} maná"
+        title="${escHtml(s.name)}: ${escHtml(s.desc)} | ${freeHeal ? 'Cura gratis del set Paladín' : cost + ' frags · ' + (s.mana || 0) + ' maná'}"
         style="--spell-clr:${clr}">
       <img src="${imgUrl}" class="spell-orb-img" alt="${escHtml(s.name)}"
            onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
       <div class="spell-orb-icon" style="display:none">${s.icon}</div>
       <div class="spell-orb-name">${escHtml(s.name)}</div>
-      <div class="spell-orb-frags ${hasFrags ? 'spell-orb-ready' : 'spell-orb-cd'}">${have}/${cost}</div>
+      <div class="spell-orb-frags ${hasFrags ? 'spell-orb-ready' : 'spell-orb-cd'}">${freeHeal ? '✝️' : have + '/' + cost}</div>
       ${manaBadge}
     </button>`;
   }).join('')}</div>`;
