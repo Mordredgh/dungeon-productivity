@@ -58,6 +58,41 @@ const TITLES = [
 
 const XP_TABLE = { main: 100, side: 50, daily: 25, weekly: 75, habit: 20 };
 const POM_XP = 15;
+
+/* ── MISIÓN DEL DÍA — pool curado, seleccionado por seed de fecha ──
+   xp/gold fijos, mayores que una daily normal (25 XP / 10 oro) */
+const DAILY_SPECIAL_QUESTS = [
+  { name:'🌅 Madrugar con propósito',     desc:'Completa tu primera misión antes de las 9am.' },
+  { name:'⚔️ Tres victorias seguidas',    desc:'Completa 3 misiones cualquiera hoy.' },
+  { name:'📚 Sesión de enfoque profundo', desc:'Completa 1 pomodoro completo sin pausar.' },
+  { name:'🛡️ Cero pendientes',           desc:'Termina el día sin misiones vencidas.' },
+  { name:'🗡️ Cacería de jefe',           desc:'Ataca al menos 1 vez a cualquier jefe activo.' },
+  { name:'🌙 Cierre nocturno',            desc:'Completa una misión después de las 8pm.' },
+  { name:'🔥 Mantén la racha viva',       desc:'Completa al menos 1 misión antes de medianoche.' },
+  { name:'💎 Misión legendaria',          desc:'Completa cualquier misión de prioridad Épica o superior.' },
+  { name:'🧪 Alquimista del día',         desc:'Usa cualquier hechizo o poción.' },
+  { name:'🐾 Cuida tu compañero',         desc:'Alimenta o activa a tu mascota.' },
+  { name:'📜 Plan del día',               desc:'Crea una misión nueva y complétala el mismo día.' },
+  { name:'⚒️ Visita al Herrero',          desc:'Abre el Herrero y revisa tus recetas disponibles.' },
+  { name:'🏰 Ronda del Reino',            desc:'Revisa tu Sala del Trono y tus Zonas del Dungeon.' },
+  { name:'✝️ Hábito cumplido',            desc:'Completa cualquier hábito positivo hoy.' },
+];
+const DAILY_SPECIAL_XP   = 60;
+const DAILY_SPECIAL_GOLD = 30;
+
+/* ── HITOS DE RACHA — recompensa en oro/XP (no solo logro cosmético) ── */
+const STREAK_REWARD_MILESTONES = [
+  { days: 3,   xp: 50,   gold: 30   },
+  { days: 7,   xp: 120,  gold: 80   },
+  { days: 14,  xp: 250,  gold: 150  },
+  { days: 21,  xp: 350,  gold: 220  },
+  { days: 30,  xp: 500,  gold: 350  },
+  { days: 60,  xp: 1000, gold: 700  },
+  { days: 100, xp: 2000, gold: 1500 },
+  { days: 150, xp: 3000, gold: 2200 },
+  { days: 200, xp: 4000, gold: 3000 },
+  { days: 365, xp: 8000, gold: 6000 },
+];
 const LEVEL_BASE = 100;
 const LEVEL_SCALE = 1.5;
 const THEMES = ['dark', 'light', 'cyber', 'oled', 'parchment'];
@@ -180,6 +215,33 @@ const SECRET_SET_BONUSES = {
   'druida':         'Las mascotas no pierden hambre durante 48h tras equipar el set',
   'estrella-caida': '+10% a TODOS los stats simultáneamente',
 };
+
+/* ── MEJORAS PERMANENTES (sumidero de oro funcional) ─────────
+   Compra única por id, persistida en hero.gold_upgrades (jsonb array de ids) */
+const GOLD_UPGRADES = [
+  { id:'forge_slot',  name:'Cola de Forja +1',     icon:'⚒️', cost:5000,  desc:'+1 espacio en la cola de forja de sets secretos (máx 3→4)' },
+  { id:'forge_slot2', name:'Cola de Forja +1 (II)', icon:'⚒️', cost:12000, desc:'+1 espacio adicional en la cola de forja (4→5)', reqUpgrade:'forge_slot' },
+  { id:'drop_rate',   name:'Ojo del Coleccionista', icon:'🔮', cost:8000,  desc:'+5% drop rate base en todo el loot de misiones' },
+  { id:'gold_boost',  name:'Pacto del Mercader',    icon:'💰', cost:10000, desc:'+10% oro permanente en todas las ganancias' },
+];
+function hasGoldUpgrade(id) {
+  if (!hero) return false;
+  try { return JSON.parse(hero.gold_upgrades || '[]').includes(id); } catch { return false; }
+}
+function getForgeQueueMax() {
+  let max = 3;
+  if (hasGoldUpgrade('forge_slot'))  max++;
+  if (hasGoldUpgrade('forge_slot2')) max++;
+  return max;
+}
+
+/* ── COSMÉTICOS — marcos de avatar (sumidero de oro sin afectar balance) ── */
+const AVATAR_FRAMES = [
+  { id:'bronce',  name:'Marco de Bronce',  icon:'🟤', cost:1500,  cssClass:'frame-bronce' },
+  { id:'plata',   name:'Marco de Plata',   icon:'⚪', cost:4000,  cssClass:'frame-plata' },
+  { id:'oro',     name:'Marco de Oro',     icon:'🟡', cost:9000,  cssClass:'frame-oro' },
+  { id:'arcano',  name:'Marco Arcano',     icon:'🔮', cost:15000, cssClass:'frame-arcano' },
+];
 
 const GOLD_TABLE = { main:50, side:20, daily:10, weekly:35, habit:8 };
 

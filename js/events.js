@@ -199,6 +199,58 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ============================================================
+   MISIÓN DEL DÍA — curada, seleccionada por seed de fecha
+   ============================================================ */
+function _dayOfYearSeed(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const start = new Date(d.getFullYear(), 0, 0);
+  return Math.floor((d - start) / 86400000);
+}
+async function checkDailySpecialQuest() {
+  if (!hero) return;
+  const today = new Date().toISOString().split('T')[0];
+  if (hero.daily_special_date === today) return;
+
+  const seed = _dayOfYearSeed(today);
+  const tmpl = DAILY_SPECIAL_QUESTS[seed % DAILY_SPECIAL_QUESTS.length];
+
+  const { data } = await db.from('dungeon_quests').insert({
+    name: tmpl.name, notes: tmpl.desc, type: 'side', priority: 'epico',
+    tags: 'mision-del-dia', deadline: today, done: false,
+    hero_id: hero.id, created_at: new Date().toISOString()
+  }).select().single();
+
+  if (data) {
+    quests.unshift(data);
+    renderQuestList();
+    toast('⭐', `Misión del Día: "${tmpl.name}" — +${DAILY_SPECIAL_XP} XP +${DAILY_SPECIAL_GOLD}🪙`);
+  }
+  await saveHero({ daily_special_date: today });
+}
+
+/* ============================================================
+   HITOS DE RACHA — recompensa real en oro/XP (no solo logro)
+   ============================================================ */
+async function checkStreakRewards() {
+  if (!hero) return;
+  const streak  = hero.streak || 0;
+  const claimed = (() => { try { return JSON.parse(hero.streak_rewards_claimed || '[]'); } catch { return []; } })();
+  let dirty = false;
+
+  for (const m of STREAK_REWARD_MILESTONES) {
+    if (streak >= m.days && !claimed.includes(m.days)) {
+      claimed.push(m.days);
+      dirty = true;
+      if (typeof addXP === 'function')   await addXP(m.xp, 'main', null);
+      if (typeof addGold === 'function') addGold(m.gold);
+      toast('🔥', `¡Racha de ${m.days} días! +${m.xp} XP +${m.gold}🪙`);
+      if (typeof dungeonPush === 'function') dungeonPush('🔥 Hito de Racha', `${m.days} días consecutivos — +${m.xp} XP +${m.gold}🪙`);
+    }
+  }
+  if (dirty) await saveHero({ streak_rewards_claimed: JSON.stringify(claimed) });
+}
+
+/* ============================================================
    FEATURE 2: Auto-reset de misiones diarias
    ============================================================ */
 async function resetDailyQuests() {

@@ -114,7 +114,8 @@ async function craftSecretPiece(classKey, pieceKey) {
   if (getInvCount(iKey) > 0) { toast('✅', 'Ya tienes esta pieza forjada.'); return; }
 
   const queue = _getForgeQueue();
-  if (queue.length >= 3) { toast('⚒️', 'Cola llena — máximo 3 piezas en espera.'); return; }
+  const maxQueue = typeof getForgeQueueMax === 'function' ? getForgeQueueMax() : 3;
+  if (queue.length >= maxQueue) { toast('⚒️', `Cola llena — máximo ${maxQueue} piezas en espera.`); return; }
   if (queue.find(q => q.classKey === classKey && q.pieceKey === pieceKey)) {
     toast('⏳', 'Esta pieza ya está en la cola de forja.'); return;
   }

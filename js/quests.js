@@ -36,7 +36,8 @@ async function completeQuest(id, el) {
   await db.from('dungeon_quests').update({ done: true, done_at: now }).eq('id', id);
   q.done = true; q.done_at = now;
 
-  let xpAmt = calcQuestXP(q);
+  const _isDailySpecial = (q.tags || '').includes('mision-del-dia');
+  let xpAmt = _isDailySpecial ? DAILY_SPECIAL_XP : calcQuestXP(q);
 
   // Tag-based class bonus (guerrero×2 en #ejercicio, mago×2 en #estudio, etc.)
   const _tagMult = _getTagClassBonus(q);
@@ -144,7 +145,7 @@ async function completeQuest(id, el) {
   await addXP(xpAmt, q.type, el);
 
   // Gold earned
-  const goldBase = GOLD_TABLE ? (GOLD_TABLE[q.type] || 10) : 10;
+  const goldBase = _isDailySpecial ? DAILY_SPECIAL_GOLD : (GOLD_TABLE ? (GOLD_TABLE[q.type] || 10) : 10);
   const goldMult = typeof getGoldMult === 'function' ? getGoldMult() : 1;
   const todGoldMult    = typeof getTODBonus === 'function' ? getTODBonus().goldMult : 1;
   const skillGoldMult  = typeof getSkillTreeGoldBonus === 'function' ? (1 + getSkillTreeGoldBonus()) : 1;

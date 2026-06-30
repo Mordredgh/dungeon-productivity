@@ -64,8 +64,9 @@ function renderHeroUI() {
   }
   if (lvlBadge) lvlBadge.textContent = lvl;
 
-  // Avatar ring by class
-  avatarBtn.className = 'hero-avatar-btn avatar-class-' + (hero.hero_class || 'guerrero');
+  // Avatar ring by class + marco cosmético equipado
+  const frameDef = typeof AVATAR_FRAMES !== 'undefined' ? AVATAR_FRAMES.find(f => f.id === hero.equipped_frame) : null;
+  avatarBtn.className = 'hero-avatar-btn avatar-class-' + (hero.hero_class || 'guerrero') + (frameDef ? ' ' + frameDef.cssClass : '');
 
   document.getElementById('heroName').textContent = hero.name || 'Héroe';
   const title = getDynamicTitle(hero);

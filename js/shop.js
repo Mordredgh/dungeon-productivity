@@ -9,7 +9,9 @@ function addGold(n) {
   const agiBonus = n > 0 && hero?.agi ? 1 + hero.agi * 0.01 : 1;
   // Bono de set Estrella Caída: +10% a todo el oro ganado
   const starBonus = n > 0 && typeof isSecretSetComplete === 'function' && isSecretSetComplete('estrella-caida') ? 1.10 : 1;
-  setGold(getGold() + Math.round(n * bonus * agiBonus * starBonus));
+  // Mejora permanente: Pacto del Mercader +10% oro
+  const upgradeBonus = n > 0 && typeof hasGoldUpgrade === 'function' && hasGoldUpgrade('gold_boost') ? 1.10 : 1;
+  setGold(getGold() + Math.round(n * bonus * agiBonus * starBonus * upgradeBonus));
 }
 function spendGold(n) { if (getGold() < n) { toast('💸', 'Oro insuficiente.'); return false; } addGold(-n); return true; }
 
@@ -53,12 +55,17 @@ function renderShopItems() {
     { id: 'fragment',   label: '✨ Fragmentos'   },
     { id: 'potion',     label: '🧪 Pociones'     },
     { id: 'alimento',   label: '🍖 Alimento'     },
+    { id: 'mejoras',    label: '📈 Mejoras'      },
+    { id: 'marcos',     label: '🖼️ Marcos'      },
   ];
 
   const tabs = `<div class="rpg-shop-tabs">${cats.map(c =>
     `<button class="rpg-shop-tab ${shopCategory === c.id ? 'active' : ''}"
        onclick="shopCategory='${c.id}';renderShopItems()">${c.label}</button>`
   ).join('')}</div>`;
+
+  if (shopCategory === 'mejoras') { el.innerHTML = tabs + _renderGoldUpgrades(); return; }
+  if (shopCategory === 'marcos')  { el.innerHTML = tabs + _renderAvatarFrames(); return; }
 
   const items = SHOP_ITEMS.filter(i => i.category === shopCategory);
 
@@ -82,6 +89,80 @@ function renderShopItems() {
   }).join('');
 
   el.innerHTML = tabs + `<div class="rpg-shop-grid">${cards || '<p style="color:var(--text3);padding:24px;text-align:center">Sin artículos en esta categoría</p>'}</div>`;
+}
+
+/* ── Mejoras permanentes (compra única, no consumibles) ──── */
+function _renderGoldUpgrades() {
+  const gold = getGold();
+  const cards = GOLD_UPGRADES.map(u => {
+    const owned   = hasGoldUpgrade(u.id);
+    const locked  = u.reqUpgrade && !hasGoldUpgrade(u.reqUpgrade);
+    const canBuy  = !owned && !locked && gold >= u.cost;
+    return `
+    <div class="rpg-shop-card rpg-rarity-legendary">
+      <div class="rpg-rarity-tag" style="color:${_RARITY_COLOR.legendary}">PERMANENTE</div>
+      <div class="rpg-item-visual"><span class="rpg-item-emoji">${u.icon}</span></div>
+      <div class="rpg-shop-item-name">${escHtml(u.name)}</div>
+      <div class="rpg-shop-item-desc">${escHtml(u.desc)}</div>
+      <button class="rpg-buy-btn" onclick="buyGoldUpgrade('${u.id}')" ${canBuy ? '' : 'disabled'}>
+        ${owned ? '✅ Adquirida' : locked ? '🔒 Requiere mejora previa' : '🪙 ' + u.cost.toLocaleString()}
+      </button>
+    </div>`;
+  }).join('');
+  return `<div class="rpg-shop-grid">${cards}</div>`;
+}
+async function buyGoldUpgrade(id) {
+  const u = GOLD_UPGRADES.find(x => x.id === id);
+  if (!u || hasGoldUpgrade(id)) return;
+  if (u.reqUpgrade && !hasGoldUpgrade(u.reqUpgrade)) { toast('🔒', 'Necesitas la mejora previa primero.'); return; }
+  if (!spendGold(u.cost)) return;
+  const owned = (() => { try { return JSON.parse(hero.gold_upgrades || '[]'); } catch { return []; } })();
+  owned.push(id);
+  hero.gold_upgrades = JSON.stringify(owned);
+  await db.from('dungeon_heroes').update({ gold_upgrades: hero.gold_upgrades }).eq('id', hero.id);
+  toast(u.icon, `¡${u.name} adquirida permanentemente!`);
+  renderShopItems();
+}
+
+/* ── Marcos de avatar (cosmético, no afecta balance) ───────── */
+function _renderAvatarFrames() {
+  const gold = getGold();
+  const owned = (() => { try { return JSON.parse(hero.owned_frames || '[]'); } catch { return []; } })();
+  const cards = AVATAR_FRAMES.map(f => {
+    const isOwned   = owned.includes(f.id);
+    const isEquipped = hero.equipped_frame === f.id;
+    const canBuy    = !isOwned && gold >= f.cost;
+    return `
+    <div class="rpg-shop-card rpg-rarity-epic">
+      <div class="rpg-rarity-tag" style="color:${_RARITY_COLOR.epic}">COSMÉTICO</div>
+      <div class="rpg-item-visual"><span class="rpg-item-emoji">${f.icon}</span></div>
+      <div class="rpg-shop-item-name">${escHtml(f.name)}</div>
+      <button class="rpg-buy-btn" onclick="${isOwned ? `equipAvatarFrame('${f.id}')` : `buyAvatarFrame('${f.id}')`}" ${!isOwned && !canBuy ? 'disabled' : ''}>
+        ${isEquipped ? '✅ Equipado' : isOwned ? '👕 Equipar' : '🪙 ' + f.cost.toLocaleString()}
+      </button>
+    </div>`;
+  }).join('');
+  return `<div class="rpg-shop-grid">${cards}</div>`;
+}
+async function buyAvatarFrame(id) {
+  const f = AVATAR_FRAMES.find(x => x.id === id);
+  if (!f) return;
+  const owned = (() => { try { return JSON.parse(hero.owned_frames || '[]'); } catch { return []; } })();
+  if (owned.includes(id)) return;
+  if (!spendGold(f.cost)) return;
+  owned.push(id);
+  hero.owned_frames = JSON.stringify(owned);
+  hero.equipped_frame = id;
+  await db.from('dungeon_heroes').update({ owned_frames: hero.owned_frames, equipped_frame: id }).eq('id', hero.id);
+  toast(f.icon, `¡${f.name} adquirido y equipado!`);
+  renderShopItems();
+  renderHeroUI();
+}
+async function equipAvatarFrame(id) {
+  hero.equipped_frame = id;
+  await saveHero({ equipped_frame: id });
+  renderShopItems();
+  renderHeroUI();
 }
 
 async function buyItem(id, cost) {
