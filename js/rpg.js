@@ -212,6 +212,14 @@ function damageBoss(dmg) {
         if (typeof tryRuneDrop === 'function' && Math.random() < (reward.runeChance || 0)) {
           setTimeout(() => tryRuneDrop('boss'), 1400);
         }
+        // Titán: 8% de drop de material en bosses Legendario/Mítico/Cataclismo
+        if (['legendario', 'mitico', 'cataclismo'].includes(b.rarity) && typeof addInvItem === 'function') {
+          const _cls = (() => { try { return JSON.parse(hero?.secret_classes || '[]'); } catch { return []; } })();
+          if (_cls.includes('titan') && Math.random() < 0.08) {
+            await addInvItem('secret_mat_titan', 'secret_material', 1);
+            toast('🪨', '¡Núcleo de Roca Ancestral obtenido del jefe!');
+          }
+        }
         updateBossBanner();
       }, 800);
     }

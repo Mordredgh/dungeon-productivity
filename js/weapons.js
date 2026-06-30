@@ -352,6 +352,7 @@ function renderSmithy() {
     ${rows ? `<div class="smithy-section-title">⚔️ Armas</div><div class="smithy-recipes">${rows}</div>` : ''}
     ${armorRows ? `<div class="smithy-section-title" style="margin-top:18px">🛡️ Armaduras</div><div class="smithy-recipes">${armorRows}</div>` : ''}
     ${typeof RUNE_DEFS !== 'undefined' ? _renderRuneCrafting() : ''}
+    ${typeof _renderSecretSmithy === 'function' ? _renderSecretSmithy() : ''}
   `;
 }
 

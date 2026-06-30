@@ -270,6 +270,9 @@ async function completeQuest(id, el) {
     addDailyGoalXP(xpAmt);
   }
 
+  // Drops de materiales para sets de clases secretas
+  if (typeof trySecretMatDrop === 'function') await trySecretMatDrop(q);
+
   renderQuestList();
   renderHistory();
   renderStats();

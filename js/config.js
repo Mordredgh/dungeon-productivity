@@ -147,6 +147,40 @@ const SECRET_CLASS_DEFS = [
     bonus:'+5% a todos los multiplicadores de XP en cualquier misión' },
 ];
 
+/* ── SETS DE CLASES SECRETAS ─────────────────────────────── */
+const SECRET_MATERIAL_DEFS = {
+  'crononauta':     { key: 'secret_mat_crononauta', name: 'Fragmento de Hora Congelada', icon: '⏳', color: '#93c5fd' },
+  'paladin':        { key: 'secret_mat_paladin',     name: 'Pluma de Juramento Sagrado',  icon: '🪶', color: '#fde68a' },
+  'nigromante':     { key: 'secret_mat_nigromante',  name: 'Hueso del Renacer',            icon: '🦴', color: '#6ee7b7' },
+  'titan':          { key: 'secret_mat_titan',       name: 'Núcleo de Roca Ancestral',     icon: '🪨', color: '#fbbf24' },
+  'druida':         { key: 'secret_mat_druida',      name: 'Perla de Marea Eterna',        icon: '🪬', color: '#67e8f9' },
+  'estrella-caida': { key: 'secret_mat_estrella',    name: 'Polvo Estelar',                icon: '✨', color: '#e879f9' },
+};
+
+const SECRET_SET_PIECES = [
+  { key: 'guantes', name: 'Guantes', matCost: 8,  goldCost: 1500, forgeHours: 24  },
+  { key: 'botas',   name: 'Botas',   matCost: 8,  goldCost: 1500, forgeHours: 24  },
+  { key: 'grebas',  name: 'Grebas',  matCost: 10, goldCost: 2000, forgeHours: 36  },
+  { key: 'casco',   name: 'Casco',   matCost: 12, goldCost: 2500, forgeHours: 48  },
+  { key: 'pecho',   name: 'Pecho',   matCost: 18, goldCost: 4000, forgeHours: 72  },
+  { key: 'arma',    name: 'Arma',    matCost: 25, goldCost: 6500, forgeHours: 120 },
+];
+
+const SECRET_SET_MILESTONES = [
+  { at: 20, xp: 500,  gold: 0,   label: '25%' },
+  { at: 40, xp: 1000, gold: 500, label: '50%' },
+  { at: 60, xp: 2000, gold: 0,   label: '75%' },
+];
+
+const SECRET_SET_BONUSES = {
+  'crononauta':     'Las misiones vencidas no penalizan HP, solo XP reducido',
+  'paladin':        '+1 uso adicional gratuito de hechizo de Curación por día',
+  'nigromante':     'Al llegar a 0 HP, una vez por semana resucitas con 25% HP',
+  'titan':          '+20% HP Máx permanente',
+  'druida':         'Las mascotas no pierden hambre durante 48h tras equipar el set',
+  'estrella-caida': '+10% a TODOS los stats simultáneamente',
+};
+
 const GOLD_TABLE = { main:50, side:20, daily:10, weekly:35, habit:8 };
 
 const CDN = 'https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/';

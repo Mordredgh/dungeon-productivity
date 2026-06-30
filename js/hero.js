@@ -223,6 +223,10 @@ async function checkSecretClassUnlocks() {
     const d = defs.find(x => x.key === k);
     toast(d?.icon || '🔓', `¡Clase Secreta desbloqueada: ${d?.name || k}!`);
     if (typeof dungeonPush === 'function') dungeonPush('🔓 Clase Secreta', `${d?.name || k} desbloqueada. Ve a tu personaje para adoptarla.`);
+    // Cada clase desbloqueada (excepto Estrella Caída) otorga 1 Polvo Estelar automático
+    if (k !== 'estrella-caida' && typeof addInvItem === 'function') {
+      setTimeout(() => addInvItem('secret_mat_estrella', 'secret_material', 1), 1500);
+    }
   });
   if (typeof renderCharacterSheet === 'function') renderCharacterSheet();
 }
@@ -239,5 +243,15 @@ async function addHP(amount) {
     _prog.hp_zeros = (_prog.hp_zeros || 0) + 1;
     await saveSecretProgress(_prog);
     checkSecretClassUnlocks();
+  }
+  // Nigromante: al llegar exactamente a 0 HP, garantiza 1 Hueso del Renacer
+  if (amount < 0 && newHp === 0) {
+    const _cls = (() => { try { return JSON.parse(hero.secret_classes || '[]'); } catch { return []; } })();
+    if (_cls.includes('nigromante') && typeof addInvItem === 'function') {
+      setTimeout(async () => {
+        await addInvItem('secret_mat_nigromante', 'secret_material', 1);
+        if (typeof toast === 'function') toast('🦴', '¡Hueso del Renacer obtenido al caer!');
+      }, 600);
+    }
   }
 }
