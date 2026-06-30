@@ -7,7 +7,9 @@ function setGold(n) { const g = Math.max(0, Math.round(n)); if (hero) { hero.gol
 function addGold(n) {
   const bonus    = n > 0 && typeof getDungeonBonus === 'function' ? getDungeonBonus('gold') : 1;
   const agiBonus = n > 0 && hero?.agi ? 1 + hero.agi * 0.01 : 1;
-  setGold(getGold() + Math.round(n * bonus * agiBonus));
+  // Bono de set Estrella Caída: +10% a todo el oro ganado
+  const starBonus = n > 0 && typeof isSecretSetComplete === 'function' && isSecretSetComplete('estrella-caida') ? 1.10 : 1;
+  setGold(getGold() + Math.round(n * bonus * agiBonus * starBonus));
 }
 function spendGold(n) { if (getGold() < n) { toast('💸', 'Oro insuficiente.'); return false; } addGold(-n); return true; }
 

@@ -329,6 +329,11 @@ async function checkOverdueHP() {
   // Eclipse weather: HP doesn't drop from overdue
   const todayWeather = localStorage.getItem('dungeon-weather-' + today);
   if (todayWeather === 'eclipse') { toast('🌑', 'Eclipse Arcano: HP protegida hoy.'); return; }
+  // Bono de set Crononauta: misiones vencidas no quitan HP
+  if (typeof isSecretSetComplete === 'function' && isSecretSetComplete('crononauta')) {
+    toast('⏰', 'Set del Crononauta: el tiempo perdona tu HP por misiones vencidas.');
+    return;
+  }
   if (hero.amulet) {
     await saveHero({ amulet: false });
     toast('🧿', '¡Amuleto de Protección absorbió el daño de misiones vencidas!');

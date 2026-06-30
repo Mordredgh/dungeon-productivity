@@ -166,6 +166,18 @@ async function _checkSecretSetComplete(classKey) {
   if (!allPieces) return;
   const clsDef = (typeof SECRET_CLASS_DEFS !== 'undefined' ? SECRET_CLASS_DEFS : []).find(d => d.key === classKey);
   toast('⭐', `¡Set completo de ${clsDef?.name || classKey}! El bono de set está activo.`);
+
+  // Bono de set Titán: +20% HP máx permanente (se aplica una sola vez)
+  if (classKey === 'titan') {
+    const prog = getSecretProgress();
+    if (!prog.titan_hp_bonus_applied) {
+      const newHpMax = Math.round((hero.hp_max || 100) * 1.20);
+      await saveHero({ hp_max: newHpMax });
+      prog.titan_hp_bonus_applied = true;
+      await saveSecretProgress(prog);
+      toast('⛰️', `¡Set del Titán! HP máx permanente: ${newHpMax}.`);
+    }
+  }
 }
 
 function isSecretSetComplete(classKey) {

@@ -90,6 +90,8 @@ function classXPBonus(type) {
     if ((type === 'side' || type === 'daily') && hero.intel) bonus *= 1 + hero.intel * 0.01;
     if (hero.prestige)                                       bonus *= 1 + hero.prestige * 0.05;
   }
+  // Bono de set Estrella Caída: +10% a todos los multiplicadores de XP
+  if (typeof isSecretSetComplete === 'function' && isSecretSetComplete('estrella-caida')) bonus *= 1.10;
   return bonus;
 }
 
@@ -235,7 +237,20 @@ async function checkSecretClassUnlocks() {
 async function addHP(amount) {
   if (!hero) return;
   const runeHpMax = typeof getRuneBonus === 'function' ? getRuneBonus('hp_max') : 0;
-  const newHp = Math.max(0, Math.min((hero.hp || 0) + amount, (hero.hp_max || 100) + runeHpMax));
+  let newHp = Math.max(0, Math.min((hero.hp || 0) + amount, (hero.hp_max || 100) + runeHpMax));
+
+  // Bono de set Nigromante: revive automático 1×/semana al llegar a 0 HP
+  if (newHp === 0 && typeof isSecretSetComplete === 'function' && isSecretSetComplete('nigromante')) {
+    const _prog = getSecretProgress();
+    const lastRevive = _prog.nigromante_revive_at ? new Date(_prog.nigromante_revive_at) : null;
+    if (!lastRevive || Date.now() - lastRevive.getTime() > 7 * 86400000) {
+      newHp = Math.round((hero.hp_max || 100) * 0.25);
+      _prog.nigromante_revive_at = new Date().toISOString();
+      await saveSecretProgress(_prog);
+      if (typeof toast === 'function') toast('💀', '¡Set del Nigromante te revive con 25% HP!');
+    }
+  }
+
   await saveHero({ hp: newHp });
   renderHeroUI();
   if (amount < 0 && newHp <= 10) {
