@@ -325,7 +325,7 @@ Solo para datos no críticos (se puede perder sin consecuencias):
 ---
 
 ## Service Worker
-- Versión actual: `dungeon-v186`
+- Versión actual: `dungeon-v187`
 - **Siempre bumpar** al modificar cualquier JS/CSS — lo hace `deploy.sh` automáticamente
 - Estrategia: cache-first con skipWaiting + clients.claim
 
