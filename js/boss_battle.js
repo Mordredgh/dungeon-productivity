@@ -371,7 +371,9 @@ function _bbRender() {
     <button class="bb-move-btn bb-battle-potion${potionCount < 1 ? ' bb-move-exhausted' : ''}"
       onclick="${potionCount < 1 || _bbAnimating ? '' : 'useBattlePotion()'}" ${potionCount < 1 || _bbAnimating ? 'disabled' : ''}
       title="Cura 40% del HP máx de tu mascota. Usa la misma poción que necesitas para evolucionarla.">
-      <span class="bb-move-icon">🧪</span>
+      <img src="images/pet_pocion_${escHtml(_bbPet.pet_key)}.png" class="bb-move-icon-img" alt=""
+           onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+      <span class="bb-move-icon" style="display:none">🧪</span>
       <span class="bb-move-name">Poción de ${escHtml(_bbPetDef.name.split(' ')[0])}</span>
       <span class="bb-move-type">Cura 40% HP</span>
       <span class="bb-move-dmg">×${potionCount}</span>
