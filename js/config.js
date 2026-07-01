@@ -93,8 +93,12 @@ const STREAK_REWARD_MILESTONES = [
   { days: 200, xp: 4000, gold: 3000 },
   { days: 365, xp: 8000, gold: 6000 },
 ];
-const LEVEL_BASE = 100;
-const LEVEL_SCALE = 1.5;
+/* Curva de nivel — cuadrática, no exponencial (rebalanceada 2026-06-30).
+   La anterior (100 * 1.5^n compuesto) hacía nivel 50 literalmente
+   inalcanzable (~12,700 millones de XP acumulada). Esta apunta a
+   ~6-9 meses de juego activo consistente para llegar a nivel 50. */
+const LEVEL_FLOOR = 50;
+const LEVEL_QUAD  = 2;
 const THEMES = ['dark', 'light', 'cyber', 'oled', 'parchment'];
 const THEME_NAMES = { dark: 'Oscuro', light: 'Claro', cyber: 'Cyber', oled: 'OLED', parchment: 'Pergamino' };
 

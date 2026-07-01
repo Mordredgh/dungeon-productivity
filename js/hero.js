@@ -92,7 +92,7 @@ async function spendMasteryPoint(nodeId) {
 function xpForLevel(lvl) {
   if (lvl <= 0) return 0;
   let total = 0;
-  for (let i = 1; i <= lvl; i++) total += Math.round(LEVEL_BASE * Math.pow(LEVEL_SCALE, i - 1));
+  for (let i = 1; i <= lvl; i++) total += Math.round(LEVEL_FLOOR + LEVEL_QUAD * i * i);
   return total;
 }
 

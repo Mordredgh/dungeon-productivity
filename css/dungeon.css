@@ -8399,6 +8399,10 @@ body::after {
   border-color: rgba(250,204,21,.35);
   background: linear-gradient(135deg, rgba(250,204,21,.08), rgba(250,204,21,.02));
 }
+.bb-move-btn.bb-battle-potion {
+  border-color: rgba(74,222,128,.35);
+  background: linear-gradient(135deg, rgba(74,222,128,.08), rgba(74,222,128,.02));
+}
 
 /* ── Responsive mobile ────────────────────────────────────── */
 @media (max-width: 480px) {

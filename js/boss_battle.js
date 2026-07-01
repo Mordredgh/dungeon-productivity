@@ -86,14 +86,20 @@ function _bbMaxAttacks() { return 5 + (typeof getMasteryBonus === 'function' ? g
 function _bbLeft(cycle) { try { return Math.max(0, _bbMaxAttacks() - parseInt(localStorage.getItem(_bbAttackKey(cycle)) || '0', 10)); } catch { return _bbMaxAttacks(); } }
 function _bbUse(cycle)  { try { const k = _bbAttackKey(cycle); localStorage.setItem(k, String((parseInt(localStorage.getItem(k)||'0',10))+1)); } catch {} }
 
-/* ── Daño del boss al contra-atacar ──────────────────────── */
+/* ── Nivel del jefe — escala con el nivel del héroe ───────── */
+function _bbBossLevel() { return hero?._level || 1; }
+
+/* ── Daño del boss al contra-atacar (estilo Pokémon: nivel + variación) ── */
 function _bbBossDmg() {
   const state = getMultiBossState();
   const boss  = state[_bbCycle];
   if (!boss || !_bbPetDef) return 3;
   const petDef    = getPetStatAtLevel(_bbPetDef, _bbPet?.pet_level || 1).def || 0;
   const rarMult   = { comun:0.4, raro:0.7, epico:1.1, legendario:1.5, mitico:2.0, cataclismo:2.8 }[boss.rarity] || 1;
-  return Math.max(1, Math.ceil(boss.maxHp * 0.005 * rarMult) - Math.floor(petDef * 0.4));
+  const levelTerm = (2 * _bbBossLevel() / 5 + 2);
+  const random    = 0.85 + Math.random() * 0.30; // 0.85–1.15, variación real por golpe
+  const base      = levelTerm * rarMult * 1.2;
+  return Math.max(1, Math.round(base * random) - Math.floor(petDef * 0.3));
 }
 
 /* ── Daño solo al ciclo objetivo ──────────────────────────── */
@@ -140,7 +146,9 @@ function _bbBossElement() {
   return def?.element || 'Normal';
 }
 
-/* ── Calcular daño de un movimiento (con efectividad elemental) ── */
+/* ── Calcular daño de un movimiento (con efectividad elemental) ──
+   Determinístico — se usa para el preview en los botones. La
+   variación aleatoria real se aplica al golpear con _bbApplyVariance(). */
 function _bbCalcDmg(move) {
   const bossState = getMultiBossState();
   const boss      = bossState[_bbCycle];
@@ -151,6 +159,11 @@ function _bbCalcDmg(move) {
   const mult   = typeof getElementMultiplier === 'function' ? getElementMultiplier(_bbBossElement(), move.type) : 1;
   const masteryMult = 1 + (typeof getMasteryBonus === 'function' ? getMasteryBonus('fuerza_bruta') : 0);
   return Math.max(1, Math.round((base + bonus) * mult * masteryMult));
+}
+
+/* Variación aleatoria estilo Pokémon (0.85–1.15) — aplicar solo al golpear de verdad */
+function _bbApplyVariance(dmg) {
+  return Math.max(1, Math.round(dmg * (0.85 + Math.random() * 0.30)));
 }
 
 /* ── Abrir pantalla de batalla ────────────────────────────── */
@@ -247,7 +260,7 @@ function _bbRender() {
   const elemIcon  = { Fuego:'🔥', Elemental:'🌿', Eléctrico:'⚡', Aéreo:'💨', Oscuro:'🌑', Mágico:'✨', Cataclismo:'🌀', Normal:'⚪' }[bossEl] || '⚪';
   const bossInfoEl = document.getElementById('bbBossInfo');
   if (bossInfoEl) bossInfoEl.innerHTML = `
-    <div class="bb-entity-name" style="color:${rarClr}">${escHtml(boss.name)}</div>
+    <div class="bb-entity-name" style="color:${rarClr}">${escHtml(boss.name)} <span style="font-size:11px;color:var(--text3)">Nv.${_bbBossLevel()}</span></div>
     <div class="bb-rarity-chip" style="color:${rarClr};border-color:${rarClr}44">${rarLbl}</div>
     <div class="bb-rarity-chip" style="margin-left:4px">${elemIcon} ${escHtml(bossEl)}</div>
     <div class="bb-hp-row">
@@ -352,13 +365,65 @@ function _bbRender() {
       <span class="bb-move-dmg">${_bbHeroSkillUsed ? 'Usada' : '1×/batalla'}</span>
     </button>` : '';
 
+  /* ─ Poción de mascota usable en batalla (consume la de eclosión/evolución) ─ */
+  const potionCount = getInvCount('pet_potion_' + _bbPet.pet_key);
+  const potionHtml = `
+    <button class="bb-move-btn bb-battle-potion${potionCount < 1 ? ' bb-move-exhausted' : ''}"
+      onclick="${potionCount < 1 || _bbAnimating ? '' : 'useBattlePotion()'}" ${potionCount < 1 || _bbAnimating ? 'disabled' : ''}
+      title="Cura 40% del HP máx de tu mascota. Usa la misma poción que necesitas para evolucionarla.">
+      <span class="bb-move-icon">🧪</span>
+      <span class="bb-move-name">Poción de ${escHtml(_bbPetDef.name.split(' ')[0])}</span>
+      <span class="bb-move-type">Cura 40% HP</span>
+      <span class="bb-move-dmg">×${potionCount}</span>
+    </button>`;
+
   if (movePanelEl) movePanelEl.innerHTML = `
     ${petChipsHtml}
     <div class="bb-moves-grid">${movesHtml}</div>
     ${heroSkillHtml}
+    ${potionHtml}
     <div class="bb-attacks-counter${attacksLeft === 0 ? ' exhausted' : ''}">
       ⚔️ ${attacksLeft}/${_bbMaxAttacks()} ataques hoy · <span>${resetMsg}</span>
     </div>`;
+}
+
+/* ── Usar poción de mascota en batalla (cura, cuesta 1 poción de evolución) ── */
+async function useBattlePotion() {
+  if (_bbAnimating || !_bbPet || !_bbPetDef) return;
+  const potionCount = getInvCount('pet_potion_' + _bbPet.pet_key);
+  if (potionCount < 1) return;
+  if (!confirm(`¿Usar 1 Poción de ${_bbPetDef.name}? Ya no la tendrás para eclosionar o evolucionar mascotas.`)) return;
+
+  _bbAnimating = true;
+  const ok = await consumeInvItem('pet_potion_' + _bbPet.pet_key, 1);
+  if (!ok) { _bbAnimating = false; return; }
+
+  const healAmt = Math.round(_bbPetMaxHp * 0.40);
+  _bbPetHp = Math.min(_bbPetMaxHp, _bbPetHp + healAmt);
+  const petSpriteEl = document.getElementById('bbPetSprite');
+  const floater = document.getElementById('bbPetDmgFloat');
+  if (floater && petSpriteEl) {
+    floater.textContent = '+' + healAmt;
+    floater.className   = 'bb-dmg-float bb-pet-side bb-dmg-active bb-heal-float';
+    const rect = petSpriteEl.getBoundingClientRect();
+    floater.style.left = (rect.left + rect.width  / 2 - 30) + 'px';
+    floater.style.top  = (rect.top  + rect.height / 3)      + 'px';
+    setTimeout(() => { floater.className = 'bb-dmg-float bb-pet-side'; }, 900);
+  }
+  toast('🧪', `+${healAmt} HP para ${_bbPetDef.name}.`);
+  await _bbDelay(500);
+
+  await _bbBossCounterAttack();
+  _bbAnimating = false;
+
+  if (_bbPetHp <= 0) {
+    toast('💀', `${_bbPetDef?.name || 'Tu mascota'} se debilitó en batalla...`);
+    await _bbDelay(800);
+    closeBossBattle();
+    return;
+  }
+
+  _bbRender();
 }
 
 /* ── Ejecutar ataque ──────────────────────────────────────── */
@@ -374,7 +439,7 @@ async function executeBattleAttack(moveIdx) {
 
   _bbAnimating = true;
 
-  const dmg = _bbCalcDmg(move);
+  const dmg = _bbApplyVariance(_bbCalcDmg(move));
   _bbUse(_bbCycle);
 
   /* ─ Animación: pet lunge ─ */
@@ -497,7 +562,7 @@ async function useHeroBattleSkill() {
       dmg = Math.max(1, Math.round(base * mult));
     }
 
-    const actualDmg = _damageBossCycle(_bbCycle, dmg);
+    const actualDmg = _damageBossCycle(_bbCycle, _bbApplyVariance(dmg));
     if (bossSpriteEl) bossSpriteEl.classList.add('bb-hit');
     _bbSpawnDmgFloat(actualDmg, bossSpriteEl);
     toast(skill.icon, `${skill.name}! ${actualDmg} de daño.`);

@@ -341,6 +341,34 @@ Solo para datos no críticos (se puede perder sin consecuencias):
   (`_bbHeroSkillUsed`, reset en `openBossBattle()`), independiente de `useClassSkill()` (esa es maná,
   fuera de combate). `useHeroBattleSkill()` en boss_battle.js maneja 4 tipos: ataque normal/mágico,
   `heal` (clérigo cura mascota), `crit` (pícaro dobla mejor movimiento), `double` (arquero golpea 2×)
+
+## Rebalance de combate y progresión (2026-06-30, sesión posterior a v186)
+
+**⚠️ Curva de nivel reescrita — causa salto retroactivo de nivel visible.**
+La curva anterior (`LEVEL_BASE=100 * LEVEL_SCALE=1.5^n` compuesto) era matemáticamente rota: nivel 50
+requería ~12,700 millones de XP acumulada, inalcanzable en la práctica. Reemplazada por
+`LEVEL_FLOOR=50, LEVEL_QUAD=2` → `xpForLevel(n) = Σ(50 + 2×i²)`, apuntando a ~6-9 meses de juego activo
+para llegar a nivel 50 (cumulative ~83,300 XP total). **Consecuencia real:** con la data de Mordred al
+momento del cambio (nivel 11, 12,910 XP total), la nueva curva lo recalcula a **nivel 26** en el
+siguiente render (recompensa retroactiva por XP ya ganada bajo una curva que estaba injustamente
+inflada, no es un bug). `xpForLevel()` en hero.js, constantes en config.js.
+
+**Nivel de boss + daño Pokémon-style (`boss_battle.js`):**
+- `_bbBossLevel()` = nivel actual del héroe — el jefe escala contigo, nunca se vuelve trivial. Mostrado
+  como chip "Nv.X" junto al nombre del jefe en `_bbRender()`
+- `_bbBossDmg()` reescrita: `levelTerm=(2×nivelBoss/5+2) × multiplicador_rareza × 1.2`, con
+  **variación aleatoria real 0.85–1.15 por golpe** (antes era 100% determinístico y se clavaba en el
+  piso de 1 de daño para bosses comunes/raros sin importar nada)
+- El ataque de la mascota (`_bbCalcDmg`) sigue siendo determinístico (así el preview en los botones no
+  parpadea), pero la variación se aplica al momento real de golpear vía `_bbApplyVariance(dmg)` — tanto
+  en `executeBattleAttack()` como en `useHeroBattleSkill()`
+
+**Pociones de mascota usables en batalla:**
+- Las pociones (`pet_potion_<key>`) ya existían como moneda para eclosionar huevos y evolucionar — no
+  se creó un ítem nuevo, se les dio un segundo uso. Botón "🧪 Poción de [Mascota]" en el panel de
+  batalla, cura 40% del HP máx, con `confirm()` explícito advirtiendo que consume la misma poción que
+  necesitas para evolucionar (deliberado — es un trade-off real, no un descuido)
+- `useBattlePotion()` en boss_battle.js — consume turno (dispara contraataque del boss después)
 - Contraataque del boss extraído a `_bbBossCounterAttack()` reusable (antes duplicado)
 
 ## Sumideros de oro (v184)
