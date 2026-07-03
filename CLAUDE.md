@@ -1,5 +1,5 @@
 # Arcanum Dungeon Productivity — CLAUDE.md
-> Última actualización: 2026-06-30 · SW cache: `dungeon-v181`
+> Última actualización: 2026-06-30 · SW cache: `dungeon-v188`
 
 ## Proyecto
 - **URL:** https://dungeon.mordredgh.com
@@ -370,6 +370,9 @@ inflada, no es un bug). `xpForLevel()` en hero.js, constantes en config.js.
   necesitas para evolucionar (deliberado — es un trade-off real, no un descuido)
 - `useBattlePotion()` en boss_battle.js — consume turno (dispara contraataque del boss después)
 - Contraataque del boss extraído a `_bbBossCounterAttack()` reusable (antes duplicado)
+- **Fix v188:** el botón de poción usaba emoji 🧪 genérico; corregido a `images/pet_pocion_[pet_key].png`
+  (arte que ya existía en las 7 especies, solo estaba mal conectado — ver sección "Esperando arte de
+  Gerardo" para el inventario completo de qué otros iconos de esta sesión siguen en emoji)
 
 ## Sumideros de oro (v184)
 - **Mejoras permanentes** (`GOLD_UPGRADES` en config.js, compra única, `hero.gold_upgrades` jsonb):
@@ -520,6 +523,21 @@ también corre al inicio de `completeQuest()`, no solo al boot).
   - Mientras no exista el arte, la UI usa emojis como placeholder (no bloquea el sistema)
 - **Quitar fondo a iconos generados** — todo el arte de UI/equipo/mascotas/monturas/sets secretos/ruleta/
   banners/mapa está listo, solo falta remover el fondo blanco/color de cada imagen
+- **Pociones de mascota en batalla — YA RESUELTO (v188), no necesita arte nueva.** El botón de curación
+  en `boss_battle.js` usaba emoji 🧪 genérico; se corrigió para usar `images/pet_pocion_[pet_key].png`,
+  que **ya existía** en las 7 especies. Ejemplo de por qué vale la pena repasar el inventario de arte
+  antes de pedir más — a veces ya está ahí y solo falta conectarlo en el código.
+- **Iconos con emoji genérico que podrían mejorar con arte real** (no bloquean nada, son polish
+  opcional — priorizados de más a menos visible en pantalla):
+  1. **Marcos de avatar cosméticos** (`AVATAR_FRAMES` en config.js) — hoy son solo bordes CSS con
+     gradiente (`.frame-bronce/.frame-plata/.frame-oro/.frame-arcano` en dungeon.css), sin textura
+     ilustrada. Son lo más visible (siempre en pantalla) — mayor prioridad si se dibuja algo.
+  2. **Skills de héroe en combate** (`HERO_BATTLE_SKILLS`) — 6 iconos emoji (⚔️🔮✝️🗡️🏹🚀), uno por
+     clase, visibles en cada batalla de jefe.
+  3. **Elementos de combate** (`BOSS_ELEMENT_CHART` keys) — 7 iconos emoji (🔥🌿⚡💨🌑✨🌀) en el chip
+     de elemento del jefe.
+  4. **Árbol de Maestría** (`MASTERY_TREE`) — 6 iconos emoji (❤️💰⏳💪🍀🗲).
+  5. **Mejoras permanentes de Tienda** (`GOLD_UPGRADES`) — 4 iconos emoji (⚒️🔮💰).
 
 ---
 
