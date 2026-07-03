@@ -1,5 +1,5 @@
 # Arcanum Dungeon Productivity — CLAUDE.md
-> Última actualización: 2026-06-30 · SW cache: `dungeon-v188`
+> Última actualización: 2026-06-30 · SW cache: `dungeon-v189`
 
 ## Proyecto
 - **URL:** https://dungeon.mordredgh.com
@@ -23,7 +23,7 @@
 config.js → state.js → db.js → hero.js → quests.js → timer.js → inventory.js →
 spells.js → views.js → ui.js → events.js → oracle.js → shop.js → rpg.js →
 pets.js → weapons.js → secret_sets.js → goals.js → reputation.js → patterns.js →
-mechanics.js → character.js → spotify.js → weather.js → dungeon_clock.js →
+mechanics.js → character.js → weather.js → dungeon_clock.js →
 skill_tree.js → bestiary.js → dungeon_grows.js → runes.js → google_fit.js →
 hero_score.js → push.js → combos.js → habits.js → ruleta.js → duolingo.js →
 drops.js → daily_goal.js → weekly_summary.js → challenges.js → zones.js →
@@ -40,7 +40,7 @@ Agregar archivos nuevos **ANTES de `auth.js`**.
 | Archivo | Propósito | Funciones clave |
 |---------|-----------|----------------|
 | `config.js` | Constantes globales | `SUPA_URL`, `SUPA_KEY`, `XP_TABLE`, `GOLD_TABLE`, `CLASS_SKILLS`, `SHOP_ITEMS`, `ACHIEVEMENT_DEFS`, `DROP_TABLE` |
-| `state.js` | Variables globales | `db`, `hero`, `quests`, `pomodoros`, `timer`, `goals`, `bulkMode`, `spotifyAccessToken`, `xpMultiplier` |
+| `state.js` | Variables globales | `db`, `hero`, `quests`, `pomodoros`, `timer`, `goals`, `bulkMode`, `xpMultiplier` |
 | `db.js` | Supabase ops | `initDB()`, `loadHero()`, `loadQuests()`, `loadPomodoros()`, `savePom()`, `loadInventory()`, `loadPets()` |
 | `hero.js` | Progresión héroe | `loadHero()`, `deriveHero()`, `saveHero()`, `addXP()`, `addHP()`, `calcLevel()`, `checkDailyStreak()`, `xpForLevel()`, `doPrestige()` |
 | `auth.js` | Login/logout | `doLogin()`, `doLogout()`, `toggleLoginPw()` |
@@ -94,7 +94,6 @@ Agregar archivos nuevos **ANTES de `auth.js`**.
 |---------|-----------|----------------|
 | `google_fit.js` | Pasos diarios | `connectGoogleFit()`, `syncGoogleFitSteps()`, `renderFitWidget()` |
 | `duolingo.js` | Sync XP Duolingo | `syncDuolingo()`, `getDuoUsername()`, `renderDuolingoWidget()` |
-| `spotify.js` | Now Playing | `connectSpotify()`, `spotifyToggle()`, `renderSpotifyWidget()` |
 | `weather.js` | Clima real | `loadRealWeather()`, `renderWeatherDetail()` |
 | `push.js` | Web Push | `initPush()`, `dungeonPush(title, body, url?)`, `isPushSubscribed()` |
 | `dungeon_clock.js` | Reloj + TOD bonuses | `getDungeonTOD()`, `getTODBonus()`, `updateDungeonClock()` |
@@ -113,7 +112,7 @@ Agregar archivos nuevos **ANTES de `auth.js`**.
 | `inventory` | Inventario |
 | `pets` | Mascotas |
 | `goals` | Metas largas |
-| `integrations` | Fit + Duolingo + Spotify |
+| `integrations` | Fit + Duolingo |
 | `dungeon-grows` | Mapa dungeon |
 | `character` | Character Hub (5 tabs) |
 | `zones` | Zonas del dungeon |
@@ -141,7 +140,6 @@ Hábitos:      habit_history (jsonb) — fechas completadas por quest_id, para r
 Reporte mensual: monthly_report_text, monthly_report_date
 Integración:  fit_access_token, fit_refresh_token, fit_token_expiry, fit_sync_date, fit_xp_date
               duo_username, duo_sync_date, duo_xp_date, duo_today_xp, duo_streak
-              spotify_refresh_token
 Meta diaria:  daily_goal, daily_goal_xp, daily_goal_date
 Perfil:       name, hero_class, race, avatar, guild_name, webhook_url
 ```
@@ -487,7 +485,7 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 ## Features permanentemente excluidas
 - Virtual scroll, re-render optimization, build step, SVG icons inline
 - Supabase Realtime, sistema de Campaña, PWA widget, multiplayer
-- Kanban (removido v39), Google Calendar (removido v39)
+- Kanban (removido v39), Google Calendar (removido v39), Spotify (removido v189 — Gerardo nunca lo usó)
 - Precio por cantidad, modo kiosco (son de Maneki POS)
 - Dark mode automático por hora, favoritos, frecuencia de compra
 - Alertas de riesgo, cupones, tags de pedidos, timeline, plantillas automáticas

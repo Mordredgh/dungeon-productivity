@@ -17,8 +17,6 @@ async function bootApp() {
   if (Notification.permission === 'granted') notifEnabled = true;
   await initDB();
   if (typeof initPush === 'function') initPush();
-  await handleSpotifyCallback();
-  renderSpotifyWidget();
   loadRealWeather();
   updateDungeonClock();
   setInterval(updateDungeonClock, 60 * 1000);
