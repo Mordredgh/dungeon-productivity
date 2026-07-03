@@ -601,6 +601,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 
 .si-icon  { font-size: 18px; line-height: 1; }
+.si-icon-img { width: 20px; height: 20px; object-fit: contain; }
 .si-label { display: none; }
 
 /* Action buttons grid at the bottom */
@@ -1244,6 +1245,8 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .achievement-card.locked { opacity: .45; }
 
 .achievement-icon { font-size: 30px; }
+.achievement-icon-img { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
+.ach-cat-grid .achievement-icon-img { width: 32px; height: 32px; }
 
 .achievement-info { flex: 1; }
 
@@ -3317,6 +3320,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
    EVENT MODAL
    ============================================================ */
 .event-modal-icon { font-size:52px; margin-bottom:8px; }
+.event-modal-icon-img { width:72px; height:72px; object-fit:contain; margin:0 auto 8px; }
 
 /* ============================================================
    DIARY ENTRIES
@@ -5102,6 +5106,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   margin-bottom: 8px;
 }
 .zone-icon  { font-size: 26px; line-height: 1; flex-shrink: 0; }
+.zone-icon-img { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; }
 .zone-name  { font-size: 13px; font-weight: 700; color: var(--text); }
 .zone-desc  { font-size: 10px; color: var(--text3); margin-top: 2px; }
 .zone-rank-lbl { font-size: 11px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
@@ -5262,10 +5267,11 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   cursor: crosshair;
   overflow: hidden;
   border-radius: 8px 0 0 8px;
-  /* Pared de piedra oscura + suelo de madera */
+  /* Fondo ilustrado + gradientes de iluminación encima */
   background:
     radial-gradient(ellipse 75% 40% at 50% 0%,  rgba(110,65,220,.18) 0%, transparent 65%),
-    radial-gradient(ellipse 110% 50% at 50% 100%, rgba(70,35,8,.55)   0%, transparent 60%),
+    radial-gradient(ellipse 110% 50% at 50% 100%, rgba(70,35,8,.35)   0%, transparent 60%),
+    url('images/fondo_sala_personal.webp') center / cover no-repeat,
     linear-gradient(to bottom,
       #0d0720 0%,
       #130b2a 38%,
@@ -6221,6 +6227,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   color: var(--text);
 }
 .chr-attr-ico { font-size: 18px; line-height: 1; }
+.chr-attr-ico-img { width: 20px; height: 20px; object-fit: contain; }
 .chr-attr-name {
   font-size: 10px;
   color: var(--text2);
@@ -6288,6 +6295,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   background: rgba(249,226,175,.07);
 }
 .chr-pill-icon { font-size: 22px; line-height: 1; }
+.chr-pill-icon-img { width: 26px; height: 26px; object-fit: contain; }
 .chr-pill-name {
   font-size: 10px;
   color: var(--text2);
@@ -7270,7 +7278,7 @@ body::after {
   transform-origin: bottom center;
   transition: transform .01s;
 }
-.dock-icon {
+.dock-icon, .dock-icon-img {
   font-size: 24px;
   display: block;
   transition: transform .18s cubic-bezier(.23,1,.32,1), filter .18s;
@@ -7278,13 +7286,14 @@ body::after {
   filter: drop-shadow(0 0 0 transparent);
   line-height: 1;
 }
-.dock-item:hover .dock-icon {
+.dock-icon-img { width: 24px; height: 24px; object-fit: contain; }
+.dock-item:hover .dock-icon, .dock-item:hover .dock-icon-img {
   transform: scale(1.55) translateY(-6px);
   filter: drop-shadow(0 4px 10px rgba(168,85,247,.55));
 }
 /* Neighbour magnification via JS (class added by dock JS) */
-.dock-item.dock-near .dock-icon  { transform: scale(1.28) translateY(-3px); }
-.dock-item.dock-far  .dock-icon  { transform: scale(1.12) translateY(-1px); }
+.dock-item.dock-near .dock-icon, .dock-item.dock-near .dock-icon-img  { transform: scale(1.28) translateY(-3px); }
+.dock-item.dock-far  .dock-icon, .dock-item.dock-far  .dock-icon-img  { transform: scale(1.12) translateY(-1px); }
 
 .dock-item::after {
   content: attr(data-label);

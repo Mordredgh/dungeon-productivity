@@ -55,7 +55,7 @@ function renderGarden() {
 
   container.innerHTML = `
     <div class="garden-wrap" id="gardenWrap">
-      <img src="images/jardin_fondo.png" class="garden-bg-img" alt="Jardín de Mascotas">
+      <img src="images/jardin_fondo.webp" class="garden-bg-img" alt="Jardín de Mascotas">
       <div class="garden-tod-overlay garden-tod-${tod}"></div>
       <div class="garden-pets-layer" id="gardenPetsLayer"></div>
       <div class="garden-controls">
@@ -119,7 +119,7 @@ function _renderGardenPets() {
     el.dataset.key   = key;
 
     el.innerHTML = `
-      <img src="images/pet_${stage}_${key}.png" class="garden-pet-img" alt="${escHtml(def?.name || key)}"
+      <img src="images/pet_${stage}_${key}.webp" class="garden-pet-img" alt="${escHtml(def?.name || key)}"
            onerror="this.src='${typeof CDN !== 'undefined' ? CDN : ''}dungeon/pet_${stage}_${key}.png';this.onerror=null">
       ${ownedPet?.is_active ? '<div class="garden-pet-crown">👑</div>' : ''}
       ${mood ? `<div class="garden-pet-mood">${mood}</div>` : ''}`;
@@ -192,7 +192,7 @@ function _openGardenModal(key) {
     const potions = typeof getInvCount === 'function' ? getInvCount('pet_potion_' + key) : 0;
     const canHatch = def && potions >= def.hatch;
     inner.innerHTML = `
-      <img src="images/pet_egg_${key}.png" class="gm-pet-img" alt="" onerror="this.style.display='none'">
+      <img src="images/pet_egg_${key}.webp" class="gm-pet-img" alt="" onerror="this.style.display='none'">
       <div class="gm-name">${escHtml(def?.name || key)}</div>
       <div class="gm-stage">🥚 Huevo</div>
       <div class="gm-meta">Necesitas ${def?.hatch || '?'} pociones<br>Tienes <b style="color:${canHatch ? 'var(--green)' : 'var(--red)'}">${potions}</b></div>
@@ -227,7 +227,7 @@ function _openGardenModal(key) {
   }
 
   inner.innerHTML = `
-    <img src="images/pet_${stage}_${key}.png" class="gm-pet-img" alt="" onerror="this.style.display='none'">
+    <img src="images/pet_${stage}_${key}.webp" class="gm-pet-img" alt="" onerror="this.style.display='none'">
     <div class="gm-name">${escHtml(def?.name || key)}</div>
     <div class="gm-stage">${stLabel} · Nv.${petLvl}</div>
     <div class="gm-xp-bar-wrap">
@@ -290,7 +290,7 @@ function _openReySanctuary() {
 
   content.innerHTML = `
     <div class="rey-pet-wrap">
-      <img src="images/pet_${stage}_rey-tempestad.png" class="rey-pet-img" alt="${escHtml(def?.name || 'Rey')}"
+      <img src="images/pet_${stage}_rey-tempestad.webp" class="rey-pet-img" alt="${escHtml(def?.name || 'Rey')}"
            onerror="this.style.display='none'">
       <div class="rey-pet-name">👑 ${escHtml(def?.name || 'Rey de la Tempestad')}</div>
       <div class="rey-pet-stage">${stageLabel}</div>

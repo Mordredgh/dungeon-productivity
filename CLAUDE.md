@@ -1,5 +1,5 @@
 # Arcanum Dungeon Productivity — CLAUDE.md
-> Última actualización: 2026-06-30 · SW cache: `dungeon-v189`
+> Última actualización: 2026-07-03 · SW cache: `dungeon-v190`
 
 ## Proyecto
 - **URL:** https://dungeon.mordredgh.com
@@ -511,31 +511,55 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 - **Facciones del Dungeon** — gremios con reputación propia, misiones exclusivas
 - **Avatar Visual con Capas** — composición de sprites
 
-### Esperando arte de Gerardo
-- Sala Personal del Héroe
-- Jardín de Mascotas
-- **Sets de Clases Secretas** — sistema completo (ver sección abajo), solo faltan los iconos:
-  - 6 materiales: `secret_mat_crononauta.png`, `secret_mat_paladin.png`, `secret_mat_nigromante.png`,
-    `secret_mat_titan.png`, `secret_mat_druida.png`, `secret_mat_estrella.png`
-  - 36 piezas de armadura/arma (6 clases × 6 piezas): `secret_[clase]_[guantes|botas|grebas|casco|pecho|arma].png`
-  - Mientras no exista el arte, la UI usa emojis como placeholder (no bloquea el sistema)
-- **Quitar fondo a iconos generados** — todo el arte de UI/equipo/mascotas/monturas/sets secretos/ruleta/
-  banners/mapa está listo, solo falta remover el fondo blanco/color de cada imagen
-- **Pociones de mascota en batalla — YA RESUELTO (v188), no necesita arte nueva.** El botón de curación
-  en `boss_battle.js` usaba emoji 🧪 genérico; se corrigió para usar `images/pet_pocion_[pet_key].png`,
-  que **ya existía** en las 7 especies. Ejemplo de por qué vale la pena repasar el inventario de arte
-  antes de pedir más — a veces ya está ahí y solo falta conectarlo en el código.
-- **Iconos con emoji genérico que podrían mejorar con arte real** (no bloquean nada, son polish
-  opcional — priorizados de más a menos visible en pantalla):
-  1. **Marcos de avatar cosméticos** (`AVATAR_FRAMES` en config.js) — hoy son solo bordes CSS con
-     gradiente (`.frame-bronce/.frame-plata/.frame-oro/.frame-arcano` en dungeon.css), sin textura
-     ilustrada. Son lo más visible (siempre en pantalla) — mayor prioridad si se dibuja algo.
-  2. **Skills de héroe en combate** (`HERO_BATTLE_SKILLS`) — 6 iconos emoji (⚔️🔮✝️🗡️🏹🚀), uno por
-     clase, visibles en cada batalla de jefe.
-  3. **Elementos de combate** (`BOSS_ELEMENT_CHART` keys) — 7 iconos emoji (🔥🌿⚡💨🌑✨🌀) en el chip
-     de elemento del jefe.
-  4. **Árbol de Maestría** (`MASTERY_TREE`) — 6 iconos emoji (❤️💰⏳💪🍀🗲).
-  5. **Mejoras permanentes de Tienda** (`GOLD_UPGRADES`) — 4 iconos emoji (⚒️🔮💰).
+### Arte integrado 2026-07-03 — sesión grande (~390 assets, todo convertido a WebP)
+Gerardo generó y subió el lote completo de arte pendiente en `F:\Dungeon\` (carpetas por categoría,
+ver `dungeon_prompts.html` en Downloads para los prompts usados). Se integró todo en una sola sesión:
+
+**Convertido TODO el catálogo a WebP** (existente + nuevo): 634MB → 60MB (~90% reducción) usando
+`sharp` (instalado ad-hoc en scratchpad, no es dependencia del proyecto). Los `.png` viejos quedaron
+respaldados en `images_png_backup/` (no se sube a producción, solo por si acaso). **Todas las
+referencias de código** (`images/*.png` → `.webp`) actualizadas vía regex — incluyendo `config.js`
+`SHOP_ITEMS[].img` que casi se queda fuera del reemplazo inicial (46 referencias, revisado y corregido).
+
+**Ya conectado a código (funcional, no solo archivo copiado):**
+- ✅ **36 piezas de armadura de clases secretas** (`secret_[clase]_[pieza].webp`) — el pendiente más
+  grande, resuelto. `_renderSecretSmithy()` en secret_sets.js ahora muestra `<img>` con fallback emoji.
+  **Aún faltan los 6 materiales** (`secret_mat_*`) — no vinieron en este lote.
+- ✅ Nav lateral (16), toolbar/dock (6), atributos (5), clases (6), razas (4) — index.html + character.js
+- ✅ 27 de 34 logros (`ACHIEVEMENT_DEFS[].img`) — spells.js `renderAchievements()`
+- ✅ Clima (5), eventos aleatorios (10, con modal `#eventIconImg`), estaciones (4, en efx-chip sin imagen
+  por ahora) — config.js + rpg.js
+- ✅ Zonas del Dungeon / mapa del mundo (6) — resulta que `world_map.js` ya esperaba `map_${id}.webp`
+  desde antes; zones.js ahora usa el mismo naming en vez de duplicar con `zona_*`
+- ✅ **Sala Personal completa** (10 muebles + fondo) — sistema que llevaba meses esperando arte
+  (`SALA_FURNITURE[].img`, `.sala-room` background en dungeon.css)
+- ✅ **Sistema de fondos de vista** (15 fondos: misiones/metas/stats/logros/historial/tienda/inventario/
+  mascotas/mi-dungeon/integraciones/personaje/habilidades/runas/bestiario/herrero) — otro sistema
+  (`ui.js _setPageBg()`, `_VIEW_BG`, `_CTAB_BG`) que ya existía en código esperando archivos
+- ✅ 30 retratos de personaje (`char_[clase]_[raza].webp` + 6 `char_secreto_*`) — views.js ya esperaba
+  este naming exacto
+- ✅ Refresco completo: 27 bosses, 12 banners de boss, 9 salas del dungeon, 35 assets de mascota
+  (huevo/bebé/montura/poción/alimento × 7 especies) + 21 fondos de mascota, 16 runas, 12 hechizos,
+  9 items consumibles — todos sobreescritos con las versiones nuevas usando el naming que el código
+  ya esperaba
+
+**Sin conectar (fuente disponible en `F:\Dungeon\ARBOL DE HABILIDADES\`, no copiado a `images/`):**
+- **Árbol de habilidades** (11 archivos: nodo ofensivo/defensivo/arcano × bloqueado/disponible/
+  desbloqueado + 2 líneas de conexión) — el árbol usa SVG dibujado a mano con coordenadas exactas
+  (`viewBox 0 0 228 36`) para las líneas de conexión; reescribirlo sin poder verlo visualmente es
+  demasiado riesgoso. Pendiente de una sesión dedicada con verificación visual.
+- **Habilidades de clase** (6 `habilidad_*.webp`) — el botón de habilidad de clase (`#classSkillBtn`)
+  está oculto en la UI actual ("kept hidden for JS compatibility"), no hay superficie visible donde
+  conectarlos hasta que se reactive esa función.
+- **Slots de equipo vacíos** (7 `slot_*.webp`) — `_cspWeaponSlotHtml()`/`_cspArmorSlotHtml()` en
+  character.js existen pero no se llaman desde ningún lado (código muerto).
+
+**Iconos que siguen en emoji** (bajo impacto, quedan como estaban):
+marcos de avatar cosméticos (bordes CSS sin textura), elementos en el chip de combate, árbol de
+maestría, mejoras permanentes de tienda — ninguno bloquea nada, es polish opcional.
+
+### Pendiente real de arte
+- 6 materiales de clases secretas (`secret_mat_crononauta/paladin/nigromante/titan/druida/estrella.png`)
 
 ---
 

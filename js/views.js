@@ -47,7 +47,7 @@ function renderHeroUI() {
   // Avatar image (CDN) with emoji fallback
   const cls  = hero.hero_class || 'guerrero';
   const race = (typeof heroRace !== 'undefined' ? heroRace : null) || hero.race || 'humano';
-  const avatarImgUrl = `images/char_${cls}_${race}.png`;
+  const avatarImgUrl = `images/char_${cls}_${race}.webp`;
   let avatarVisual = avatarBtn.querySelector('.hero-avatar-img, .hero-avatar-emoji');
   const needRebuild = !avatarVisual || avatarVisual.dataset.cls !== cls || avatarVisual.dataset.race !== race;
   if (needRebuild) {
@@ -785,13 +785,13 @@ function _bossCycleCardHtml(cycle, b) {
   }
 
   const imgHtml = b.key
-    ? `<img src="images/boss_${escHtml(b.key)}.png" class="bcard-img" alt=""
+    ? `<img src="images/boss_${escHtml(b.key)}.webp" class="bcard-img" alt=""
            onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
        <div class="bcard-emoji" style="display:none">👹</div>`
     : `<div class="bcard-emoji">👹</div>`;
 
   const variant    = (Math.floor(Date.now() / 86400000) % 2) + 1;
-  const bgLayers   = `linear-gradient(180deg,rgba(12,3,22,.45) 0%,rgba(6,6,18,.65) 55%,rgba(4,4,14,.88) 100%),url('images/boss-bg-${b.rarity}-${variant}.png') center bottom/cover no-repeat`;
+  const bgLayers   = `linear-gradient(180deg,rgba(12,3,22,.45) 0%,rgba(6,6,18,.65) 55%,rgba(4,4,14,.88) 100%),url('images/boss-bg-${b.rarity}-${variant}.webp') center bottom/cover no-repeat`;
   const atkLeft    = typeof _bbLeft === 'function' ? _bbLeft(cycle) : 5;
   const atkClass   = atkLeft === 0 ? ' exhausted' : atkLeft <= 2 ? ' low' : '';
 

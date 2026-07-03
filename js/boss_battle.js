@@ -249,7 +249,7 @@ function _bbRender() {
   /* ─ Boss background ─ */
   const variant = (Math.floor(Date.now() / 86400000) % 2) + 1;
   const bgBoss  = document.getElementById('bbBg');
-  if (bgBoss) bgBoss.style.backgroundImage = `url('images/boss-bg-${boss.rarity}-${variant}.png')`;
+  if (bgBoss) bgBoss.style.backgroundImage = `url('images/boss-bg-${boss.rarity}-${variant}.webp')`;
 
   /* ─ Cycle badge ─ */
   const badge = document.getElementById('bbCycleBadge');
@@ -274,7 +274,7 @@ function _bbRender() {
   const bossEmoji    = bossDef?.emoji || '👹';
   const bossSpriteEl = document.getElementById('bbBossSprite');
   if (bossSpriteEl) bossSpriteEl.innerHTML = boss.key
-    ? `<img class="bb-boss-img" src="images/boss_${escHtml(boss.key)}.png" alt="${escHtml(boss.name)}"
+    ? `<img class="bb-boss-img" src="images/boss_${escHtml(boss.key)}.webp" alt="${escHtml(boss.name)}"
            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
        <div class="bb-sprite-emoji">${bossEmoji}</div>`
     : `<div class="bb-sprite-emoji">${bossEmoji}</div>`;
@@ -304,7 +304,7 @@ function _bbRender() {
   const _petIcon  = escHtml(_bbPetDef.icon || '🐾');
   if (petSpriteEl) petSpriteEl.innerHTML = (_petStage === 'egg')
     ? `<div class="bb-pet-emoji">${_petIcon}</div>`
-    : `<img class="bb-pet-img" src="images/pet_${_petStage}_${_petKey}.png" alt="${escHtml(_bbPetDef.name)}"
+    : `<img class="bb-pet-img" src="images/pet_${_petStage}_${_petKey}.webp" alt="${escHtml(_bbPetDef.name)}"
            onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
        <div class="bb-pet-emoji" style="display:none">${_petIcon}</div>`;
 
@@ -371,7 +371,7 @@ function _bbRender() {
     <button class="bb-move-btn bb-battle-potion${potionCount < 1 ? ' bb-move-exhausted' : ''}"
       onclick="${potionCount < 1 || _bbAnimating ? '' : 'useBattlePotion()'}" ${potionCount < 1 || _bbAnimating ? 'disabled' : ''}
       title="Cura 40% del HP máx de tu mascota. Usa la misma poción que necesitas para evolucionarla.">
-      <img src="images/pet_pocion_${escHtml(_bbPet.pet_key)}.png" class="bb-move-icon-img" alt=""
+      <img src="images/pet_pocion_${escHtml(_bbPet.pet_key)}.webp" class="bb-move-icon-img" alt=""
            onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
       <span class="bb-move-icon" style="display:none">🧪</span>
       <span class="bb-move-name">Poción de ${escHtml(_bbPetDef.name.split(' ')[0])}</span>

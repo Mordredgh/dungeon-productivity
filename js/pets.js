@@ -225,7 +225,7 @@ function renderActivePet() {
     else {
       chip.style.display = 'flex';
       chip.innerHTML = `
-        <img src="images/pet_${active.stage}_${active.pet_key}.png" class="active-pet-img" alt="${escHtml(def.name)}"
+        <img src="images/pet_${active.stage}_${active.pet_key}.webp" class="active-pet-img" alt="${escHtml(def.name)}"
              onerror="this.src='${CDN}dungeon/pet_${active.stage}_${active.pet_key}.png';this.onerror=null">
         <span style="display:none;font-size:20px">${def.icon}</span>
         <div class="active-pet-info">
@@ -250,7 +250,7 @@ function renderActivePet() {
     const petXP   = active.pet_xp || 0;
     const potions = typeof getInvCount==='function' ? getInvCount('pet_potion_'+active.pet_key) : 0;
     const ab      = PET_ABILITIES?.[active.pet_key]?.[stage];
-    const fondoUrl= `images/pet_fondo_${stage}_${active.pet_key}.png`;
+    const fondoUrl= `images/pet_fondo_${stage}_${active.pet_key}.webp`;
     const stageLabel = isMount ? '🌟 Montura' : '🐣 Bebé';
 
     section.querySelector('.panel-title').textContent = `🐾 Mascota — ${stageLabel}`;
@@ -258,7 +258,7 @@ function renderActivePet() {
       <div class="pet-rpanel">
         <div class="pet-rpanel-imgwrap">
           <img src="${fondoUrl}" class="pet-rpanel-bg" alt="">
-          <img src="images/pet_${stage}_${active.pet_key}.png" class="pet-rpanel-img ${isMount?'anim-bounce':'anim-float'}" alt=""
+          <img src="images/pet_${stage}_${active.pet_key}.webp" class="pet-rpanel-img ${isMount?'anim-bounce':'anim-float'}" alt=""
                onerror="this.src='${CDN}dungeon/pet_${stage}_${active.pet_key}.png';this.onerror=null">
           <div class="pet-rpanel-emoji" style="display:none">${def.icon}</div>
         </div>
@@ -330,14 +330,14 @@ function renderActivePet() {
     const petKey  = eggItem.item_key.replace('pet_egg_', '');
     const eDef    = _petDef(petKey);
     const ab      = PET_ABILITIES?.[petKey]?.egg;
-    const fondoUrl= `images/pet_fondo_egg_${petKey}.png`;
+    const fondoUrl= `images/pet_fondo_egg_${petKey}.webp`;
 
     section.querySelector('.panel-title').textContent = '🥚 Mascota — Huevo';
     panel.innerHTML = `
       <div class="pet-rpanel">
         <div class="pet-rpanel-imgwrap">
           <img src="${fondoUrl}" class="pet-rpanel-bg" alt="">
-          <img src="images/pet_egg_${petKey}.png" class="pet-rpanel-img anim-shake" alt=""
+          <img src="images/pet_egg_${petKey}.webp" class="pet-rpanel-img anim-shake" alt=""
                onerror="this.src='${CDN}dungeon/pet_egg_${petKey}.png';this.onerror=null">
           <div class="pet-rpanel-emoji" style="display:none">${eDef?.icon||'🥚'}</div>
         </div>
@@ -440,7 +440,7 @@ function renderPets() {
   if (eggRows.length) {
     html += `<div class="pets-section-title">🥚 Huevos en Inventario</div><div class="pets-grid">`;
     for (const { def, qty } of eggRows) {
-      const imgUrl = `images/pet_egg_${def.key}.png`;
+      const imgUrl = `images/pet_egg_${def.key}.webp`;
       const potions  = getInvCount('pet_potion_' + def.key);
       const canHatch = potions >= def.hatch;
       html += `
@@ -466,7 +466,7 @@ function renderPets() {
     html += `<div class="pets-section-title" style="margin-top:20px">🐾 Tus Mascotas</div><div class="pets-grid">`;
     for (const { def, myPets } of ownedGroups) {
       for (const pet of myPets) {
-        const imgUrl   = `images/pet_${pet.stage}_${def.key}.png`;
+        const imgUrl   = `images/pet_${pet.stage}_${def.key}.webp`;
         const fedPct   = Math.min(100, Math.round(((pet.potions_fed||0) / def.evolve) * 100));
         const potions  = getInvCount('pet_potion_' + def.key);
         const isActive = pet.is_active;

@@ -258,7 +258,9 @@ function _renderSecretSmithy() {
       const dur = piece.forgeHours >= 24 ? `${piece.forgeHours / 24}d` : `${piece.forgeHours}h`;
       return `
         <div class="smithy-recipe ${owned ? 'smithy-ready' : canForge ? 'smithy-ready' : 'smithy-locked'}">
-          <div class="smithy-emoji" style="display:flex">${def.icon}</div>
+          <img src="images/secret_${classKey}_${piece.key}.webp" class="smithy-img" alt=""
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="smithy-emoji" style="display:none">${def.icon}</div>
           <div class="smithy-info">
             <div class="smithy-name">${piece.name} de ${def.name}</div>
             <div class="smithy-req">${statusHtml}</div>

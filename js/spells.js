@@ -291,8 +291,11 @@ function renderAchievements() {
     const icon    = mystery ? '🔒' : a.icon;
     const name    = mystery ? '???' : escHtml(a.name);
     const desc    = ok ? a.desc : (mystery ? 'Logro secreto — ¡descúbrelo!' : '???');
+    const iconHtml = (a.img && !mystery)
+      ? `<img src="images/${a.img}.webp" class="achievement-icon-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="achievement-icon" style="display:none">${icon}</div>`
+      : `<div class="achievement-icon">${icon}</div>`;
     return `<div class="achievement-card ${ok ? 'unlocked' : 'locked'} ${mystery ? 'ach-mystery' : ''}">
-      <div class="achievement-icon">${icon}</div>
+      ${iconHtml}
       <div class="achievement-info">
         <div class="achievement-name">${name}</div>
         <div class="achievement-desc">${desc}</div>

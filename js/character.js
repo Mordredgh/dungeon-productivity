@@ -1,18 +1,18 @@
 'use strict';
 
 const CLASS_LABELS = {
-  guerrero: { name: 'Guerrero', icon: '⚔️', bonus: '+10% XP épicas' },
-  mago:     { name: 'Mago',     icon: '🧙', bonus: '+10% todo XP' },
-  picaro:   { name: 'Pícaro',   icon: '🗡️', bonus: '+10% XP encargos' },
-  clerigo:  { name: 'Clérigo',  icon: '✝️', bonus: 'HP con búsquedas' },
-  arquero:  { name: 'Arquero',  icon: '🏹', bonus: '+10% XP crónicas' },
-  fundador: { name: 'Fundador', icon: '🚀', bonus: 'Caótico' },
+  guerrero: { name: 'Guerrero', icon: '⚔️', bonus: '+10% XP épicas',   img: 'clase_guerrero' },
+  mago:     { name: 'Mago',     icon: '🧙', bonus: '+10% todo XP',      img: 'clase_mago' },
+  picaro:   { name: 'Pícaro',   icon: '🗡️', bonus: '+10% XP encargos', img: 'clase_picaro' },
+  clerigo:  { name: 'Clérigo',  icon: '✝️', bonus: 'HP con búsquedas', img: 'clase_clerigo' },
+  arquero:  { name: 'Arquero',  icon: '🏹', bonus: '+10% XP crónicas', img: 'clase_arquero' },
+  fundador: { name: 'Fundador', icon: '🚀', bonus: 'Caótico',          img: 'clase_fundador' },
 };
 const RACE_LABELS = {
-  humano: { name: 'Humano', icon: '🧑', bonus: '+10% XP' },
-  elfo:   { name: 'Elfo',   icon: '🧝', bonus: '+5min focus' },
-  enano:  { name: 'Enano',  icon: '⛏️', bonus: '+10 HP' },
-  orco:   { name: 'Orco',   icon: '💪', bonus: 'Perdona 1 día' },
+  humano: { name: 'Humano', icon: '🧑', bonus: '+10% XP',        img: 'raza_humano' },
+  elfo:   { name: 'Elfo',   icon: '🧝', bonus: '+5min focus',    img: 'raza_elfo' },
+  enano:  { name: 'Enano',  icon: '⛏️', bonus: '+10 HP',         img: 'raza_enano' },
+  orco:   { name: 'Orco',   icon: '💪', bonus: 'Perdona 1 día',  img: 'raza_orco' },
 };
 
 /* ── Selección visual de clase / raza (auto-save) ──────────── */
@@ -92,7 +92,7 @@ function _cspWeaponSlotHtml(label, icon, weapon) {
   const slugMap  = { daga: 'dagas' };
   const def  = WEAPON_DEFS.find(d => d.key === weapon.weapon_key) || { icon };
   const tier = WEAPON_TIERS[weapon.tier] || { color: '#9ca3af', label: weapon.tier };
-  const img  = `images/arma_${slugMap[weapon.weapon_key] || weapon.weapon_key}_${weapon.tier}.png`;
+  const img  = `images/arma_${slugMap[weapon.weapon_key] || weapon.weapon_key}_${weapon.tier}.webp`;
   const glow = (weapon.tier === 'legendario' || weapon.tier === 'mitico') ? 'anim-pulse-glow' : '';
   return `
     <div class="csp-eq-slot csp-equipped ${glow}" style="--wc:${tier.color}"
@@ -115,7 +115,7 @@ function _cspArmorSlotHtml(slotKey, label, icon) {
       <span class="csp-eq-slot-label">${label}</span>
     </div>`;
   const tier     = WEAPON_TIERS[equipped.tier] || { color: '#9ca3af', label: equipped.tier };
-  const img      = `images/arma_${equipped.weapon_key}_${equipped.tier}.png`;
+  const img      = `images/arma_${equipped.weapon_key}_${equipped.tier}.webp`;
   const armorDef = typeof ARMOR_DEFS !== 'undefined'
     ? ARMOR_DEFS.find(d => d.key === equipped.weapon_key) : null;
   const statLine = armorDef
@@ -144,7 +144,7 @@ function _cspInvGridHtml() {
   bag.forEach(w => {
     const def  = WEAPON_DEFS.find(d => d.key === w.weapon_key) || { icon: '⚔️' };
     const tier = WEAPON_TIERS[w.tier] || { color: '#9ca3af' };
-    const img  = `images/arma_${w.weapon_key}_${w.tier}.png`;
+    const img  = `images/arma_${w.weapon_key}_${w.tier}.webp`;
     cells.push(`
       <div class="csp-inv-cell csp-weapon-cell" style="--wc:${tier.color}"
            onclick="equipWeapon('${w.id}')" title="${escHtml(w.name)} · ${tier.label} — Click para equipar">
@@ -222,7 +222,7 @@ function _charPortraitHtml() {
   const race = heroRace || hero.race || 'humano';
   return `
     <div class="char-portrait-ring">
-      <img src="images/char_${cls}_${race}.png" class="char-portrait-img" alt=""
+      <img src="images/char_${cls}_${race}.webp" class="char-portrait-img" alt=""
            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="char-portrait-emoji" style="display:none">${hero.avatar || '🧙'}</div>
     </div>`;
@@ -234,20 +234,22 @@ function _charPreviewPortrait() {
   const ring = document.querySelector('.char-portrait-ring');
   if (!ring) return;
   ring.innerHTML = `
-    <img src="images/char_${cls}_${race}.png" class="char-portrait-img" alt=""
+    <img src="images/char_${cls}_${race}.webp" class="char-portrait-img" alt=""
          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
     <div class="char-portrait-emoji" style="display:none">${hero.avatar || '🧙'}</div>`;
 }
 
 /* ── Helpers Chronicle B ─────────────────────────────────────── */
-function _chrAttrCardHtml(key, icon, name, eff) {
+function _chrAttrCardHtml(key, icon, name, eff, img) {
   const val    = hero[key] || 0;
   const canAdd = (hero.attr_points || 0) > 0;
   return `
     <div class="chr-attr-card">
       <div class="chr-attr-top-row">
         <span class="chr-attr-val">${val}</span>
-        <span class="chr-attr-ico">${icon}</span>
+        ${img
+          ? `<img src="images/${img}.webp" class="chr-attr-ico-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="chr-attr-ico" style="display:none">${icon}</span>`
+          : `<span class="chr-attr-ico">${icon}</span>`}
       </div>
       <div class="chr-attr-name">${name}</div>
       <div class="chr-attr-eff">${eff}</div>
@@ -339,7 +341,7 @@ function renderCharacterSheet() {
 
       <div class="chr-portrait-card">
         <div class="char-portrait-ring">
-          <img src="images/char_${cls}_${race}.png" class="char-portrait-img" alt=""
+          <img src="images/char_${cls}_${race}.webp" class="char-portrait-img" alt=""
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="char-portrait-emoji" style="display:none">${hero.avatar || '🧙'}</div>
         </div>
@@ -379,11 +381,11 @@ function renderCharacterSheet() {
       <div class="chr-section">
         <div class="chr-section-hd">Atributos ${ptsBadge}</div>
         <div class="chr-attr-grid">
-          ${_chrAttrCardHtml('str',   '💪', 'Fuerza',       '+1% XP épicas')}
-          ${_chrAttrCardHtml('intel', '🧠', 'Intelecto',    '+1% XP encargos')}
-          ${_chrAttrCardHtml('agi',   '🏃', 'Agilidad',     '+1% Oro')}
-          ${_chrAttrCardHtml('con',   '❤️', 'Constitución', '+2 HP máx')}
-          ${_chrAttrCardHtml('lck',   '🍀', 'Suerte',       '+1 botín /5')}
+          ${_chrAttrCardHtml('str',   '💪', 'Fuerza',       '+1% XP épicas',   'attr_fuerza')}
+          ${_chrAttrCardHtml('intel', '🧠', 'Intelecto',    '+1% XP encargos', 'attr_intelecto')}
+          ${_chrAttrCardHtml('agi',   '🏃', 'Agilidad',     '+1% Oro',         'attr_agilidad')}
+          ${_chrAttrCardHtml('con',   '❤️', 'Constitución', '+2 HP máx',       'attr_constitucion')}
+          ${_chrAttrCardHtml('lck',   '🍀', 'Suerte',       '+1 botín /5',     'attr_suerte')}
         </div>
       </div>
 
@@ -392,7 +394,7 @@ function renderCharacterSheet() {
         <div class="chr-class-grid">
           ${Object.entries(CLASS_LABELS).map(([k, d]) => `
             <div class="chr-class-pill${k === cls ? ' chr-selected' : ''}" data-cls="${k}" onclick="selectHeroClass('${k}')">
-              <span class="chr-pill-icon">${d.icon}</span>
+              <img src="images/${d.img}.webp" class="chr-pill-icon-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="chr-pill-icon" style="display:none">${d.icon}</span>
               <span class="chr-pill-name">${d.name}</span>
               <span class="chr-pill-bonus">${d.bonus || ''}</span>
             </div>`).join('')}
@@ -425,7 +427,7 @@ function renderCharacterSheet() {
         <div class="chr-race-grid">
           ${Object.entries(RACE_LABELS).map(([k, d]) => `
             <div class="chr-race-pill${k === race ? ' chr-selected' : ''}" data-race="${k}" onclick="selectHeroRace('${k}')">
-              <span class="chr-pill-icon">${d.icon}</span>
+              <img src="images/${d.img}.webp" class="chr-pill-icon-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="chr-pill-icon" style="display:none">${d.icon}</span>
               <span class="chr-pill-name">${d.name}</span>
             </div>`).join('')}
         </div>

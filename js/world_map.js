@@ -32,7 +32,7 @@ function renderWorldMap() {
         onclick="_wmOpenZone('${z.id}')"
         title="${z.name} — ${rankName}">
       <div class="wm-hs-icon">
-        <img src="images/map_${z.id}.png" class="wm-hs-img" alt="${z.name}"
+        <img src="images/map_${z.id}.webp" class="wm-hs-img" alt="${z.name}"
              onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
         <span style="display:none">${z.icon}</span>
       </div>
@@ -40,7 +40,7 @@ function renderWorldMap() {
     </button>`;
   }).join('');
 
-  const mapSrc = 'images/mapa_mundo.png';
+  const mapSrc = 'images/mapa_mundo.webp';
 
   el.innerHTML = `
     <div class="wm-wrap">
@@ -58,7 +58,7 @@ function renderWorldMap() {
           const rc  = ['var(--text3)','#60a5fa','#a78bfa','#fb923c','#facc15'][inf.rank] || 'var(--text3)';
           return `<div class="wm-legend-row">
             <span class="wm-legend-icon" style="--z-clr:${z.color}">
-              <img src="images/map_${z.id}.png" class="wm-legend-img" alt="${z.name}"
+              <img src="images/map_${z.id}.webp" class="wm-legend-img" alt="${z.name}"
                    onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
               <span style="display:none">${z.icon}</span>
             </span>
@@ -131,7 +131,7 @@ function _wmOpenZone(zoneId) {
     <div class="wm-detail-inner" style="--z-clr:${z.color}">
       <button class="wm-detail-close" onclick="document.getElementById('wmDetailPanel').style.display='none';document.querySelectorAll('.wm-hotspot').forEach(b=>b.classList.remove('wm-hs-active'))">✕</button>
       <div class="wm-detail-icon">
-        <img src="images/map_${z.id}.png" class="wm-detail-img" alt="${z.name}"
+        <img src="images/map_${z.id}.webp" class="wm-detail-img" alt="${z.name}"
              onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
         <span style="display:none">${z.icon}</span>
       </div>

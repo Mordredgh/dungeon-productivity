@@ -160,7 +160,7 @@ function renderRunePanel() {
             return `
               <div class="rp-rune-card" style="--rc:${def.color}" title="${def.desc}">
                 <div class="rp-rune-gem">
-                  ${def.img ? `<img src="images/${def.img}.png" class="rune-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${def.icon}</span>` : `<span>${def.icon}</span>`}
+                  ${def.img ? `<img src="images/${def.img}.webp" class="rune-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${def.icon}</span>` : `<span>${def.icon}</span>`}
                 </div>
                 <div class="rp-rune-name">${def.name}</div>
                 <div class="rp-rune-eff">${def.desc}</div>
@@ -183,7 +183,7 @@ function renderRunePanel() {
         const pct   = Math.min(100, Math.round((have / RUNE_FRAG_COST) * 100));
         return `
           <div class="rp-frag-card ${ready ? 'rp-frag-ready' : ''}" style="--rc:${def.color}" title="${def.name}: ${def.desc}">
-            <img src="images/${def.fragImg}.png" class="rune-frag-img" alt=""
+            <img src="images/${def.fragImg}.webp" class="rune-frag-img" alt=""
                  onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
             <span class="rune-frag-fallback" style="display:none">${def.icon}</span>
             <div class="rp-frag-bar"><div class="rp-frag-fill" style="width:${pct}%;background:${def.color}"></div></div>

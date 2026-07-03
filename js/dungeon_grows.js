@@ -205,7 +205,7 @@ function _showRoomUnlockModal(room, cb) {
   modal.className = 'room-unlock-overlay';
   modal.innerHTML = `
     <div class="room-unlock-card" style="--rc:${room.color}">
-      <div class="room-unlock-bg" style="background-image:url('images/dungeon_sala${room.sala}.png')"></div>
+      <div class="room-unlock-bg" style="background-image:url('images/dungeon_sala${room.sala}.webp')"></div>
       <div class="room-unlock-content">
         <div class="room-unlock-label">✨ ¡Nueva Sala Descubierta!</div>
         <div class="room-unlock-icon">${room.icon}</div>
@@ -301,7 +301,7 @@ function _renderWeekProgress(q, xp, streak, unlocked, weeks, nextRoom, weeksLeft
 }
 
 function _renderRoom(r, isOpen) {
-  const imgBg = `linear-gradient(180deg,rgba(0,0,0,.2) 0%,rgba(0,0,0,.72) 100%),url('images/dungeon_sala${r.sala}.png') center/cover no-repeat`;
+  const imgBg = `linear-gradient(180deg,rgba(0,0,0,.2) 0%,rgba(0,0,0,.72) 100%),url('images/dungeon_sala${r.sala}.webp') center/cover no-repeat`;
   const glow  = `radial-gradient(circle at 50% 0%, color-mix(in srgb,${r.color} 40%,transparent) 0%, transparent 70%)`;
 
   const statText = isOpen && typeof hero !== 'undefined' ? r.stat(hero) : '';
@@ -334,7 +334,7 @@ function _renderRoom(r, isOpen) {
   const isNext   = r.sala === (hero.unlocked_rooms || 3) + 1;
   return `
     <div class="dg-room dg-room-locked ${isNext ? 'dg-room-next' : ''}" style="--rc:${r.color}">
-      <div class="dg-room-locked-bg" style="background-image:url('images/dungeon_sala${r.sala}.png')"></div>
+      <div class="dg-room-locked-bg" style="background-image:url('images/dungeon_sala${r.sala}.webp')"></div>
       <div class="dg-room-body">
         <div class="dg-room-header">
           <span class="dg-room-icon">🔒</span>

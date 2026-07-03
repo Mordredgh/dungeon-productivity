@@ -6,16 +6,16 @@
    ─────────────────────────────────────────────────────────── */
 
 const SALA_FURNITURE = [
-  { id:'sillon',       name:'Sillón',          img:'mueble_sillon.png'       },
-  { id:'candelabro',   name:'Candelabro',       img:'mueble_candelabro.png'   },
-  { id:'cofre',        name:'Cofre',            img:'mueble_cofre.png'        },
-  { id:'espejo',       name:'Espejo Arcano',    img:'mueble_espejo.png'       },
-  { id:'estanteria',   name:'Estantería',       img:'mueble_estanteria.png'   },
-  { id:'bola-cristal', name:'Bola de Cristal',  img:'mueble_bola-cristal.png' },
-  { id:'cuadro',       name:'Cuadro',           img:'mueble_cuadro.png'       },
-  { id:'planta',       name:'Planta Arcana',    img:'mueble_planta.png'       },
-  { id:'rack-armas',   name:'Rack de Armas',    img:'mueble_rack-armas.png'   },
-  { id:'vasija',       name:'Vasija',           img:'mueble_vasija.png'       },
+  { id:'sillon',       name:'Sillón',          img:'mueble_sillon.webp'       },
+  { id:'candelabro',   name:'Candelabro',       img:'mueble_candelabro.webp'   },
+  { id:'cofre',        name:'Cofre',            img:'mueble_cofre.webp'        },
+  { id:'espejo',       name:'Espejo Arcano',    img:'mueble_espejo.webp'       },
+  { id:'estanteria',   name:'Estantería',       img:'mueble_estanteria.webp'   },
+  { id:'bola-cristal', name:'Bola de Cristal',  img:'mueble_bola-cristal.webp' },
+  { id:'cuadro',       name:'Cuadro',           img:'mueble_cuadro.webp'       },
+  { id:'planta',       name:'Planta Arcana',    img:'mueble_planta.webp'       },
+  { id:'rack-armas',   name:'Rack de Armas',    img:'mueble_rack-armas.webp'   },
+  { id:'vasija',       name:'Vasija',           img:'mueble_vasija.webp'       },
 ];
 
 let _salaSelected       = null;  // id de mueble a colocar

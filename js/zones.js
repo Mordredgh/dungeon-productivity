@@ -91,7 +91,8 @@ function renderZones() {
         return `
         <div class="zone-card" style="--zc:${z.color}">
           <div class="zone-card-top">
-            <span class="zone-icon">${z.icon}</span>
+            <img src="images/map_${z.id}.webp" class="zone-icon-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+            <span class="zone-icon" style="display:none">${z.icon}</span>
             <div style="flex:1;min-width:0">
               <div class="zone-name">${z.name}</div>
               <div class="zone-desc">${z.desc}</div>

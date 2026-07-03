@@ -249,7 +249,17 @@ function triggerRandomEvent() {
   showEventModal(ev);
 }
 function showEventModal(ev) {
-  document.getElementById('eventIcon').textContent  = ev.icon;
+  const iconEl = document.getElementById('eventIcon');
+  const imgEl  = document.getElementById('eventIconImg');
+  iconEl.textContent = ev.icon;
+  if (ev.img && imgEl) {
+    imgEl.src = `images/${ev.img}.webp`;
+    imgEl.style.display = 'block';
+    iconEl.style.display = 'none';
+  } else if (imgEl) {
+    imgEl.style.display = 'none';
+    iconEl.style.display = 'block';
+  }
   document.getElementById('eventTitle').textContent = ev.title;
   document.getElementById('eventDesc').textContent  = ev.desc;
   document.getElementById('eventChoices').innerHTML = ev.choices.map((c, i) =>

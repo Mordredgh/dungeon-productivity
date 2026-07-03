@@ -42,7 +42,7 @@ function renderBestiary() {
   const renderCard = b => {
     const known = defeated.includes(b.key);
     const clr   = BESTIARY_RARITY_CLR[b.rarity] || '#9ca3af';
-    const img   = `images/boss_${b.key}.png`;
+    const img   = `images/boss_${b.key}.webp`;
     return `<div class="bst-card ${known ? 'bst-known' : 'bst-unknown'}" style="--bc:${clr}">
       <div class="bst-rarity-bar" style="background:${clr}22;border-top:2px solid ${clr}">
         <span class="bst-rarity-label" style="color:${clr}">${RARITY_LABEL[b.rarity] || b.rarity}</span>

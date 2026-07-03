@@ -186,9 +186,9 @@ function renderInventory() {
         ? '<span class="inv-slot-badge inv-slot-badge--def">DEF</span>'
         : '';
     const imgSrc = item.item_key.startsWith('spell_')
-      ? `/images/${item.item_key}.png`
+      ? `/images/${item.item_key}.webp`
       : item.item_key.startsWith('pet_egg_')
-        ? `/images/pet_egg_${item.item_key.slice(8)}.png`
+        ? `/images/pet_egg_${item.item_key.slice(8)}.webp`
         : item.item_key.startsWith('pet_food_')
           ? `${CDN}dungeon/${item.item_key.replace('pet_food_', 'pet_alimento_')}.png`
           : item.item_key.startsWith('pet_potion_')
@@ -364,7 +364,7 @@ function _renderRuneCrafting() {
     const canCraft = have >= cost;
     return `
       <div class="smithy-recipe ${canCraft ? 'smithy-ready' : 'smithy-locked'}">
-        <img src="images/${def.fragImg}.png" class="smithy-img" alt="" style="--wc:${def.color}"
+        <img src="images/${def.fragImg}.webp" class="smithy-img" alt="" style="--wc:${def.color}"
              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <div class="smithy-emoji" style="display:none">${def.icon}</div>
         <div class="smithy-info">
