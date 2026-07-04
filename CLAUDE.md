@@ -1,5 +1,5 @@
 # Arcanum Dungeon Productivity — CLAUDE.md
-> Última actualización: 2026-07-03 · SW cache: `dungeon-v190`
+> Última actualización: 2026-07-03 · SW cache: `dungeon-v191`
 
 ## Proyecto
 - **URL:** https://dungeon.mordredgh.com
@@ -339,6 +339,35 @@ Solo para datos no críticos (se puede perder sin consecuencias):
   (`_bbHeroSkillUsed`, reset en `openBossBattle()`), independiente de `useClassSkill()` (esa es maná,
   fuera de combate). `useHeroBattleSkill()` en boss_battle.js maneja 4 tipos: ataque normal/mágico,
   `heal` (clérigo cura mascota), `crit` (pícaro dobla mejor movimiento), `double` (arquero golpea 2×)
+
+## Rebalance de mascotas y bosses (2026-07-03, reportado por Gerardo)
+
+**Curva de nivel de montura (1-50) — antes 3 escalones planos (100/200/400 XP), ahora progresiva:**
+`_petXPForNextLevel(level) = round(80 + 12 × level^1.5)` en pets.js — ~85,000 XP acumulada total para
+llegar a nivel 50, moderado comparado a la curva real de Pokémon (que llega a cientos de miles), pero
+ya no es plana. La etapa bebé (Nv.1-15, `PET_BABY_XP_PER_LEVEL=150`) se dejó igual — es un arco corto
+antes de evolucionar, no hacía falta curva.
+
+**Bug arreglado: mascota se curaba sola al reentrar a `boss_battle.js`.**
+Antes `_bbPetHp`/`_bbPetMaxHp` eran variables locales que se reseteaban a HP completo cada vez que se
+llamaba `openBossBattle()` — o sea, "derrotada" no tenía ninguna consecuencia real más allá de cerrar
+la pantalla. Ahora: al caer en batalla, la mascota queda **agotada** (`pet.exhausted_until` en DB,
+columna nueva en `dungeon_pets`) por 2-8h según la rareza del jefe (`_BB_EXHAUST_HOURS` en
+boss_battle.js). Mientras está agotada: no se puede seleccionar para pelear (chip atenuado con 😴,
+`openBossBattle()` la excluye de la auto-selección), y se puede despertar antes de tiempo con una
+poción de esa especie (`wakePetWithPotion()` en pets.js, botón en la tarjeta de Mascotas). Helper
+compartido `isPetResting(pet)` en pets.js, usado también por boss_battle.js.
+
+**Boss ahora también escala en HP, no solo en daño, con el nivel del héroe.**
+`getMultiBossState()` en rpg.js: `boss.maxHp = BOSS_CYCLE_HP[rareza] × (1 + (nivel_héroe-1) × 0.03)` —
+antes solo el daño del contraataque (`_bbBossDmg()`) escalaba con nivel; el HP era fijo por rareza.
+Ahora un héroe de nivel 50 enfrenta bosses con ~2.47× el HP base de esa rareza.
+
+**Ataque de mascota que escala con su propio nivel — ya existía, confirmado funcionando.**
+`getPetStatAtLevel()` ya aplicaba `stat_gain.atk` por nivel, y `_bbCalcDmg()` ya multiplicaba por
+`petSt.atk`. No hizo falta cambio — el pedido de Gerardo ya estaba resuelto, solo no era visible
+por el bug de HP-reset de arriba (con la mascota siempre a full HP, el efecto del nivel en el ATK
+pasaba desapercibido frente al daño del jefe).
 
 ## Rebalance de combate y progresión (2026-06-30, sesión posterior a v186)
 

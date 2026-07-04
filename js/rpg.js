@@ -160,7 +160,9 @@ function getMultiBossState() {
     if (!existing || existing.periodKey !== periodKey) {
       const def = _selectBossForCycle(cycle, periodKey);
       if (def) {
-        const hp = BOSS_CYCLE_HP[def.rarity] || 100;
+        // El jefe escala con el nivel del héroe — no se vuelve trivial al subir de nivel
+        const lvlMult = 1 + ((hero?._level || 1) - 1) * 0.03;
+        const hp = Math.round((BOSS_CYCLE_HP[def.rarity] || 100) * lvlMult);
         state[cycle] = { key:def.key, name:def.name, rarity:def.rarity, hp, maxHp:hp, defeated:false, periodKey };
         changed = true;
       }

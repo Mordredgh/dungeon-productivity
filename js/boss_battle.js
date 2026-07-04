@@ -137,6 +137,33 @@ function _damageBossCycle(cycle, baseDmg) {
   return finalDmg;
 }
 
+/* ── Agotamiento de mascota — al caer en batalla, no se cura sola ──
+   Escala con la rareza del jefe: cuanto más duro el combate, más
+   tiempo real de descanso necesita. Se puede saltar con una poción. */
+const _BB_EXHAUST_HOURS = { comun:2, raro:2, epico:4, legendario:4, mitico:8, cataclismo:8 };
+
+function _bbIsPetExhausted(pet) {
+  return typeof isPetResting === 'function' ? isPetResting(pet) : !!(pet && pet.exhausted_until && new Date(pet.exhausted_until) > new Date());
+}
+
+async function _bbSetPetExhausted() {
+  if (!_bbPet || !_bbCycle) return;
+  const bossState = getMultiBossState();
+  const boss      = bossState[_bbCycle];
+  const hours     = _BB_EXHAUST_HOURS[boss?.rarity] || 2;
+  const until     = new Date(Date.now() + hours * 3600000).toISOString();
+  _bbPet.exhausted_until = until;
+  await db.from('dungeon_pets').update({ exhausted_until: until }).eq('id', _bbPet.id);
+  return hours;
+}
+
+async function _bbHandlePetFaint() {
+  const hours = await _bbSetPetExhausted();
+  toast('💀', `${_bbPetDef?.name || 'Tu mascota'} se debilitó en batalla... descansará ${hours}h (o usa una poción para despertarla ya).`);
+  await _bbDelay(1000);
+  closeBossBattle();
+}
+
 /* ── Elemento del jefe activo ──────────────────────────────── */
 function _bbBossElement() {
   const bossState = getMultiBossState();
@@ -174,9 +201,8 @@ function openBossBattle(cycle) {
   if (boss.defeated) { toast('🏆', 'Este jefe ya fue derrotado. ¡Espera al siguiente ciclo!'); return; }
 
   _bbCycle   = cycle;
-  _bbPet     = (typeof pets !== 'undefined' && pets.find(p => p.is_active && p.stage !== 'egg'))
-               || (typeof pets !== 'undefined' && pets.find(p => p.stage !== 'egg'))
-               || null;
+  const _availablePets = (typeof pets !== 'undefined' ? pets : []).filter(p => p.stage !== 'egg' && !_bbIsPetExhausted(p));
+  _bbPet     = _availablePets.find(p => p.is_active) || _availablePets[0] || null;
   _bbPetDef  = _bbPet ? PET_DEFS.find(d => d.key === _bbPet.pet_key) : null;
   _bbAnimating = false;
   _bbHeroSkillUsed = false;
@@ -224,8 +250,12 @@ function _bbPickPet(petId) {
   if (typeof pets === 'undefined') return;
   const p = pets.find(x => x.id === petId);
   if (!p) return;
+  if (_bbIsPetExhausted(p)) { toast('😴', 'Esta mascota está descansando — no puede batallar todavía.'); return; }
   _bbPet    = p;
   _bbPetDef = PET_DEFS.find(d => d.key === p.pet_key) || null;
+  const st    = getPetStatAtLevel(_bbPetDef, _bbPet.pet_level || 1);
+  _bbPetMaxHp = Math.max(20, 40 + Math.round(st.atk * 4));
+  _bbPetHp    = _bbPetMaxHp;
   _bbRender();
 }
 
@@ -285,12 +315,16 @@ function _bbRender() {
   const movePanelEl = document.getElementById('bbMovePanel');
 
   if (!_bbPet || !_bbPetDef) {
-    if (petSpriteEl) petSpriteEl.innerHTML = `<div class="bb-sprite-emoji" style="font-size:60px">🥚</div>`;
-    if (petInfoEl)   petInfoEl.innerHTML   = '<div class="bb-entity-name" style="color:var(--text3)">Sin mascota</div>';
-    if (movePanelEl) movePanelEl.innerHTML = `
-      <div class="bb-no-pet-msg">Necesitas una mascota para batallar.
-        <button class="btn btn-primary" style="margin-top:10px;font-size:12px" onclick="closeBossBattle();switchView('shop')">🏪 Ir a la Tienda</button>
-      </div>`;
+    const hasRestingPets = (typeof pets !== 'undefined' ? pets : []).some(p => p.stage !== 'egg' && _bbIsPetExhausted(p));
+    if (petSpriteEl) petSpriteEl.innerHTML = `<div class="bb-sprite-emoji" style="font-size:60px">${hasRestingPets ? '😴' : '🥚'}</div>`;
+    if (petInfoEl)   petInfoEl.innerHTML   = `<div class="bb-entity-name" style="color:var(--text3)">${hasRestingPets ? 'Mascotas descansando' : 'Sin mascota'}</div>`;
+    if (movePanelEl) movePanelEl.innerHTML = hasRestingPets
+      ? `<div class="bb-no-pet-msg">Todas tus mascotas están agotadas por batallas anteriores.<br>Usa una poción en Mascotas para despertar una ahora, o espera a que descansen.
+          <button class="btn btn-ghost" style="margin-top:10px;font-size:12px" onclick="closeBossBattle();switchView('pets')">🐾 Ir a Mascotas</button>
+        </div>`
+      : `<div class="bb-no-pet-msg">Necesitas una mascota para batallar.
+          <button class="btn btn-primary" style="margin-top:10px;font-size:12px" onclick="closeBossBattle();switchView('shop')">🏪 Ir a la Tienda</button>
+        </div>`;
     return;
   }
 
@@ -325,9 +359,11 @@ function _bbRender() {
   const availPets = typeof pets !== 'undefined' ? pets.filter(p => p.stage !== 'egg') : [];
   const petChipsHtml = availPets.length > 1
     ? `<div class="bb-pet-chips">${availPets.map(p => {
-        const def = PET_DEFS.find(d => d.key === p.pet_key);
-        return `<button class="bb-pet-chip${p.id === _bbPet.id ? ' active' : ''}" onclick="_bbPickPet('${p.id}')">
-          ${def?.icon || '🐾'} <span>${escHtml(def?.name?.split(' ')[0] || p.pet_key)}</span>
+        const def   = PET_DEFS.find(d => d.key === p.pet_key);
+        const rest  = _bbIsPetExhausted(p);
+        return `<button class="bb-pet-chip${p.id === _bbPet.id ? ' active' : ''}${rest ? ' bb-pet-chip-resting' : ''}"
+            onclick="_bbPickPet('${p.id}')" title="${rest ? 'Descansando' : ''}">
+          ${rest ? '😴' : (def?.icon || '🐾')} <span>${escHtml(def?.name?.split(' ')[0] || p.pet_key)}</span>
         </button>`;
       }).join('')}</div>` : '';
 
@@ -419,9 +455,7 @@ async function useBattlePotion() {
   _bbAnimating = false;
 
   if (_bbPetHp <= 0) {
-    toast('💀', `${_bbPetDef?.name || 'Tu mascota'} se debilitó en batalla...`);
-    await _bbDelay(800);
-    closeBossBattle();
+    await _bbHandlePetFaint();
     return;
   }
 
@@ -488,9 +522,7 @@ async function executeBattleAttack(moveIdx) {
   _bbAnimating = false;
 
   if (_bbPetHp <= 0) {
-    toast('💀', `${_bbPetDef?.name || 'Tu mascota'} se debilitó en batalla...`);
-    await _bbDelay(800);
-    closeBossBattle();
+    await _bbHandlePetFaint();
     return;
   }
 
@@ -592,9 +624,7 @@ async function useHeroBattleSkill() {
   _bbAnimating = false;
 
   if (_bbPetHp <= 0) {
-    toast('💀', `${_bbPetDef?.name || 'Tu mascota'} se debilitó en batalla...`);
-    await _bbDelay(800);
-    closeBossBattle();
+    await _bbHandlePetFaint();
     return;
   }
 

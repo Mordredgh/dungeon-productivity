@@ -10,11 +10,27 @@ async function loadPets() {
 
 function _petDef(key) { return PET_DEFS.find(p => p.key === key); }
 
-/* XP necesaria para subir al siguiente nivel de montura (Nv.1-50) */
+/* Mascota agotada tras caer en batalla — no puede pelear hasta descansar o usar poción */
+function isPetResting(pet) {
+  return !!(pet && pet.exhausted_until && new Date(pet.exhausted_until) > new Date());
+}
+async function wakePetWithPotion(petId) {
+  const pet = pets.find(p => p.id === petId);
+  if (!pet || !isPetResting(pet)) return;
+  const def = _petDef(pet.pet_key);
+  if (getInvCount('pet_potion_' + pet.pet_key) < 1) { toast('🧪', `Sin pociones de ${def?.name || 'esta mascota'}.`); return; }
+  await consumeInvItem('pet_potion_' + pet.pet_key, 1);
+  pet.exhausted_until = null;
+  await db.from('dungeon_pets').update({ exhausted_until: null }).eq('id', pet.id);
+  toast('✨', `¡${def?.name || 'Tu mascota'} despertó! Lista para batallar de nuevo.`);
+  renderPets(); renderActivePet();
+}
+
+/* XP necesaria para subir al siguiente nivel de montura (Nv.1-50) — curva
+   progresiva estilo Pokémon pero moderada (~85,000 XP acumulada total, no
+   los cientos de miles de la curva real). Antes eran 3 escalones planos. */
 function _petXPForNextLevel(level) {
-  if (level <= 10) return 100;
-  if (level <= 25) return 200;
-  return 400;
+  return Math.round(80 + 12 * Math.pow(level, 1.5));
 }
 
 /* XP necesaria para subir de nivel bebé (Nv.1-15, siempre 150) */
@@ -481,6 +497,16 @@ function renderPets() {
           <div class="pet-card-name">${escHtml(def.name)}</div>
           <div class="pet-card-rarity">${isMount ? '🌟 Montura' : '🐣 Bebé'}</div>
           ${(() => { const ab = PET_ABILITIES?.[def.key]?.[pet.stage]; return ab ? `<div class="pet-ability-tag" style="font-size:9px">${ab.icon} ${escHtml(ab.desc)}</div>` : ''; })()}
+          ${isPetResting(pet) ? (() => {
+            const ms = new Date(pet.exhausted_until) - new Date();
+            const h  = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
+            const pots = getInvCount('pet_potion_' + pet.pet_key);
+            return `<div class="pet-resting-badge">😴 Descansando · ${h > 0 ? h + 'h ' : ''}${m}m restantes</div>
+              <button class="pet-action-btn ${pots > 0 ? '' : 'pet-btn-disabled'}"
+                onclick="wakePetWithPotion('${pet.id}')" ${pots > 0 ? '' : 'disabled'}>
+                🧪 Despertar con poción (${pots})
+              </button>`;
+          })() : ''}
           ${!isMount ? (() => {
             const bLvl  = pet.pet_level || 1;
             const bXP   = pet.pet_xp || 0;
