@@ -1,3 +1,52 @@
+﻿# LEAD ARCHITECT - GERARDO AI EMPIRE
+
+> Rule: Talk tight caveman. Same technical accuracy. Brain big, mouth small.
+
+## 1. CORE OPERATING PRINCIPLES
+
+- **No Slop:** Prose dense, direct, human. Target >35/50 score.
+- **TDD:** Coding task â†’ `/tdd`. Write failing test first.
+- **Domain Context:** Before big task â†’ `/grill-with-docs`. Jargon changes â†’ update `CONTEXT.md` in root.
+- **YAGNI:** Default `/ponytail`. No over-engineer.
+- **Obsidian Sync:** Synced vault = truth. Query obsidian-cli if task blind.
+
+## 2. SKILL ROUTING (1800+ arsenal)
+
+Run `/ask-matt` or `/ponytail-help` to resolve path.
+
+| Need | Skill |
+|------|-------|
+| Web scraper / ingestion | `firecrawl-scraper` |
+| Brand / visuals | `ckm-brand`, `impeccable`, Meigen.ai |
+| Bugs | `systematic-debugging` |
+| Ads / marketing | `marketingagentskills`, `claude-ads` |
+| Code graph | Codebase MCP + `graphify` |
+| Knowledge docs | NotebookLM Skill |
+
+## 3. CAVEMAN ACTIVATION
+
+- **Always-on:** Mode `full` or `ultra`. Turn on via `/caveman` or "talk like caveman".
+- **Git:** Commits via `/caveman-commit` (Subject â‰¤50 char, why > what).
+- **PR Review:** `/caveman-review` (One-line comment: line, bug, fix).
+- **Memory Sync:** `/caveman-compress` on project files to save input tokens.
+- **Delegation:** Use `cavecrew` / `/cavecrew` subagents. Output caveman-compressed.
+
+## 4. SECURITY & ENVIRONMENT
+
+- **Sec:** Run Anthropic-Cybersecurity-Skills only in local/sandbox path. No external targets.
+- **Env:** Local-first. Ollama (`qwen2.5-coder`, `deepseek-r1`) + local MCPs + Claude API fallback.
+- **Keys:** Local `.env` only. Never output keys to stdout/logs.
+
+## 5. QUALITY GATES (Pre-merge)
+
+- Accessibility â†’ `/fixing-accessibility`
+- Design check â†’ `/impeccable`
+- Performance check â†’ `/ponytail-gain`
+- Humanize client logs â†’ `/humanizer`
+
+> Doubt? Stop. Ask: "Plan A or Plan B?"
+
+---
 # Arcanum Dungeon Productivity — CLAUDE.md
 > Última actualización: 2026-07-03 · SW cache: `dungeon-v191`
 
@@ -362,6 +411,39 @@ compartido `isPetResting(pet)` en pets.js, usado también por boss_battle.js.
 `getMultiBossState()` en rpg.js: `boss.maxHp = BOSS_CYCLE_HP[rareza] × (1 + (nivel_héroe-1) × 0.03)` —
 antes solo el daño del contraataque (`_bbBossDmg()`) escalaba con nivel; el HP era fijo por rareza.
 Ahora un héroe de nivel 50 enfrenta bosses con ~2.47× el HP base de esa rareza.
+
+## Profundidad de combate estilo Pokémon (2026-07-06)
+
+Análisis pedido por Gerardo contra un documento de referencia de mecánicas Pokémon — 6 features
+agregadas (las que decía "FALTA" + la parcial), todo en `boss_battle.js`/`pets.js` salvo lo indicado:
+
+1. **Golpes críticos** — `_bbApplyVariance(dmg)` rueda ~8% (mascota) / `_bbBossDmg()` ~5% (jefe),
+   ×1.5 daño, flag `_bbLastCrit` leído justo después para el toast "¡Golpe Crítico!". Solo se aplica
+   al golpe real, nunca en el preview determinístico `_bbCalcDmg()`.
+2. **Stat stages (±6 estilo Pokémon)** — `_bbPetAtkStage`/`_bbPetDefStage`, multiplicador
+   `_bbStageMult(n)` = `(2+n)/2` si n≥0 o `2/(2-n)` si n<0. El jefe tiene 15% de chance de debilitar
+   ATK o DEF de la mascota en cada contraataque (`_bbBossCounterAttack()`); el movimiento "Especial"
+   (tier definitivo, power 4.0) también sube el ATK propio +1 etapa al usarse. Se resetea en
+   `openBossBattle()`/`_bbPickPet()` — solo dura la batalla, no persiste en DB.
+3. **Estados alterados** — `_bbPetStatus` (`null`/`'quemado'`/`'paralizado'`), infligido por el jefe
+   según su elemento (`Fuego`→quemado, `Eléctrico`→parálisis, 25% chance por contraataque, solo si no
+   hay estado ya activo). Quemado: -25% daño de la mascota (`_bbCalcDmg`) + DoT 6% HP máx por turno.
+   Parálisis: 25% chance de fallar el turno por completo (`executeBattleAttack`). Local a la batalla,
+   sin persistencia en DB.
+4. **Mascotas shiny** — columna `is_shiny` (boolean) en `dungeon_pets` (migración pendiente de aplicar
+   si el MCP de Supabase estuvo caído). ~2% chance en `hatchEgg()`. Puramente cosmético — badge ✨ +
+   glow dorado vía CSS (`pet-card-shiny`, `pet-rpanel-shiny`), sin arte alternativo.
+5. **PP por movimiento** — antes solo existía el contador global diario (`_bbLeft`/`_bbUse`, 5 ataques
+   por jefe). Ahora cada movimiento también tiene su propio límite vía localStorage
+   (`_bbMovePPKey`/`_bbMovePPLeft`/`_bbUseMovePP`), escalado por poder: Especial (power≥4)=2 usos,
+   power≥2.5=3, power≥1.5=5, básico=8. Mostrado como "PP x/y" en cada botón de movimiento.
+6. **Curvas de XP por rareza de mascota** — `_petXPForNextLevel(level, def)` en pets.js ahora recibe
+   la definición de la mascota y aplica `_PET_RARITY_XP_MULT` (común=1× ... cataclismo=2.8×). Mascotas
+   más raras piden más XP por nivel que las comunes, en vez de la misma curva universal.
+
+**Explícitamente NO agregado** (evaluado y descartado en el análisis): sistema de IVs/EVs genético
+(demasiado complejo sin payoff para una app de productividad), objetos equipables en mascotas,
+batallas dobles, mega-evolución — no sirven el propósito del proyecto.
 
 **Ataque de mascota que escala con su propio nivel — ya existía, confirmado funcionando.**
 `getPetStatAtLevel()` ya aplicaba `stat_gain.atk` por nivel, y `_bbCalcDmg()` ya multiplicaba por

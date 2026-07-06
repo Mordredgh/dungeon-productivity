@@ -3435,6 +3435,16 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   background:rgba(148,163,184,.15); color:var(--text2);
   border-radius:20px; padding:3px 10px; margin:4px 0;
 }
+.pet-card-shiny { box-shadow:0 0 0 1px rgba(250,204,21,.5), 0 0 14px rgba(250,204,21,.35); }
+.pet-shiny-badge {
+  position:absolute; top:-6px; left:-6px; font-size:15px;
+  animation:pet-shiny-sparkle 1.6s ease-in-out infinite;
+}
+.pet-rpanel-shiny .pet-rpanel-img { filter:saturate(1.4) drop-shadow(0 0 10px rgba(250,204,21,.6)); }
+@keyframes pet-shiny-sparkle {
+  0%, 100% { opacity:1; transform:scale(1) rotate(0deg); }
+  50%      { opacity:.6; transform:scale(1.15) rotate(15deg); }
+}
 .pet-stats-grid {
   display:grid; grid-template-columns:1fr 1fr; gap:4px; width:100%; margin:6px 0;
 }
@@ -8177,6 +8187,14 @@ body::after {
 }
 .bb-hp-val { font-size: 9px; color: var(--text3); flex-shrink: 0; min-width: 44px; text-align: right; }
 .bb-stat-row { font-size: 9px; color: var(--text3); margin-top: 5px; letter-spacing: .02em; }
+.bb-status-row { display:flex; gap:4px; margin-top:4px; flex-wrap:wrap; }
+.bb-status-tag {
+  font-size: 9px; font-weight:600; padding:2px 7px; border-radius:10px;
+  background: rgba(148,163,184,.15); color: var(--text2);
+}
+.bb-status-burn { background: rgba(248,113,113,.18); color:#f87171; }
+.bb-status-para { background: rgba(250,204,21,.18); color:#facc15; }
+.bb-move-pp { position:absolute; bottom:6px; left:8px; font-size:9px; color:var(--text3); }
 
 /* Sprites */
 .bb-boss-img {

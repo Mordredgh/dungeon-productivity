@@ -28,9 +28,15 @@ async function wakePetWithPotion(petId) {
 
 /* XP necesaria para subir al siguiente nivel de montura (Nv.1-50) — curva
    progresiva estilo Pokémon pero moderada (~85,000 XP acumulada total, no
-   los cientos de miles de la curva real). Antes eran 3 escalones planos. */
-function _petXPForNextLevel(level) {
-  return Math.round(80 + 12 * Math.pow(level, 1.5));
+   los cientos de miles de la curva real). Antes eran 3 escalones planos.
+   Multiplicador por rareza: mascotas más raras piden más XP por nivel. */
+const _PET_RARITY_XP_MULT = {
+  'común':1, 'comun':1, 'poco común':1.15, 'poco comun':1.15, 'raro':1.3,
+  'épico':1.5, 'epico':1.5, 'legendario':1.8, 'mítico':2.2, 'mitico':2.2, 'cataclismo':2.8
+};
+function _petXPForNextLevel(level, def) {
+  const mult = def ? (_PET_RARITY_XP_MULT[def.rarity] || 1) : 1;
+  return Math.round((80 + 12 * Math.pow(level, 1.5)) * mult);
 }
 
 /* XP necesaria para subir de nivel bebé (Nv.1-15, siempre 150) */
@@ -101,13 +107,19 @@ async function hatchEgg(petKey) {
   }
   await consumeInvItem('pet_egg_' + petKey, 1);
   await consumeInvItem('pet_potion_' + petKey, def.hatch);
+  const isShiny = Math.random() < 0.02;
   const { data } = await db.from('dungeon_pets').insert({
     hero_id: hero.id, pet_key: petKey,
     stage: 'baby', potions_fed: 0, pet_level: 1, pet_xp: 0, is_active: false,
+    is_shiny: isShiny,
     obtained_at: new Date().toISOString()
   }).select().single();
   if (data) pets.push(data);
-  toast('🐣', `¡${def.name} ha eclosionado! Nv.1 — derrota jefes y dale pociones para subirla.`);
+  if (isShiny) {
+    toast('✨', `¡${def.name} ha eclosionado y es SHINY! ✨ Nv.1 — derrota jefes y dale pociones para subirla.`);
+  } else {
+    toast('🐣', `¡${def.name} ha eclosionado! Nv.1 — derrota jefes y dale pociones para subirla.`);
+  }
   renderPets();
   renderActivePet();
 }
@@ -170,8 +182,8 @@ async function feedPetFood(petId) {
   let newXP     = (pet.pet_xp || 0) + gained;
   let newLvl    = curLvl;
 
-  while (newLvl < 50 && newXP >= _petXPForNextLevel(newLvl)) {
-    newXP -= _petXPForNextLevel(newLvl);
+  while (newLvl < 50 && newXP >= _petXPForNextLevel(newLvl, def)) {
+    newXP -= _petXPForNextLevel(newLvl, def);
     newLvl++;
   }
 
@@ -184,7 +196,7 @@ async function feedPetFood(petId) {
     if (typeof dungeonPush === 'function') dungeonPush(`⭐ ¡${def.name} subió a Nv.${newLvl}!`, `¡Sigue alimentándola para desbloquear más stats!`);
     checkReyTempestad();
   } else {
-    const need = _petXPForNextLevel(newLvl);
+    const need = _petXPForNextLevel(newLvl, def);
     toast(def.icon, `+${gained} XP · ${def.name} Nv.${newLvl} (${newXP}/${need} para siguiente)`);
   }
   renderPets(); renderActivePet();
@@ -272,15 +284,16 @@ function renderActivePet() {
     section.querySelector('.panel-title').textContent = `🐾 Mascota — ${stageLabel}`;
     panel.innerHTML = `
       <div class="pet-rpanel">
-        <div class="pet-rpanel-imgwrap">
+        <div class="pet-rpanel-imgwrap ${active.is_shiny ? 'pet-rpanel-shiny' : ''}">
           <img src="${fondoUrl}" class="pet-rpanel-bg" alt="">
           <img src="images/pet_${stage}_${active.pet_key}.webp" class="pet-rpanel-img ${isMount?'anim-bounce':'anim-float'}" alt=""
                onerror="this.src='${CDN}dungeon/pet_${stage}_${active.pet_key}.png';this.onerror=null">
           <div class="pet-rpanel-emoji" style="display:none">${def.icon}</div>
+          ${active.is_shiny ? `<span class="pet-shiny-badge" title="¡Shiny!">✨</span>` : ''}
         </div>
         <div class="pet-rpanel-body">
           <div class="pet-rpanel-info">
-            <div class="pet-rpanel-name">${escHtml(def.name)}</div>
+            <div class="pet-rpanel-name">${escHtml(def.name)}${active.is_shiny ? ' ✨' : ''}</div>
             <div class="pet-rpanel-rarity">${def.rarity}</div>
             ${ab ? `<div class="pet-ability-tag" style="margin:4px 0">${ab.icon} ${escHtml(ab.desc)}</div>` : ''}
             ${!isMount ? (() => {
@@ -308,7 +321,7 @@ function renderActivePet() {
             })() : (() => {
               const lvl   = active.pet_level || 1;
               const xp    = active.pet_xp || 0;
-              const need  = _petXPForNextLevel(lvl);
+              const need  = _petXPForNextLevel(lvl, def);
               const xpPct = lvl >= 50 ? 100 : Math.round((xp / need) * 100);
               const st    = getPetStatAtLevel(def, lvl);
               const food  = typeof getInvCount === 'function' ? getInvCount('pet_food_' + active.pet_key) : 0;
@@ -488,13 +501,14 @@ function renderPets() {
         const isActive = pet.is_active;
         const isMount  = pet.stage === 'mount';
         html += `
-        <div class="pet-card ${isActive ? 'pet-card-active' : ''}">
+        <div class="pet-card ${isActive ? 'pet-card-active' : ''} ${pet.is_shiny ? 'pet-card-shiny' : ''}">
           <div class="pet-card-visual">
             <img src="${imgUrl}" class="pet-card-img" alt="${escHtml(def.name)}"
                  onerror="this.src='${CDN}dungeon/pet_${pet.stage}_${def.key}.png';this.onerror=null">
             ${isMount ? `<span class="pet-mount-crown">🌟</span>` : ''}
+            ${pet.is_shiny ? `<span class="pet-shiny-badge" title="¡Shiny!">✨</span>` : ''}
           </div>
-          <div class="pet-card-name">${escHtml(def.name)}</div>
+          <div class="pet-card-name">${escHtml(def.name)}${pet.is_shiny ? ' ✨' : ''}</div>
           <div class="pet-card-rarity">${isMount ? '🌟 Montura' : '🐣 Bebé'}</div>
           ${(() => { const ab = PET_ABILITIES?.[def.key]?.[pet.stage]; return ab ? `<div class="pet-ability-tag" style="font-size:9px">${ab.icon} ${escHtml(ab.desc)}</div>` : ''; })()}
           ${isPetResting(pet) ? (() => {
@@ -538,7 +552,7 @@ function renderPets() {
           })() : (() => {
             const lvl  = pet.pet_level || 1;
             const xp   = pet.pet_xp || 0;
-            const need = _petXPForNextLevel(lvl);
+            const need = _petXPForNextLevel(lvl, def);
             const xpPct= lvl >= 50 ? 100 : Math.round((xp / need) * 100);
             const st   = getPetStatAtLevel(def, lvl);
             const food = typeof getInvCount === 'function' ? getInvCount('pet_food_' + pet.pet_key) : 0;

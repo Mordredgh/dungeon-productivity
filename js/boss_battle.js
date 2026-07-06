@@ -76,6 +76,30 @@ let _bbPetHp         = 100;
 let _bbPetMaxHp      = 100;
 let _bbHeroSkillUsed = false;
 
+/* ── Modificadores de stats en batalla (estilo Pokémon, ±6) ── */
+let _bbPetAtkStage = 0;
+let _bbPetDefStage = 0;
+/* ── Estado alterado de la mascota (solo local a la batalla) ── */
+let _bbPetStatus = null; // null | 'quemado' | 'paralizado'
+/* ── Último golpe fue crítico (leído justo tras _bbApplyVariance/_bbBossDmg) ── */
+let _bbLastCrit = false;
+
+function _bbResetBattleModifiers() {
+  _bbPetAtkStage = 0;
+  _bbPetDefStage = 0;
+  _bbPetStatus   = null;
+}
+
+/* Multiplicador de etapa estilo Pokémon: etapa>=0 → (2+n)/2, etapa<0 → 2/(2-n) */
+function _bbStageMult(stage) {
+  return stage >= 0 ? (2 + stage) / 2 : 2 / (2 - stage);
+}
+function _bbRaiseAtkStage(n) { _bbPetAtkStage = Math.max(-6, Math.min(6, _bbPetAtkStage + n)); }
+function _bbLowerStat(stat, n) {
+  if (stat === 'atk') _bbPetAtkStage = Math.max(-6, Math.min(6, _bbPetAtkStage - n));
+  else _bbPetDefStage = Math.max(-6, Math.min(6, _bbPetDefStage - n));
+}
+
 /* ── Ataques: clave por ciclo+periodo (no solo fecha) ─────── */
 /* Esto garantiza 5 ataques frescos cuando se genera un boss nuevo */
 function _bbAttackKey(cycle) {
@@ -86,6 +110,26 @@ function _bbMaxAttacks() { return 5 + (typeof getMasteryBonus === 'function' ? g
 function _bbLeft(cycle) { try { return Math.max(0, _bbMaxAttacks() - parseInt(localStorage.getItem(_bbAttackKey(cycle)) || '0', 10)); } catch { return _bbMaxAttacks(); } }
 function _bbUse(cycle)  { try { const k = _bbAttackKey(cycle); localStorage.setItem(k, String((parseInt(localStorage.getItem(k)||'0',10))+1)); } catch {} }
 
+/* ── PP por movimiento — límite individual además del contador global ──
+   Movimientos más fuertes (Especial) tienen menos usos por jefe/período. */
+function _bbMoveMaxPP(move) {
+  if (move.power >= 4)   return 2;
+  if (move.power >= 2.5) return 3;
+  if (move.power >= 1.5) return 5;
+  return 8;
+}
+function _bbMovePPKey(cycle, moveId) {
+  const period = typeof _bossPeriodKey === 'function' ? _bossPeriodKey(cycle) : new Date().toISOString().split('T')[0];
+  return 'dungeon-bb-pp-' + cycle + '-' + period + '-' + moveId;
+}
+function _bbMovePPLeft(cycle, move) {
+  try { return Math.max(0, _bbMoveMaxPP(move) - parseInt(localStorage.getItem(_bbMovePPKey(cycle, move.id)) || '0', 10)); }
+  catch { return _bbMoveMaxPP(move); }
+}
+function _bbUseMovePP(cycle, move) {
+  try { const k = _bbMovePPKey(cycle, move.id); localStorage.setItem(k, String((parseInt(localStorage.getItem(k)||'0',10))+1)); } catch {}
+}
+
 /* ── Nivel del jefe — escala con el nivel del héroe ───────── */
 function _bbBossLevel() { return hero?._level || 1; }
 
@@ -93,13 +137,17 @@ function _bbBossLevel() { return hero?._level || 1; }
 function _bbBossDmg() {
   const state = getMultiBossState();
   const boss  = state[_bbCycle];
+  _bbLastCrit = false;
   if (!boss || !_bbPetDef) return 3;
-  const petDef    = getPetStatAtLevel(_bbPetDef, _bbPet?.pet_level || 1).def || 0;
+  const petDef    = (getPetStatAtLevel(_bbPetDef, _bbPet?.pet_level || 1).def || 0) * _bbStageMult(_bbPetDefStage);
   const rarMult   = { comun:0.4, raro:0.7, epico:1.1, legendario:1.5, mitico:2.0, cataclismo:2.8 }[boss.rarity] || 1;
   const levelTerm = (2 * _bbBossLevel() / 5 + 2);
   const random    = 0.85 + Math.random() * 0.30; // 0.85–1.15, variación real por golpe
   const base      = levelTerm * rarMult * 1.2;
-  return Math.max(1, Math.round(base * random) - Math.floor(petDef * 0.3));
+  const isCrit    = Math.random() < 0.05;
+  _bbLastCrit     = isCrit;
+  const critMult  = isCrit ? 1.5 : 1;
+  return Math.max(1, Math.round(base * random * critMult) - Math.floor(petDef * 0.3));
 }
 
 /* ── Daño solo al ciclo objetivo ──────────────────────────── */
@@ -182,15 +230,20 @@ function _bbCalcDmg(move) {
   if (!boss || !_bbPetDef) return 1;
   const petSt  = getPetStatAtLevel(_bbPetDef, _bbPet.pet_level || 1);
   const base   = Math.ceil(boss.maxHp * 0.04 * move.power);
-  const bonus  = Math.floor(petSt.atk * 2);
+  const bonus  = Math.floor(petSt.atk * 2 * _bbStageMult(_bbPetAtkStage));
   const mult   = typeof getElementMultiplier === 'function' ? getElementMultiplier(_bbBossElement(), move.type) : 1;
   const masteryMult = 1 + (typeof getMasteryBonus === 'function' ? getMasteryBonus('fuerza_bruta') : 0);
-  return Math.max(1, Math.round((base + bonus) * mult * masteryMult));
+  const burnMult    = _bbPetStatus === 'quemado' ? 0.75 : 1;
+  return Math.max(1, Math.round((base + bonus) * mult * masteryMult * burnMult));
 }
 
-/* Variación aleatoria estilo Pokémon (0.85–1.15) — aplicar solo al golpear de verdad */
+/* Variación aleatoria estilo Pokémon (0.85–1.15) + golpe crítico (~8%, x1.5) —
+   aplicar solo al golpear de verdad, nunca en el preview determinístico. */
 function _bbApplyVariance(dmg) {
-  return Math.max(1, Math.round(dmg * (0.85 + Math.random() * 0.30)));
+  const isCrit = Math.random() < 0.08;
+  _bbLastCrit  = isCrit;
+  const critMult = isCrit ? 1.5 : 1;
+  return Math.max(1, Math.round(dmg * (0.85 + Math.random() * 0.30) * critMult));
 }
 
 /* ── Abrir pantalla de batalla ────────────────────────────── */
@@ -206,6 +259,7 @@ function openBossBattle(cycle) {
   _bbPetDef  = _bbPet ? PET_DEFS.find(d => d.key === _bbPet.pet_key) : null;
   _bbAnimating = false;
   _bbHeroSkillUsed = false;
+  _bbResetBattleModifiers();
 
   /* Inicializar HP de combate de la mascota */
   if (_bbPet && _bbPetDef) {
@@ -256,6 +310,7 @@ function _bbPickPet(petId) {
   const st    = getPetStatAtLevel(_bbPetDef, _bbPet.pet_level || 1);
   _bbPetMaxHp = Math.max(20, 40 + Math.round(st.atk * 4));
   _bbPetHp    = _bbPetMaxHp;
+  _bbResetBattleModifiers();
   _bbRender();
 }
 
@@ -345,15 +400,21 @@ function _bbRender() {
   /* ─ Pet info ─ */
   const petHpPct = Math.max(0, Math.round((_bbPetHp / _bbPetMaxHp) * 100));
   const petHpClr = petHpPct > 50 ? '#4ade80' : petHpPct > 25 ? '#facc15' : '#f87171';
+  const statusTag = _bbPetStatus === 'quemado' ? '<span class="bb-status-tag bb-status-burn">🔥 Quemado</span>'
+    : _bbPetStatus === 'paralizado' ? '<span class="bb-status-tag bb-status-para">⚡ Paralizado</span>' : '';
+  const stageTag = (_bbPetAtkStage || _bbPetDefStage)
+    ? `<span class="bb-status-tag">${_bbPetAtkStage ? '⚔️' + (_bbPetAtkStage > 0 ? '+' : '') + _bbPetAtkStage : ''} ${_bbPetDefStage ? '🛡️' + (_bbPetDefStage > 0 ? '+' : '') + _bbPetDefStage : ''}</span>`
+    : '';
   if (petInfoEl) petInfoEl.innerHTML = `
-    <div class="bb-entity-name">${escHtml(_bbPetDef.name)}</div>
+    <div class="bb-entity-name">${escHtml(_bbPetDef.name)}${_bbPet.is_shiny ? ' ✨' : ''}</div>
     <div class="bb-level-chip">Nv.${_bbPet.pet_level || 1} · ${_bbPet.stage}</div>
     <div class="bb-hp-row">
       <span class="bb-hp-lbl">HP</span>
       <div class="bb-hp-track"><div id="bbPetHpFill" class="bb-hp-fill" style="width:${petHpPct}%;background:${petHpClr}"></div></div>
       <span class="bb-hp-val">${_bbPetHp}/${_bbPetMaxHp}</span>
     </div>
-    <div class="bb-stat-row">⚔️ ATK ${petSt.atk.toFixed(1)} · 🛡️ DEF +${petSt.def.toFixed(0)}</div>`;
+    <div class="bb-stat-row">⚔️ ATK ${petSt.atk.toFixed(1)} · 🛡️ DEF +${petSt.def.toFixed(0)}</div>
+    <div class="bb-status-row">${statusTag}${stageTag}</div>`;
 
   /* ─ Selectora de mascota ─ */
   const availPets = typeof pets !== 'undefined' ? pets.filter(p => p.stage !== 'egg') : [];
@@ -371,19 +432,20 @@ function _bbRender() {
   const moves = _bbMoves(_bbPet.pet_key);
   const movesHtml = moves.map((mv, i) => {
     const unlocked = _bbMoveUnlocked(mv, _bbPet);
-    const disabled = !unlocked || attacksLeft === 0;
+    const ppLeft   = unlocked ? _bbMovePPLeft(_bbCycle, mv) : 0;
+    const disabled = !unlocked || attacksLeft === 0 || ppLeft <= 0;
     const dmg      = unlocked ? _bbCalcDmg(mv) : '?';
     const elMult   = unlocked && typeof getElementMultiplier === 'function' ? getElementMultiplier(bossEl, mv.type) : 1;
     const elTag     = elMult > 1 ? ' <span style="color:#4ade80">▲</span>' : elMult < 1 ? ' <span style="color:#f87171">▼</span>' : '';
     const typeClass = 'bb-type-' + mv.type.toLowerCase().replace(/[^a-z]/g,'');
-    return `<button class="bb-move-btn${unlocked ? '' : ' bb-move-locked'}${attacksLeft === 0 ? ' bb-move-exhausted' : ''}"
+    return `<button class="bb-move-btn${unlocked ? '' : ' bb-move-locked'}${attacksLeft === 0 || ppLeft <= 0 ? ' bb-move-exhausted' : ''}"
       onclick="${disabled ? '' : `executeBattleAttack(${i})`}"
       ${disabled ? 'disabled' : ''}
       title="${unlocked ? mv.name + ' · ~' + dmg + ' daño' + (elMult > 1 ? ' (súper efectivo)' : elMult < 1 ? ' (poco efectivo)' : '') : '🔒 Requiere Nv.' + mv.reqLevel}">
       <span class="bb-move-icon">${mv.icon}</span>
       <span class="bb-move-name">${mv.name}</span>
       <span class="bb-move-type ${typeClass}">${unlocked ? mv.type : '🔒 Nv.' + mv.reqLevel}</span>
-      ${unlocked ? `<span class="bb-move-dmg">~${dmg}${elTag}</span>` : ''}
+      ${unlocked ? `<span class="bb-move-dmg">~${dmg}${elTag}</span><span class="bb-move-pp">PP ${ppLeft}/${_bbMoveMaxPP(mv)}</span>` : ''}
     </button>`;
   }).join('');
 
@@ -472,11 +534,28 @@ async function executeBattleAttack(moveIdx) {
   const moves = _bbMoves(_bbPet.pet_key);
   const move  = moves[moveIdx];
   if (!move || !_bbMoveUnlocked(move, _bbPet)) return;
+  if (_bbMovePPLeft(_bbCycle, move) <= 0) { toast('🚫', `${move.name} sin usos restantes hoy.`); return; }
 
   _bbAnimating = true;
+  _bbUse(_bbCycle);
+  _bbUseMovePP(_bbCycle, move);
+
+  /* ─ Parálisis: chance de fallar el turno por completo ── */
+  if (_bbPetStatus === 'paralizado' && Math.random() < 0.25) {
+    toast('⚡', `¡${_bbPetDef.name} está paralizado y no pudo atacar!`, 1300);
+    await _bbDelay(400);
+    await _bbBossCounterAttack();
+    _bbAnimating = false;
+    if (_bbPetHp <= 0) { await _bbHandlePetFaint(); return; }
+    _bbRender();
+    return;
+  }
+
+  /* ─ Especial (movimiento definitivo): también sube ATK propio 1 etapa ── */
+  if (move.type === 'Especial') _bbRaiseAtkStage(1);
 
   const dmg = _bbApplyVariance(_bbCalcDmg(move));
-  _bbUse(_bbCycle);
+  const wasCrit = _bbLastCrit;
 
   /* ─ Animación: pet lunge ─ */
   const petEl = document.querySelector('.bb-pet-emoji');
@@ -493,6 +572,9 @@ async function executeBattleAttack(moveIdx) {
 
   /* ─ Flotar número de daño ─ */
   _bbSpawnDmgFloat(actualDmg, bossSpriteEl);
+
+  if (wasCrit) toast('💥', '¡Golpe crítico!', 1000);
+  if (move.type === 'Especial') toast('⬆️', `¡${_bbPetDef.name} sube su ATAQUE!`, 1000);
 
   /* ─ Feedback de efectividad elemental ─ */
   const _elMult = typeof getElementMultiplier === 'function' ? getElementMultiplier(_bbBossElement(), move.type) : 1;
@@ -531,6 +613,7 @@ async function executeBattleAttack(moveIdx) {
 
 /* ── Contraataque del jefe — reusable (ataque de mascota y skill de héroe) ── */
 async function _bbBossCounterAttack() {
+  const boss = getMultiBossState()[_bbCycle];
   await _bbDelay(260);
   const bossSpriteEl2 = document.getElementById('bbBossSprite');
   if (bossSpriteEl2) {
@@ -541,6 +624,7 @@ async function _bbBossCounterAttack() {
   if (bossSpriteEl2) bossSpriteEl2.style.transform = '';
 
   const bossDmg      = _bbBossDmg();
+  if (_bbLastCrit) toast('💥', '¡Golpe crítico del jefe!', 1000);
   // Bono de set Druida: mascota no cae en batalla durante 48h tras equipar
   const druidaShield = typeof isDruidaProtectionActive === 'function' && isDruidaProtectionActive();
   _bbPetHp            = Math.max(druidaShield ? 1 : 0, _bbPetHp - bossDmg);
@@ -550,6 +634,34 @@ async function _bbBossCounterAttack() {
 
   await _bbDelay(380);
   if (petSpriteEl2) petSpriteEl2.classList.remove('bb-hit');
+
+  if (_bbPetHp <= 0) return;
+
+  /* ── Debuff de estadística: 15% chance de que el jefe baje ATK o DEF ── */
+  if (Math.random() < 0.15) {
+    const stat = Math.random() < 0.5 ? 'atk' : 'def';
+    _bbLowerStat(stat, 1);
+    toast('📉', `¡${boss?.name || 'El jefe'} debilitó tu ${stat === 'atk' ? 'ATAQUE' : 'DEFENSA'}!`, 1200);
+  }
+
+  /* ── Infligir estado alterado según elemento del jefe ── */
+  const bossElNow = _bbBossElement();
+  if (!_bbPetStatus && bossElNow === 'Fuego' && Math.random() < 0.25) {
+    _bbPetStatus = 'quemado';
+    toast('🔥', `${_bbPetDef?.name || 'Tu mascota'} quedó QUEMADA — pierde daño y HP cada turno.`, 1400);
+  } else if (!_bbPetStatus && bossElNow === 'Eléctrico' && Math.random() < 0.25) {
+    _bbPetStatus = 'paralizado';
+    toast('⚡', `${_bbPetDef?.name || 'Tu mascota'} quedó PARALIZADA — puede fallar su turno.`, 1400);
+  }
+
+  /* ── DoT de quemadura ── */
+  if (_bbPetStatus === 'quemado') {
+    const burnDmg = Math.max(1, Math.round(_bbPetMaxHp * 0.06));
+    _bbPetHp = Math.max(0, _bbPetHp - burnDmg);
+    _bbSpawnPetDmgFloat(burnDmg, petSpriteEl2);
+    toast('🔥', `Quemadura: -${burnDmg} HP`, 900);
+    await _bbDelay(300);
+  }
 }
 
 /* ── Habilidad de héroe en combate — 1 uso por batalla ────── */
@@ -596,10 +708,12 @@ async function useHeroBattleSkill() {
       dmg = Math.max(1, Math.round(base * mult));
     }
 
-    const actualDmg = _damageBossCycle(_bbCycle, _bbApplyVariance(dmg));
+    const variedDmg = _bbApplyVariance(dmg);
+    const wasCrit    = _bbLastCrit;
+    const actualDmg = _damageBossCycle(_bbCycle, variedDmg);
     if (bossSpriteEl) bossSpriteEl.classList.add('bb-hit');
     _bbSpawnDmgFloat(actualDmg, bossSpriteEl);
-    toast(skill.icon, `${skill.name}! ${actualDmg} de daño.`);
+    toast(skill.icon, `${skill.name}! ${actualDmg} de daño.${wasCrit ? ' 💥 ¡Crítico!' : ''}`);
 
     if (skill.type === 'Normal' && hero.hero_class === 'fundador' && typeof addGold === 'function') {
       const bonusGold = Math.round(actualDmg * 0.5);
