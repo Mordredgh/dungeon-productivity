@@ -445,6 +445,32 @@ agregadas (las que decía "FALTA" + la parcial), todo en `boss_battle.js`/`pets.
 (demasiado complejo sin payoff para una app de productividad), objetos equipables en mascotas,
 batallas dobles, mega-evolución — no sirven el propósito del proyecto.
 
+## Auditoría de cobertura de arte (2026-07-08)
+
+Pedido por Gerardo: "aun faltan mucho arte para no utilizar iconos genericos". Auditoría completa
+confirmó que la cobertura de arte ya es alta (~395 assets); los huecos reales eran 3 bugs de código
+(arte ya entregado pero nunca se mostraba) + wiring faltante, no arte nuevo pendiente en su mayoría.
+
+**Bugs arreglados (arte ya existía, código pedía extensión equivocada):**
+- `js/spells.js` — pedía `spell_X.png`, el archivo real es `.webp`. Afectaba las 12 orbes de hechizo.
+- `js/weapons.js` (líneas 110 y 282, inventario + fragua) — mismo bug con `arma_X_Y.png` vs `.webp`.
+  Afectaba las 50 combinaciones de arma/armadura.
+
+**Wiring agregado (arte ya existía, nunca se conectó a la UI):**
+- Clima (`clima_*.webp`, 5 archivos) y estaciones (`estacion_*.webp`, 4 archivos) — la franja de
+  "efectos activos" (`_collectActiveEffects()`/`renderEffectsBar()`/`openEffectsModal()` en
+  `views.js`) solo mostraba el emoji del `WEATHER_TYPES`/`SEASONAL_EVENTS`, ignorando el campo `img`
+  que ya apuntaba a arte real. Ahora usa `<img>` con fallback a emoji vía `onerror`.
+
+**Arte real aún pendiente (confirmado, no es bug):**
+- 6 materiales de clase secreta: `secret_mat_crononauta/paladin/nigromante/titan/druida/estrella.webp`
+- Cosméticos menores sin arte scoped: Árbol de Maestría (6 nodos), Mejoras de Oro en tienda (4),
+  Skills de héroe en combate (6). Árbol de Habilidades (30 nodos) tiene arte fuente fuera del repo
+  (`F:\Dungeon\ARBOL DE HABILIDADES`, 11 archivos SVG) pendiente de sesión de integración/QA visual
+  dedicada — no es un simple drop de archivos.
+- 14 logros menores/ocultos y 32 iconos de movimiento de combate (Zarpazo, Mordida, etc.) — badges
+  chicos de UI, se evaluó dejarlos en emoji permanentemente (bajo impacto visual).
+
 **Ataque de mascota que escala con su propio nivel — ya existía, confirmado funcionando.**
 `getPetStatAtLevel()` ya aplicaba `stat_gain.atk` por nivel, y `_bbCalcDmg()` ya multiplicaba por
 `petSt.atk`. No hizo falta cambio — el pedido de Gerardo ya estaba resuelto, solo no era visible

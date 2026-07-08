@@ -212,7 +212,7 @@ function renderSpells() {
     const hasMana  = !s.mana || curMana >= s.mana || freeHeal;
     const ready    = hasFrags && hasMana;
     const clr      = freeHeal ? '#fde68a' : (s.color || '#a855f7');
-    const imgUrl   = 'images/spell_' + s.id + '.png';
+    const imgUrl   = 'images/spell_' + s.id + '.webp';
     const manaBadge = s.mana
       ? `<div class="spell-orb-mana ${hasMana ? '' : 'spell-mana-low'}">${freeHeal ? '✝️ Gratis' : '💧' + s.mana}</div>`
       : '';

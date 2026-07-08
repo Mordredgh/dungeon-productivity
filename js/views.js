@@ -843,13 +843,13 @@ function _collectActiveEffects() {
   // Seasonal event
   if (typeof getSeasonalEvent === 'function') {
     const ev = getSeasonalEvent();
-    if (ev) effects.push({ icon: ev.icon, name: ev.name, desc: `+${Math.round(ev.xpBonus*100)}% XP`, color: ev.color || '#a78bfa', category: '🌟 Estacional' });
+    if (ev) effects.push({ icon: ev.icon, img: ev.img, name: ev.name, desc: `+${Math.round(ev.xpBonus*100)}% XP`, color: ev.color || '#a78bfa', category: '🌟 Estacional' });
   }
   // Weather
   if (typeof getTodayWeather === 'function' && typeof WEATHER_TYPES !== 'undefined') {
     const w  = getTodayWeather();
     const wd = WEATHER_TYPES[w];
-    if (wd) effects.push({ icon: wd.icon, name: wd.name, desc: wd.desc, color: '#60a5fa', category: '🌤️ Clima' });
+    if (wd) effects.push({ icon: wd.icon, img: wd.img, name: wd.name, desc: wd.desc, color: '#60a5fa', category: '🌤️ Clima' });
   }
   // Active potions (inventory items with xpBonus or goldBonus)
   if (typeof inventory !== 'undefined' && typeof ITEM_DEFS !== 'undefined') {
@@ -876,9 +876,14 @@ function renderEffectsBar() {
   const efx = _collectActiveEffects();
   if (!efx.length) { bar.style.display = 'none'; return; }
   bar.style.display = 'flex';
-  bar.innerHTML = efx.slice(0, 4).map(e =>
-    `<span class="efx-chip" style="--efx-clr:${e.color}">${e.icon} <span class="efx-chip-name">${escHtml(e.name)}</span> <span class="efx-chip-val">${escHtml(e.desc)}</span></span>`
-  ).join('') + (efx.length > 4 ? `<span class="efx-chip efx-more">+${efx.length-4} más</span>` : '') +
+  bar.innerHTML = efx.slice(0, 4).map(e => {
+    const iconHtml = e.img
+      ? `<img src="images/${e.img}.webp" class="efx-chip-icon" alt=""
+             onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+         <span style="display:none">${e.icon}</span>`
+      : e.icon;
+    return `<span class="efx-chip" style="--efx-clr:${e.color}">${iconHtml} <span class="efx-chip-name">${escHtml(e.name)}</span> <span class="efx-chip-val">${escHtml(e.desc)}</span></span>`;
+  }).join('') + (efx.length > 4 ? `<span class="efx-chip efx-more">+${efx.length-4} más</span>` : '') +
   `<span class="efx-expand" title="Ver todos">▶</span>`;
 }
 
@@ -895,7 +900,9 @@ function openEffectsModal() {
       `<div>
         <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">${escHtml(cat)}</div>
         ${items.map(e => `<div class="efx-row" style="--efx-clr:${e.color}">
-          <span class="efx-row-icon">${e.icon}</span>
+          ${e.img
+            ? `<img src="images/${e.img}.webp" class="efx-row-icon" alt="" onerror="this.outerHTML='<span class=\\'efx-row-icon\\'>${e.icon}</span>'">`
+            : `<span class="efx-row-icon">${e.icon}</span>`}
           <div style="flex:1;min-width:0">
             <div class="efx-row-name">${escHtml(e.name)}</div>
             <div class="efx-row-desc">${escHtml(e.desc)}</div>
