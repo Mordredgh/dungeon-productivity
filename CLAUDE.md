@@ -171,7 +171,7 @@ Agregar archivos nuevos **ANTES de `auth.js`**.
 
 ---
 
-## Tablas Supabase (Aglaya)
+## Tablas Supabase (proyecto propio, ver traspaso 2026-07-12 abajo)
 
 ### `dungeon_heroes` — columnas relevantes
 ```
@@ -461,6 +461,34 @@ confirmó que la cobertura de arte ya es alta (~395 assets); los huecos reales e
   "efectos activos" (`_collectActiveEffects()`/`renderEffectsBar()`/`openEffectsModal()` en
   `views.js`) solo mostraba el emoji del `WEATHER_TYPES`/`SEASONAL_EVENTS`, ignorando el campo `img`
   que ya apuntaba a arte real. Ahora usa `<img>` con fallback a emoji vía `onerror`.
+
+## Traspaso a proyecto Supabase propio (2026-07-12)
+
+Dungeon estaba en `stdedxhxxoyostymldqn` (proyecto "Aglaya Marketing"). Gerardo empezó a reutilizar
+ese mismo proyecto para Aglaya Marketing y quería aislar Dungeon — no por choque real de nombres de
+tabla (Postgres namespacea por tabla, no por proyecto, y `dungeon_*` ya tenía prefijo propio), sino
+para separar blast radius, facturación y ruido de logs/advisors. Creó cuenta Supabase nueva (otro
+correo) para no gastar el segundo proyecto free de su cuenta principal (ya tiene Maneki + Aglaya ahí).
+
+**Proyecto nuevo:** `xibmopqlgjbcypxixnri.supabase.co` (org "Arcanum Dungeon", plan Free, región
+ca-central-1). `js/config.js` (`SUPA_URL`, `SUPA_KEY`, `CDN`) apunta ahí desde v194.
+
+**Qué se migró (sin downtime, DB viejo se dejó intacto como respaldo):**
+- **9 tablas `dungeon_*`** — schema recreado a mano vía `information_schema` (columnas exactas,
+  tipos, defaults) + RLS idéntica (`require_auth` policy, `auth.role() = 'authenticated'`), datos
+  copiados fila por fila (heroes, quests, pomodoros, inventory, pets, weapons, runes, goals,
+  push_subscriptions) vía script Node (`pg` client + `execute_sql` del MCP para leer el origen).
+  Verificado conteo de filas idéntico al viejo tras la carga.
+- **Storage bucket `assets/dungeon/*`** — 270 archivos, ~452MB (arte legacy `.png`, fallback CDN de
+  `onerror` en las imágenes; el catálogo real vive en `images/*.webp` local, esto es solo respaldo).
+  Migrado descargando cada archivo del bucket público viejo y subiéndolo al nuevo vía Storage REST
+  API con `service_role` key.
+- **3 Edge Functions** (`send-push`, `google-oauth`, `duolingo-proxy`) — código fuente extraído del
+  proyecto viejo y redesplegado al nuevo vía `supabase functions deploy` (Supabase CLI + personal
+  access token de la cuenta nueva, sin Docker corriendo — el CLI lo permite igual).
+
+**No migrado (fuera de scope, viven en el proyecto Aglaya y no son de Dungeon):** las otras 29 tablas
+del proyecto viejo (`aglaya_*`, `blog_*`, `portfolio`, etc.) — esas se quedan donde están.
 
 **Arte real aún pendiente (confirmado, no es bug):**
 - 6 materiales de clase secreta: `secret_mat_crononauta/paladin/nigromante/titan/druida/estrella.webp`
