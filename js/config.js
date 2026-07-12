@@ -3,8 +3,8 @@
 // Capture OAuth callback params before Supabase auto-detects and clears ?code= from the URL
 const _oauthParams = new URLSearchParams(window.location.search);
 
-const SUPA_URL = 'https://stdedxhxxoyostymldqn.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0ZGVkeGh4eG95b3N0eW1sZHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MTQ2NTMsImV4cCI6MjA4ODQ5MDY1M30.OUhqeeqjlQa6ufECPzOJqZ-gQB93pg8nu0g1j4lEXyI';
+const SUPA_URL = 'https://xibmopqlgjbcypxixnri.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpYm1vcHFsZ2piY3lweGl4bnJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4Nzg2OTUsImV4cCI6MjA5OTQ1NDY5NX0.cvczYn3u44M9UwcLWmKEH4MP-y2qeT_tDvMcHHqb1o0';
 
 const WEATHER = {
   0:{i:'☀️',d:'Cielo despejado'},      1:{i:'🌤️',d:'Mayormente despejado'},
@@ -264,7 +264,7 @@ const AVATAR_FRAMES = [
 
 const GOLD_TABLE = { main:50, side:20, daily:10, weekly:35, habit:8 };
 
-const CDN = 'https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/';
+const CDN = 'https://xibmopqlgjbcypxixnri.supabase.co/storage/v1/object/public/assets/';
 
 /* ── GOOGLE OAUTH2 (mismo client ID para Fit + Calendar) ──── */
 const GOOGLE_CLIENT_ID    = '631929698326-s30ji937vmgri0spmpup3t21tfje35ci.apps.googleusercontent.com';
