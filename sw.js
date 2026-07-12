@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v196';
+﻿const CACHE = 'dungeon-v197';
 const ASSETS = [
   '/',
   '/index.html',
@@ -408,8 +408,8 @@ self.addEventListener('push', e => {
   e.waitUntil(
     self.registration.showNotification(data.title || 'Arcanum', {
       body:    data.body  || '',
-      icon:    'https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png',
-      badge:   'https://stdedxhxxoyostymldqn.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png',
+      icon:    'https://xibmopqlgjbcypxixnri.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png',
+      badge:   'https://xibmopqlgjbcypxixnri.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png',
       vibrate: [200, 100, 200],
       data:    { url: data.url || '/' },
     })
