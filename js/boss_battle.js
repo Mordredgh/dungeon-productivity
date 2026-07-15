@@ -537,10 +537,9 @@ async function executeBattleAttack(moveIdx) {
   if (_bbMovePPLeft(_bbCycle, move) <= 0) { toast('🚫', `${move.name} sin usos restantes hoy.`); return; }
 
   _bbAnimating = true;
-  _bbUse(_bbCycle);
-  _bbUseMovePP(_bbCycle, move);
 
-  /* ─ Parálisis: chance de fallar el turno por completo ── */
+  /* ─ Parálisis: chance de fallar el turno por completo. Se pierde el turno
+       (el jefe contraataca) pero NO se gasta ataque diario ni PP — fiel a Pokémon. ── */
   if (_bbPetStatus === 'paralizado' && Math.random() < 0.25) {
     toast('⚡', `¡${_bbPetDef.name} está paralizado y no pudo atacar!`, 1300);
     await _bbDelay(400);
@@ -550,6 +549,9 @@ async function executeBattleAttack(moveIdx) {
     _bbRender();
     return;
   }
+
+  _bbUse(_bbCycle);
+  _bbUseMovePP(_bbCycle, move);
 
   /* ─ Especial (movimiento definitivo): también sube ATK propio 1 etapa ── */
   if (move.type === 'Especial') _bbRaiseAtkStage(1);
