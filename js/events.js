@@ -23,8 +23,12 @@ document.querySelectorAll('.filter-tab[data-hfilter]').forEach(btn => btn.addEve
   renderHistory();
 }));
 
-// History search
-document.getElementById('historySearch').addEventListener('input', () => { historyPage = 1; renderHistory(); });
+// History search (debounced 200ms — evita re-render por cada tecla)
+let _histSearchTimer;
+document.getElementById('historySearch').addEventListener('input', () => {
+  clearTimeout(_histSearchTimer);
+  _histSearchTimer = setTimeout(() => { historyPage = 1; renderHistory(); }, 200);
+});
 
 document.getElementById('addQuestBtn').addEventListener('click', () => {
   let name = document.getElementById('qName').value.trim();
@@ -781,7 +785,19 @@ function initParticles() {
       ctx.fill();
     });
   }
-  setInterval(draw, 50);
+
+  // rAF en vez de setInterval: pausa solo cuando la pestaña está oculta (ahorra CPU/batería),
+  // gate de ~50ms para conservar la velocidad visual original (20fps).
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    draw();  // reduced-motion: un solo cuadro estático
+    return;
+  }
+  let _lastDraw = 0;
+  function loop(ts) {
+    if (ts - _lastDraw >= 50) { _lastDraw = ts; draw(); }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
 }
 
 /* ============================================================
