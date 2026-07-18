@@ -136,7 +136,7 @@ function _renderGoldUpgrades() {
     return `
     <div class="rpg-shop-card rpg-rarity-legendary">
       <div class="rpg-rarity-tag" style="color:${_RARITY_COLOR.legendary}">PERMANENTE</div>
-      <div class="rpg-item-visual"><span class="rpg-item-emoji">${u.icon}</span></div>
+      <div class="rpg-item-visual"><img src="images/${u.img}.webp" class="rpg-item-art" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="rpg-item-emoji" style="display:none">${u.icon}</span></div>
       <div class="rpg-shop-item-name">${escHtml(u.name)}</div>
       <div class="rpg-shop-item-desc">${escHtml(u.desc)}</div>
       <button class="rpg-buy-btn" onclick="buyGoldUpgrade('${u.id}')" ${canBuy ? '' : 'disabled'}>
@@ -170,7 +170,7 @@ function _renderAvatarFrames() {
     return `
     <div class="rpg-shop-card rpg-rarity-epic">
       <div class="rpg-rarity-tag" style="color:${_RARITY_COLOR.epic}">COSMÉTICO</div>
-      <div class="rpg-item-visual"><span class="rpg-item-emoji">${f.icon}</span></div>
+      <div class="rpg-item-visual"><img src="images/${f.img}.webp" class="rpg-item-art" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="rpg-item-emoji" style="display:none">${f.icon}</span></div>
       <div class="rpg-shop-item-name">${escHtml(f.name)}</div>
       <button class="rpg-buy-btn" onclick="${isOwned ? `equipAvatarFrame('${f.id}')` : `buyAvatarFrame('${f.id}')`}" ${!isOwned && !canBuy ? 'disabled' : ''}>
         ${isEquipped ? '✅ Equipado' : isOwned ? '👕 Equipar' : '🪙 ' + f.cost.toLocaleString()}

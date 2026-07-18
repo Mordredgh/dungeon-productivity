@@ -436,7 +436,7 @@ function renderCharacterSheet() {
             const canSpend = !maxed && (hero.mastery_points || 0) > 0;
             return `
             <div class="chr-mastery-node${maxed ? ' chr-mastery-maxed' : ''}">
-              <div class="chr-mastery-icon">${node.icon}</div>
+              <div class="chr-mastery-icon"><img src="images/${node.img}.webp" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none">${node.icon}</span></div>
               <div class="chr-mastery-name">${escHtml(node.name)} <span class="chr-mastery-rank">${rank}/${node.maxRank}</span></div>
               <div class="chr-mastery-desc">${escHtml(node.desc)}</div>
               <button class="chr-mastery-btn" onclick="spendMasteryPoint('${node.id}')" ${canSpend ? '' : 'disabled'}>

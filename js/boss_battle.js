@@ -10,16 +10,16 @@
    ──────────────────────────────────────────────────────────── */
 const PET_MOVES = {
   'zorro-naturaleza': [
-    { id:'zarpazo',    name:'Zarpazo',            icon:'🌿', power:1.0, type:'Normal',    reqLevel:0  },
-    { id:'mordida',    name:'Mordida Silvestre',   icon:'🦷', power:1.5, type:'Normal',    reqLevel:0  },
-    { id:'torbellino', name:'Torbellino Verde',    icon:'🌪️', power:2.5, type:'Elemental', reqLevel:5  },
-    { id:'furia-nat',  name:'Furia Natural',       icon:'🌳', power:4.0, type:'Especial',  reqLevel:15 },
+    { id:'zarpazo',    name:'Zarpazo',            icon:'🌿', img:'move_normal', power:1.0, type:'Normal',    reqLevel:0  },
+    { id:'mordida',    name:'Mordida Silvestre',   icon:'🦷', img:'move_normal', power:1.5, type:'Normal',    reqLevel:0  },
+    { id:'torbellino', name:'Torbellino Verde',    icon:'🌪️', img:'move_elemental', power:2.5, type:'Elemental', reqLevel:5  },
+    { id:'furia-nat',  name:'Furia Natural',       icon:'🌳', img:'move_especial', power:4.0, type:'Especial',  reqLevel:15 },
   ],
   'pantera-sombra': [
-    { id:'garra',    name:'Garra Oscura',     icon:'🌑', power:1.0, type:'Normal',   reqLevel:0  },
-    { id:'paso',     name:'Paso Sombra',      icon:'💨', power:1.5, type:'Normal',   reqLevel:0  },
-    { id:'mirada',   name:'Mirada Abisal',    icon:'👁️', power:2.5, type:'Oscuro',   reqLevel:5  },
-    { id:'eclipse',  name:'Eclipse Total',    icon:'🌑', power:4.0, type:'Especial', reqLevel:15 },
+    { id:'garra',    name:'Garra Oscura',     icon:'🌑', img:'move_normal', power:1.0, type:'Normal',   reqLevel:0  },
+    { id:'paso',     name:'Paso Sombra',      icon:'💨', img:'move_normal', power:1.5, type:'Normal',   reqLevel:0  },
+    { id:'mirada',   name:'Mirada Abisal',    icon:'👁️', img:'move_oscuro', power:2.5, type:'Oscuro',   reqLevel:5  },
+    { id:'eclipse',  name:'Eclipse Total',    icon:'🌑', img:'move_especial', power:4.0, type:'Especial', reqLevel:15 },
   ],
   'lobo-tormenta': [
     { id:'mordisco', name:'Mordisco Eléctrico', icon:'⚡', power:1.0, type:'Normal',    reqLevel:0  },
@@ -61,6 +61,17 @@ const _BB_FALLBACK_MOVES = [
 ];
 
 function _bbMoves(petKey) { return PET_MOVES[petKey] || _BB_FALLBACK_MOVES; }
+
+function _bbMoveVisual(move) {
+  const type = String(move?.type || 'Normal').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const img = move?.img || `move_${type}`;
+  return `<img class="bb-move-art" src="images/${img}.webp" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none">${move?.icon || '✦'}</span>`;
+}
+
+function _bbHeroVisual(heroClass, fallback) {
+  const img = `habilidad_${heroClass || 'guerrero'}`;
+  return `<img class="bb-move-art" src="images/${img}.webp" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none">${fallback || '✦'}</span>`;
+}
 
 function _bbMoveUnlocked(move, pet) {
   return (pet.pet_level || 1) >= (move.reqLevel || 0);
@@ -541,7 +552,7 @@ function _bbRender() {
       onclick="${disabled ? '' : `executeBattleAttack(${i})`}"
       ${disabled ? 'disabled' : ''}
       title="${unlocked ? mv.name + ' · ~' + dmg + ' daño' + (elMult > 1 ? ' (súper efectivo)' : elMult < 1 ? ' (poco efectivo)' : '') : '🔒 Requiere Nv.' + mv.reqLevel}">
-      <span class="bb-move-icon">${mv.icon}</span>
+      <span class="bb-move-icon">${_bbMoveVisual(mv)}</span>
       <span class="bb-move-name">${mv.name}</span>
       <span class="bb-move-type ${typeClass}">${unlocked ? mv.type : '🔒 Nv.' + mv.reqLevel}</span>
       ${unlocked ? `<span class="bb-move-dmg">~${dmg}${elTag}</span><span class="bb-move-pp">PP ${ppLeft}/${_bbMoveMaxPP(mv)}</span>` : ''}
@@ -556,7 +567,7 @@ function _bbRender() {
     <button class="bb-move-btn bb-hero-skill${_bbHeroSkillUsed ? ' bb-move-exhausted' : ''}"
       onclick="${_bbHeroSkillUsed ? '' : 'useHeroBattleSkill()'}" ${_bbHeroSkillUsed || _bbAnimating ? 'disabled' : ''}
       title="${heroSkill.desc}">
-      <span class="bb-move-icon">${heroSkill.icon}</span>
+      <span class="bb-move-icon">${_bbHeroVisual(hero?.hero_class, heroSkill.icon)}</span>
       <span class="bb-move-name">${heroSkill.name}</span>
       <span class="bb-move-type">Habilidad de Héroe</span>
       <span class="bb-move-dmg">${_bbHeroSkillUsed ? 'Usada' : '1×/batalla'}</span>

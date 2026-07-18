@@ -308,12 +308,12 @@ const SECRET_SET_BONUSES = {
 /* ── ÁRBOL DE MAESTRÍA — gastado con puntos de prestige ──────
    1 punto de maestría por cada Ascensión. Cada nodo escala por rango. */
 const MASTERY_TREE = [
-  { id:'vigor',         name:'Vigor Ancestral',  icon:'❤️', maxRank:5, effectPerRank:0.02, desc:'+2% HP máx por rango' },
-  { id:'fortuna',       name:'Fortuna Eterna',   icon:'💰', maxRank:5, effectPerRank:0.02, desc:'+2% oro ganado por rango' },
-  { id:'persistencia',  name:'Persistencia',     icon:'⏳', maxRank:5, effectPerRank:0.05, desc:'-5% tiempo de forja por rango' },
-  { id:'fuerza_bruta',  name:'Fuerza Bruta',     icon:'💪', maxRank:5, effectPerRank:0.03, desc:'+3% daño de mascota en jefes por rango' },
-  { id:'suerte',        name:'Suerte del Gremio', icon:'🍀', maxRank:5, effectPerRank:0.02, desc:'+2% drop rate por rango' },
-  { id:'voluntad',      name:'Voluntad de Hierro', icon:'🗲', maxRank:3, effectPerRank:1,    desc:'+1 ataque diario contra jefes por rango' },
+  { id:'vigor',         name:'Vigor Ancestral',  icon:'❤️', img:'mastery_vigor', maxRank:5, effectPerRank:0.02, desc:'+2% HP máx por rango' },
+  { id:'fortuna',       name:'Fortuna Eterna',   icon:'💰', img:'mastery_fortuna', maxRank:5, effectPerRank:0.02, desc:'+2% oro ganado por rango' },
+  { id:'persistencia',  name:'Persistencia',     icon:'⏳', img:'mastery_persistencia', maxRank:5, effectPerRank:0.05, desc:'-5% tiempo de forja por rango' },
+  { id:'fuerza_bruta',  name:'Fuerza Bruta',     icon:'💪', img:'mastery_fuerza_bruta', maxRank:5, effectPerRank:0.03, desc:'+3% daño de mascota en jefes por rango' },
+  { id:'suerte',        name:'Suerte del Gremio', icon:'🍀', img:'mastery_suerte', maxRank:5, effectPerRank:0.02, desc:'+2% drop rate por rango' },
+  { id:'voluntad',      name:'Voluntad de Hierro', icon:'🗲', img:'mastery_voluntad', maxRank:3, effectPerRank:1,    desc:'+1 ataque diario contra jefes por rango' },
 ];
 function getMasteryRank(nodeId) {
   if (!hero) return 0;
@@ -328,10 +328,10 @@ function getMasteryBonus(nodeId) {
 /* ── MEJORAS PERMANENTES (sumidero de oro funcional) ─────────
    Compra única por id, persistida en hero.gold_upgrades (jsonb array de ids) */
 const GOLD_UPGRADES = [
-  { id:'forge_slot',  name:'Cola de Forja +1',     icon:'⚒️', cost:5000,  desc:'+1 espacio en la cola de forja de sets secretos (máx 3→4)' },
-  { id:'forge_slot2', name:'Cola de Forja +1 (II)', icon:'⚒️', cost:12000, desc:'+1 espacio adicional en la cola de forja (4→5)', reqUpgrade:'forge_slot' },
-  { id:'drop_rate',   name:'Ojo del Coleccionista', icon:'🔮', cost:8000,  desc:'+5% drop rate base en todo el loot de misiones' },
-  { id:'gold_boost',  name:'Pacto del Mercader',    icon:'💰', cost:10000, desc:'+10% oro permanente en todas las ganancias' },
+  { id:'forge_slot',  name:'Cola de Forja +1',     icon:'⚒️', img:'upgrade_forge_slot', cost:5000,  desc:'+1 espacio en la cola de forja de sets secretos (máx 3→4)' },
+  { id:'forge_slot2', name:'Cola de Forja +1 (II)', icon:'⚒️', img:'upgrade_forge_slot2', cost:12000, desc:'+1 espacio adicional en la cola de forja (4→5)', reqUpgrade:'forge_slot' },
+  { id:'drop_rate',   name:'Ojo del Coleccionista', icon:'🔮', img:'upgrade_drop_rate', cost:8000,  desc:'+5% drop rate base en todo el loot de misiones' },
+  { id:'gold_boost',  name:'Pacto del Mercader',    icon:'💰', img:'upgrade_gold_boost', cost:10000, desc:'+10% oro permanente en todas las ganancias' },
 ];
 function hasGoldUpgrade(id) {
   if (!hero) return false;
@@ -346,10 +346,10 @@ function getForgeQueueMax() {
 
 /* ── COSMÉTICOS — marcos de avatar (sumidero de oro sin afectar balance) ── */
 const AVATAR_FRAMES = [
-  { id:'bronce',  name:'Marco de Bronce',  icon:'🟤', cost:1500,  cssClass:'frame-bronce' },
-  { id:'plata',   name:'Marco de Plata',   icon:'⚪', cost:4000,  cssClass:'frame-plata' },
-  { id:'oro',     name:'Marco de Oro',     icon:'🟡', cost:9000,  cssClass:'frame-oro' },
-  { id:'arcano',  name:'Marco Arcano',     icon:'🔮', cost:15000, cssClass:'frame-arcano' },
+  { id:'bronce',  name:'Marco de Bronce',  icon:'🟤', img:'frame_bronce', cost:1500,  cssClass:'frame-bronce' },
+  { id:'plata',   name:'Marco de Plata',   icon:'⚪', img:'frame_plata', cost:4000,  cssClass:'frame-plata' },
+  { id:'oro',     name:'Marco de Oro',     icon:'🟡', img:'frame_oro', cost:9000,  cssClass:'frame-oro' },
+  { id:'arcano',  name:'Marco Arcano',     icon:'🔮', img:'frame_arcano', cost:15000, cssClass:'frame-arcano' },
 ];
 
 const GOLD_TABLE = { main:50, side:20, daily:10, weekly:35, habit:8 };
@@ -703,18 +703,18 @@ const ACHIEVEMENT_DEFS = [
   // ── Rachas ──
   { id: 'streak_3',       icon: '🔥',    name: 'En Llamas',          desc: 'Racha de 3 días',               cond: h => (h.longest_streak || 0) >= 3, img:'logro_en-llamas' },
   { id: 'streak_7',       icon: '🔥🔥',  name: 'Semana Épica',       desc: 'Racha de 7 días',               cond: h => (h.longest_streak || 0) >= 7, img:'logro_semana-epica' },
-  { id: 'streak_14',      icon: '🔥💫',  name: 'Fortuna Continua',   desc: 'Racha de 14 días',              cond: h => (h.longest_streak || 0) >= 14 },
+  { id: 'streak_14',      icon: '🔥💫',  name: 'Fortuna Continua',   desc: 'Racha de 14 días',              cond: h => (h.longest_streak || 0) >= 14, img:'logro_streak_14' },
   { id: 'streak_30',      icon: '💎',    name: 'Indestructible',     desc: 'Racha de 30 días',              cond: h => (h.longest_streak || 0) >= 30, img:'logro_indestructible' },
-  { id: 'streak_60',      icon: '🌙',    name: 'Monje del Dungeon',  desc: 'Racha de 60 días',              cond: h => (h.longest_streak || 0) >= 60 },
+  { id: 'streak_60',      icon: '🌙',    name: 'Monje del Dungeon',  desc: 'Racha de 60 días',              cond: h => (h.longest_streak || 0) >= 60, img:'logro_streak_60' },
   { id: 'streak_100',     icon: '☀️',   name: 'Eterno',             desc: 'Racha de 100 días',             cond: h => (h.longest_streak || 0) >= 100, img:'logro_eterno' },
   // ── Épicas ──
-  { id: 'first_main',     icon: '⭐',    name: 'Misión Mayor',       desc: 'Completa una misión principal',  cond: h => (h._main_done || 0) >= 1 },
-  { id: 'five_main',      icon: '⭐⭐',  name: 'Héroe Principal',    desc: 'Completa 5 misiones principales', cond: h => (h._main_done || 0) >= 5 },
-  { id: 'main_25',        icon: '🗺️',   name: 'Conquistador',       desc: 'Completa 25 misiones principales', cond: h => (h._main_done || 0) >= 25 },
+  { id: 'first_main',     icon: '⭐',    name: 'Misión Mayor',       desc: 'Completa una misión principal',  cond: h => (h._main_done || 0) >= 1, img:'logro_first_main' },
+  { id: 'five_main',      icon: '⭐⭐',  name: 'Héroe Principal',    desc: 'Completa 5 misiones principales', cond: h => (h._main_done || 0) >= 5, img:'logro_five_main' },
+  { id: 'main_25',        icon: '🗺️',   name: 'Conquistador',       desc: 'Completa 25 misiones principales', cond: h => (h._main_done || 0) >= 25, img:'logro_main_25' },
   // ── Magia ──
-  { id: 'spell_cast',     icon: '✨',   name: 'Arcano',             desc: 'Lanza tu primer hechizo',        cond: h => (h._spells_cast || 0) >= 1 },
+  { id: 'spell_cast',     icon: '✨',   name: 'Arcano',             desc: 'Lanza tu primer hechizo',        cond: h => (h._spells_cast || 0) >= 1, img:'logro_spell_cast' },
   // ── Salud ──
-  { id: 'full_hp',        icon: '❤️',   name: 'Inquebrantable',     desc: 'Mantén HP al máximo',            cond: h => (h.hp || 0) >= (h.hp_max || 100) },
+  { id: 'full_hp',        icon: '❤️',   name: 'Inquebrantable',     desc: 'Mantén HP al máximo',            cond: h => (h.hp || 0) >= (h.hp_max || 100), img:'logro_full_hp' },
   // ── Oro ──
   { id: 'gold_500',       icon: '🪙',   name: 'Mercader',           desc: 'Acumula 500 de oro',             cond: h => (h.gold || 0) >= 500, img:'logro_mercader' },
   { id: 'gold_2000',      icon: '💳',   name: 'Banquero del Gremio', desc: 'Acumula 2,000 de oro',          cond: h => (h.gold || 0) >= 2000, img:'logro_banquero' },
@@ -725,7 +725,7 @@ const ACHIEVEMENT_DEFS = [
     cond: () => (quests||[]).some(q => q.done && q.done_at && new Date(q.done_at).getHours() < 7) },
   { id: 'h_nocturno',    icon: '🦇', name: 'Criatura de la Noche', desc: 'Completa una misión después de las 11pm', hidden: true, img:'logro_nocturno',
     cond: () => (quests||[]).some(q => q.done && q.done_at && new Date(q.done_at).getHours() >= 23) },
-  { id: 'h_maldito',     icon: '💀', name: 'El Número Maldito',   desc: 'Llega exactamente al nivel 13',          hidden: true,
+  { id: 'h_maldito',     icon: '💀', name: 'El Número Maldito',   desc: 'Llega exactamente al nivel 13',          hidden: true, img:'logro_h_maldito',
     cond: h => h._level >= 13 },
   { id: 'h_dia_gloria',  icon: '⚡', name: 'Día de Gloria',        desc: 'Completa 5 misiones en un solo día',    hidden: true, img:'logro_dia-gloria',
     cond: () => { const c={}; (quests||[]).filter(q=>q.done&&q.done_at).forEach(q=>{const d=q.done_at.split('T')[0];c[d]=(c[d]||0)+1;}); return Object.values(c).some(v=>v>=5); } },

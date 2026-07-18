@@ -10,6 +10,15 @@ async function loadPets() {
 
 function _petDef(key) { return PET_DEFS.find(p => p.key === key); }
 
+function _petAbilityVisual(petKey, fallback = '✦') {
+  const family = {
+    'zorro-naturaleza':'nature', 'pantera-sombra':'shadow', 'lobo-tormenta':'storm',
+    grifo:'griffin', 'dragon-fuego':'dragon', 'fenix-mitico':'phoenix', 'rey-tempestad':'storm'
+  }[petKey];
+  if (!family) return fallback;
+  return `<img class="pet-ability-art" src="images/pet_power_${family}.webp" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none">${fallback}</span>`;
+}
+
 /* Mascota agotada tras caer en batalla — no puede pelear hasta descansar o usar poción */
 function isPetResting(pet) {
   return !!(pet && pet.exhausted_until && new Date(pet.exhausted_until) > new Date());
@@ -335,7 +344,7 @@ function renderActivePet() {
           <div class="pet-rpanel-info">
             <div class="pet-rpanel-name">${escHtml(def.name)}${active.is_shiny ? ' ✨' : ''}</div>
             <div class="pet-rpanel-rarity">${def.rarity}</div>
-            ${ab ? `<div class="pet-ability-tag" style="margin:4px 0">${ab.icon} ${escHtml(ab.desc)}</div>` : ''}
+            ${ab ? `<div class="pet-ability-tag" style="margin:4px 0">${_petAbilityVisual(active.pet_key, ab.icon)} ${escHtml(ab.desc)}</div>` : ''}
             <div class="pet-bond-card" title="Completa misiones con esta mascota activa para fortalecer el vínculo.">
               <div><span>🐾 Vínculo: ${bondRank.name}</span><b>${bond}${nextBond ? '/' + nextBond.min : ' MAX'}</b></div>
               <div class="pet-bond-bar"><i style="width:${bondPct}%"></i></div>
@@ -387,7 +396,7 @@ function renderActivePet() {
               <div style="font-size:9px;color:var(--text3);margin-top:2px">Alimento en Tienda → 🍖 Alimento</div>`;
             })()}
             <button class="pet-power-btn ${powered?'pet-power-used':'anim-pulse-btn'}" onclick="activatePetPower()" ${powered?'disabled':''}>
-              ${powered ? '⏳ Poder usado hoy' : `${ab?.icon||'⚡'} Activar Poder`}
+              ${powered ? '⏳ Poder usado hoy' : `${_petAbilityVisual(active.pet_key, ab?.icon || '⚡')} Activar Poder`}
             </button>
             <button class="pet-action-btn" style="margin-top:2px;font-size:10px;opacity:.7"
               onclick="setActivePet('')">Desactivar</button>
@@ -419,9 +428,9 @@ function renderActivePet() {
           <div class="pet-rpanel-info">
             <div class="pet-rpanel-name">${escHtml(eDef?.name||'Huevo')}</div>
             <div class="pet-rpanel-rarity">${eDef?.rarity||''}</div>
-            ${ab ? `<div class="pet-ability-tag" style="margin:4px 0">${ab.icon} ${escHtml(ab.desc)}</div>` : ''}
+            ${ab ? `<div class="pet-ability-tag" style="margin:4px 0">${_petAbilityVisual(petKey, ab.icon)} ${escHtml(ab.desc)}</div>` : ''}
             <button class="pet-power-btn ${powered?'pet-power-used':'anim-pulse-btn'}" onclick="activatePetPower()" ${powered?'disabled':''}>
-              ${powered ? '⏳ Poder usado hoy' : `${ab?.icon||'🥚'} Activar Poder`}
+              ${powered ? '⏳ Poder usado hoy' : `${_petAbilityVisual(petKey, ab?.icon || '🥚')} Activar Poder`}
             </button>
           </div>
         </div>
@@ -555,7 +564,7 @@ function renderPets() {
           </div>
           <div class="pet-card-name">${escHtml(def.name)}${pet.is_shiny ? ' ✨' : ''}</div>
           <div class="pet-card-rarity">${isMount ? '🌟 Montura' : '🐣 Bebé'}</div>
-          ${(() => { const ab = PET_ABILITIES?.[def.key]?.[pet.stage]; return ab ? `<div class="pet-ability-tag" style="font-size:9px">${ab.icon} ${escHtml(ab.desc)}</div>` : ''; })()}
+          ${(() => { const ab = PET_ABILITIES?.[def.key]?.[pet.stage]; return ab ? `<div class="pet-ability-tag" style="font-size:9px">${_petAbilityVisual(def.key, ab.icon)} ${escHtml(ab.desc)}</div>` : ''; })()}
           ${isPetResting(pet) ? (() => {
             const ms = new Date(pet.exhausted_until) - new Date();
             const h  = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);

@@ -263,7 +263,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   font-size: 22px;
   width: 42px;
   height: 42px;
-  border-radius: 50%;
+  border-radius: 10px;
   border: 2px solid transparent;
   background: linear-gradient(var(--bg3), var(--bg3)) padding-box,
               linear-gradient(135deg, var(--accent), var(--accent2)) border-box;
@@ -274,6 +274,21 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   transition: var(--transition-spring);
   position: relative;
 }
+
+.hero-avatar-btn .hero-avatar-img,
+.hero-avatar-btn .hero-avatar-emoji { border-radius: 7px; }
+.hero-avatar-btn[class*="frame-"]::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  z-index: 3;
+  pointer-events: none;
+  background: center / contain no-repeat;
+}
+.hero-avatar-btn.frame-bronce::after { background-image: url('../images/frame_bronce.webp'); }
+.hero-avatar-btn.frame-plata::after { background-image: url('../images/frame_plata.webp'); }
+.hero-avatar-btn.frame-oro::after { background-image: url('../images/frame_oro.webp'); }
+.hero-avatar-btn.frame-arcano::after { background-image: url('../images/frame_arcano.webp'); }
 
 .hero-avatar-btn:hover { transform: scale(1.08); }
 
@@ -6527,6 +6542,9 @@ img.efx-row-icon { width: 24px; height: 24px; object-fit: contain; }
 }
 .chr-mastery-node.chr-mastery-maxed { border-color: rgba(249,226,175,.35); }
 .chr-mastery-icon { font-size: 20px; margin-bottom: 2px; }
+.chr-mastery-icon img, .rpg-item-art { width: 42px; height: 42px; object-fit: contain; image-rendering: pixelated; }
+.bb-move-art { width: 25px; height: 25px; object-fit: contain; image-rendering: pixelated; vertical-align: middle; }
+.pet-ability-art { width: 18px; height: 18px; object-fit: contain; image-rendering: pixelated; vertical-align: middle; }
 .chr-mastery-name { font-size: 11px; font-weight: 600; color: var(--text); }
 .chr-mastery-rank { color: var(--text3); font-weight: 400; }
 .chr-mastery-desc { font-size: 10px; color: var(--text3); margin: 4px 0 6px; min-height: 26px; }
