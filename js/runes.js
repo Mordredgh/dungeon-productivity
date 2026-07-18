@@ -77,7 +77,7 @@ async function socketRune(runeId, weaponId) {
   const maxSlots = RUNE_SOCKET_COUNT[weapon.tier] || 0;
   if (!maxSlots) { toast('⚠️', 'Esta arma no tiene ranuras para runas.'); return; }
 
-  const slots = weapon.rune_slots ? JSON.parse(weapon.rune_slots) : [];
+  const slots = (() => { try { return weapon.rune_slots ? JSON.parse(weapon.rune_slots) : []; } catch(e) { return Array.isArray(weapon.rune_slots) ? weapon.rune_slots : []; } })();
   if (slots.length >= maxSlots) { toast('⚠️', 'Ranuras de runa llenas.'); return; }
 
   slots.push(runeId);
@@ -97,7 +97,8 @@ async function unsocketRune(runeId) {
   if (!rune) return;
   const weapon = (typeof weapons !== 'undefined' ? weapons : []).find(w => w.id === rune.weapon_id);
   if (weapon && weapon.rune_slots) {
-    const slots = JSON.parse(weapon.rune_slots).filter(id => id !== runeId);
+    const cur = (() => { try { return JSON.parse(weapon.rune_slots); } catch(e) { return Array.isArray(weapon.rune_slots) ? weapon.rune_slots : []; } })();
+    const slots = cur.filter(id => id !== runeId);
     await db.from('dungeon_weapons').update({ rune_slots: JSON.stringify(slots) }).eq('id', weapon.id);
     weapon.rune_slots = JSON.stringify(slots);
   }

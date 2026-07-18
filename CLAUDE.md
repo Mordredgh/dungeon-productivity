@@ -657,6 +657,26 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 
 ---
 
+## Habilidad de clase, slots de equipo y avatar en capas lite (v201, 2026-07-18)
+
+- **Botón de habilidad de clase reactivado.** `renderClassSkillBtn()` (rpg.js) ya tenía toda la lógica
+  de `useClassSkill()` conectada en dos call sites — el botón solo estaba `display:none` fijo en
+  index.html ("kept hidden for JS compatibility"). Ahora muestra icono (`images/habilidad_[clase].webp`
+  con fallback emoji), nombre y maná actual/costo. Deshabilitado si no alcanza el maná.
+- **Slots de equipo vacíos con arte.** `_chrEqRowHtml()`/`_chrArmorRowHtml()` (character.js, las
+  funciones REALMENTE usadas por `renderCharacterSheet()`) ahora muestran `images/slot_*.webp` de
+  fondo cuando el slot está vacío, en vez de solo emoji. Se eliminó el código muerto duplicado
+  `_cspWeaponSlotHtml()`/`_cspArmorSlotHtml()` que nunca se llamaba desde ningún lado.
+- **Avatar Visual con Capas — versión lite implementada.** El catálogo de arte solo tiene retratos
+  flat (`char_[clase]_[raza].webp`), no piezas de sprite separables — layering real requeriría arte
+  nuevo. Se implementó la alternativa pragmática: `_chrPortraitBadgesHtml()` superpone 2 badges (arma
+  principal equipada + mejor pieza de armadura por tier) como iconos pequeños en las esquinas
+  inferiores del retrato en el character sheet, usando el arte de armas/armaduras que ya existe.
+- **Revisión de tienda:** confirmado que ya tiene 9 consumibles con efectos reales distintos (todos
+  verificados wireados: `potion_exp`, `amulet`, `xpstone`, `revival`, `hp_minor`, `gold_rush_exp`
+  usado en `quests.js addXP()`, `boss_shield` usado en `rpg.js checkBossDeadline()`, `xp_scroll_sm`).
+  El ítem de backlog "tienda mejorada" ya estaba resuelto en una sesión anterior no documentada aquí.
+
 ## Backlog (no implementar sin confirmar con Gerardo)
 
 > **2026-06-30:** auditoría completa del backlog contra el código real. De los 7 ítems que decía este
