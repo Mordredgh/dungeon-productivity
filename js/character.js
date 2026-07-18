@@ -81,60 +81,6 @@ async function assignAttrPoint(key) {
   renderCharacterSheet();
 }
 
-/* ── Slots de equipo (legacy — se mantienen para compatibilidad) */
-function _cspWeaponSlotHtml(label, icon, weapon) {
-  if (!weapon) return `
-    <div class="csp-eq-slot" onclick="switchView('inventory')" title="Equipar desde inventario">
-      <span class="csp-eq-slot-icon">${icon}</span>
-      <span class="csp-eq-slot-label">${label}</span>
-      <span class="csp-eq-slot-hint">Vacío</span>
-    </div>`;
-  const slugMap  = { daga: 'dagas' };
-  const def  = WEAPON_DEFS.find(d => d.key === weapon.weapon_key) || { icon };
-  const tier = WEAPON_TIERS[weapon.tier] || { color: '#9ca3af', label: weapon.tier };
-  const img  = `images/arma_${slugMap[weapon.weapon_key] || weapon.weapon_key}_${weapon.tier}.webp`;
-  const glow = (weapon.tier === 'legendario' || weapon.tier === 'mitico') ? 'anim-pulse-glow' : '';
-  return `
-    <div class="csp-eq-slot csp-equipped ${glow}" style="--wc:${tier.color}"
-         onclick="unequipWeapon('${weapon.id}')" title="Click para desequipar">
-      <img src="${img}" class="csp-eq-slot-img" alt=""
-           onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-      <span class="csp-eq-slot-icon" style="display:none">${def.icon}</span>
-      <span class="csp-eq-slot-name">${escHtml(weapon.name)}</span>
-      <span class="csp-eq-slot-tier" style="color:${tier.color}">${tier.label}</span>
-      <span class="csp-eq-slot-label">${label}</span>
-    </div>`;
-}
-
-function _cspArmorSlotHtml(slotKey, label, icon) {
-  const equipped = (typeof weapons !== 'undefined' ? weapons : [])
-    .find(w => w.is_equipped && w.slot === slotKey);
-  if (!equipped) return `
-    <div class="csp-eq-slot" onclick="switchView('smithy')" title="Forjar o comprar">
-      <span class="csp-eq-slot-icon">${icon}</span>
-      <span class="csp-eq-slot-label">${label}</span>
-    </div>`;
-  const tier     = WEAPON_TIERS[equipped.tier] || { color: '#9ca3af', label: equipped.tier };
-  const img      = `images/arma_${equipped.weapon_key}_${equipped.tier}.webp`;
-  const armorDef = typeof ARMOR_DEFS !== 'undefined'
-    ? ARMOR_DEFS.find(d => d.key === equipped.weapon_key) : null;
-  const statLine = armorDef
-    ? (armorDef.statKey === 'hpMax'
-        ? `+${armorDef.statBase[equipped.tier] || 0} HP`
-        : `+${Math.round((armorDef.statBase[equipped.tier] || 0) * 100)}%`)
-    : '';
-  const glow = (equipped.tier === 'legendario' || equipped.tier === 'mitico') ? 'anim-pulse-glow' : '';
-  return `
-    <div class="csp-eq-slot csp-equipped ${glow}" style="--wc:${tier.color}"
-         onclick="unequipWeapon('${equipped.id}')" title="Click para desequipar">
-      <img src="${img}" class="csp-eq-slot-img" alt=""
-           onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-      <span class="csp-eq-slot-icon" style="display:none">${icon}</span>
-      ${statLine ? `<span class="csp-eq-slot-tier" style="color:${tier.color}">${statLine}</span>` : ''}
-      <span class="csp-eq-slot-label">${label}</span>
-    </div>`;
-}
-
 /* ── Grid de inventario ──────────────────────────────────────── */
 function _cspInvGridHtml() {
   const bag = (typeof weapons !== 'undefined' ? weapons : []).filter(w => !w.is_equipped);
@@ -258,15 +204,40 @@ function _chrAttrCardHtml(key, icon, name, eff, img) {
     </div>`;
 }
 
+/* ── Avatar en capas (lite): badges de equipo sobre el retrato ── */
+function _chrPortraitBadgesHtml(equipped) {
+  const armorSlots = ['head', 'body', 'hands', 'legs', 'feet'];
+  const armorPieces = (typeof weapons !== 'undefined' ? weapons : [])
+    .filter(w => w.is_equipped && armorSlots.includes(w.slot));
+  const mainHand = equipped.find(w => w.slot === 'main_hand');
+  const badges = [];
+  if (mainHand) {
+    const img = `images/arma_${mainHand.weapon_key}_${mainHand.tier}.webp`;
+    badges.push(`<img src="${img}" class="chr-portrait-badge chr-badge-weapon" alt="" title="${escHtml(mainHand.name)}" onerror="this.style.display='none'">`);
+  }
+  if (armorPieces.length) {
+    const tierOrder = Object.keys(WEAPON_TIERS);
+    const best = armorPieces.reduce((a, b) => (tierOrder.indexOf(b.tier) > tierOrder.indexOf(a.tier) ? b : a));
+    const img = `images/arma_${best.weapon_key}_${best.tier}.webp`;
+    badges.push(`<img src="${img}" class="chr-portrait-badge chr-badge-armor" alt="" title="${escHtml(best.name)}" onerror="this.style.display='none'">`);
+  }
+  return badges.join('');
+}
+
 function _chrEqRowHtml(slotKey, label, icon, weapon, fallbackView) {
-  if (!weapon) return `
+  if (!weapon) {
+    const slotImg = { main_hand: 'slot_arma-principal', off_hand: 'slot_arma-secundaria' }[slotKey];
+    return `
     <div class="chr-eq-row" onclick="switchView('${fallbackView}')" title="Equipar">
-      <span class="chr-eq-icon">${icon}</span>
+      <img src="images/${slotImg}.webp" class="chr-eq-slot-img" alt=""
+           onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+      <span class="chr-eq-icon" style="display:none">${icon}</span>
       <div class="chr-eq-info">
         <div class="chr-eq-vacant">Vacío</div>
         <div class="chr-eq-slot-lbl">${label}</div>
       </div>
     </div>`;
+  }
   const def  = WEAPON_DEFS.find(d => d.key === weapon.weapon_key) || { icon };
   const tier = WEAPON_TIERS[weapon.tier] || { color: '#9ca3af', label: weapon.tier };
   const glow = (weapon.tier === 'legendario' || weapon.tier === 'mitico') ? 'anim-pulse-glow' : '';
@@ -284,14 +255,19 @@ function _chrEqRowHtml(slotKey, label, icon, weapon, fallbackView) {
 function _chrArmorRowHtml(slotKey, label, icon) {
   const eq = (typeof weapons !== 'undefined' ? weapons : [])
     .find(w => w.is_equipped && w.slot === slotKey);
-  if (!eq) return `
+  if (!eq) {
+    const slotImg = { head: 'slot_casco', body: 'slot_pecho', hands: 'slot_guantes', legs: 'slot_grebas', feet: 'slot_botas' }[slotKey];
+    return `
     <div class="chr-eq-row" onclick="switchView('smithy')" title="Forjar o comprar">
-      <span class="chr-eq-icon">${icon}</span>
+      <img src="images/${slotImg}.webp" class="chr-eq-slot-img" alt=""
+           onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+      <span class="chr-eq-icon" style="display:none">${icon}</span>
       <div class="chr-eq-info">
         <div class="chr-eq-vacant">Vacío</div>
         <div class="chr-eq-slot-lbl">${label}</div>
       </div>
     </div>`;
+  }
   const tier     = WEAPON_TIERS[eq.tier] || { color: '#9ca3af', label: eq.tier };
   const armorDef = typeof ARMOR_DEFS !== 'undefined'
     ? ARMOR_DEFS.find(d => d.key === eq.weapon_key) : null;
@@ -344,6 +320,7 @@ function renderCharacterSheet() {
           <img src="images/char_${cls}_${race}.webp" class="char-portrait-img" alt=""
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="char-portrait-emoji" style="display:none">${hero.avatar || '🧙'}</div>
+          ${_chrPortraitBadgesHtml(equipped)}
         </div>
         <div class="chr-portrait-overlay">
           <div class="chr-hero-name">${escHtml(hero.name || 'Héroe')}</div>

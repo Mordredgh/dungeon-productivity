@@ -17,8 +17,8 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="https://xibmopqlgjbcypxixnri.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png" type="image/png">
 <link rel="apple-touch-icon" href="https://xibmopqlgjbcypxixnri.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png">
-<link rel="stylesheet" href="css/dungeon.css?v=200">
-<link rel="stylesheet" href="css/dungeon-v2.css?v=200">
+<link rel="stylesheet" href="css/dungeon.css?v=201">
+<link rel="stylesheet" href="css/dungeon-v2.css?v=201">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" defer></script>
 </head>
@@ -695,8 +695,10 @@
         <div class="panel-title">🐾 Mascota</div>
         <div id="activePetPanel"></div>
       </div>
-      <!-- class skill kept hidden for JS compatibility -->
-      <button id="classSkillBtn" style="display:none" onclick="useClassSkill()"></button>
+      <div class="panel-section" id="classSkillSection">
+        <div class="panel-title">🔮 Habilidad de Clase</div>
+        <button id="classSkillBtn" class="class-skill-btn" style="display:none" onclick="useClassSkill()"></button>
+      </div>
 
       <!-- spellsList kept in modal — see spellsModal below -->
 
@@ -1315,55 +1317,55 @@
 <!-- Loot Drop Container -->
 <div id="lootDropContainer" style="position:fixed;inset:0;pointer-events:none;z-index:9000" aria-hidden="true"></div>
 
-<script src="js/config.js?v=200" defer></script>
-<script src="js/state.js?v=200" defer></script>
-<script src="js/db.js?v=200" defer></script>
-<script src="js/hero.js?v=200" defer></script>
-<script src="js/quests.js?v=200" defer></script>
-<script src="js/timer.js?v=200" defer></script>
-<script src="js/inventory.js?v=200" defer></script>
-<script src="js/spells.js?v=200" defer></script>
-<script src="js/views.js?v=200" defer></script>
-<script src="js/ui.js?v=200" defer></script>
-<script src="js/events.js?v=200" defer></script>
-<script src="js/oracle.js?v=200" defer></script>
-<script src="js/shop.js?v=200" defer></script>
-<script src="js/rpg.js?v=200" defer></script>
-<script src="js/pets.js?v=200" defer></script>
-<script src="js/weapons.js?v=200" defer></script>
-<script src="js/secret_sets.js?v=200" defer></script>
-<script src="js/goals.js?v=200" defer></script>
-<script src="js/reputation.js?v=200" defer></script>
-<script src="js/patterns.js?v=200" defer></script>
-<script src="js/mechanics.js?v=200" defer></script>
-<script src="js/character.js?v=200" defer></script>
-<script src="js/weather.js?v=200" defer></script>
-<script src="js/dungeon_clock.js?v=200" defer></script>
-<script src="js/skill_tree.js?v=200" defer></script>
-<script src="js/bestiary.js?v=200" defer></script>
-<script src="js/dungeon_grows.js?v=200" defer></script>
-<script src="js/runes.js?v=200" defer></script>
-<script src="js/google_fit.js?v=200" defer></script>
-<script src="js/hero_score.js?v=200" defer></script>
-<script src="js/push.js?v=200" defer></script>
-<script src="js/combos.js?v=200" defer></script>
-<script src="js/habits.js?v=200" defer></script>
-<script src="js/ruleta.js?v=200" defer></script>
-<script src="js/duolingo.js?v=200" defer></script>
-<script src="js/drops.js?v=200" defer></script>
-<script src="js/daily_goal.js?v=200" defer></script>
-<script src="js/weekly_summary.js?v=200" defer></script>
-<script src="js/challenges.js?v=200" defer></script>
-<script src="js/zones.js?v=200" defer></script>
-<script src="js/hero_card.js?v=200" defer></script>
-<script src="js/world_map.js?v=200" defer></script>
-<script src="js/sala_personal.js?v=200" defer></script>
-<script src="js/pet_garden.js?v=200" defer></script>
-<script src="js/animations.js?v=200" defer></script>
-<script src="js/effects.js?v=200" defer></script>
-<script src="js/boss_battle.js?v=200" defer></script>
-<script src="js/auth.js?v=200" defer></script>
-<script src="js/main.js?v=200" defer></script>
+<script src="js/config.js?v=201" defer></script>
+<script src="js/state.js?v=201" defer></script>
+<script src="js/db.js?v=201" defer></script>
+<script src="js/hero.js?v=201" defer></script>
+<script src="js/quests.js?v=201" defer></script>
+<script src="js/timer.js?v=201" defer></script>
+<script src="js/inventory.js?v=201" defer></script>
+<script src="js/spells.js?v=201" defer></script>
+<script src="js/views.js?v=201" defer></script>
+<script src="js/ui.js?v=201" defer></script>
+<script src="js/events.js?v=201" defer></script>
+<script src="js/oracle.js?v=201" defer></script>
+<script src="js/shop.js?v=201" defer></script>
+<script src="js/rpg.js?v=201" defer></script>
+<script src="js/pets.js?v=201" defer></script>
+<script src="js/weapons.js?v=201" defer></script>
+<script src="js/secret_sets.js?v=201" defer></script>
+<script src="js/goals.js?v=201" defer></script>
+<script src="js/reputation.js?v=201" defer></script>
+<script src="js/patterns.js?v=201" defer></script>
+<script src="js/mechanics.js?v=201" defer></script>
+<script src="js/character.js?v=201" defer></script>
+<script src="js/weather.js?v=201" defer></script>
+<script src="js/dungeon_clock.js?v=201" defer></script>
+<script src="js/skill_tree.js?v=201" defer></script>
+<script src="js/bestiary.js?v=201" defer></script>
+<script src="js/dungeon_grows.js?v=201" defer></script>
+<script src="js/runes.js?v=201" defer></script>
+<script src="js/google_fit.js?v=201" defer></script>
+<script src="js/hero_score.js?v=201" defer></script>
+<script src="js/push.js?v=201" defer></script>
+<script src="js/combos.js?v=201" defer></script>
+<script src="js/habits.js?v=201" defer></script>
+<script src="js/ruleta.js?v=201" defer></script>
+<script src="js/duolingo.js?v=201" defer></script>
+<script src="js/drops.js?v=201" defer></script>
+<script src="js/daily_goal.js?v=201" defer></script>
+<script src="js/weekly_summary.js?v=201" defer></script>
+<script src="js/challenges.js?v=201" defer></script>
+<script src="js/zones.js?v=201" defer></script>
+<script src="js/hero_card.js?v=201" defer></script>
+<script src="js/world_map.js?v=201" defer></script>
+<script src="js/sala_personal.js?v=201" defer></script>
+<script src="js/pet_garden.js?v=201" defer></script>
+<script src="js/animations.js?v=201" defer></script>
+<script src="js/effects.js?v=201" defer></script>
+<script src="js/boss_battle.js?v=201" defer></script>
+<script src="js/auth.js?v=201" defer></script>
+<script src="js/main.js?v=201" defer></script>
 
 <!-- Challenges Modal -->
 <!-- HECHIZOS MODAL -->

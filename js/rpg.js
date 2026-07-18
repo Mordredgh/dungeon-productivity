@@ -308,10 +308,34 @@ function addMana(n) {
 function renderClassSkillBtn() {
   const el = document.getElementById('classSkillBtn');
   if (!el || !hero) return;
+  const skill = CLASS_SKILLS[hero.hero_class];
+  if (!skill) { el.style.display = 'none'; return; }
   const mana = hero.mana || 0;
   const canUse = mana >= MANA_SKILL_COST;
-  el.style.opacity = canUse ? '1' : '0.5';
-  el.title = canUse ? 'Usar habilidad de clase' : `Necesitas ${MANA_SKILL_COST} maná (tienes ${mana})`;
+  el.style.display = 'flex';
+  el.disabled = !canUse;
+  el.title = canUse ? skill.desc : `Necesitas ${MANA_SKILL_COST} maná (tienes ${mana})`;
+
+  el.textContent = '';
+  const img = document.createElement('img');
+  img.src = `images/habilidad_${hero.hero_class}.webp`;
+  img.className = 'class-skill-icon-img';
+  img.alt = '';
+  img.onerror = function () { this.style.display = 'none'; this.nextElementSibling.style.display = 'inline'; };
+  const emoji = document.createElement('span');
+  emoji.className = 'class-skill-emoji';
+  emoji.style.display = 'none';
+  emoji.textContent = skill.icon;
+  const info = document.createElement('span');
+  info.className = 'class-skill-info';
+  const name = document.createElement('span');
+  name.className = 'class-skill-name';
+  name.textContent = skill.name;
+  const manaLbl = document.createElement('span');
+  manaLbl.className = 'class-skill-mana';
+  manaLbl.textContent = `💙 ${mana}/${MANA_SKILL_COST}`;
+  info.append(name, manaLbl);
+  el.append(img, emoji, info);
 }
 async function useClassSkill() {
   if (!hero) return;
