@@ -54,6 +54,44 @@ const TITLES = [
 const XP_TABLE = { main: 100, side: 50, daily: 25, weekly: 75, habit: 20 };
 const POM_XP = 15;
 
+/* ── FACCIONES DEL DUNGEON — reputación por tipo de misión ──
+   3 rangos por facción, rango máximo desbloquea 1 misión exclusiva
+   reclamable una sola vez (recompensa real, no cosmética). */
+const FACTION_DEFS = [
+  { id: 'campeones',  type: 'main',   name: 'Orden de los Campeones',   icon: '⚔️', color: '#ef4444',
+    desc: 'Forjada por quienes solo aceptan las misiones épicas.',
+    ranks: [
+      { name: 'Aspirante', xp: 0 },
+      { name: 'Campeón',   xp: 400 },
+      { name: 'Leyenda',   xp: 1200 },
+    ],
+    exclusive: { name: 'Encargo de la Orden: prueba final', xp: 250, gold: 150 } },
+  { id: 'mercaderes', type: 'side',   name: 'Gremio de Mercaderes',     icon: '💼', color: '#f59e0b',
+    desc: 'Comerciantes y solucionadores de encargos del reino.',
+    ranks: [
+      { name: 'Aprendiz', xp: 0 },
+      { name: 'Socio',    xp: 300 },
+      { name: 'Magnate',  xp: 900 },
+    ],
+    exclusive: { name: 'Contrato del Gremio: encargo dorado', xp: 150, gold: 300 } },
+  { id: 'disciplina', type: 'daily',  name: 'Círculo de la Disciplina', icon: '🔄', color: '#22c55e',
+    desc: 'Monjes de la rutina — veneran la búsqueda diaria.',
+    ranks: [
+      { name: 'Novicio', xp: 0 },
+      { name: 'Monje',   xp: 250 },
+      { name: 'Maestro', xp: 750 },
+    ],
+    exclusive: { name: 'Rito del Círculo: búsqueda sagrada', xp: 100, gold: 80 } },
+  { id: 'cronicas',   type: 'weekly', name: 'Consejo de las Crónicas',  icon: '📜', color: '#8b5cf6',
+    desc: 'Guardianes de las grandes gestas semanales.',
+    ranks: [
+      { name: 'Escriba',  xp: 0 },
+      { name: 'Cronista', xp: 350 },
+      { name: 'Archivero', xp: 1000 },
+    ],
+    exclusive: { name: 'Crónica del Consejo: gesta perdida', xp: 200, gold: 200 } },
+];
+
 /* ── MISIÓN DEL DÍA — pool curado, seleccionado por seed de fecha ──
    xp/gold fijos, mayores que una daily normal (25 XP / 10 oro) */
 const DAILY_SPECIAL_QUESTS = [

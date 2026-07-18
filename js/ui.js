@@ -294,6 +294,7 @@ function switchView(v) {
     if (v === 'dungeon-grows'){ if (typeof renderDungeonGrows==='function')  renderDungeonGrows(); }
     if (v === 'zones')        { if (typeof renderZones==='function')         renderZones(); }
     if (v === 'worldmap')     { if (typeof renderWorldMap==='function')      renderWorldMap(); }
+    if (v === 'factions')     { if (typeof renderFactions==='function')      renderFactions(); }
     if (v === 'integrations') { renderIntegrations(); }
     if (v === 'config')       { if (typeof renderConfigView === 'function') renderConfigView(); }
     const moreBtn = document.getElementById('mobileNavMoreBtn');

@@ -324,7 +324,7 @@ async function updateQuest(id, patch) {
    3 misiones del mismo tipo seguidas → escudo de racha.       */
 async function _checkMissionShield(type) {
   if (!hero || !type) return;
-  const hist = JSON.parse(localStorage.getItem('dungeon-type-history') || '[]');
+  let hist; try { hist = JSON.parse(localStorage.getItem('dungeon-type-history') || '[]'); } catch { hist = []; }
   hist.push(type);
   const recent = hist.slice(-3);
   localStorage.setItem('dungeon-type-history', JSON.stringify(hist.slice(-20)));

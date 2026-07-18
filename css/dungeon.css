@@ -8589,3 +8589,42 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   .bcard-time-urgent { animation: none; }
 }
+
+/* ── Facciones del Dungeon ─────────────────────────── */
+.faction-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 4px 16px 24px;
+}
+@media (max-width: 600px) { .faction-grid { grid-template-columns: 1fr; } }
+
+.faction-card {
+  background: color-mix(in srgb, var(--fc) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--fc) 25%, transparent);
+  border-radius: 14px;
+  padding: 14px;
+  transition: border-color .2s, transform .15s;
+}
+.faction-card:hover {
+  border-color: color-mix(in srgb, var(--fc) 50%, transparent);
+  transform: translateY(-1px);
+}
+.faction-card-hd { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.faction-icon { font-size: 28px; line-height: 1; flex-shrink: 0; }
+.faction-name { font-size: 13px; font-weight: 700; color: var(--text); }
+.faction-rank { font-size: 11px; font-weight: 700; color: var(--fc); margin-top: 1px; }
+.faction-desc { font-size: 10px; color: var(--text3); margin-bottom: 8px; }
+.faction-bar-track { height: 6px; border-radius: 4px; background: rgba(255,255,255,.06); overflow: hidden; margin-bottom: 4px; }
+.faction-bar-fill { height: 100%; background: var(--fc); border-radius: 4px; transition: width .3s ease-out; }
+.faction-bar-lbl { font-size: 10px; color: var(--text3); margin-bottom: 10px; }
+.faction-claim-btn {
+  width: 100%; padding: 8px 10px; border-radius: 10px; cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--fc) 40%, transparent);
+  background: color-mix(in srgb, var(--fc) 15%, transparent);
+  color: var(--text); font-size: 11px; font-weight: 700;
+  transition: opacity .15s, transform .1s;
+}
+.faction-claim-btn:hover:not(:disabled) { opacity: .9; }
+.faction-claim-btn:active:not(:disabled) { transform: scale(.97); }
+.faction-claim-btn:disabled { cursor: not-allowed; opacity: .45; }

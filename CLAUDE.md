@@ -657,6 +657,29 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 
 ---
 
+## Oráculo IA eliminado + funciones dependientes de OpenClaw pasadas a cálculo local (v203, 2026-07-18)
+
+Gerardo eliminó el bot OpenClaw para siempre (segunda vez que se anuncia, ver también nota de
+2026-07-08 sobre Hermes). Todo lo que dependía de `fetch('/openclaw/send')` o `/openclaw/history`
+fallaba en silencio ("No se pudo conectar con el oráculo"). Se eliminó/reemplazó todo:
+- **`js/oracle.js` borrado por completo** — chat del Oráculo, botón, panel, prompts rápidos, todo
+  el HTML/CSS asociado (`.oracle-*`), entrada en `sw.js` ASSETS y `<script>` en index.html.
+- **`checkWeeklyRetro()`/`showWeeklyRetro()`/`checkDeadlineAlerts()`** (vivían en oracle.js pero NO
+  dependían de IA, solo stats reales) se movieron a `events.js` para no perderlas.
+- **Diario del Héroe** (`generateDiaryEntryAI` en rpg.js) — ya tenía fallback local
+  (`generateDiaryEntry()`, plantillas con datos reales). Se quitó el intento de fetch muerto,
+  ahora usa directo el fallback local, sin llamada de red inútil.
+- **Profecía semanal + veredicto** (`_evaluateProphecy` en rpg.js) — el texto de la profecía en sí
+  ya era local (templates + misiones reales embebidas). El veredicto de fin de semana pedía a IA
+  evaluar si se cumplió; ahora se calcula localmente comparando `missionIds` de la profecía contra
+  cuáles quedaron `done` (Cumplida ≥100%, Parcial ≥50%, Incumplida <50%).
+- **Análisis de Patrones** (`generatePatternAnalysis` en patterns.js) y **Reporte Mensual**
+  (`generateMonthlyReport`) — no tenían fallback, mostraban "no se pudo generar" para siempre.
+  Reescritos para computar localmente (día más productivo, tipo de misión predominante, hora pico
+  de pomodoros, racha, logros del mes) en vez de mandar prompt a IA externa.
+- **Nota:** `renderOraculo()` en views.js (la card "🔮 El Oráculo Habla" con frases de sabor según
+  racha/nivel) NO se tocó — es texto local hardcodeado, nunca dependió de OpenClaw.
+
 ## Habilidad de clase, slots de equipo y avatar en capas lite (v201, 2026-07-18)
 
 - **Botón de habilidad de clase reactivado.** `renderClassSkillBtn()` (rpg.js) ya tenía toda la lógica

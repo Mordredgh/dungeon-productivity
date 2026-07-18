@@ -17,8 +17,8 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="https://xibmopqlgjbcypxixnri.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png" type="image/png">
 <link rel="apple-touch-icon" href="https://xibmopqlgjbcypxixnri.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png">
-<link rel="stylesheet" href="css/dungeon.css?v=203">
-<link rel="stylesheet" href="css/dungeon-v2.css?v=203">
+<link rel="stylesheet" href="css/dungeon.css?v=204">
+<link rel="stylesheet" href="css/dungeon-v2.css?v=204">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" defer></script>
 </head>
@@ -256,6 +256,7 @@
         <!-- Fila 5: exploración -->
         <button class="sidebar-item" data-view="zones" onclick="switchView('zones')" title="Zonas del Dungeon" data-label="Zonas"><span class="si-icon">🗺️</span></button>
         <button class="sidebar-item" data-view="worldmap" onclick="switchView('worldmap')" title="Mapa del Mundo" data-label="Mapa"><img src="images/nav_mundo.webp" class="si-icon-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="si-icon" style="display:none">🌍</span></button>
+        <button class="sidebar-item" data-view="factions" onclick="switchView('factions')" title="Facciones del Dungeon" data-label="Facciones"><span class="si-icon">🏛️</span></button>
         <button class="sidebar-item" data-view="config" onclick="switchView('config')" title="Configuración" data-label="Config"><img src="images/nav_config.webp" class="si-icon-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="si-icon" style="display:none">⚙️</span></button>
       </div>
 
@@ -280,6 +281,7 @@
         <button class="view-tab" data-view="pets">🐾<span class="tab-label"> Mascotas</span></button>
         <button class="view-tab" data-view="zones">🗺️<span class="tab-label"> Zonas</span></button>
         <button class="view-tab" data-view="worldmap">🌍<span class="tab-label"> Mapa</span></button>
+        <button class="view-tab" data-view="factions">🏛️<span class="tab-label"> Facciones</span></button>
       </div>
 
       <!-- CHARACTER HUB TAB BAR — fuera del .view para evitar conflictos de padding/z-index -->
@@ -540,6 +542,12 @@
           <div id="zonesView"></div>
         </div>
 
+        <!-- FACTIONS VIEW -->
+        <div class="view" id="view-factions">
+          <div class="view-header"><h2 class="view-title">🏛️ Facciones del Dungeon</h2></div>
+          <div id="factionsView"></div>
+        </div>
+
         <!-- WORLD MAP VIEW -->
         <div class="view" id="view-worldmap">
           <div class="view-header"><h2 class="view-title">🌍 Mapa del Mundo</h2></div>
@@ -795,6 +803,9 @@
     </button>
     <button class="mobile-more-item view-tab" data-view="worldmap" onclick="closeMobileMore();switchView('worldmap')">
       <span>🌍</span><span>Mapa</span>
+    </button>
+    <button class="mobile-more-item view-tab" data-view="factions" onclick="closeMobileMore();switchView('factions')">
+      <span>🏛️</span><span>Facciones</span>
     </button>
     <button class="mobile-more-item" onclick="closeMobileMore();openChallengesModal()">
       <span>🏆</span><span>Retos</span>
@@ -1293,54 +1304,55 @@
 <!-- Loot Drop Container -->
 <div id="lootDropContainer" style="position:fixed;inset:0;pointer-events:none;z-index:9000" aria-hidden="true"></div>
 
-<script src="js/config.js?v=203" defer></script>
-<script src="js/state.js?v=203" defer></script>
-<script src="js/db.js?v=203" defer></script>
-<script src="js/hero.js?v=203" defer></script>
-<script src="js/quests.js?v=203" defer></script>
-<script src="js/timer.js?v=203" defer></script>
-<script src="js/inventory.js?v=203" defer></script>
-<script src="js/spells.js?v=203" defer></script>
-<script src="js/views.js?v=203" defer></script>
-<script src="js/ui.js?v=203" defer></script>
-<script src="js/events.js?v=203" defer></script>
-<script src="js/shop.js?v=203" defer></script>
-<script src="js/rpg.js?v=203" defer></script>
-<script src="js/pets.js?v=203" defer></script>
-<script src="js/weapons.js?v=203" defer></script>
-<script src="js/secret_sets.js?v=203" defer></script>
-<script src="js/goals.js?v=203" defer></script>
-<script src="js/reputation.js?v=203" defer></script>
-<script src="js/patterns.js?v=203" defer></script>
-<script src="js/mechanics.js?v=203" defer></script>
-<script src="js/character.js?v=203" defer></script>
-<script src="js/weather.js?v=203" defer></script>
-<script src="js/dungeon_clock.js?v=203" defer></script>
-<script src="js/skill_tree.js?v=203" defer></script>
-<script src="js/bestiary.js?v=203" defer></script>
-<script src="js/dungeon_grows.js?v=203" defer></script>
-<script src="js/runes.js?v=203" defer></script>
-<script src="js/google_fit.js?v=203" defer></script>
-<script src="js/hero_score.js?v=203" defer></script>
-<script src="js/push.js?v=203" defer></script>
-<script src="js/combos.js?v=203" defer></script>
-<script src="js/habits.js?v=203" defer></script>
-<script src="js/ruleta.js?v=203" defer></script>
-<script src="js/duolingo.js?v=203" defer></script>
-<script src="js/drops.js?v=203" defer></script>
-<script src="js/daily_goal.js?v=203" defer></script>
-<script src="js/weekly_summary.js?v=203" defer></script>
-<script src="js/challenges.js?v=203" defer></script>
-<script src="js/zones.js?v=203" defer></script>
-<script src="js/hero_card.js?v=203" defer></script>
-<script src="js/world_map.js?v=203" defer></script>
-<script src="js/sala_personal.js?v=203" defer></script>
-<script src="js/pet_garden.js?v=203" defer></script>
-<script src="js/animations.js?v=203" defer></script>
-<script src="js/effects.js?v=203" defer></script>
-<script src="js/boss_battle.js?v=203" defer></script>
-<script src="js/auth.js?v=203" defer></script>
-<script src="js/main.js?v=203" defer></script>
+<script src="js/config.js?v=204" defer></script>
+<script src="js/state.js?v=204" defer></script>
+<script src="js/db.js?v=204" defer></script>
+<script src="js/hero.js?v=204" defer></script>
+<script src="js/quests.js?v=204" defer></script>
+<script src="js/timer.js?v=204" defer></script>
+<script src="js/inventory.js?v=204" defer></script>
+<script src="js/spells.js?v=204" defer></script>
+<script src="js/views.js?v=204" defer></script>
+<script src="js/ui.js?v=204" defer></script>
+<script src="js/events.js?v=204" defer></script>
+<script src="js/shop.js?v=204" defer></script>
+<script src="js/rpg.js?v=204" defer></script>
+<script src="js/pets.js?v=204" defer></script>
+<script src="js/weapons.js?v=204" defer></script>
+<script src="js/secret_sets.js?v=204" defer></script>
+<script src="js/goals.js?v=204" defer></script>
+<script src="js/reputation.js?v=204" defer></script>
+<script src="js/patterns.js?v=204" defer></script>
+<script src="js/mechanics.js?v=204" defer></script>
+<script src="js/character.js?v=204" defer></script>
+<script src="js/weather.js?v=204" defer></script>
+<script src="js/dungeon_clock.js?v=204" defer></script>
+<script src="js/skill_tree.js?v=204" defer></script>
+<script src="js/bestiary.js?v=204" defer></script>
+<script src="js/dungeon_grows.js?v=204" defer></script>
+<script src="js/runes.js?v=204" defer></script>
+<script src="js/google_fit.js?v=204" defer></script>
+<script src="js/hero_score.js?v=204" defer></script>
+<script src="js/push.js?v=204" defer></script>
+<script src="js/combos.js?v=204" defer></script>
+<script src="js/habits.js?v=204" defer></script>
+<script src="js/ruleta.js?v=204" defer></script>
+<script src="js/duolingo.js?v=204" defer></script>
+<script src="js/drops.js?v=204" defer></script>
+<script src="js/daily_goal.js?v=204" defer></script>
+<script src="js/weekly_summary.js?v=204" defer></script>
+<script src="js/challenges.js?v=204" defer></script>
+<script src="js/zones.js?v=204" defer></script>
+<script src="js/factions.js?v=204" defer></script>
+<script src="js/hero_card.js?v=204" defer></script>
+<script src="js/world_map.js?v=204" defer></script>
+<script src="js/sala_personal.js?v=204" defer></script>
+<script src="js/pet_garden.js?v=204" defer></script>
+<script src="js/animations.js?v=204" defer></script>
+<script src="js/effects.js?v=204" defer></script>
+<script src="js/boss_battle.js?v=204" defer></script>
+<script src="js/auth.js?v=204" defer></script>
+<script src="js/main.js?v=204" defer></script>
 
 <!-- Challenges Modal -->
 <!-- HECHIZOS MODAL -->
