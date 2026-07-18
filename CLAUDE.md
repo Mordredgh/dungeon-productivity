@@ -667,7 +667,17 @@ y una misión exclusiva reclamable una sola vez al llegar al rango máximo (crea
 **✅ Migración aplicada 2026-07-18** — `ALTER TABLE dungeon_heroes ADD COLUMN IF NOT EXISTS
 faction_claims jsonb DEFAULT '[]'::jsonb;`, corrida vía SQL Editor con la sesión de Gerardo ya
 logueada en Chrome (el MCP de Supabase conectado no alcanza esta cuenta separada, ver traspaso
-2026-07-12). Botón "Reclamar misión exclusiva" funcional.
+2026-07-12).
+
+**Fix 2026-07-18 (post-feedback):** la primera versión creaba 1 sola misión con nombre vago
+("Contrato del Gremio: encargo dorado") sin pasos concretos — Gerardo probó y no sabía qué tenía
+que hacer exactamente. Rediseñado: `FACTION_DEFS[].exclusive` ahora es `{ steps:[3 nombres
+concretos], xp, gold }` en vez de `{ name, xp, gold }`. `claimFactionExclusive()` crea las 3 quests
+reales de una vez (tipo del gremio, tag `#faccion`). `hero.faction_claims` pasó de array de strings
+a array de objetos `{ id, questIds:[...], done }` para trackear cuáles 3 IDs pertenecen a qué serie.
+Nuevo hook `checkFactionExclusiveProgress(questId)` llamado desde `quests.js completeQuest()` (junto
+a `trySecretMatDrop`) — cuando las 3 quests de una serie están `done`, entrega el bono XP/oro
+automático una sola vez. Botón cambia de estado: Reclamar → "⏳ Serie en progreso" → "✅ Completada".
 
 **Nota de diseño:** ya existía `reputation.js` (reputación por tag libre `#trabajo`/`#salud`, +10% XP
 al pasar 500 XP). Se evaluó reusarlo pero Gerardo pidió identidad propia (nombre/icono/UI dedicada),

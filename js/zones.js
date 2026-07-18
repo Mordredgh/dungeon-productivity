@@ -111,3 +111,66 @@ function renderZones() {
       }).join('')}
     </div>`;
 }
+
+/* ── MISIONES ALEATORIAS DE ZONA (1/día) ─────────────────────
+   Cada zona tiene un pool de misiones concretas y accionables que,
+   al completarse, cuentan para la reputación de esa zona (mismo
+   type/tags que exige zone.match). Dedup por localStorage — sin
+   columna nueva en hero. ─────────────────────────────────── */
+const ZONE_QUEST_TEMPLATES = {
+  ciudadela: [
+    { name: 'Avanza 1 hora en tu proyecto más importante', type: 'main' },
+    { name: 'Termina algo que llevas posponiendo',          type: 'main' },
+    { name: 'Da un paso grande hacia tu meta de la semana',  type: 'main' },
+  ],
+  campo: [
+    { name: 'Resuelve un pendiente administrativo (pago, trámite, mensaje)', type: 'side' },
+    { name: 'Ordena tu bandeja de entrada',                                  type: 'side' },
+    { name: 'Responde los mensajes pendientes de hoy',                      type: 'side' },
+  ],
+  torre: [
+    { name: 'Lee 20 minutos de un libro',        type: 'side', tags: '#lectura' },
+    { name: 'Avanza un módulo de tu curso',       type: 'side', tags: '#curso' },
+    { name: 'Aprende algo nuevo de tu área',      type: 'side', tags: '#aprender' },
+  ],
+  fortaleza: [
+    { name: 'Haz 20 minutos de ejercicio',              type: 'side', tags: '#ejercicio' },
+    { name: 'Sal a caminar o correr 15 minutos',        type: 'side', tags: '#correr' },
+    { name: 'Revisa tu salud: agua, comida, descanso',  type: 'side', tags: '#salud' },
+  ],
+  jardin: [
+    { name: 'Bebe suficiente agua hoy',            type: 'habit' },
+    { name: 'Duerme temprano esta noche',          type: 'habit' },
+    { name: 'Medita o respira profundo 5 minutos', type: 'habit' },
+  ],
+  cripta: [
+    { name: 'Evita redes sociales 1 hora antes de dormir', type: 'habit', tags: 'habit-' },
+    { name: 'No proscrastines tu tarea más importante hoy', type: 'habit', tags: 'habit-' },
+    { name: 'Evita snacks después de las 9pm',              type: 'habit', tags: 'habit-' },
+  ],
+};
+
+async function checkZoneRandomQuest() {
+  if (!hero) return;
+  const today = new Date().toISOString().split('T')[0];
+  const key = 'dungeon-zone-quest-' + today;
+  if (localStorage.getItem(key)) return;
+  localStorage.setItem(key, '1');
+
+  const zoneIds = Object.keys(ZONE_QUEST_TEMPLATES);
+  const zoneId  = zoneIds[Math.floor(Math.random() * zoneIds.length)];
+  const pool    = ZONE_QUEST_TEMPLATES[zoneId];
+  const tpl     = pool[Math.floor(Math.random() * pool.length)];
+  const z       = ZONES.find(zz => zz.id === zoneId);
+
+  const { data } = await db.from('dungeon_quests').insert({
+    name: tpl.name, type: tpl.type, tags: tpl.tags || '', priority: 'normal',
+    hero_id: hero.id, created_at: new Date().toISOString(), done: false,
+  }).select().single();
+
+  if (data) {
+    quests.unshift(data);
+    renderQuestList();
+    toast(z?.icon || '🗺️', `${z?.name || 'Zona'}: nueva misión — "${tpl.name}"`);
+  }
+}

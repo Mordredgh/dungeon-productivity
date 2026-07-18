@@ -32,6 +32,7 @@ async function bootApp() {
   await checkOverdueHP();
   await checkWagerExpiry();
   if (typeof checkDailySpecialQuest === 'function') await checkDailySpecialQuest();
+  if (typeof checkZoneRandomQuest === 'function') await checkZoneRandomQuest();
   if (typeof checkStreakRewards === 'function') await checkStreakRewards();
   updatePomGoalUI();
   restoreTimerState();
