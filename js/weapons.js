@@ -59,6 +59,19 @@ async function unequipWeapon(id) {
   renderInventory(); renderSmithy();
 }
 
+async function salvageWeapon(id) {
+  const weapon = weapons.find(item => item.id === id);
+  if (!weapon || weapon.is_equipped || isForging(weapon)) return;
+  const fragments = { comun:1, raro:2, epico:4, legendario:7, mitico:12 }[weapon.tier] || 1;
+  if (!confirm(`Desmantelar ${weapon.name}? Recuperarás ${fragments} fragmentos de runa.`)) return;
+  const { error } = await db.from('dungeon_weapons').delete().eq('id', weapon.id).eq('hero_id', hero.id);
+  if (error) { toast('Error', 'No se pudo desmantelar la pieza.'); return; }
+  weapons = weapons.filter(item => item.id !== weapon.id);
+  if (typeof addInvItem === 'function') await addInvItem('rune_fragment', 'rune_fragment', fragments);
+  toast('♢', `${weapon.name} se convirtió en ${fragments} fragmentos de runa.`);
+  renderInventory(); renderSmithy();
+}
+
 async function craftWeapon(weaponKey, targetTier) {
   const recipe = CRAFT_RECIPES[targetTier];
   if (!recipe) return;
@@ -307,7 +320,7 @@ function _vaultEquipmentCard(weapon) {
           return `<span class="${rDef ? 'filled' : ''}" style="--rune:${rDef?.color || '#40344d'}">${rDef?.icon || '◇'}</span>`;
         }).join('') || '<em>Sin ranuras</em>'}</div>
       </div>
-      <button class="vault-gear-action" ${forging ? 'disabled' : ''} onclick="${weapon.is_equipped ? `unequipWeapon('${weapon.id}')` : `equipWeapon('${weapon.id}')`}">${forging ? 'Forjando' : weapon.is_equipped ? 'Quitar' : 'Equipar'}</button>
+      <div class="vault-gear-actions"><button class="vault-gear-action" ${forging ? 'disabled' : ''} onclick="${weapon.is_equipped ? `unequipWeapon('${weapon.id}')` : `equipWeapon('${weapon.id}')`}">${forging ? 'Forjando' : weapon.is_equipped ? 'Quitar' : 'Equipar'}</button>${!weapon.is_equipped && !forging ? `<button class="vault-gear-salvage" onclick="salvageWeapon('${weapon.id}')" title="Desmantelar">♢</button>` : ''}</div>
     </article>`;
 }
 

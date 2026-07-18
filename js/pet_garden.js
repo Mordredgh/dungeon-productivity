@@ -89,6 +89,10 @@ function gardenUpgrade(id) {
 }
 
 function _gardenExpedition() { return _gardenRead('expedition', null); }
+function isPetOnGardenExpedition(petId) {
+  const trip = _gardenExpedition();
+  return !!(trip && trip.petId === petId && trip.endsAt > Date.now());
+}
 function gardenStartExpedition(petId, type) {
   const pet = (pets || []).find(p => p.id === petId);
   const def = GARDEN_EXPEDITIONS[type];

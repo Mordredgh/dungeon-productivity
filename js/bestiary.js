@@ -30,13 +30,37 @@ function getBestiary() {
   try { return JSON.parse(hero.bestiary || '[]'); } catch { return []; }
 }
 
+function _bestiaryKnowledgeKey() { return `dungeon-bestiary-knowledge-${hero?.id || 'guest'}`; }
+function getBossKnowledge(bossKey) {
+  try { return JSON.parse(localStorage.getItem(_bestiaryKnowledgeKey()) || '{}')[bossKey] || { victories:0 }; }
+  catch { return { victories:0 }; }
+}
+function _recordBossKnowledge(bossKey) {
+  try {
+    const all = JSON.parse(localStorage.getItem(_bestiaryKnowledgeKey()) || '{}');
+    const next = { ...(all[bossKey] || {}), victories:(all[bossKey]?.victories || 0) + 1, lastSeen:Date.now() };
+    all[bossKey] = next;
+    localStorage.setItem(_bestiaryKnowledgeKey(), JSON.stringify(all));
+    return next;
+  } catch { return { victories:1 }; }
+}
+function getBossResearchStage(bossKey) {
+  const wins = getBossKnowledge(bossKey).victories || 0;
+  return wins >= 5 ? 3 : wins >= 3 ? 2 : wins >= 1 ? 1 : 0;
+}
+
 async function recordBossDefeat(bossKey) {
   const list = getBestiary();
-  if (list.includes(bossKey)) return;
-  list.push(bossKey);
-  await saveHero({ bestiary: JSON.stringify(list) });
+  const wasKnown = list.includes(bossKey);
+  const knowledge = _recordBossKnowledge(bossKey);
+  if (!wasKnown) {
+    list.push(bossKey);
+    await saveHero({ bestiary: JSON.stringify(list) });
+  }
   const def = (typeof BOSS_DEFS !== 'undefined' ? BOSS_DEFS : []).find(b => b.key === bossKey);
-  if (def) toast('📖', `Bestiario: ${def.name} registrado.`);
+  if (def && !wasKnown) toast('📖', `Bestiario: ${def.name} registrado.`);
+  if (def && knowledge.victories === 3) toast('🔍', `Tácticas de ${def.name} descifradas.`);
+  if (def && knowledge.victories === 5) toast('✦', `Crónica completa de ${def.name} desbloqueada.`);
 }
 
 function renderBestiary() {
@@ -114,6 +138,13 @@ function renderBestiaryCodex(el) {
   };
   const card = boss => { const isKnown = defeated.includes(boss.key); const color = BESTIARY_RARITY_CLR[boss.rarity] || '#64748b'; return `<button class="bstd-spine ${isKnown ? 'is-known' : ''} ${boss.key === _bestiarySelectedKey ? 'is-current' : ''}" style="--bstd:${color}" ${isKnown ? `onclick="selectBestiaryEntry('${boss.key}')"` : 'disabled'}><span>${isKnown ? boss.emoji || '✦' : '?'}</span><b>${isKnown ? escHtml(boss.name) : 'Registro sellado'}</b><small>${boss.rarity}</small></button>`; };
   el.innerHTML = `<section class="bstd-shell"><header class="bstd-header"><div><span>ARCHIVO DE ARCANUM</span><h3>Bestiario del Dungeon</h3></div><div class="bstd-progress"><b>${defeated.length}/${all.length}</b><i><em style="width:${pct}%"></em></i><small>${pct}% descifrado</small></div></header><div class="bstd-layout"><aside class="bstd-shelf">${all.map(card).join('')}</aside><main class="bstd-detail">${entry(selected)}</main></div></section>`;
+  if (selected) {
+    const wins = getBossKnowledge(selected.key).victories || 0;
+    const stage = getBossResearchStage(selected.key);
+    const labels = ['Identidad sellada', 'Avistamiento registrado', 'Patrones tácticos', 'Crónica completa'];
+    const page = el.querySelector('.bstd-page');
+    if (page) page.insertAdjacentHTML('beforeend', `<div class="bstd-research"><b>Investigación: ${labels[stage]}</b><span>${wins}/5 victorias documentadas</span><i><em style="width:${Math.min(100, wins / 5 * 100)}%"></em></i><small>${stage < 2 ? 'Vence al jefe 3 veces para revelar sus patrones.' : stage < 3 ? 'Dos victorias más revelarán su crónica completa.' : 'Archivo completo: historia y tácticas descifradas.'}</small></div>`);
+  }
 }
 function selectBestiaryEntry(key) { _bestiarySelectedKey = key; renderBestiary(); }
 

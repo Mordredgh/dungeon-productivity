@@ -1,12 +1,16 @@
-/* BOOT */
+/* BOOT: un fallo de red no debe dejar la pantalla en un estado muerto. */
+async function _bootGuard(label, action) {
+  try { return await action(); }
+  catch (error) { console.error(`[Dungeon] ${label}`, error); return null; }
+}
 (async () => {
-  // db ya existe (creado en db.js al cargar el script)
-  const { data: { session } } = await db.auth.getSession();
+  const result = await _bootGuard('sesión', () => db.auth.getSession());
+  const session = result?.data?.session;
   if (!session) {
     document.getElementById('loginOverlay').style.display = 'flex';
-    return; // bootApp() se llama desde auth.js cuando el login es exitoso
+    return;
   }
-  await bootApp();
+  await _bootGuard('aplicación', bootApp);
 })();
 
 async function bootApp() {
@@ -15,7 +19,11 @@ async function bootApp() {
   updateTimerUI();
   document.getElementById('timerPhase').textContent = 'Listo';
   if (Notification.permission === 'granted') notifEnabled = true;
-  await initDB();
+  const initialized = await _bootGuard('carga inicial', initDB);
+  if (initialized === null) {
+    toast('Red', 'No se pudo cargar tu partida. Revisa la conexión y vuelve a intentar.');
+    return;
+  }
   if (typeof initPush === 'function') initPush();
   loadRealWeather();
   updateDungeonClock();

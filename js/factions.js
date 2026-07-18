@@ -119,10 +119,13 @@ async function checkFactionExclusiveProgress(questId) {
   await saveHero({ faction_claims: hero.faction_claims });
   if (def) {
     const salaFaction = typeof getSalaBonus === 'function' ? getSalaBonus('faction_xp') : 0;
-    const rewardXP = Math.round(def.exclusive.xp * (1 + salaFaction));
+    const rawXP = Math.round(def.exclusive.xp * (1 + salaFaction));
+    const rewardXP = typeof balanceReward === 'function' ? balanceReward('xp', def.exclusive.xp, rawXP).amount : rawXP;
+    const rewardGold = typeof balanceReward === 'function' ? balanceReward('gold', def.exclusive.gold, def.exclusive.gold).amount : def.exclusive.gold;
     await addXP(rewardXP, 'side', null);
-    if (typeof addGold === 'function') addGold(def.exclusive.gold);
-    toast(def.icon, `¡Serie de ${def.name} completada! +${def.exclusive.xp} XP, +${def.exclusive.gold} oro.`);
+    if (typeof addGold === 'function') addGold(rewardGold);
+    if (typeof recordRewardLedger === 'function') recordRewardLedger({ type:'faction', faction:def.id, xp:rewardXP, gold:rewardGold, at:Date.now() });
+    toast(def.icon, `¡Serie de ${def.name} completada! +${rewardXP} XP, +${rewardGold} oro.`);
   }
   renderFactions();
 }

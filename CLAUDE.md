@@ -657,6 +657,29 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 
 ---
 
+## Google Fit arreglado + Duolingo eliminado (v236→v239, 2026-07-18)
+
+Gerardo reportó: Duolingo decía "usuario no existe" y Google Fit lo desconectaba constantemente.
+
+**Google Fit — bug real de código, arreglado en `google_fit.js`:**
+- `_fitEnsureToken()` perdía el token en memoria (`_fitToken`) en cada recarga de página y no
+  confiaba en `hero.fit_token_expiry` persistido, forzando refresh innecesario en cada load.
+- `syncGoogleFitSteps()` desconectaba (`disconnectGoogleFit()`, borra tokens) ante CUALQUIER 401
+  **o** 403 de la Fitness API. 403 no siempre es "expiró" — puede ser permiso/alcance/API
+  deshabilitada en Cloud Console, y desconectar no soluciona nada de eso, solo fuerza reconectar
+  sin motivo real. Ahora: en 401 reintenta refresh una vez antes de desconectar; en 403 solo avisa,
+  no borra la conexión.
+
+**Duolingo — no era un bug nuestro, Duolingo cerró el acceso.** Probé en el navegador los 2
+endpoints que usaba `duolingo-proxy` (edge function) con una cuenta pública conocida (no la de
+Gerardo, para descartar typo): `2017-06-30/users?username=X` devuelve `{}` vacío para cualquier
+usuario, y el fallback `/users/{username}` devuelve `401 Unauthorized` directo. Duolingo cerró el
+acceso público sin sesión a ambos. Sin API oficial de Duolingo para esto, no hay fix posible del
+lado de Dungeon. Confirmado con Gerardo, se eliminó por completo: `js/duolingo.js` borrado, card
+en Integraciones, script tag, entrada en sw.js ASSETS, llamada en `main.js`. Torre del Saber
+(zona) sigue funcionando solo con misiones manuales de estudio — perdió el canal de XP externo de
+Duolingo que se había agregado en v208, pero ese canal nunca llegó a funcionar en producción real.
+
 ## Bonus pasivo de gremio + reclamo repetible + Fit/Duolingo alimentan zonas (v208, 2026-07-18)
 
 Gerardo preguntó qué más mejorar en Fortaleza (zona) y Gremio (Facciones); pidió también aprovechar

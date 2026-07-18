@@ -38,6 +38,7 @@ async function completeQuest(id, el) {
 
   const _isDailySpecial = (q.tags || '').includes('mision-del-dia');
   let xpAmt = _isDailySpecial ? DAILY_SPECIAL_XP : calcQuestXP(q);
+  const baseXPAmt = xpAmt;
 
   // Tag-based class bonus (guerrero×2 en #ejercicio, mago×2 en #estudio, etc.)
   const _tagMult = _getTagClassBonus(q);
@@ -158,6 +159,9 @@ async function completeQuest(id, el) {
     if (hpPct < 0.2) xpAmt = Math.round(xpAmt * 1.5);
   }
 
+  const balancedXP = typeof balanceReward === 'function' ? balanceReward('xp', baseXPAmt, xpAmt) : { amount:xpAmt, capped:false };
+  xpAmt = balancedXP.amount;
+  if (balancedXP.capped) toast('⚖️', `Recompensa equilibrada: máximo ×${REWARD_CAPS.xp} XP por misión.`);
   await addXP(xpAmt, q.type, el);
 
   // Gold earned
@@ -172,6 +176,9 @@ async function completeQuest(id, el) {
   let goldAmt  = Math.round(goldBase * goldMult * doubleNadaMult * todGoldMult * skillGoldMult * runeGoldMult * weaponGoldMult * goldRushMult * mountSpdMult);
   if (typeof getMapExpeditionBonus === 'function') goldAmt = Math.round(goldAmt * (1 + getMapExpeditionBonus(q, 'gold')));
   if (hero && hero.nightmare_mode) goldAmt *= 2;
+  const balancedGold = typeof balanceReward === 'function' ? balanceReward('gold', goldBase, goldAmt) : { amount:goldAmt, capped:false };
+  goldAmt = balancedGold.amount;
+  if (typeof recordRewardLedger === 'function') recordRewardLedger({ quest:q.name, type:q.type, xp:xpAmt, gold:goldAmt, xpMult:balancedXP.multiplier, goldMult:balancedGold.multiplier, capped:balancedXP.capped || balancedGold.capped });
   if (typeof addGold === 'function') {
     addGold(goldAmt);
     if (typeof spawnGoldParticle === 'function') spawnGoldParticle(goldAmt, el);

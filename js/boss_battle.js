@@ -173,7 +173,8 @@ function _bbAttackKey(cycle) {
   const period = typeof _bossPeriodKey === 'function' ? _bossPeriodKey(cycle) : new Date().toISOString().split('T')[0];
   return 'dungeon-bb-atk-' + cycle + '-' + period;
 }
-function _bbMaxAttacks() { return 5 + (typeof getMasteryBonus === 'function' ? getMasteryBonus('voluntad') : 0); }
+/* La batalla debe permitir una sesión táctica real, no cinco clics y fuera. */
+function _bbMaxAttacks() { return 12 + (typeof getMasteryBonus === 'function' ? getMasteryBonus('voluntad') : 0); }
 function _bbLeft(cycle) { try { return Math.max(0, _bbMaxAttacks() - parseInt(localStorage.getItem(_bbAttackKey(cycle)) || '0', 10)); } catch { return _bbMaxAttacks(); } }
 function _bbUse(cycle)  { try { const k = _bbAttackKey(cycle); localStorage.setItem(k, String((parseInt(localStorage.getItem(k)||'0',10))+1)); } catch {} }
 
@@ -210,7 +211,9 @@ function _bbBossDmg() {
   const rarMult   = { comun:0.4, raro:0.7, epico:1.1, legendario:1.5, mitico:2.0, cataclismo:2.8 }[boss.rarity] || 1;
   const levelTerm = (2 * _bbBossLevel() / 5 + 2);
   const random    = 0.85 + Math.random() * 0.30; // 0.85–1.15, variación real por golpe
-  const base      = levelTerm * rarMult * 1.2;
+  const hpPct     = boss.maxHp ? boss.hp / boss.maxHp : 1;
+  const phaseMult = hpPct <= .25 ? 1.55 : hpPct <= .60 ? 1.28 : 1;
+  const base      = levelTerm * rarMult * 1.2 * phaseMult;
   const isCrit    = Math.random() < 0.05;
   _bbLastCrit     = isCrit;
   const critMult  = isCrit ? 1.5 : 1;
@@ -235,10 +238,13 @@ function _damageBossCycle(cycle, baseDmg) {
     b.defeated = true;
     const reward = (typeof BOSS_DEFEAT_REWARDS !== 'undefined' && BOSS_DEFEAT_REWARDS[b.rarity]) || { gold:50, xp:100 };
     setTimeout(async () => {
-      if (typeof addGold        === 'function') addGold(reward.gold);
-      if (typeof addXP          === 'function') await addXP(reward.xp, 'main', null);
-      if (typeof toast          === 'function') toast('🏆', `¡${b.name} DERROTADO! +${reward.gold}🪙 +${reward.xp} XP`);
-      if (typeof dungeonPush    === 'function') dungeonPush('🏆 ¡Jefe Derrotado!', `${b.name} venció. +${reward.gold}🪙 +${reward.xp} XP`);
+      const xp = typeof balanceReward === 'function' ? balanceReward('xp', reward.xp, reward.xp).amount : reward.xp;
+      const gold = typeof balanceReward === 'function' ? balanceReward('gold', reward.gold, reward.gold).amount : reward.gold;
+      if (typeof addGold        === 'function') addGold(gold);
+      if (typeof addXP          === 'function') await addXP(xp, 'main', null);
+      if (typeof recordRewardLedger === 'function') recordRewardLedger({ type:'boss', boss:b.key, xp, gold, at:Date.now() });
+      if (typeof toast          === 'function') toast('🏆', `¡${b.name} DERROTADO! +${gold}🪙 +${xp} XP`);
+      if (typeof dungeonPush    === 'function') dungeonPush('🏆 ¡Jefe Derrotado!', `${b.name} venció. +${gold}🪙 +${xp} XP`);
       if (typeof recordBossDefeat === 'function') recordBossDefeat(b.key);
       if (typeof trackBossKill    === 'function') trackBossKill();
       if (typeof addActivePetXP   === 'function') addActivePetXP({ daily:30, weekly:100, monthly:250 }[cycle] || 30);
@@ -381,6 +387,7 @@ function _bbPickPet(petId) {
   if (typeof pets === 'undefined') return;
   const p = pets.find(x => x.id === petId);
   if (!p) return;
+  if (typeof isPetOnGardenExpedition === 'function' && isPetOnGardenExpedition(p.id)) { toast('🧭', 'Esta mascota está explorando el jardín y no puede entrar a batalla.'); return; }
   if (_bbIsPetExhausted(p)) { toast('😴', 'Esta mascota está descansando — no puede batallar todavía.'); return; }
   _bbPet    = p;
   _bbPetDef = PET_DEFS.find(d => d.key === p.pet_key) || null;
@@ -573,7 +580,7 @@ function _bbRender() {
     ${petChipsHtml}
     <div class="bb-actions-grid">${movesHtml}${heroSkillHtml}${potionHtml}</div>
     <div class="bb-attacks-counter${attacksLeft === 0 ? ' exhausted' : ''}">
-      ⚔️ ${attacksLeft}/${_bbMaxAttacks()} ataques hoy · <span>${resetMsg}</span>
+      ⚔️ ${attacksLeft}/${_bbMaxAttacks()} energía de combate · <span>${resetMsg}</span>
     </div>`;
 }
 

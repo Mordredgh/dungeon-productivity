@@ -108,6 +108,14 @@ const SKILL_RACE_DEFS = {
     { id:'race_orco_clan', tier:2, name:'Juramento de Clan', icon:'🐗', desc:'+6% XP en misiones side', requires:['race_orco_furia'] },
   ],
 };
+const CLASS_DOCTRINES = {
+  guerrero:[{ id:'bastion', name:'Bastión', icon:'🛡️', desc:'+8 HP máximo' },{ id:'duelista', name:'Duelista', icon:'⚔️', desc:'+6% XP en épicas' }],
+  mago:[{ id:'oraculo', name:'Oráculo', icon:'🔮', desc:'+6% XP global' },{ id:'alquimista', name:'Alquimista', icon:'⚗️', desc:'+8% oro global' }],
+  picaro:[{ id:'saboteador', name:'Saboteador', icon:'🗡️', desc:'+10% oro en encargos' },{ id:'explorador', name:'Explorador', icon:'🧭', desc:'+8% XP semanal' }],
+  clerigo:[{ id:'guardián', name:'Guardián', icon:'✨', desc:'+8 HP máximo' },{ id:'peregrino', name:'Peregrino', icon:'🕯️', desc:'+8% XP diaria' }],
+  arquero:[{ id:'acechador', name:'Acechador', icon:'🏹', desc:'+8% XP semanal' },{ id:'cartógrafo', name:'Cartógrafo', icon:'🗺️', desc:'+6% XP global' }],
+  fundador:[{ id:'visionario', name:'Visionario', icon:'📜', desc:'+6% XP global' },{ id:'mercader', name:'Mercader', icon:'💰', desc:'+8% oro global' }],
+};
 function getAllSkillDefs(cls = hero?.hero_class || 'guerrero', race = heroRace || hero?.race || 'humano') {
   return [...(SKILL_TREE_DEFS[cls] || []), ...(SKILL_CLASS_EXPANSIONS[cls] || []), ...(SKILL_RACE_DEFS[race] || [])];
 }
@@ -118,6 +126,17 @@ function getHeroSkillTree() {
 
 function hasSkill(skillId) {
   return !!getHeroSkillTree()[skillId];
+}
+function getHeroDoctrine() { return getHeroSkillTree().__doctrine || ''; }
+async function chooseDoctrine(id) {
+  const cls = hero?.hero_class || 'guerrero';
+  const doctrine = (CLASS_DOCTRINES[cls] || []).find(item => item.id === id);
+  const tree = getHeroSkillTree();
+  if (!doctrine || tree.__doctrine) return;
+  tree.__doctrine = id;
+  await saveHero({ skill_tree: JSON.stringify(tree) });
+  toast('✦', `Doctrina elegida: ${doctrine.name}.`);
+  renderCharacterSheet();
 }
 
 function canLearnSkill(skillDef) {
@@ -143,7 +162,9 @@ async function learnSkill(skillId) {
 function getSkillTreeXPBonus(type) {
   const cls  = hero?.hero_class || 'guerrero';
   const defs = getAllSkillDefs(cls);
-  return _skillXPBonus(defs, type);
+  const doctrine = (CLASS_DOCTRINES[cls] || []).find(item => item.id === getHeroDoctrine());
+  const doctrineValue = doctrine?.desc.includes('XP global') ? .06 : doctrine?.desc.includes('XP en épicas') && type === 'main' ? .06 : doctrine?.desc.includes('XP semanal') && type === 'weekly' ? .08 : doctrine?.desc.includes('XP diaria') && type === 'daily' ? .08 : 0;
+  return _skillXPBonus(defs, type) + doctrineValue;
   /* Legacy parser retained below for backwards-compatible saved descriptions. */
   let bonus  = 0;
   for (const s of defs) {
@@ -182,11 +203,13 @@ function _skillXPBonus(defs, type) {
 function getSkillTreeGoldBonus() {
   const cls  = hero?.hero_class || 'guerrero';
   const defs = getAllSkillDefs(cls);
+  const doctrine = (CLASS_DOCTRINES[cls] || []).find(item => item.id === getHeroDoctrine());
+  const doctrineValue = doctrine?.desc.includes('oro global') ? .08 : doctrine?.desc.includes('oro en encargos') ? .10 : 0;
   return defs.filter(skill => hasSkill(skill.id)).reduce((total, skill) => {
     const desc = skill.desc.toLowerCase();
     const value = Number((desc.match(/\+(\d+)%/) || [])[1] || 0) / 100;
     return desc.includes('oro') ? total + value : total;
-  }, 0);
+  }, doctrineValue);
   let bonus  = 0;
   for (const s of defs) {
     if (!hasSkill(s.id)) continue;
@@ -226,6 +249,7 @@ function renderSkillTree() {
   if (!el || !hero) return;
 
   _renderExpandedSkillTree(el);
+  _injectDoctrineChooser(el);
   return;
 
   const cls  = hero.hero_class || 'guerrero';
@@ -306,6 +330,19 @@ function renderSkillTree() {
         <span class="skt-leg skt-leg-locked">🔒 Bloqueada</span>
       </div>
     </div>`;
+}
+
+function _injectDoctrineChooser(el) {
+  const cls = hero?.hero_class || 'guerrero';
+  const choices = CLASS_DOCTRINES[cls] || [];
+  const selected = getHeroDoctrine();
+  const shell = el.querySelector('.skt3-shell');
+  const board = el.querySelector('.skt3-board');
+  if (!shell || !board || !choices.length) return;
+  const section = document.createElement('section');
+  section.className = 'skt3-doctrine';
+  section.innerHTML = `<div><span>DOCTRINA DE CLASE</span><b>${selected ? 'Rumbo sellado' : 'Elige una senda permanente'}</b><small>${selected ? 'Una doctrina define la identidad de este héroe.' : 'No cuesta puntos; no se puede cambiar después.'}</small></div><div class="skt3-doctrine-options">${choices.map(choice => `<button class="${selected === choice.id ? 'selected' : ''}" ${selected ? 'disabled' : `onclick="chooseDoctrine('${choice.id}')"`}><i>${choice.icon}</i><b>${choice.name}</b><small>${choice.desc}</small></button>`).join('')}</div>`;
+  shell.insertBefore(section, board);
 }
 
 function _renderExpandedSkillTree(el) {

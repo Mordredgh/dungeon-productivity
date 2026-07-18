@@ -293,7 +293,7 @@ function renderQuestList() {
   // Group pending by type with separators
   const typeOrder = ['mitico', 'main', 'weekly', 'side', 'daily'];
   const typeLabelsGroup = { mitico:'💎 Míticas', main:'⚔️ Misiones Épicas', weekly:'📜 Crónicas Semanales', side:'🗡️ Encargos', daily:'🌅 Búsquedas Diarias' };
-  let html = '';
+  let html = typeof renderAdventureCycle === 'function' ? renderAdventureCycle() : '';
 
   if (pinned.length) {
     html += `<div class="type-separator">📌 Ancladas<span>${pinned.length}</span></div>`;
