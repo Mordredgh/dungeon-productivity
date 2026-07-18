@@ -55,8 +55,9 @@ const XP_TABLE = { main: 100, side: 50, daily: 25, weekly: 75, habit: 20 };
 const POM_XP = 15;
 
 /* ── FACCIONES DEL DUNGEON — reputación por tipo de misión ──
-   3 rangos por facción, rango máximo desbloquea 1 misión exclusiva
-   reclamable una sola vez (recompensa real, no cosmética). */
+   3 rangos por facción, rango máximo desbloquea una serie de 3
+   misiones concretas reales (no 1 sola genérica) — el oro/XP bono
+   se entrega al completar la 3ª. Reclamable una sola vez. */
 const FACTION_DEFS = [
   { id: 'campeones',  type: 'main',   name: 'Orden de los Campeones',   icon: '⚔️', color: '#ef4444',
     desc: 'Forjada por quienes solo aceptan las misiones épicas.',
@@ -65,7 +66,9 @@ const FACTION_DEFS = [
       { name: 'Campeón',   xp: 400 },
       { name: 'Leyenda',   xp: 1200 },
     ],
-    exclusive: { name: 'Encargo de la Orden: prueba final', xp: 250, gold: 150 } },
+    exclusive: {
+      steps: ['Derrota al Jefe Semanal esta semana', 'Completa 1 misión Épica pendiente', 'Mantén tu racha activa 3 días seguidos'],
+      xp: 250, gold: 150 } },
   { id: 'mercaderes', type: 'side',   name: 'Gremio de Mercaderes',     icon: '💼', color: '#f59e0b',
     desc: 'Comerciantes y solucionadores de encargos del reino.',
     ranks: [
@@ -73,7 +76,9 @@ const FACTION_DEFS = [
       { name: 'Socio',    xp: 300 },
       { name: 'Magnate',  xp: 900 },
     ],
-    exclusive: { name: 'Contrato del Gremio: encargo dorado', xp: 150, gold: 300 } },
+    exclusive: {
+      steps: ['Completa 2 Encargos pendientes', 'Cierra un Encargo con fecha límite vencida (o el más antiguo)', 'Crea y completa 1 Encargo nuevo hoy mismo'],
+      xp: 150, gold: 300 } },
   { id: 'disciplina', type: 'daily',  name: 'Círculo de la Disciplina', icon: '🔄', color: '#22c55e',
     desc: 'Monjes de la rutina — veneran la búsqueda diaria.',
     ranks: [
@@ -81,7 +86,9 @@ const FACTION_DEFS = [
       { name: 'Monje',   xp: 250 },
       { name: 'Maestro', xp: 750 },
     ],
-    exclusive: { name: 'Rito del Círculo: búsqueda sagrada', xp: 100, gold: 80 } },
+    exclusive: {
+      steps: ['Completa tu Búsqueda Diaria hoy', 'Completa 2 Búsquedas Diarias más esta semana', 'Cierra la semana sin fallar ningún día'],
+      xp: 100, gold: 80 } },
   { id: 'cronicas',   type: 'weekly', name: 'Consejo de las Crónicas',  icon: '📜', color: '#8b5cf6',
     desc: 'Guardianes de las grandes gestas semanales.',
     ranks: [
@@ -89,7 +96,9 @@ const FACTION_DEFS = [
       { name: 'Cronista', xp: 350 },
       { name: 'Archivero', xp: 1000 },
     ],
-    exclusive: { name: 'Crónica del Consejo: gesta perdida', xp: 200, gold: 200 } },
+    exclusive: {
+      steps: ['Completa 1 Crónica Semanal pendiente', 'Crea una nueva Crónica Semanal y complétala', 'Revisa la Sala del Trono al cerrar la semana'],
+      xp: 200, gold: 200 } },
 ];
 
 /* ── MISIÓN DEL DÍA — pool curado, seleccionado por seed de fecha ──

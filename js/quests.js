@@ -274,6 +274,9 @@ async function completeQuest(id, el) {
   // Drops de materiales para sets de clases secretas
   if (typeof trySecretMatDrop === 'function') await trySecretMatDrop(q);
 
+  // Progreso de serie de misiones exclusivas de Facción
+  if (typeof checkFactionExclusiveProgress === 'function') await checkFactionExclusiveProgress(id);
+
   renderQuestList();
   renderHistory();
   renderStats();

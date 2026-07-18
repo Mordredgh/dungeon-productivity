@@ -657,6 +657,26 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 
 ---
 
+## Facciones del Dungeon (v204, 2026-07-18) — pendiente: migración manual
+
+Nueva feature `js/factions.js` + `FACTION_DEFS` en config.js. 4 gremios con identidad propia, uno por
+tipo de misión (main/side/daily/weekly), cada uno con 3 rangos por XP acumulado all-time de ese tipo,
+y una misión exclusiva reclamable una sola vez al llegar al rango máximo (crea una quest real en
+`dungeon_quests` con recompensa XP/oro fija, marca `hero.faction_claims` para evitar reclamo doble).
+
+**✅ Migración aplicada 2026-07-18** — `ALTER TABLE dungeon_heroes ADD COLUMN IF NOT EXISTS
+faction_claims jsonb DEFAULT '[]'::jsonb;`, corrida vía SQL Editor con la sesión de Gerardo ya
+logueada en Chrome (el MCP de Supabase conectado no alcanza esta cuenta separada, ver traspaso
+2026-07-12). Botón "Reclamar misión exclusiva" funcional.
+
+**Nota de diseño:** ya existía `reputation.js` (reputación por tag libre `#trabajo`/`#salud`, +10% XP
+al pasar 500 XP). Se evaluó reusarlo pero Gerardo pidió identidad propia (nombre/icono/UI dedicada),
+no solo un reskin — por eso Facciones es un sistema separado, basado en `quest.type` (garantizado
+siempre presente) en vez de tags opcionales que dependen de que Gerardo los use.
+
+Vista nueva `factions` — sidebar, tabs desktop, mobile-more-sheet, todos siguiendo el patrón exacto
+de Zonas del Dungeon. CSS al final de dungeon.css (`.faction-*`).
+
 ## Oráculo IA eliminado + funciones dependientes de OpenClaw pasadas a cálculo local (v203, 2026-07-18)
 
 Gerardo eliminó el bot OpenClaw para siempre (segunda vez que se anuncia, ver también nota de

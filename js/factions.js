@@ -2,8 +2,10 @@
 /* ============================================================
    FACCIONES DEL DUNGEON
    Reputación acumulada por tipo de misión completada (all-time).
-   3 rangos por facción; el rango máximo desbloquea 1 misión
-   exclusiva reclamable una sola vez (hero.faction_claims jsonb).
+   3 rangos por facción; el rango máximo desbloquea una SERIE de
+   3 misiones reales concretas (no 1 sola genérica). El bono de
+   oro/XP se entrega al completar las 3. Reclamable una sola vez.
+   hero.faction_claims = [{ id, questIds:[...], done:false }]
    ============================================================ */
 
 function _factionXP(type) {
@@ -29,23 +31,47 @@ async function claimFactionExclusive(factionId) {
   const rankIdx = _factionRankIndex(def, xp);
   if (rankIdx < def.ranks.length - 1) { toast('🔒', 'Aún no alcanzas el rango máximo de esta facción.'); return; }
   const claims = _factionClaims();
-  if (claims.includes(factionId)) { toast('✅', 'Ya reclamaste la misión exclusiva de esta facción.'); return; }
+  if (claims.some(c => c.id === factionId)) { toast('✅', 'Ya reclamaste la serie de misiones de esta facción.'); return; }
 
-  const { data } = await db.from('dungeon_quests').insert({
-    hero_id: hero.id,
-    name: def.exclusive.name,
-    type: def.type,
-    tags: '#faccion',
-    notes: `Misión exclusiva de ${def.name}.`,
-    priority: 'epico',
-  }).select().single();
-  if (data) quests.push(data);
+  const questIds = [];
+  for (const step of def.exclusive.steps) {
+    const { data } = await db.from('dungeon_quests').insert({
+      hero_id: hero.id,
+      name: step,
+      type: def.type,
+      tags: '#faccion',
+      notes: `Misión de la serie exclusiva de ${def.name}.`,
+      priority: 'epico',
+    }).select().single();
+    if (data) { quests.push(data); questIds.push(data.id); }
+  }
 
-  claims.push(factionId);
+  claims.push({ id: factionId, questIds, done: false });
   hero.faction_claims = JSON.stringify(claims);
   await saveHero({ faction_claims: hero.faction_claims });
-  toast(def.icon, `¡Misión exclusiva de ${def.name} desbloqueada! Revisa tus misiones.`);
+  toast(def.icon, `¡3 misiones de ${def.name} desbloqueadas! Complétalas para el bono final.`);
   renderQuestList();
+  renderFactions();
+}
+
+/* Llamado desde quests.js completeQuest() tras cada misión completada */
+async function checkFactionExclusiveProgress(questId) {
+  if (!hero) return;
+  const claims = _factionClaims();
+  const entry = claims.find(c => !c.done && c.questIds && c.questIds.includes(questId));
+  if (!entry) return;
+  const allDone = entry.questIds.every(qid => quests.find(q => q.id === qid && q.done));
+  if (!allDone) return;
+
+  const def = FACTION_DEFS.find(f => f.id === entry.id);
+  entry.done = true;
+  hero.faction_claims = JSON.stringify(claims);
+  await saveHero({ faction_claims: hero.faction_claims });
+  if (def) {
+    await addXP(def.exclusive.xp, 'side', null);
+    if (typeof addGold === 'function') addGold(def.exclusive.gold);
+    toast(def.icon, `¡Serie de ${def.name} completada! +${def.exclusive.xp} XP, +${def.exclusive.gold} oro.`);
+  }
   renderFactions();
 }
 
@@ -56,7 +82,7 @@ function _factionCardEl(def, claims) {
   const isMax    = rankIdx === def.ranks.length - 1;
   const nextRank = def.ranks[rankIdx + 1];
   const pct      = nextRank ? Math.min(100, Math.round(((xp - rank.xp) / (nextRank.xp - rank.xp)) * 100)) : 100;
-  const claimed  = claims.includes(def.id);
+  const claimEntry = claims.find(c => c.id === def.id);
 
   const card = document.createElement('div');
   card.className = 'faction-card';
@@ -95,8 +121,10 @@ function _factionCardEl(def, claims) {
 
   const btn = document.createElement('button');
   btn.className = 'faction-claim-btn';
+  const claimed = !!claimEntry;
+  const done = claimEntry?.done;
   btn.disabled = !(isMax && !claimed);
-  btn.textContent = claimed ? '✅ Misión exclusiva reclamada' : isMax ? `🎁 Reclamar: ${def.exclusive.name}` : '🔒 Rango máximo para desbloquear';
+  btn.textContent = done ? '✅ Serie completada' : claimed ? '⏳ Serie en progreso — revisa tus misiones' : isMax ? '🎁 Reclamar serie de misiones' : '🔒 Rango máximo para desbloquear';
   btn.addEventListener('click', () => claimFactionExclusive(def.id));
 
   card.append(hd, desc, barTrack, barLbl, btn);
