@@ -55,11 +55,20 @@ function _shopOwnedText(item) {
   }
   return null;
 }
+function _shopDailyOffer() {
+  const day = new Date().toISOString().slice(0, 10);
+  const pool = SHOP_ITEMS.filter(item => !['mejoras','marcos'].includes(item.category));
+  if (!pool.length) return null;
+  const seed = [...day].reduce((total, char) => total + char.charCodeAt(0), 0);
+  const item = pool[seed % pool.length];
+  return { id:item.id, discount:20, cost:Math.max(1, Math.round(item.cost * .8)) };
+}
 
 function renderShopItems() {
   const el = document.getElementById('shopItems');
   if (!el) return;
   const gold = getGold();
+  const dailyOffer = _shopDailyOffer();
 
   const cats = [
     { id: 'consumible', label: '⚗️ Consumibles' },
@@ -91,7 +100,9 @@ function renderShopItems() {
   const items = SHOP_ITEMS.filter(i => i.category === shopCategory);
 
   const cards = items.map(item => {
-    const canBuy  = gold >= item.cost;
+    const offer = dailyOffer?.id === item.id ? dailyOffer : null;
+    const finalCost = offer ? offer.cost : item.cost;
+    const canBuy  = gold >= finalCost;
     const rarity  = item.rarity || _shopRarity(item.cost);
     const imgHtml = item.img
       ? `<img src="images/${item.img}" alt="" onerror="this.src='${CDN}dungeon/${item.img}';this.onerror=null">`
@@ -106,7 +117,7 @@ function renderShopItems() {
       <div class="rpg-shop-item-name">${escHtml(item.name)}</div>
       <div class="rpg-shop-item-desc">${escHtml(item.desc)}</div>
       ${ownedBadge}
-      <button class="rpg-buy-btn" onclick="buyItem('${item.id}',${item.cost})" ${canBuy ? '' : 'disabled'}>
+      <button class="rpg-buy-btn" onclick="buyItem('${item.id}',${finalCost})" ${canBuy ? '' : 'disabled'}>
         🪙 ${item.cost}
       </button>
     </div>`;

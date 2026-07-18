@@ -1,4 +1,4 @@
-const CACHE = 'dungeon-v248';
+const CACHE = 'dungeon-v249';
 const ASSETS = [
   '/',
   '/index.html',
@@ -156,6 +156,7 @@ const ASSETS = [
   /* Pet garden */
   '/js/pet_garden.js',
   '/js/boss_battle.js',
+  '/js/onboarding.js',
   '/images/jardin_fondo.webp',
   /* Pet eggs */
   '/images/pet_egg_zorro-naturaleza.webp',
@@ -319,7 +320,7 @@ const ASSETS = [
   '/images/logro_rico-poder.webp',
   '/images/logro_semana-epica.webp',
   '/images/logro_senor-caos.webp',
-  '/images/logro_señor-tiempo.webp',
+  '/images/logro_seÃ±or-tiempo.webp',
   '/images/logro_tesoro-arcano.webp',
   '/images/logro_tiempo-infinito.webp',
   '/images/logro_triple-amenaza.webp',
@@ -437,7 +438,7 @@ self.addEventListener('notificationclick', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) return;
   if (e.request.url.includes('supabase.co')) return;
-  // HTML: network-first para siempre tener la versiÃ³n mÃ¡s reciente
+  // HTML: network-first para siempre tener la versiÃƒÂ³n mÃƒÂ¡s reciente
   if (e.request.headers.get('accept')?.includes('text/html')) {
     e.respondWith(
       fetch(e.request).catch(() => caches.match(e.request))

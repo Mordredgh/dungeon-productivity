@@ -76,4 +76,5 @@ async function bootApp() {
   updateFocusTodayChip();
   if (typeof checkSecretForgeQueue === 'function') await checkSecretForgeQueue();
   if (typeof animBootSequence === 'function') animBootSequence();
+  if (typeof showOnboardingIfNeeded === 'function') showOnboardingIfNeeded();
 }
