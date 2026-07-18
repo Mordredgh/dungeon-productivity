@@ -657,6 +657,26 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 
 ---
 
+## Misiones aleatorias de Zona (v206, 2026-07-18)
+
+Gerardo vio el Mapa del Mundo (6 zonas: Ciudadela/Campo de Batalla/Torre del Saber/Fortaleza/Jardín
+Arcano/Cripta — que resultan ser exactamente las mismas 6 `ZONES` de `zones.js`, ya existentes) y
+pidió que aparezcan periódicamente misiones aleatorias ligadas a cada una, con tareas de provecho real.
+
+- **`ZONE_QUEST_TEMPLATES`** en `zones.js` — pool de 3 misiones concretas y accionables por zona,
+  con el `type`/`tags` exacto que exige el `match()` de esa zona (para que al completarlas sumen
+  reputación de zona automáticamente, sin sistema paralelo):
+  - Ciudadela (`main`): avanzar proyecto importante, terminar algo pospuesto, meta semanal
+  - Campo de Batalla (`side`): pendientes administrativos, bandeja de entrada, mensajes
+  - Torre del Saber (`side` + tag `#lectura`/`#curso`/`#aprender`): leer, curso, aprender algo nuevo
+  - Fortaleza (`side` + tag `#ejercicio`/`#correr`/`#salud`): ejercicio, caminar/correr, salud básica
+  - Jardín Arcano (`habit` positivo): agua, dormir temprano, meditar
+  - Cripta (`habit` negativo, tag `habit-`): evitar redes antes de dormir, no procrastinar, evitar snacks
+- **`checkZoneRandomQuest()`** — 1×/día, elige zona y plantilla al azar, crea la quest real vía
+  `db.insert` directo (mismo patrón que `checkDailySpecialQuest()`). Dedup por localStorage
+  (`dungeon-zone-quest-YYYY-MM-DD`), sin columna nueva en `hero` — no requirió migración.
+  Llamado desde `main.js bootApp()` junto a `checkDailySpecialQuest()`.
+
 ## Facciones del Dungeon (v204, 2026-07-18) — pendiente: migración manual
 
 Nueva feature `js/factions.js` + `FACTION_DEFS` en config.js. 4 gremios con identidad propia, uno por

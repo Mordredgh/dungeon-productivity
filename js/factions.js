@@ -33,8 +33,14 @@ async function claimFactionExclusive(factionId) {
   const claims = _factionClaims();
   if (claims.some(c => c.id === factionId)) { toast('✅', 'Ya reclamaste la serie de misiones de esta facción.'); return; }
 
+  const pool  = [...def.exclusive.stepsPool];
+  const steps = [];
+  for (let i = 0; i < 3 && pool.length; i++) {
+    steps.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+  }
+
   const questIds = [];
-  for (const step of def.exclusive.steps) {
+  for (const step of steps) {
     const { data } = await db.from('dungeon_quests').insert({
       hero_id: hero.id,
       name: step,

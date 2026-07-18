@@ -56,8 +56,9 @@ const POM_XP = 15;
 
 /* ── FACCIONES DEL DUNGEON — reputación por tipo de misión ──
    3 rangos por facción, rango máximo desbloquea una serie de 3
-   misiones concretas reales (no 1 sola genérica) — el oro/XP bono
-   se entrega al completar la 3ª. Reclamable una sola vez. */
+   misiones reales elegidas al azar de un pool más grande (variedad
+   en cada reclamo) — el oro/XP bono se entrega al completar las 3.
+   Reclamable una sola vez. */
 const FACTION_DEFS = [
   { id: 'campeones',  type: 'main',   name: 'Orden de los Campeones',   icon: '⚔️', color: '#ef4444',
     desc: 'Forjada por quienes solo aceptan las misiones épicas.',
@@ -67,7 +68,17 @@ const FACTION_DEFS = [
       { name: 'Leyenda',   xp: 1200 },
     ],
     exclusive: {
-      steps: ['Derrota al Jefe Semanal esta semana', 'Completa 1 misión Épica pendiente', 'Mantén tu racha activa 3 días seguidos'],
+      stepsPool: [
+        'Derrota al Jefe Semanal esta semana',
+        'Completa 1 misión Épica pendiente',
+        'Mantén tu racha activa 3 días seguidos',
+        'Crea y completa 1 misión Épica nueva hoy',
+        'Termina el proyecto más grande que tengas abierto',
+        'Alcanza el siguiente nivel de tu héroe',
+        'Completa 2 misiones Épicas esta semana',
+        'Derrota un Jefe con tu mascota sin usar pociones',
+        'Cierra una misión Épica vencida hace tiempo',
+      ],
       xp: 250, gold: 150 } },
   { id: 'mercaderes', type: 'side',   name: 'Gremio de Mercaderes',     icon: '💼', color: '#f59e0b',
     desc: 'Comerciantes y solucionadores de encargos del reino.',
@@ -77,7 +88,17 @@ const FACTION_DEFS = [
       { name: 'Magnate',  xp: 900 },
     ],
     exclusive: {
-      steps: ['Completa 2 Encargos pendientes', 'Cierra un Encargo con fecha límite vencida (o el más antiguo)', 'Crea y completa 1 Encargo nuevo hoy mismo'],
+      stepsPool: [
+        'Completa 2 Encargos pendientes',
+        'Cierra un Encargo con fecha límite vencida (o el más antiguo)',
+        'Crea y completa 1 Encargo nuevo hoy mismo',
+        'Completa 3 Encargos en un solo día',
+        'Resuelve el Encargo que más llevas posponiendo',
+        'Cierra tu bandeja de Encargos a cero por hoy',
+        'Completa un Encargo antes del mediodía',
+        'Agrega y completa un Encargo urgente',
+        'Termina 2 Encargos de baja prioridad acumulados',
+      ],
       xp: 150, gold: 300 } },
   { id: 'disciplina', type: 'daily',  name: 'Círculo de la Disciplina', icon: '🔄', color: '#22c55e',
     desc: 'Monjes de la rutina — veneran la búsqueda diaria.',
@@ -87,7 +108,17 @@ const FACTION_DEFS = [
       { name: 'Maestro', xp: 750 },
     ],
     exclusive: {
-      steps: ['Completa tu Búsqueda Diaria hoy', 'Completa 2 Búsquedas Diarias más esta semana', 'Cierra la semana sin fallar ningún día'],
+      stepsPool: [
+        'Completa tu Búsqueda Diaria hoy',
+        'Completa 2 Búsquedas Diarias más esta semana',
+        'Cierra la semana sin fallar ningún día',
+        'Completa tu Búsqueda Diaria antes del mediodía',
+        'Completa 3 días seguidos de Búsqueda Diaria',
+        'Añade una nueva Búsqueda Diaria y complétala hoy',
+        'Termina tu Búsqueda Diaria antes de dormir 2 noches seguidas',
+        'Completa tus Búsquedas Diarias sin usar pociones de XP',
+        'Cierra el día con todas tus Búsquedas Diarias en cero',
+      ],
       xp: 100, gold: 80 } },
   { id: 'cronicas',   type: 'weekly', name: 'Consejo de las Crónicas',  icon: '📜', color: '#8b5cf6',
     desc: 'Guardianes de las grandes gestas semanales.',
@@ -97,7 +128,17 @@ const FACTION_DEFS = [
       { name: 'Archivero', xp: 1000 },
     ],
     exclusive: {
-      steps: ['Completa 1 Crónica Semanal pendiente', 'Crea una nueva Crónica Semanal y complétala', 'Revisa la Sala del Trono al cerrar la semana'],
+      stepsPool: [
+        'Completa 1 Crónica Semanal pendiente',
+        'Crea una nueva Crónica Semanal y complétala',
+        'Revisa la Sala del Trono al cerrar la semana',
+        'Completa 2 Crónicas Semanales esta semana',
+        'Cierra una Crónica Semanal antes del domingo',
+        'Planea la Crónica Semanal de la próxima semana',
+        'Termina la Crónica Semanal más antigua pendiente',
+        'Completa una Crónica Semanal sin ayuda de bonus',
+        'Revisa tu progreso semanal y ajusta tus metas',
+      ],
       xp: 200, gold: 200 } },
 ];
 
