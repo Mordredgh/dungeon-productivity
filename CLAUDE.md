@@ -657,6 +657,15 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 
 ---
 
+## Más variedad: 10 misiones/zona + pool de gremio (v207, 2026-07-18)
+
+Gerardo pidió más variedad tras probar la v206/v205. Dos expansiones:
+- **`ZONE_QUEST_TEMPLATES`** — de 3 a 10 misiones por zona (60 en total), mismo patrón type/tags.
+- **`FACTION_DEFS[].exclusive`** — de `steps` fijo (siempre las mismas 3) a `stepsPool` (9 opciones),
+  `claimFactionExclusive()` ahora elige 3 al azar sin repetir por reclamo (`pool.splice` con índice
+  random). Cada vez que se reclame una facción (aunque sea otro héroe o tras reset) sale una
+  combinación distinta.
+
 ## Misiones aleatorias de Zona (v206, 2026-07-18)
 
 Gerardo vio el Mapa del Mundo (6 zonas: Ciudadela/Campo de Batalla/Torre del Saber/Fortaleza/Jardín

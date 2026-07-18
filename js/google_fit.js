@@ -130,7 +130,11 @@ async function _applyFitXP(today) {
   if (hero?.fit_xp_date === today) return;
   await saveHero({ fit_xp_date: today });
   const bonus = fitSteps >= 10000 ? 80 : fitSteps >= 7500 ? 50 : fitSteps >= 5000 ? 30 : fitSteps >= 2500 ? 15 : 0;
-  if (bonus > 0) { await addXP(bonus, 'side', null); toast('💪', `¡${fitSteps.toLocaleString()} pasos! +${bonus} XP`); }
+  if (bonus > 0) {
+    await addXP(bonus, 'side', null);
+    if (typeof addZoneExtXP === 'function') await addZoneExtXP('fortaleza', bonus);
+    toast('💪', `¡${fitSteps.toLocaleString()} pasos! +${bonus} XP`);
+  }
 }
 
 function renderFitWidget() {

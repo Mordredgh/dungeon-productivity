@@ -61,6 +61,7 @@ async function syncDuolingo() {
     if (arcXP > 0 && hero?.duo_xp_date !== today) {
       await saveHero({ duo_xp_date: today });
       await addXP(arcXP, 'side', null);
+      if (typeof addZoneExtXP === 'function') await addZoneExtXP('torre', arcXP);
       toast('🦜', `Duolingo: ${duoXP} XP → +${arcXP} XP en Arcanum · Racha: ${streak}🔥`);
     } else {
       toast('🦜', `Duolingo sincronizado · ${duoXP > 0 ? duoXP + ' XP hoy' : 'Sin XP hoy'} · Racha: ${streak}🔥`);

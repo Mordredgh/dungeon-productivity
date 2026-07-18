@@ -126,6 +126,11 @@ async function completeQuest(id, el) {
     xpAmt = Math.round(xpAmt * (1 + getZoneBonus(q)));
   }
 
+  // Facción del Dungeon — bonus pasivo por rango de gremio
+  if (typeof getFactionBonus === 'function') {
+    xpAmt = Math.round(xpAmt * (1 + getFactionBonus(q)));
+  }
+
   // Doble o Nada — multiplica (o anula) XP y oro de esta misión
   const doubleNadaMult = typeof resolveDoubleOrNothing === 'function' ? resolveDoubleOrNothing(q) : 1;
   xpAmt = Math.round(xpAmt * doubleNadaMult);

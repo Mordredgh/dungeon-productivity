@@ -2,10 +2,14 @@
 /* ============================================================
    FACCIONES DEL DUNGEON
    Reputación acumulada por tipo de misión completada (all-time).
-   3 rangos por facción; el rango máximo desbloquea una SERIE de
-   3 misiones reales concretas (no 1 sola genérica). El bono de
-   oro/XP se entrega al completar las 3. Reclamable una sola vez.
-   hero.faction_claims = [{ id, questIds:[...], done:false }]
+   3 rangos por facción — cada rango da bonus pasivo de XP (igual
+   patrón que Zonas) en misiones del tipo de esa facción. El rango
+   máximo desbloquea una SERIE de 3 misiones reales al azar (de un
+   pool más grande); el bono de oro/XP se entrega al completar las
+   3. Reclamable de nuevo cada FACTION_RECLAIM_COOLDOWN_MS una vez
+   completada la serie anterior.
+   hero.faction_claims = [{ id, questIds:[...], done, doneAt }]
+   (histórico — se van agregando entradas, nunca se borran)
    ============================================================ */
 
 function _factionXP(type) {
@@ -20,8 +24,22 @@ function _factionRankIndex(def, xp) {
   return idx;
 }
 
+/* Bonus pasivo de XP por rango de facción — llamado desde quests.js completeQuest() */
+function getFactionBonus(q) {
+  const def = FACTION_DEFS.find(f => f.type === q.type);
+  if (!def) return 0;
+  const xp = _factionXP(def.type);
+  const idx = _factionRankIndex(def, xp);
+  return def.ranks[idx].bonus || 0;
+}
+
 function _factionClaims() {
   try { return JSON.parse(hero?.faction_claims || '[]'); } catch { return []; }
+}
+
+function _factionLatestClaim(factionId, claims) {
+  const own = claims.filter(c => c.id === factionId);
+  return own.length ? own[own.length - 1] : null;
 }
 
 async function claimFactionExclusive(factionId) {
@@ -30,8 +48,18 @@ async function claimFactionExclusive(factionId) {
   const xp = _factionXP(def.type);
   const rankIdx = _factionRankIndex(def, xp);
   if (rankIdx < def.ranks.length - 1) { toast('🔒', 'Aún no alcanzas el rango máximo de esta facción.'); return; }
+
   const claims = _factionClaims();
-  if (claims.some(c => c.id === factionId)) { toast('✅', 'Ya reclamaste la serie de misiones de esta facción.'); return; }
+  const latest = _factionLatestClaim(factionId, claims);
+  if (latest && !latest.done) { toast('⏳', 'Ya tienes una serie en progreso para esta facción.'); return; }
+  if (latest && latest.done) {
+    const elapsed = Date.now() - (latest.doneAt || 0);
+    if (elapsed < FACTION_RECLAIM_COOLDOWN_MS) {
+      const daysLeft = Math.ceil((FACTION_RECLAIM_COOLDOWN_MS - elapsed) / 86400000);
+      toast('🔒', `Podrás reclamar una nueva serie de ${def.name} en ${daysLeft} día${daysLeft === 1 ? '' : 's'}.`);
+      return;
+    }
+  }
 
   const pool  = [...def.exclusive.stepsPool];
   const steps = [];
@@ -52,7 +80,7 @@ async function claimFactionExclusive(factionId) {
     if (data) { quests.push(data); questIds.push(data.id); }
   }
 
-  claims.push({ id: factionId, questIds, done: false });
+  claims.push({ id: factionId, questIds, done: false, doneAt: null });
   hero.faction_claims = JSON.stringify(claims);
   await saveHero({ faction_claims: hero.faction_claims });
   toast(def.icon, `¡3 misiones de ${def.name} desbloqueadas! Complétalas para el bono final.`);
@@ -71,6 +99,7 @@ async function checkFactionExclusiveProgress(questId) {
 
   const def = FACTION_DEFS.find(f => f.id === entry.id);
   entry.done = true;
+  entry.doneAt = Date.now();
   hero.faction_claims = JSON.stringify(claims);
   await saveHero({ faction_claims: hero.faction_claims });
   if (def) {
@@ -88,7 +117,7 @@ function _factionCardEl(def, claims) {
   const isMax    = rankIdx === def.ranks.length - 1;
   const nextRank = def.ranks[rankIdx + 1];
   const pct      = nextRank ? Math.min(100, Math.round(((xp - rank.xp) / (nextRank.xp - rank.xp)) * 100)) : 100;
-  const claimEntry = claims.find(c => c.id === def.id);
+  const latest   = _factionLatestClaim(def.id, claims);
 
   const card = document.createElement('div');
   card.className = 'faction-card';
@@ -106,7 +135,7 @@ function _factionCardEl(def, claims) {
   name.textContent = def.name;
   const rankEl = document.createElement('div');
   rankEl.className = 'faction-rank';
-  rankEl.textContent = rank.name;
+  rankEl.textContent = rank.name + (rank.bonus > 0 ? ` · +${Math.round(rank.bonus * 100)}% XP` : '');
   title.append(name, rankEl);
   hd.append(icon, title);
 
@@ -127,10 +156,20 @@ function _factionCardEl(def, claims) {
 
   const btn = document.createElement('button');
   btn.className = 'faction-claim-btn';
-  const claimed = !!claimEntry;
-  const done = claimEntry?.done;
-  btn.disabled = !(isMax && !claimed);
-  btn.textContent = done ? '✅ Serie completada' : claimed ? '⏳ Serie en progreso — revisa tus misiones' : isMax ? '🎁 Reclamar serie de misiones' : '🔒 Rango máximo para desbloquear';
+  const inProgress = latest && !latest.done;
+  const onCooldown = latest && latest.done && (Date.now() - (latest.doneAt || 0)) < FACTION_RECLAIM_COOLDOWN_MS;
+  const canClaim = isMax && !inProgress && !onCooldown;
+  btn.disabled = !canClaim;
+  if (inProgress) {
+    btn.textContent = '⏳ Serie en progreso — revisa tus misiones';
+  } else if (onCooldown) {
+    const daysLeft = Math.ceil((FACTION_RECLAIM_COOLDOWN_MS - (Date.now() - latest.doneAt)) / 86400000);
+    btn.textContent = `✅ Completada — nueva serie en ${daysLeft}d`;
+  } else if (isMax) {
+    btn.textContent = latest ? '🎁 Reclamar nueva serie' : '🎁 Reclamar serie de misiones';
+  } else {
+    btn.textContent = '🔒 Rango máximo para desbloquear';
+  }
   btn.addEventListener('click', () => claimFactionExclusive(def.id));
 
   card.append(hd, desc, barTrack, barLbl, btn);

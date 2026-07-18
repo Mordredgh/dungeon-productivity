@@ -55,17 +55,19 @@ const XP_TABLE = { main: 100, side: 50, daily: 25, weekly: 75, habit: 20 };
 const POM_XP = 15;
 
 /* ── FACCIONES DEL DUNGEON — reputación por tipo de misión ──
-   3 rangos por facción, rango máximo desbloquea una serie de 3
-   misiones reales elegidas al azar de un pool más grande (variedad
-   en cada reclamo) — el oro/XP bono se entrega al completar las 3.
-   Reclamable una sola vez. */
+   3 rangos por facción, cada rango da bonus pasivo de XP (igual que
+   Zonas) en misiones de ese tipo. Rango máximo desbloquea una serie
+   de 3 misiones reales al azar (de un pool más grande) — el oro/XP
+   bono se entrega al completar las 3. Reclamable de nuevo cada 7 días
+   una vez completada la serie anterior (FACTION_RECLAIM_COOLDOWN_MS). */
+const FACTION_RECLAIM_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
 const FACTION_DEFS = [
   { id: 'campeones',  type: 'main',   name: 'Orden de los Campeones',   icon: '⚔️', color: '#ef4444',
     desc: 'Forjada por quienes solo aceptan las misiones épicas.',
     ranks: [
-      { name: 'Aspirante', xp: 0 },
-      { name: 'Campeón',   xp: 400 },
-      { name: 'Leyenda',   xp: 1200 },
+      { name: 'Aspirante', xp: 0,    bonus: 0 },
+      { name: 'Campeón',   xp: 400,  bonus: 0.05 },
+      { name: 'Leyenda',   xp: 1200, bonus: 0.12 },
     ],
     exclusive: {
       stepsPool: [
@@ -83,9 +85,9 @@ const FACTION_DEFS = [
   { id: 'mercaderes', type: 'side',   name: 'Gremio de Mercaderes',     icon: '💼', color: '#f59e0b',
     desc: 'Comerciantes y solucionadores de encargos del reino.',
     ranks: [
-      { name: 'Aprendiz', xp: 0 },
-      { name: 'Socio',    xp: 300 },
-      { name: 'Magnate',  xp: 900 },
+      { name: 'Aprendiz', xp: 0,   bonus: 0 },
+      { name: 'Socio',    xp: 300, bonus: 0.05 },
+      { name: 'Magnate',  xp: 900, bonus: 0.12 },
     ],
     exclusive: {
       stepsPool: [
@@ -103,9 +105,9 @@ const FACTION_DEFS = [
   { id: 'disciplina', type: 'daily',  name: 'Círculo de la Disciplina', icon: '🔄', color: '#22c55e',
     desc: 'Monjes de la rutina — veneran la búsqueda diaria.',
     ranks: [
-      { name: 'Novicio', xp: 0 },
-      { name: 'Monje',   xp: 250 },
-      { name: 'Maestro', xp: 750 },
+      { name: 'Novicio', xp: 0,   bonus: 0 },
+      { name: 'Monje',   xp: 250, bonus: 0.05 },
+      { name: 'Maestro', xp: 750, bonus: 0.12 },
     ],
     exclusive: {
       stepsPool: [
@@ -123,9 +125,9 @@ const FACTION_DEFS = [
   { id: 'cronicas',   type: 'weekly', name: 'Consejo de las Crónicas',  icon: '📜', color: '#8b5cf6',
     desc: 'Guardianes de las grandes gestas semanales.',
     ranks: [
-      { name: 'Escriba',  xp: 0 },
-      { name: 'Cronista', xp: 350 },
-      { name: 'Archivero', xp: 1000 },
+      { name: 'Escriba',   xp: 0,    bonus: 0 },
+      { name: 'Cronista',  xp: 350,  bonus: 0.05 },
+      { name: 'Archivero', xp: 1000, bonus: 0.12 },
     ],
     exclusive: {
       stepsPool: [

@@ -37,6 +37,18 @@ const _ZR_NAMES   = ['Forastero','Conocido','Aliado','Campeón','Leyenda'];
 const _ZR_BONUSES = [0, 0.05, 0.10, 0.15, 0.25];
 const _ZR_COLORS  = ['var(--text3)','#60a5fa','#a78bfa','#fb923c','#facc15'];
 
+/* XP externo de zona (Google Fit → Fortaleza, Duolingo → Torre del Saber) */
+function _zoneExtXP(zoneId) {
+  try { return (JSON.parse(hero?.zone_ext_xp || '{}'))[zoneId] || 0; } catch { return 0; }
+}
+async function addZoneExtXP(zoneId, amount) {
+  if (!hero || !(amount > 0)) return;
+  let obj = {}; try { obj = JSON.parse(hero.zone_ext_xp || '{}'); } catch {}
+  obj[zoneId] = (obj[zoneId] || 0) + amount;
+  hero.zone_ext_xp = JSON.stringify(obj);
+  await saveHero({ zone_ext_xp: hero.zone_ext_xp });
+}
+
 function calcZoneXP() {
   const out = {};
   ZONES.forEach(z => { out[z.id] = 0; });
@@ -46,6 +58,7 @@ function calcZoneXP() {
     const z = ZONES.find(z => z.match(q));
     if (z) out[z.id] += xp;
   });
+  ZONES.forEach(z => { out[z.id] += _zoneExtXP(z.id); });
   return out;
 }
 
