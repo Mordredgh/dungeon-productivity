@@ -23,7 +23,6 @@ async function bootApp() {
   await handleGoogleFitCallback();
   syncGoogleFitSteps();
   renderFitWidget();
-  renderDuolingoWidget();
   renderNightmareModeBtn();
   renderComboChip();
   await migrateRarity();

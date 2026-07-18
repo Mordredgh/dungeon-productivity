@@ -309,6 +309,8 @@ function renderSkillTree() {
 }
 
 function _renderExpandedSkillTree(el) {
+  _renderSkillTreeConstellation(el);
+  return;
   const cls = hero.hero_class || 'guerrero';
   const race = heroRace || hero.race || 'humano';
   const defs = getAllSkillDefs(cls, race);
@@ -331,4 +333,24 @@ function _renderExpandedSkillTree(el) {
     <div class="sktx-layout"><div class="sktx-main"><div class="sktx-section-title">${meta.icon} Especialización de ${meta.label}</div>${tiers.map(tier => `<div class="sktx-tier"><div class="sktx-tier-label">Rango ${tier}</div><div class="sktx-grid">${classDefs.filter(skill => skill.tier === tier).map(card).join('')}</div></div>`).join('')}</div><aside class="sktx-race"><div class="sktx-section-title">✧ Linaje ${raceLabel}</div><p>Pasivos exclusivos de tu raza.</p>${raceDefs.map(card).join('')}</aside></div>
     <footer class="sktx-footer"><span>✓ Aprendida</span><span>+1 Disponible</span><span>🔒 Requiere una senda previa</span></footer>
   </section>`;
+}
+
+function _renderSkillTreeConstellation(el) {
+  const cls = hero.hero_class || 'guerrero';
+  const race = heroRace || hero.race || 'humano';
+  const all = getAllSkillDefs(cls, race);
+  const classDefs = [...(SKILL_TREE_DEFS[cls] || []), ...(SKILL_CLASS_EXPANSIONS[cls] || [])];
+  const raceDefs = SKILL_RACE_DEFS[race] || [];
+  const meta = _SKT_META[cls] || { icon:'⚡', label:cls, color:'#a855f7' };
+  const byTier = tier => classDefs.filter(skill => skill.tier === tier);
+  const node = skill => {
+    const learned = hasSkill(skill.id);
+    const ready = canLearnSkill(skill);
+    const req = skill.requires.map(id => all.find(item => item.id === id)?.name).filter(Boolean).join(' · ');
+    return `<button class="skt3-node ${learned ? 'is-learned' : ready ? 'is-ready' : 'is-locked'}" ${ready ? `onclick="learnSkill('${skill.id}')"` : 'disabled'} title="${escHtml(skill.desc)}${req ? ' · Requiere: ' + escHtml(req) : ''}"><span class="skt3-orb">${skill.icon}</span><b>${escHtml(skill.name)}</b><small>${escHtml(skill.desc)}</small>${!learned && req ? `<em>${escHtml(req)}</em>` : ''}</button>`;
+  };
+  const connector = `<svg class="skt3-lines" viewBox="0 0 1000 500" preserveAspectRatio="none" aria-hidden="true"><g>
+    <path d="M170 410 L170 310 M500 410 L380 310 M830 410 L620 310 M380 310 L330 175 M620 310 L670 175 M330 175 L450 58 M670 175 L550 58"/>
+  </g></svg>`;
+  el.innerHTML = `<section class="skt3-shell" style="--skt3:${meta.color}"><header class="skt3-header"><div><span>${meta.icon} Senda de ${meta.label}</span><h3>Constelación del héroe</h3><p>Desbloquea nodos conectados. Cada decisión abre una ruta distinta.</p></div><div class="skt3-points"><b>✦ ${hero.skill_points || 0}</b><small>puntos de talento</small></div></header><div class="skt3-board">${connector}<div class="skt3-tier skt3-apex">${byTier(3).map(node).join('')}</div><div class="skt3-tier skt3-mid">${byTier(2).map(node).join('')}</div><div class="skt3-tier skt3-root">${byTier(1).map(node).join('')}</div></div><section class="skt3-race"><div><span>✧ Linaje racial</span><p>${{humano:'Adaptación y determinación',elfo:'Memoria lunar y raíces',enano:'Piedra, acero y resistencia',orco:'Furia, clan y conquista'}[race] || race}</p></div><div class="skt3-race-nodes">${raceDefs.map(node).join('')}</div></section><footer class="skt3-key"><span>✦ Aprendida</span><span>◉ Disponible</span><span>◌ Bloqueada</span></footer></section>`;
 }

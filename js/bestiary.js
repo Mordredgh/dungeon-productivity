@@ -42,6 +42,8 @@ async function recordBossDefeat(bossKey) {
 function renderBestiary() {
   const el = document.getElementById('bestiaryContent');
   if (!el || !hero) return;
+  renderBestiaryCodex(el);
+  return;
 
   const defeated  = getBestiary();
   const all       = typeof BOSS_DEFS !== 'undefined' ? BOSS_DEFS : [];
@@ -95,6 +97,25 @@ function renderBestiary() {
     <div class="bst-entry-overlay" id="bestiaryEntry" style="display:none" onclick="closeBestiaryEntry()"><article class="bst-entry" onclick="event.stopPropagation()" id="bestiaryEntryCard"></article></div>
   `;
 }
+
+let _bestiarySelectedKey = null;
+function renderBestiaryCodex(el) {
+  const defeated = getBestiary();
+  const all = typeof BOSS_DEFS === 'undefined' ? [] : BOSS_DEFS;
+  const known = all.filter(boss => defeated.includes(boss.key));
+  if (!_bestiarySelectedKey || !defeated.includes(_bestiarySelectedKey)) _bestiarySelectedKey = known[0]?.key || null;
+  const selected = all.find(boss => boss.key === _bestiarySelectedKey);
+  const pct = all.length ? Math.round(defeated.length / all.length * 100) : 0;
+  const entry = boss => {
+    if (!boss) return `<div class="bstd-empty"><span>📖</span><b>Aún no hay registros</b><p>Derrota a un jefe para abrir el primer capítulo del códice.</p></div>`;
+    const color = BESTIARY_RARITY_CLR[boss.rarity] || '#9ca3af';
+    const chart = typeof BOSS_ELEMENT_CHART === 'undefined' ? null : BOSS_ELEMENT_CHART[boss.element];
+    return `<div class="bstd-art" style="--bstd:${color}"><img src="images/boss_${boss.key}.webp" alt="${escHtml(boss.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span style="display:none">${boss.emoji || '👹'}</span></div><article class="bstd-page"><span class="bstd-rarity" style="color:${color}">${boss.rarity}</span><h3>${escHtml(boss.name)}</h3><div class="bstd-seal"><span>${boss.element}</span><span>${boss.hp} HP</span></div><p>${escHtml(getBossLore(boss))}</p>${chart ? `<div class="bstd-tactics"><b>Margen del cronista</b><span>Débil ante <strong>${chart.weakTo?.join(', ') || '—'}</strong></span><span>Resiste <strong>${chart.resists?.join(', ') || '—'}</strong></span></div>` : ''}</article>`;
+  };
+  const card = boss => { const isKnown = defeated.includes(boss.key); const color = BESTIARY_RARITY_CLR[boss.rarity] || '#64748b'; return `<button class="bstd-spine ${isKnown ? 'is-known' : ''} ${boss.key === _bestiarySelectedKey ? 'is-current' : ''}" style="--bstd:${color}" ${isKnown ? `onclick="selectBestiaryEntry('${boss.key}')"` : 'disabled'}><span>${isKnown ? boss.emoji || '✦' : '?'}</span><b>${isKnown ? escHtml(boss.name) : 'Registro sellado'}</b><small>${boss.rarity}</small></button>`; };
+  el.innerHTML = `<section class="bstd-shell"><header class="bstd-header"><div><span>ARCHIVO DE ARCANUM</span><h3>Bestiario del Dungeon</h3></div><div class="bstd-progress"><b>${defeated.length}/${all.length}</b><i><em style="width:${pct}%"></em></i><small>${pct}% descifrado</small></div></header><div class="bstd-layout"><aside class="bstd-shelf">${all.map(card).join('')}</aside><main class="bstd-detail">${entry(selected)}</main></div></section>`;
+}
+function selectBestiaryEntry(key) { _bestiarySelectedKey = key; renderBestiary(); }
 
 function openBestiaryEntry(key) {
   const boss = (typeof BOSS_DEFS === 'undefined' ? [] : BOSS_DEFS).find(entry => entry.key === key);

@@ -37,7 +37,7 @@ const _ZR_NAMES   = ['Forastero','Conocido','Aliado','Campeón','Leyenda'];
 const _ZR_BONUSES = [0, 0.05, 0.10, 0.15, 0.25];
 const _ZR_COLORS  = ['var(--text3)','#60a5fa','#a78bfa','#fb923c','#facc15'];
 
-/* XP externo de zona (Google Fit → Fortaleza, Duolingo → Torre del Saber) */
+/* XP externo de zona (Google Fit → Fortaleza) */
 function _zoneExtXP(zoneId) {
   try { return (JSON.parse(hero?.zone_ext_xp || '{}'))[zoneId] || 0; } catch { return 0; }
 }
