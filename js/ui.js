@@ -265,7 +265,6 @@ function _setPageBg(name) {
 }
 
 function switchView(v) {
-  if (v === 'oracle') { if (typeof openOracle === 'function') openOracle(); return; }
   if (CHAR_HUB_TABS[v]) { switchCharTab(CHAR_HUB_TABS[v]); v = 'character'; }
 
   const _currentEl = document.querySelector('.view.active');

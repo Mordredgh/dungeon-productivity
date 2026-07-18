@@ -46,7 +46,6 @@ async function bootApp() {
   initRPGSystems();
   checkDailySummary();
   checkWeeklyRetro();
-  checkMorningBriefing();
   checkMorningReview();
   renderDailyGoalBar();
   checkWeeklySummary();

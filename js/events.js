@@ -1294,11 +1294,7 @@ function checkDailySummary() {
   const doneQ = quests.filter(q => q.done && q.done_at && q.done_at.startsWith(today));
   const poms  = pomodoros.filter(p => p.started_at && p.started_at.startsWith(today)).length;
   const xp    = doneQ.reduce((s, q) => s + (XP_TABLE[q.type] || 50), 0);
-  const pending = quests.filter(q => !q.done).length;
-  toastAction('📜', `Resumen del día: ${doneQ.length} misiones · ${poms} pomodoros · +${xp} XP`, 'Resumen IA →', () => {
-    const names = doneQ.map(q => q.name).join(', ') || '(ninguna)';
-    _oracleAutoSend(`Genera mi resumen nocturno en 3-4 líneas: qué completé hoy (${doneQ.length} misiones: ${names}, ${poms} pomodoros, ${xp} XP), qué quedó pendiente (${pending} misiones), y termina con una frase motivacional corta basada en mi progreso real.`);
-  }, 12000);
+  toast('📜', `Resumen del día: ${doneQ.length} misiones · ${poms} pomodoros · +${xp} XP`, 12000);
 }
 
 /* ============================================================
@@ -1435,4 +1431,73 @@ function checkGoldNudge() {
   if (localStorage.getItem(key) === today) return;
   localStorage.setItem(key, today);
   setTimeout(() => toast('💰', `Tienes ${gold.toLocaleString()} 🪙 sin gastar. ¡Visita la Tienda o la Herrería!`), 5000);
+}
+
+/* ============================================================
+   RETROSPECTIVA SEMANAL (domingos 8pm) — solo stats, sin IA
+   ============================================================ */
+function _weekNumber(d) {
+  const jan1 = new Date(d.getFullYear(), 0, 1);
+  return Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+}
+
+function _weekDates() {
+  const arr = [];
+  for (let i = 6; i >= 0; i--) arr.push(new Date(Date.now() - i * 86400000).toISOString().split('T')[0]);
+  return arr;
+}
+
+function checkWeeklyRetro() {
+  const now = new Date();
+  if (now.getDay() !== 0 || now.getHours() < 20) return;
+  const key = `dungeon-retro-${now.getFullYear()}-${_weekNumber(now)}`;
+  if (localStorage.getItem(key)) return;
+  localStorage.setItem(key, '1');
+  showWeeklyRetro();
+}
+
+function showWeeklyRetro() {
+  const dates    = _weekDates();
+  const wQuests  = quests.filter(q => q.done && q.done_at && dates.some(d => q.done_at.startsWith(d)));
+  const wPoms    = pomodoros.filter(p => p.started_at && dates.some(d => p.started_at.startsWith(d)));
+  const wXP      = wQuests.reduce((s, q) => s + (XP_TABLE[q.type] || 50), 0);
+  const dayCount = Object.fromEntries(dates.map(d => [d, quests.filter(q => q.done && q.done_at?.startsWith(d)).length]));
+  const best     = Object.entries(dayCount).sort((a, b) => b[1] - a[1])[0];
+  const bestLbl  = best ? new Date(best[0] + 'T12:00').toLocaleDateString('es-MX', { weekday:'long' }) : '-';
+  const maxC     = Math.max(...Object.values(dayCount), 1);
+
+  const el = document.getElementById('retroContent');
+  if (!el) return;
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="retro-stat"><span class="retro-stat-num" style="color:var(--green)">${wQuests.length}</span><span class="retro-stat-lbl">misiones</span></div>
+      <div class="retro-stat"><span class="retro-stat-num" style="color:var(--gold)">${wXP}</span><span class="retro-stat-lbl">XP ganado</span></div>
+      <div class="retro-stat"><span class="retro-stat-num" style="color:var(--blue)">${wPoms.length}</span><span class="retro-stat-lbl">pomodoros</span></div>
+      <div class="retro-stat"><span class="retro-stat-num" style="color:var(--accent);font-size:16px">${bestLbl}</span><span class="retro-stat-lbl">mejor día</span></div>
+    </div>
+    <div class="mini-bar-chart">${dates.map(d => `
+      <div class="mini-bar-wrap">
+        <div class="mini-bar" style="height:${Math.max(2, Math.round((dayCount[d]/maxC)*60))}px;background:var(--accent)"></div>
+        <div class="mini-bar-label">${new Date(d+'T12:00').toLocaleDateString('es',{weekday:'narrow'})}</div>
+      </div>`).join('')}</div>`;
+  openModal('retroModal');
+}
+
+/* ============================================================
+   DEADLINE ALERTS
+   ============================================================ */
+function checkDeadlineAlerts() {
+  const today    = new Date().toISOString().split('T')[0];
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+  const alertKey = 'dungeon-alerts-' + today;
+  if (localStorage.getItem(alertKey)) return;
+  const due = quests.filter(q => !q.done && q.deadline === tomorrow);
+  if (!due.length) return;
+  localStorage.setItem(alertKey, '1');
+  setTimeout(() => {
+    due.slice(0, 3).forEach((q, i) => {
+      setTimeout(() => toast('⏰', `Vence mañana: "${q.name}"`, 6000), i * 900);
+    });
+    if (due.length > 3) setTimeout(() => toast('⏰', `+${due.length - 3} misiones más vencen mañana`, 5000), 3 * 900);
+  }, 5000);
 }

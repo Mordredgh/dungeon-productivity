@@ -17,8 +17,8 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="https://xibmopqlgjbcypxixnri.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png" type="image/png">
 <link rel="apple-touch-icon" href="https://xibmopqlgjbcypxixnri.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png">
-<link rel="stylesheet" href="css/dungeon.css?v=202">
-<link rel="stylesheet" href="css/dungeon-v2.css?v=202">
+<link rel="stylesheet" href="css/dungeon.css?v=203">
+<link rel="stylesheet" href="css/dungeon-v2.css?v=203">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" defer></script>
 </head>
@@ -145,7 +145,6 @@
     <div class="header-tools">
       <!-- hidden on desktop (≥641px) — same actions live in the bottom dock -->
       <button class="icon-btn header-dock-dup" id="diaryBtn"  onclick="openDiary()" title="Diario">📖</button>
-      <button class="icon-btn header-dock-dup" id="oracleBtn" title="Oráculo IA">🔮</button>
       <button class="icon-btn header-dock-dup" id="d20Btn"    title="Tirar D20">🎲</button>
       <button class="icon-btn header-dock-dup" id="focusBtn"  title="Modo Focus (F)">🎯</button>
       <button class="icon-btn" id="helpBtn"   title="Atajos (?)">⌨️</button>
@@ -737,7 +736,6 @@
 <!-- ── FAB Speed-Dial sub-actions (mobile) ─────────────────── -->
 <div id="fabDial" class="fab-dial">
   <button class="fab-action" onclick="openMobileAdd();closeFabDial()" data-label="Nueva Misión">⚔️</button>
-  <button class="fab-action" onclick="openOracle();closeFabDial()" data-label="Oráculo">🔮</button>
   <button class="fab-action" onclick="document.getElementById('d20Btn').click();closeFabDial()" data-label="Tirar D20">🎲</button>
 </div>
 
@@ -1153,8 +1151,7 @@
     </div>
     <div id="retroContent" style="display:flex;flex-direction:column;gap:12px;padding:4px 0 8px"></div>
     <div style="display:flex;gap:8px;margin-top:16px">
-      <button class="btn" style="flex:1" onclick="closeModal('retroModal')">Cerrar</button>
-      <button class="btn btn-primary" style="flex:1" onclick="closeModal('retroModal');oracleWeeklyReview()">🔮 Hablar con el Oráculo</button>
+      <button class="btn btn-primary" style="flex:1" onclick="closeModal('retroModal')">Cerrar</button>
     </div>
   </div>
 </div>
@@ -1179,27 +1176,6 @@
       <button class="modal-close" onclick="closeModal('diaryModal')">✕</button>
     </div>
     <div id="diaryContent" style="max-height:420px;overflow-y:auto;padding:4px 0 8px;display:flex;flex-direction:column;gap:12px"></div>
-  </div>
-</div>
-
-<!-- Oracle Panel -->
-<div class="oracle-overlay" id="oracleOverlay"></div>
-<div class="oracle-panel" id="oraclePanel">
-  <div class="oracle-header">
-    <span>🔮 Oráculo Arcano</span>
-    <button class="oracle-close" onclick="closeOracle()">✕</button>
-  </div>
-  <div class="oracle-msgs" id="oracleMsgs">
-    <div class="oracle-loading" id="oracleLoading">Invocando al oráculo...</div>
-  </div>
-  <div class="oracle-prompts">
-    <button class="oracle-prompt-chip" onclick="oracleQuickPrompt('plan')">📋 Planea mi día</button>
-    <button class="oracle-prompt-chip" onclick="oracleQuickPrompt('priority')">⚡ ¿Qué primero?</button>
-    <button class="oracle-prompt-chip" onclick="oracleQuickPrompt('summary')">🌙 Resumen</button>
-  </div>
-  <div class="oracle-input-wrap">
-    <input type="text" id="oracleInput" class="oracle-input" placeholder="Consulta al oráculo..." maxlength="2000">
-    <button class="oracle-send" id="oracleSend">⚡</button>
   </div>
 </div>
 
@@ -1317,55 +1293,54 @@
 <!-- Loot Drop Container -->
 <div id="lootDropContainer" style="position:fixed;inset:0;pointer-events:none;z-index:9000" aria-hidden="true"></div>
 
-<script src="js/config.js?v=202" defer></script>
-<script src="js/state.js?v=202" defer></script>
-<script src="js/db.js?v=202" defer></script>
-<script src="js/hero.js?v=202" defer></script>
-<script src="js/quests.js?v=202" defer></script>
-<script src="js/timer.js?v=202" defer></script>
-<script src="js/inventory.js?v=202" defer></script>
-<script src="js/spells.js?v=202" defer></script>
-<script src="js/views.js?v=202" defer></script>
-<script src="js/ui.js?v=202" defer></script>
-<script src="js/events.js?v=202" defer></script>
-<script src="js/oracle.js?v=202" defer></script>
-<script src="js/shop.js?v=202" defer></script>
-<script src="js/rpg.js?v=202" defer></script>
-<script src="js/pets.js?v=202" defer></script>
-<script src="js/weapons.js?v=202" defer></script>
-<script src="js/secret_sets.js?v=202" defer></script>
-<script src="js/goals.js?v=202" defer></script>
-<script src="js/reputation.js?v=202" defer></script>
-<script src="js/patterns.js?v=202" defer></script>
-<script src="js/mechanics.js?v=202" defer></script>
-<script src="js/character.js?v=202" defer></script>
-<script src="js/weather.js?v=202" defer></script>
-<script src="js/dungeon_clock.js?v=202" defer></script>
-<script src="js/skill_tree.js?v=202" defer></script>
-<script src="js/bestiary.js?v=202" defer></script>
-<script src="js/dungeon_grows.js?v=202" defer></script>
-<script src="js/runes.js?v=202" defer></script>
-<script src="js/google_fit.js?v=202" defer></script>
-<script src="js/hero_score.js?v=202" defer></script>
-<script src="js/push.js?v=202" defer></script>
-<script src="js/combos.js?v=202" defer></script>
-<script src="js/habits.js?v=202" defer></script>
-<script src="js/ruleta.js?v=202" defer></script>
-<script src="js/duolingo.js?v=202" defer></script>
-<script src="js/drops.js?v=202" defer></script>
-<script src="js/daily_goal.js?v=202" defer></script>
-<script src="js/weekly_summary.js?v=202" defer></script>
-<script src="js/challenges.js?v=202" defer></script>
-<script src="js/zones.js?v=202" defer></script>
-<script src="js/hero_card.js?v=202" defer></script>
-<script src="js/world_map.js?v=202" defer></script>
-<script src="js/sala_personal.js?v=202" defer></script>
-<script src="js/pet_garden.js?v=202" defer></script>
-<script src="js/animations.js?v=202" defer></script>
-<script src="js/effects.js?v=202" defer></script>
-<script src="js/boss_battle.js?v=202" defer></script>
-<script src="js/auth.js?v=202" defer></script>
-<script src="js/main.js?v=202" defer></script>
+<script src="js/config.js?v=203" defer></script>
+<script src="js/state.js?v=203" defer></script>
+<script src="js/db.js?v=203" defer></script>
+<script src="js/hero.js?v=203" defer></script>
+<script src="js/quests.js?v=203" defer></script>
+<script src="js/timer.js?v=203" defer></script>
+<script src="js/inventory.js?v=203" defer></script>
+<script src="js/spells.js?v=203" defer></script>
+<script src="js/views.js?v=203" defer></script>
+<script src="js/ui.js?v=203" defer></script>
+<script src="js/events.js?v=203" defer></script>
+<script src="js/shop.js?v=203" defer></script>
+<script src="js/rpg.js?v=203" defer></script>
+<script src="js/pets.js?v=203" defer></script>
+<script src="js/weapons.js?v=203" defer></script>
+<script src="js/secret_sets.js?v=203" defer></script>
+<script src="js/goals.js?v=203" defer></script>
+<script src="js/reputation.js?v=203" defer></script>
+<script src="js/patterns.js?v=203" defer></script>
+<script src="js/mechanics.js?v=203" defer></script>
+<script src="js/character.js?v=203" defer></script>
+<script src="js/weather.js?v=203" defer></script>
+<script src="js/dungeon_clock.js?v=203" defer></script>
+<script src="js/skill_tree.js?v=203" defer></script>
+<script src="js/bestiary.js?v=203" defer></script>
+<script src="js/dungeon_grows.js?v=203" defer></script>
+<script src="js/runes.js?v=203" defer></script>
+<script src="js/google_fit.js?v=203" defer></script>
+<script src="js/hero_score.js?v=203" defer></script>
+<script src="js/push.js?v=203" defer></script>
+<script src="js/combos.js?v=203" defer></script>
+<script src="js/habits.js?v=203" defer></script>
+<script src="js/ruleta.js?v=203" defer></script>
+<script src="js/duolingo.js?v=203" defer></script>
+<script src="js/drops.js?v=203" defer></script>
+<script src="js/daily_goal.js?v=203" defer></script>
+<script src="js/weekly_summary.js?v=203" defer></script>
+<script src="js/challenges.js?v=203" defer></script>
+<script src="js/zones.js?v=203" defer></script>
+<script src="js/hero_card.js?v=203" defer></script>
+<script src="js/world_map.js?v=203" defer></script>
+<script src="js/sala_personal.js?v=203" defer></script>
+<script src="js/pet_garden.js?v=203" defer></script>
+<script src="js/animations.js?v=203" defer></script>
+<script src="js/effects.js?v=203" defer></script>
+<script src="js/boss_battle.js?v=203" defer></script>
+<script src="js/auth.js?v=203" defer></script>
+<script src="js/main.js?v=203" defer></script>
 
 <!-- Challenges Modal -->
 <!-- HECHIZOS MODAL -->
@@ -1470,7 +1445,6 @@
 <div id="dungeonDock" class="dungeon-dock" role="toolbar" aria-label="Acciones rápidas">
   <button class="dock-item" onclick="openModal('quickAddModal')" data-label="Nueva Misión"><span class="dock-icon">⚔️</span></button>
   <button class="dock-item" onclick="document.getElementById('focusBtn').click()" data-label="Modo Focus"><img src="images/tool_timer.webp" class="dock-icon-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="dock-icon" style="display:none">⏱️</span></button>
-  <button class="dock-item" onclick="openOracle()" data-label="Oráculo Arcano"><span class="dock-icon">🔮</span></button>
   <button class="dock-item" onclick="document.getElementById('d20Btn').click()" data-label="Tirar D20"><img src="images/tool_ruleta.webp" class="dock-icon-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="dock-icon" style="display:none">🎲</span></button>
   <button class="dock-item" onclick="openDiary()" data-label="Diario"><span class="dock-icon">📖</span></button>
   <button class="dock-item" onclick="openModal('quickNotesModal')" data-label="Pergamino"><img src="images/tool_cronica.webp" class="dock-icon-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="dock-icon" style="display:none">📝</span></button>

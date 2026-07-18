@@ -493,43 +493,12 @@ function renderDiary() {
     </div>`).join('');
   if (_diaryTab === 'stats') renderDiaryStats();
 }
-async function generateDiaryEntryAI() {
-  if (!hero) return;
-  const today = new Date().toISOString().split('T')[0];
-  if (hero.diary_date === today) return;
-  const done = quests.filter(q => q.done && q.done_at?.startsWith(today));
-  if (!done.length) return;
-  const xpEarned = done.reduce((s, q) => s + (XP_TABLE[q.type] || 25), 0);
-  const names    = done.map(q => q.name).join(', ');
-  const title    = TITLES[Math.min((hero._level || hero.level || 1) - 1, TITLES.length - 1)];
-  const prompt = `Escribe una entrada de diario corta (máximo 4 líneas) en primera persona, en voz del héroe "${hero.name}" (${title}, clase ${hero.hero_class || 'aventurero'}), narrando su día como una crónica de fantasía medieval.
-Misiones completadas hoy: ${names}.
-XP ganado: ${xpEarned}. Racha actual: ${hero.streak || 0} días.
-Tono épico pero breve. Responde solo con el texto de la entrada, sin encabezados ni markdown.`;
-
-  let text = '';
-  try {
-    const r = await fetch('/openclaw/send', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: prompt })
-    });
-    const data = await r.json();
-    text = (data.reply || '').trim();
-  } catch {}
-
-  if (!text) { generateDiaryEntry(); return; }
-
-  const diary = Array.isArray(hero.diary) ? hero.diary : [];
-  diary.unshift({ date: today, text, xp: xpEarned, count: done.length });
-  if (diary.length > 60) diary.pop();
-  hero.diary = diary; hero.diary_date = today;
-  await saveHero({ diary, diary_date: today });
-  renderDiary();
-}
-
 function checkNightlyDiary() {
   if (!hero || new Date().getHours() < 21) return;
-  generateDiaryEntryAI();
+  const today = new Date().toISOString().split('T')[0];
+  if (hero.diary_date === today) return;
+  generateDiaryEntry();
+  renderDiary();
 }
 
 function openDiary() { renderDiary(); openModal('diaryModal'); checkNightlyDiary(); }
@@ -594,23 +563,14 @@ function checkProphecyVerdict() {
 }
 
 async function _evaluateProphecy(p) {
-  const dates   = typeof _weekDates === 'function' ? _weekDates() : [];
-  const wQuests = quests.filter(q => q.done && q.done_at && dates.some(d => q.done_at.startsWith(d)));
-  const wXP     = wQuests.reduce((s, q) => s + (XP_TABLE[q.type] || 50), 0);
-  const prompt = `Esta fue la profecía de la semana: "${p.text}"
-Datos reales de la semana: ${wQuests.length} misiones completadas, ${wXP} XP ganado, racha actual de ${hero.streak || 0} días.
-¿Se cumplió la profecía? Responde en 1-2 frases breves, tono místico de oráculo, con un veredicto claro al inicio (Cumplida / Incumplida / Parcial).`;
+  const missionIds = Array.isArray(p.missionIds) ? p.missionIds : [];
+  const doneCount  = missionIds.filter(id => quests.find(q => q.id === id && q.done)).length;
+  const ratio      = missionIds.length ? doneCount / missionIds.length : (quests.some(q => q.done) ? 1 : 0);
 
-  let verdict = '';
-  try {
-    const r = await fetch('/openclaw/send', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: prompt })
-    });
-    const data = await r.json();
-    verdict = (data.reply || '').trim();
-  } catch {}
-  if (!verdict) return;
+  let verdict;
+  if (ratio >= 1)        verdict = 'Cumplida — el destino se inclinó a tu favor esta semana.';
+  else if (ratio >= 0.5) verdict = 'Parcial — venciste algunas batallas, otras aguardan.';
+  else                   verdict = 'Incumplida — las estrellas exigirán más la próxima semana.';
 
   p.verdict = verdict;
   hero.prophecy = JSON.stringify(p);

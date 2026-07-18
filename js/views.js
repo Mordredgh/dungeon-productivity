@@ -448,7 +448,6 @@ function renderQuestItem(q, blocked = false) {
     <div class="quest-actions">
       ${!q.done ? `<button class="quest-action-btn" onclick="setActiveQuest('${q.id}')" title="Vincular a pomodoro">🍅</button>` : ''}
       ${!q.done ? `<button class="quest-action-btn" onclick="event.stopPropagation();togglePin('${q.id}')" title="${isPinned ? 'Desanclar' : 'Anclar'}">📌</button>` : ''}
-      ${!q.done ? `<button class="quest-action-btn" onclick="event.stopPropagation();oracleQuestAdvice('${q.id}')" title="Pedir consejo al Oráculo">🔮</button>` : ''}
       ${!q.done && !q.wager ? `<button class="quest-action-btn" onclick="event.stopPropagation();openWagerModal('${q.id}')" title="Apostar oro a esta misión">🪙</button>` : ''}
       ${!q.done && q.est_time && !isDoubleNada && (!hero || hero.doublenada_date !== new Date().toISOString().split('T')[0]) ? `<button class="quest-action-btn" onclick="event.stopPropagation();activateDoubleOrNothing('${q.id}')" title="Doble o Nada (1/día)">🎲</button>` : ''}
       <button class="quest-action-btn" onclick="openEditQuest('${q.id}')" title="Editar">✏️</button>
