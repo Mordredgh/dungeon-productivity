@@ -14,11 +14,13 @@ async function initDB() {
 
   if (!quests.length) showSkeleton();
   await Promise.all([loadHero(), loadQuests(), loadPomodoros()]);
-  await loadInventory();
-  await loadPets();
-  if (typeof loadWeapons === 'function') await loadWeapons();
-  if (typeof loadGoals  === 'function') await loadGoals();
-  if (typeof loadRunes  === 'function') await loadRunes();
+  await Promise.all([
+    loadInventory(),
+    loadPets(),
+    typeof loadWeapons === 'function' ? loadWeapons() : Promise.resolve(),
+    typeof loadGoals === 'function' ? loadGoals() : Promise.resolve(),
+    typeof loadRunes === 'function' ? loadRunes() : Promise.resolve(),
+  ]);
   renderAll();
   scheduleRandomEvent();
   checkDailyStreak();

@@ -77,4 +77,5 @@ async function bootApp() {
   if (typeof checkSecretForgeQueue === 'function') await checkSecretForgeQueue();
   if (typeof animBootSequence === 'function') animBootSequence();
   if (typeof showOnboardingIfNeeded === 'function') showOnboardingIfNeeded();
+  if (typeof initPerformanceUX === 'function') initPerformanceUX();
 }
