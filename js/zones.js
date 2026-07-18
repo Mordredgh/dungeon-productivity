@@ -84,6 +84,19 @@ function getZoneBonus(q) {
   return bonus;
 }
 
+/* La expedición del mapa puede orientar la misma zona a recursos o recuperación. */
+function getMapExpeditionBonus(q, kind) {
+  const z = ZONES.find(zone => zone.match(q));
+  if (!z) return 0;
+  try {
+    const state = JSON.parse(localStorage.getItem('dungeon-map-bonus-' + z.id) || 'null');
+    if (!state || state.expires <= Date.now()) return 0;
+    if (kind === 'gold' && state.route === 'gold') return .20;
+    if (kind === 'recovery' && state.route === 'recovery') return 15;
+  } catch {}
+  return 0;
+}
+
 function renderZones() {
   const el = document.getElementById('zonesView');
   if (!el) return;

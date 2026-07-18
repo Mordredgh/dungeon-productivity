@@ -1,4 +1,4 @@
-﻿const CACHE = 'dungeon-v208';
+﻿const CACHE = 'dungeon-v236';
 const ASSETS = [
   '/',
   '/index.html',
@@ -227,6 +227,12 @@ const ASSETS = [
   '/images/mueble_espejo.webp','/images/mueble_estanteria.webp','/images/mueble_bola-cristal.webp',
   '/images/mueble_cuadro.webp','/images/mueble_planta.webp','/images/mueble_rack-armas.webp',
   '/images/mueble_vasija.webp',
+  '/images/mueble_trono_arcano.webp','/images/mueble_mesa_orbe_astral.webp',
+  '/images/mueble_librero_alquimico.webp','/images/mueble_chimenea_arcana.webp',
+  '/images/mueble_espejo_dorado.webp','/images/mueble_rack_arsenal.webp',
+  '/images/mueble_cofre_ancestral.webp','/images/mueble_arbol_arcano.webp',
+  '/images/mueble_candelabro_violeta.webp','/images/mueble_estandarte_arcano.webp',
+  '/images/mueble_farol_dorado.webp','/images/mueble_tapete_astral.webp',
   /* View backgrounds */
   '/images/fondo_misiones.webp','/images/fondo_metas.webp','/images/fondo_stats.webp',
   '/images/fondo_logros.webp','/images/fondo_history.webp','/images/fondo_shop.webp',
@@ -276,7 +282,7 @@ const ASSETS = [
   '/images/evento_taberna.webp',
   '/images/evento_tesoro.webp',
   '/images/evento_tormenta-arcana.webp',
-  '/images/fondo_sala_personal.webp',
+  '/images/fondo_sala_personal.webp','/images/fondo_sala_santuario.webp',
   '/images/habilidad_arquero.webp',
   '/images/habilidad_clerigo.webp',
   '/images/habilidad_fundador.webp',
@@ -441,8 +447,3 @@ self.addEventListener('fetch', e => {
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );
 });
-
-
-
-
-

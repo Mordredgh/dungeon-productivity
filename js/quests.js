@@ -130,6 +130,17 @@ async function completeQuest(id, el) {
   if (typeof getFactionBonus === 'function') {
     xpAmt = Math.round(xpAmt * (1 + getFactionBonus(q)));
   }
+  if (typeof getFactionFocusBonus === 'function') {
+    xpAmt = Math.round(xpAmt * (1 + getFactionFocusBonus(q)));
+  }
+  if (typeof getActivePetBondBonus === 'function') {
+    xpAmt = Math.round(xpAmt * (1 + getActivePetBondBonus()));
+  }
+  if (typeof getSalaBonus === 'function') {
+    xpAmt = Math.round(xpAmt * (1 + getSalaBonus('quest_xp')));
+    const hour = new Date().getHours();
+    if (hour >= 20 || hour < 5) xpAmt = Math.round(xpAmt * (1 + getSalaBonus('night_xp')));
+  }
 
   // Doble o Nada — multiplica (o anula) XP y oro de esta misión
   const doubleNadaMult = typeof resolveDoubleOrNothing === 'function' ? resolveDoubleOrNothing(q) : 1;
@@ -159,6 +170,7 @@ async function completeQuest(id, el) {
   const mountSpdMult   = typeof getPetMountStat   === 'function' ? (1 + getPetMountStat('spd') / 100) : 1;
   const goldRushMult   = (hero && (hero.gold_rush_exp || 0) > Date.now()) ? 2 : 1;
   let goldAmt  = Math.round(goldBase * goldMult * doubleNadaMult * todGoldMult * skillGoldMult * runeGoldMult * weaponGoldMult * goldRushMult * mountSpdMult);
+  if (typeof getMapExpeditionBonus === 'function') goldAmt = Math.round(goldAmt * (1 + getMapExpeditionBonus(q, 'gold')));
   if (hero && hero.nightmare_mode) goldAmt *= 2;
   if (typeof addGold === 'function') {
     addGold(goldAmt);
@@ -200,6 +212,16 @@ async function completeQuest(id, el) {
       hero.hp = newHp;
       await saveHero({ hp: newHp });
       setTimeout(() => toast('💚', `+${gain} HP`), 600);
+    }
+  }
+
+  if (typeof getMapExpeditionBonus === 'function') {
+    const expeditionHeal = getMapExpeditionBonus(q, 'recovery');
+    if (expeditionHeal && hero) {
+      const newHp = Math.min((hero.hp || 0) + expeditionHeal, hero.hp_max || 100);
+      hero.hp = newHp;
+      await saveHero({ hp: newHp });
+      setTimeout(() => toast('🛡️', `Refugio de expedición: +${expeditionHeal} HP`), 400);
     }
   }
 
@@ -281,6 +303,7 @@ async function completeQuest(id, el) {
 
   // Progreso de serie de misiones exclusivas de Facción
   if (typeof checkFactionExclusiveProgress === 'function') await checkFactionExclusiveProgress(id);
+  if (typeof addActivePetBond === 'function') addActivePetBond(1);
 
   renderQuestList();
   renderHistory();

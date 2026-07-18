@@ -11,6 +11,21 @@ const BESTIARY_RARITY_CLR = {
   legendario:'#f59e0b', mitico:'#ef4444', cataclismo:'#ec4899'
 };
 
+const BOSS_LORE = {
+  'wyvern-hielo':'Nació en las cornisas donde el invierno jamás termina. Su aliento conserva las últimas voces de los exploradores perdidos.',
+  'arana-gigante':'Teje sus nidos alrededor de reliquias olvidadas; cada hilo vibra con recuerdos robados a quien cae en su cueva.',
+  'dragon-obsidiana':'Fue guardián de una fragua volcánica antes de que la piedra negra sellara su corazón con brasas eternas.',
+  'custodio-tiempo':'No protege el tiempo: protege la grieta donde una era entera fue borrada del mundo.',
+  'liche-rey':'Un monarca que rechazó la muerte y convirtió a su corte en una biblioteca de huesos y juramentos.',
+  'arquitecto-vacio':'La primera inteligencia que construyó pasillos entre estrellas. Cada derrota apenas revela una pieza de su plano.',
+  'la-que-susurra':'No habla al oído: responde desde el eco de decisiones que el héroe aún no ha tomado.',
+};
+function getBossLore(boss) {
+  if (BOSS_LORE[boss.key]) return BOSS_LORE[boss.key];
+  const element = boss.element || 'arcano';
+  return `${boss.name} apareció cuando la energía ${element.toLowerCase()} corrompió su antiguo territorio. Los cronistas de Arcanum aún discuten si es una criatura, un castigo o un guardián olvidado.`;
+}
+
 function getBestiary() {
   try { return JSON.parse(hero.bestiary || '[]'); } catch { return []; }
 }
@@ -43,7 +58,7 @@ function renderBestiary() {
     const known = defeated.includes(b.key);
     const clr   = BESTIARY_RARITY_CLR[b.rarity] || '#9ca3af';
     const img   = `images/boss_${b.key}.webp`;
-    return `<div class="bst-card ${known ? 'bst-known' : 'bst-unknown'}" style="--bc:${clr}">
+    return `<button class="bst-card ${known ? 'bst-known' : 'bst-unknown'}" style="--bc:${clr}" ${known ? `onclick="openBestiaryEntry('${b.key}')"` : 'disabled'}>
       <div class="bst-rarity-bar" style="background:${clr}22;border-top:2px solid ${clr}">
         <span class="bst-rarity-label" style="color:${clr}">${RARITY_LABEL[b.rarity] || b.rarity}</span>
       </div>
@@ -56,7 +71,7 @@ function renderBestiary() {
       <div class="bst-name" style="color:${known ? clr : 'var(--text3)'}">
         ${known ? escHtml(b.name) : '???'}
       </div>
-    </div>`;
+    </button>`;
   };
 
   const renderGroup = (label, bosses) => `
@@ -77,5 +92,19 @@ function renderBestiary() {
       return bosses.length ? renderGroup(RARITY_LABEL[r] || r.toUpperCase(), bosses) : '';
     }).join('')}
     ${seasonal.length ? renderGroup('Estacionales', seasonal) : ''}
+    <div class="bst-entry-overlay" id="bestiaryEntry" style="display:none" onclick="closeBestiaryEntry()"><article class="bst-entry" onclick="event.stopPropagation()" id="bestiaryEntryCard"></article></div>
   `;
 }
+
+function openBestiaryEntry(key) {
+  const boss = (typeof BOSS_DEFS === 'undefined' ? [] : BOSS_DEFS).find(entry => entry.key === key);
+  const overlay = document.getElementById('bestiaryEntry');
+  const card = document.getElementById('bestiaryEntryCard');
+  if (!boss || !overlay || !card || !getBestiary().includes(key)) return;
+  const color = BESTIARY_RARITY_CLR[boss.rarity] || '#9ca3af';
+  const chart = typeof BOSS_ELEMENT_CHART !== 'undefined' ? BOSS_ELEMENT_CHART[boss.element] : null;
+  card.style.setProperty('--bst-c', color);
+  card.innerHTML = `<button class="bst-entry-close" onclick="closeBestiaryEntry()">×</button><div class="bst-entry-art"><img src="images/boss_${boss.key}.webp" alt="${escHtml(boss.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span style="display:none">${boss.emoji || '👹'}</span></div><div class="bst-entry-copy"><span class="bst-entry-rarity">${boss.rarity}</span><h3>${escHtml(boss.name)}</h3><div class="bst-entry-tags"><span>${boss.element || 'Normal'}</span><span>${boss.hp} HP</span></div><p>${escHtml(getBossLore(boss))}</p>${chart ? `<div class="bst-entry-tactics"><b>Registro táctico</b><span>Débil ante: ${chart.weakTo?.length ? chart.weakTo.join(', ') : 'sin debilidad conocida'}</span><span>Resiste: ${chart.resists?.length ? chart.resists.join(', ') : 'ninguna'}</span></div>` : ''}</div>`;
+  overlay.style.display = 'flex';
+}
+function closeBestiaryEntry() { const overlay = document.getElementById('bestiaryEntry'); if (overlay) overlay.style.display = 'none'; }

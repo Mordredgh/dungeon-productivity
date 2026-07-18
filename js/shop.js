@@ -13,7 +13,8 @@ function addGold(n) {
   const upgradeBonus = n > 0 && typeof hasGoldUpgrade === 'function' && hasGoldUpgrade('gold_boost') ? 1.10 : 1;
   // Maestría: Fortuna Eterna +2%/rango
   const masteryGoldMult = n > 0 && typeof getMasteryBonus === 'function' ? 1 + getMasteryBonus('fortuna') : 1;
-  setGold(getGold() + Math.round(n * bonus * agiBonus * starBonus * upgradeBonus * masteryGoldMult));
+  const salaGoldMult = n > 0 && typeof getSalaBonus === 'function' ? 1 + getSalaBonus('gold') : 1;
+  setGold(getGold() + Math.round(n * bonus * agiBonus * starBonus * upgradeBonus * masteryGoldMult * salaGoldMult));
 }
 function spendGold(n) { if (getGold() < n) { toast('💸', 'Oro insuficiente.'); return false; } addGold(-n); return true; }
 
@@ -44,6 +45,17 @@ function _shopRarity(cost) {
 const _RARITY_LABEL = { common:'COMÚN', uncommon:'POCO COMÚN', rare:'RARO', epic:'ÉPICO', legendary:'LEGENDARIO' };
 const _RARITY_COLOR = { common:'#6e7280', uncommon:'#4ade80', rare:'#60a5fa', epic:'#c084fc', legendary:'#f9e2af' };
 
+function _shopOwnedText(item) {
+  if (item.id.startsWith('egg_'))  return getInvCount('pet_egg_' + item.id.slice(4));
+  if (item.id.startsWith('frag_')) return getInvCount('spell_' + item.id.slice(5));
+  if (item.id.startsWith('pot_'))  return getInvCount('pet_potion_' + item.id.slice(4));
+  if (item.id.startsWith('food_')) return getInvCount('pet_food_' + item.id.slice(5));
+  if ((item.id.startsWith('weapon_') || item.id.startsWith('armor_')) && typeof weapons !== 'undefined') {
+    return weapons.filter(w => w.weapon_key === item.weaponKey && w.tier === (item.tier || 'comun')).length;
+  }
+  return null;
+}
+
 function renderShopItems() {
   const el = document.getElementById('shopItems');
   if (!el) return;
@@ -66,8 +78,15 @@ function renderShopItems() {
        onclick="shopCategory='${c.id}';renderShopItems()">${c.label}</button>`
   ).join('')}</div>`;
 
-  if (shopCategory === 'mejoras') { el.innerHTML = tabs + _renderGoldUpgrades(); return; }
-  if (shopCategory === 'marcos')  { el.innerHTML = tabs + _renderAvatarFrames(); return; }
+  const activeBuffs = [
+    hero?.potion_exp > Date.now() ? '⚗️ XP doble activo' : '',
+    hero?.gold_rush_exp > Date.now() ? '🪙 Oro doble activo' : '',
+    hero?.boss_shield ? '🛡️ Escudo de jefe listo' : '',
+  ].filter(Boolean);
+  const merchantHeader = `<section class="merchant-ledger"><div><span>GREMIO DE MERCADERES</span><h3>Mercado Arcano</h3><p>${activeBuffs.length ? activeBuffs.join(' · ') : 'Invierte oro en una decisión útil, no en ruido.'}</p></div><div class="merchant-ledger-gold"><b>🪙 ${gold.toLocaleString()}</b><small>oro disponible</small></div></section>`;
+
+  if (shopCategory === 'mejoras') { el.innerHTML = merchantHeader + tabs + _renderGoldUpgrades(); return; }
+  if (shopCategory === 'marcos')  { el.innerHTML = merchantHeader + tabs + _renderAvatarFrames(); return; }
 
   const items = SHOP_ITEMS.filter(i => i.category === shopCategory);
 
@@ -78,19 +97,22 @@ function renderShopItems() {
       ? `<img src="images/${item.img}" alt="" onerror="this.src='${CDN}dungeon/${item.img}';this.onerror=null">`
       : `<span class="rpg-item-emoji">${item.icon || '📦'}</span>`;
     const qtyBadge = item.qty ? `<div class="rpg-item-qty-badge">×${item.qty}</div>` : '';
+    const owned = _shopOwnedText(item);
+    const ownedBadge = owned !== null ? `<div class="merchant-owned">Tienes ×${owned}</div>` : '';
     return `
     <div class="rpg-shop-card rpg-rarity-${rarity}">
       <div class="rpg-rarity-tag" style="color:${_RARITY_COLOR[rarity]}">${_RARITY_LABEL[rarity]}</div>
       <div class="rpg-item-visual">${imgHtml}${qtyBadge}</div>
       <div class="rpg-shop-item-name">${escHtml(item.name)}</div>
       <div class="rpg-shop-item-desc">${escHtml(item.desc)}</div>
+      ${ownedBadge}
       <button class="rpg-buy-btn" onclick="buyItem('${item.id}',${item.cost})" ${canBuy ? '' : 'disabled'}>
         🪙 ${item.cost}
       </button>
     </div>`;
   }).join('');
 
-  el.innerHTML = tabs + `<div class="rpg-shop-grid">${cards || '<p style="color:var(--text3);padding:24px;text-align:center">Sin artículos en esta categoría</p>'}</div>`;
+  el.innerHTML = merchantHeader + tabs + `<div class="rpg-shop-grid">${cards || '<p style="color:var(--text3);padding:24px;text-align:center">Sin artículos en esta categoría</p>'}</div>`;
 }
 
 /* ── Mejoras permanentes (compra única, no consumibles) ──── */

@@ -20,6 +20,7 @@ async function wakePetWithPotion(petId) {
   const def = _petDef(pet.pet_key);
   if (getInvCount('pet_potion_' + pet.pet_key) < 1) { toast('🧪', `Sin pociones de ${def?.name || 'esta mascota'}.`); return; }
   await consumeInvItem('pet_potion_' + pet.pet_key, 1);
+  localStorage.setItem('pet_lastfed_' + pet.id, String(Date.now()));
   pet.exhausted_until = null;
   await db.from('dungeon_pets').update({ exhausted_until: null }).eq('id', pet.id);
   toast('✨', `¡${def?.name || 'Tu mascota'} despertó! Lista para batallar de nuevo.`);
@@ -50,7 +51,9 @@ async function addActivePetXP(xp) {
   if (!def) return;
   const curLvl = active.pet_level || 1;
   if (curLvl >= 15) return;
-  let newXP  = (active.pet_xp || 0) + xp;
+  const salaPetXP = typeof getSalaBonus === 'function' ? 1 + getSalaBonus('pet_xp') : 1;
+  const gardenPetXP = typeof getGardenBonus === 'function' ? 1 + getGardenBonus('pet_xp') : 1;
+  let newXP  = (active.pet_xp || 0) + Math.round(xp * salaPetXP * gardenPetXP);
   let newLvl = curLvl;
   while (newLvl < 15 && newXP >= PET_BABY_XP_PER_LEVEL) { newXP -= PET_BABY_XP_PER_LEVEL; newLvl++; }
   await db.from('dungeon_pets').update({ pet_level: newLvl, pet_xp: newXP }).eq('id', active.id);
@@ -93,6 +96,38 @@ function getPetEffect(type) {
   if (type === 'main_hp'   && ab.type === 'main_hp_shield') return ab.val;
   if (type === 'no_hp_loss' && ab.type === 'main_hp_shield') return 1;
   return 0;
+}
+
+/* Vínculo local por mascota: evita migrar columnas para un progreso cosmético-jugable. */
+const _PET_BOND_RANKS = [
+  { min: 0, name: 'Recién conocidos', bonus: 0 },
+  { min: 12, name: 'Compañeros', bonus: .03 },
+  { min: 35, name: 'Leales', bonus: .05 },
+  { min: 75, name: 'Alma gemela', bonus: .08 },
+];
+function _petBondKey(petId) { return `dungeon-pet-bond-${hero?.id || 'guest'}-${petId}`; }
+function getPetBond(pet) {
+  const value = Number.parseInt(localStorage.getItem(_petBondKey(pet?.id)) || '0', 10);
+  return Number.isFinite(value) ? Math.max(0, value) : 0;
+}
+function getPetBondRank(pet) {
+  const bond = getPetBond(pet);
+  return _PET_BOND_RANKS.filter(rank => bond >= rank.min).at(-1);
+}
+function getActivePetBondBonus() {
+  const active = pets.find(p => p.is_active && p.stage !== 'egg');
+  return active ? getPetBondRank(active).bonus : 0;
+}
+function addActivePetBond(amount = 1) {
+  const active = pets.find(p => p.is_active && p.stage !== 'egg');
+  if (!active || amount <= 0) return;
+  const before = getPetBondRank(active);
+  const gardenBond = typeof getGardenBonus === 'function' ? getGardenBonus('bond') : 0;
+  const next = getPetBond(active) + amount + gardenBond;
+  localStorage.setItem(_petBondKey(active.id), String(next));
+  const after = getPetBondRank(active);
+  if (after.min > before.min) toast('🐾', `Vínculo con ${_petDef(active.pet_key)?.name || 'tu mascota'}: ${after.name}. +${Math.round(after.bonus * 100)}% XP.`);
+  renderActivePet();
 }
 
 async function hatchEgg(petKey) {
@@ -177,6 +212,7 @@ async function feedPetFood(petId) {
   if ((pet.pet_level || 1) >= 50) { toast('⭐', `¡${def.name} ya está en nivel máximo (50)!`); return; }
 
   await consumeInvItem(foodKey, 1);
+  localStorage.setItem('pet_lastfed_' + pet.id, String(Date.now()));
   const gained  = def.food_xp || 50;
   const curLvl  = pet.pet_level || 1;
   let newXP     = (pet.pet_xp || 0) + gained;
@@ -279,6 +315,10 @@ function renderActivePet() {
     const potions = typeof getInvCount==='function' ? getInvCount('pet_potion_'+active.pet_key) : 0;
     const ab      = PET_ABILITIES?.[active.pet_key]?.[stage];
     const fondoUrl= `images/pet_fondo_${stage}_${active.pet_key}.webp`;
+    const bond = getPetBond(active);
+    const bondRank = getPetBondRank(active);
+    const nextBond = _PET_BOND_RANKS.find(rank => rank.min > bond);
+    const bondPct = nextBond ? Math.min(100, Math.round(((bond - bondRank.min) / (nextBond.min - bondRank.min)) * 100)) : 100;
     const stageLabel = isMount ? '🌟 Montura' : '🐣 Bebé';
 
     section.querySelector('.panel-title').textContent = `🐾 Mascota — ${stageLabel}`;
@@ -296,6 +336,11 @@ function renderActivePet() {
             <div class="pet-rpanel-name">${escHtml(def.name)}${active.is_shiny ? ' ✨' : ''}</div>
             <div class="pet-rpanel-rarity">${def.rarity}</div>
             ${ab ? `<div class="pet-ability-tag" style="margin:4px 0">${ab.icon} ${escHtml(ab.desc)}</div>` : ''}
+            <div class="pet-bond-card" title="Completa misiones con esta mascota activa para fortalecer el vínculo.">
+              <div><span>🐾 Vínculo: ${bondRank.name}</span><b>${bond}${nextBond ? '/' + nextBond.min : ' MAX'}</b></div>
+              <div class="pet-bond-bar"><i style="width:${bondPct}%"></i></div>
+              <small>${bondRank.bonus ? '+' + Math.round(bondRank.bonus * 100) + '% XP en misiones' : 'Completa 12 misiones para el primer bonus'}</small>
+            </div>
             ${!isMount ? (() => {
               if (petLvl < 15) {
                 const xpPct = Math.round((petXP / PET_BABY_XP_PER_LEVEL) * 100);

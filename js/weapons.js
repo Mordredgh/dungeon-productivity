@@ -73,7 +73,8 @@ async function craftWeapon(weaponKey, targetTier) {
   if (error) { toast('❌', 'Error al forjar.'); return; }
   weapons = weapons.filter(w => !toDelete.includes(w.id));
   const masteryForgeMult = 1 - (typeof getMasteryBonus === 'function' ? getMasteryBonus('persistencia') : 0);
-  const cooldownMs = FORGE_COOLDOWN_MS[targetTier] ? Math.round(FORGE_COOLDOWN_MS[targetTier] * masteryForgeMult) : 0;
+  const salaForgeMult = typeof getSalaBonus === 'function' ? 1 - getSalaBonus('forge_speed') : 1;
+  const cooldownMs = FORGE_COOLDOWN_MS[targetTier] ? Math.round(FORGE_COOLDOWN_MS[targetTier] * masteryForgeMult * salaForgeMult) : 0;
   const readyAt = cooldownMs ? new Date(Date.now() + cooldownMs).toISOString() : null;
   const newW = await addWeapon(weaponKey, targetTier, readyAt);
   if (newW) {
@@ -84,7 +85,7 @@ async function craftWeapon(weaponKey, targetTier) {
 }
 
 /* ── INVENTORY VIEW ─────────────────────────────────────── */
-function renderInventory() {
+function renderInventoryLegacy() {
   const el = document.getElementById('inventoryView');
   if (!el) return;
 
@@ -253,6 +254,84 @@ function renderInventory() {
 }
 
 /* ── SMITHY VIEW ─────────────────────────────────────────── */
+/* Bóveda unificada: sustituye las dos vistas heredadas de inventario. */
+let _vaultActiveTab = 'all';
+
+function setVaultTab(tab) {
+  _vaultActiveTab = tab;
+  renderInventory();
+}
+
+function _vaultItemGroup(item) {
+  const key = item.item_key || '';
+  if (key.startsWith('spell_') || key.startsWith('rune_')) return 'magic';
+  if (key.startsWith('pet_egg_') || key.startsWith('pet_potion_') || key.startsWith('pet_food_')) return 'pets';
+  return 'materials';
+}
+
+function _vaultItemCard(item) {
+  const meta = typeof _invItemMeta === 'function' ? _invItemMeta(item.item_key) : { name:item.item_key, icon:'🎁', color:'#a78bfa', desc:'' };
+  const key = item.item_key;
+  const imageKey = key.replace(/^pet_food_/, 'pet_alimento_').replace(/^pet_potion_/, 'pet_pocion_');
+  const isSpell = key.startsWith('spell_');
+  const itemType = isSpell ? 'Hechizo' : key.startsWith('rune_') ? 'Runa' : _vaultItemGroup(item) === 'pets' ? 'Mascota' : 'Material';
+  return `
+    <button class="vault-item-card" style="--vault-item:${meta.color || '#a78bfa'}" onclick="showInvItemDetail('${escHtml(key)}')" title="${escHtml(meta.name)}">
+      <span class="vault-item-type">${itemType}</span>
+      <img src="${CDN}dungeon/${imageKey}.png" class="vault-item-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <span class="vault-item-fallback" style="display:none">${meta.icon || '🎁'}</span>
+      <span class="vault-item-qty">×${item.quantity}</span>
+      <span class="vault-item-name">${escHtml(meta.name)}</span>
+      <span class="vault-item-hint">${isSpell ? 'Conjurar' : meta.desc || 'Ver detalle'}</span>
+    </button>`;
+}
+
+function _vaultEquipmentCard(weapon) {
+  const def = WEAPON_DEFS.find(d => d.key === weapon.weapon_key) || { icon:'⚔️', slot:'main_hand' };
+  const tier = WEAPON_TIERS[weapon.tier] || { label:weapon.tier, color:'#94a3b8' };
+  const forging = isForging(weapon);
+  const sockets = (() => { try { return weapon.rune_slots ? JSON.parse(weapon.rune_slots) : []; } catch { return []; } })();
+  const maxSockets = typeof RUNE_SOCKET_COUNT !== 'undefined' ? (RUNE_SOCKET_COUNT[weapon.tier] || 0) : 0;
+  const effect = [tier.xpBonus ? `+${Math.round(tier.xpBonus * 100)}% XP` : '', tier.goldBonus ? `+${Math.round(tier.goldBonus * 100)}% oro` : ''].filter(Boolean).join(' · ') || 'Sin bonificación base';
+  const slotLabel = { main_hand:'Mano principal', off_hand:'Mano secundaria', body:'Pecho', head:'Casco', feet:'Botas', hands:'Guantes', legs:'Grebas' }[def.slot] || def.slot;
+  return `
+    <article class="vault-gear-card ${weapon.is_equipped ? 'is-equipped' : ''} ${forging ? 'is-forging' : ''}" style="--vault-tier:${tier.color}">
+      <div class="vault-gear-art"><img src="images/arma_${weapon.weapon_key}_${weapon.tier}.webp" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span style="display:none">${def.icon}</span></div>
+      <div class="vault-gear-info">
+        <div class="vault-gear-top"><span class="vault-gear-name">${escHtml(weapon.name)}</span><span class="vault-tier">${tier.label}</span></div>
+        <div class="vault-gear-meta">${weapon.is_equipped ? 'Equipado · ' : ''}${slotLabel}</div>
+        <div class="vault-gear-effect">${forging ? '⏳ En forja' : effect}</div>
+        <div class="vault-sockets">${Array.from({length:maxSockets}, (_, index) => {
+          const rune = runes?.find(r => r.id === sockets[index]);
+          const rDef = rune && RUNE_DEFS?.[rune.rune_type];
+          return `<span class="${rDef ? 'filled' : ''}" style="--rune:${rDef?.color || '#40344d'}">${rDef?.icon || '◇'}</span>`;
+        }).join('') || '<em>Sin ranuras</em>'}</div>
+      </div>
+      <button class="vault-gear-action" ${forging ? 'disabled' : ''} onclick="${weapon.is_equipped ? `unequipWeapon('${weapon.id}')` : `equipWeapon('${weapon.id}')`}">${forging ? 'Forjando' : weapon.is_equipped ? 'Quitar' : 'Equipar'}</button>
+    </article>`;
+}
+
+function renderInventory() {
+  const el = document.getElementById('inventoryView');
+  if (!el) return;
+  const inv = (typeof inventory !== 'undefined' ? inventory : []).filter(item => item.quantity > 0);
+  const equipped = weapons.filter(weapon => weapon.is_equipped);
+  const bag = weapons.filter(weapon => !weapon.is_equipped);
+  const tabItems = _vaultActiveTab === 'all' ? inv : inv.filter(item => _vaultItemGroup(item) === _vaultActiveTab);
+  const showEquipment = _vaultActiveTab === 'all' || _vaultActiveTab === 'equipment';
+  const showItems = _vaultActiveTab !== 'equipment';
+  const groupCount = group => inv.filter(item => _vaultItemGroup(item) === group).length;
+  const tab = (id, icon, label, count) => `<button class="vault-tab ${_vaultActiveTab === id ? 'active' : ''}" onclick="setVaultTab('${id}')"><span>${icon}</span>${label}<b>${count}</b></button>`;
+
+  el.innerHTML = `
+    <section class="vault-shell">
+      <header class="vault-header"><div><p class="vault-kicker">Bóveda del aventurero</p><h3>Inventario Arcano</h3><span>${equipped.length}/7 piezas equipadas · ${inv.length} tipos de objeto</span></div><div class="vault-gold"><span>🪙</span><strong>${(typeof getGold === 'function' ? getGold() : 0).toLocaleString()}</strong><small>oro</small></div></header>
+      <nav class="vault-tabs" aria-label="Categorías de inventario">${tab('all','✦','Todo',inv.length + weapons.length)}${tab('equipment','⚔️','Equipo',weapons.length)}${tab('magic','🔮','Magia',groupCount('magic'))}${tab('pets','🐾','Mascotas',groupCount('pets'))}${tab('materials','◇','Materiales',groupCount('materials'))}</nav>
+      ${showEquipment ? `<section class="vault-section"><div class="vault-section-head"><div><span>⚔️</span><h4>${_vaultActiveTab === 'all' ? 'Equipo activo' : 'Arsenal'}</h4></div><button class="vault-link" onclick="switchView('smithy')">Ir al Herrero →</button></div><div class="vault-gear-grid">${(equipped.length ? equipped : bag).map(_vaultEquipmentCard).join('') || '<div class="vault-empty">No tienes equipo todavía. La tienda del gremio tiene piezas comunes para iniciar.</div>'}</div>${_vaultActiveTab === 'all' && bag.length ? `<details class="vault-bag"><summary>Ver mochila de equipo <b>${bag.length}</b></summary><div class="vault-gear-grid">${bag.map(_vaultEquipmentCard).join('')}</div></details>` : ''}</section>` : ''}
+      ${showItems ? `<section class="vault-section"><div class="vault-section-head"><div><span>✦</span><h4>${_vaultActiveTab === 'all' ? 'Objetos y recursos' : _vaultActiveTab === 'magic' ? 'Grimorio y runas' : _vaultActiveTab === 'pets' ? 'Suministros de mascotas' : 'Materiales'}</h4></div><button class="vault-link" onclick="switchView('shop')">Visitar tienda →</button></div>${tabItems.length ? `<div class="vault-item-grid">${tabItems.map(_vaultItemCard).join('')}</div>` : '<div class="vault-empty">Nada en esta categoría. Completa misiones, derrota jefes o visita la tienda.</div>'}</section>` : ''}
+    </section>`;
+}
+
 function renderSmithy() {
   const el = document.getElementById('smithyView');
   if (!el) return;

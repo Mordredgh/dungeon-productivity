@@ -6,22 +6,64 @@
    ─────────────────────────────────────────────────────────── */
 
 const SALA_FURNITURE = [
-  { id:'sillon',       name:'Sillón',          img:'mueble_sillon.webp'       },
-  { id:'candelabro',   name:'Candelabro',       img:'mueble_candelabro.webp'   },
-  { id:'cofre',        name:'Cofre',            img:'mueble_cofre.webp'        },
-  { id:'espejo',       name:'Espejo Arcano',    img:'mueble_espejo.webp'       },
-  { id:'estanteria',   name:'Estantería',       img:'mueble_estanteria.webp'   },
-  { id:'bola-cristal', name:'Bola de Cristal',  img:'mueble_bola-cristal.webp' },
-  { id:'cuadro',       name:'Cuadro',           img:'mueble_cuadro.webp'       },
-  { id:'planta',       name:'Planta Arcana',    img:'mueble_planta.webp'       },
-  { id:'rack-armas',   name:'Rack de Armas',    img:'mueble_rack-armas.webp'   },
-  { id:'vasija',       name:'Vasija',           img:'mueble_vasija.webp'       },
+  { id:'trono-arcano',       name:'Trono Arcano',        img:'mueble_trono_arcano.webp',        category:'asientos',   rarity:'Legendario', bonus:'Un asiento digno del Señor del Santuario.', size:132 },
+  { id:'mesa-orbe-astral',   name:'Mesa de Orbe Astral', img:'mueble_mesa_orbe_astral.webp',    category:'decoracion', rarity:'Épico',       bonus:'+5% XP en descanso.', size:142 },
+  { id:'librero-alquimico',  name:'Librero Alquímico',   img:'mueble_librero_alquimico.webp',   category:'decoracion', rarity:'Raro',        bonus:'Resguarda fórmulas, tomos y elixires.', size:138 },
+  { id:'chimenea-arcana',    name:'Chimenea Arcana',     img:'mueble_chimenea_arcana.webp',     category:'decoracion', rarity:'Épico',       bonus:'Una llama violeta para tus vigilias.', size:142 },
+  { id:'espejo-dorado',      name:'Espejo Dorado',       img:'mueble_espejo_dorado.webp',       category:'muros',      rarity:'Épico',       bonus:'Refleja un poder que aún no dominas.', size:126 },
+  { id:'rack-arsenal',       name:'Rack del Arsenal',    img:'mueble_rack_arsenal.webp',        category:'decoracion', rarity:'Raro',        bonus:'Exhibe las armas de tus aventuras.', size:132 },
+  { id:'cofre-ancestral',    name:'Cofre Ancestral',     img:'mueble_cofre_ancestral.webp',     category:'decoracion', rarity:'Raro',        bonus:'Guarda los trofeos de la campaña.', size:116 },
+  { id:'arbol-arcano',       name:'Árbol Arcano',        img:'mueble_arbol_arcano.webp',        category:'decoracion', rarity:'Épico',       bonus:'Vida mágica que florece en tu sala.', size:136 },
+  { id:'candelabro-violeta', name:'Candelabro Violeta',  img:'mueble_candelabro_violeta.webp',  category:'luz',        rarity:'Raro',        bonus:'Ilumina los secretos del santuario.', size:112 },
+  { id:'estandarte-arcano',  name:'Estandarte Arcano',   img:'mueble_estandarte_arcano.webp',   category:'muros',      rarity:'Común',       bonus:'Marca tu dominio sobre esta estancia.', size:116 },
+  { id:'farol-dorado',       name:'Farol Dorado',        img:'mueble_farol_dorado.webp',        category:'luz',        rarity:'Raro',        bonus:'Una luz cálida contra la oscuridad.', size:112 },
+  { id:'tapete-astral',      name:'Tapete Astral',       img:'mueble_tapete_astral.webp',       category:'piso',       rarity:'Épico',       bonus:'El centro ritual de tu santuario.', size:158 },
+  // Legacy: conserva los muebles ya guardados por versiones anteriores.
+  { id:'sillon',       name:'Sillón',          img:'mueble_sillon.webp',       category:'asientos',   rarity:'Raro',   bonus:'Un rincón digno de un héroe.', legacy:true },
+  { id:'candelabro',   name:'Candelabro',       img:'mueble_candelabro.webp',   category:'luz',        rarity:'Común',  bonus:'Ilumina los secretos de la sala.', legacy:true },
+  { id:'cofre',        name:'Cofre',            img:'mueble_cofre.webp',        category:'decoracion', rarity:'Raro',   bonus:'Guarda los trofeos de tu aventura.', legacy:true },
+  { id:'espejo',       name:'Espejo Arcano',    img:'mueble_espejo.webp',       category:'muros',      rarity:'Épico',  bonus:'Refleja un poder que aún no dominas.', legacy:true },
+  { id:'estanteria',   name:'Estantería',       img:'mueble_estanteria.webp',   category:'decoracion', rarity:'Raro',   bonus:'Tomos, frascos y memorias antiguas.', legacy:true },
+  { id:'bola-cristal', name:'Bola de Cristal',  img:'mueble_bola-cristal.webp', category:'decoracion', rarity:'Épico',  bonus:'+5% XP en descanso.', legacy:true },
+  { id:'cuadro',       name:'Cuadro',           img:'mueble_cuadro.webp',       category:'muros',      rarity:'Común',  bonus:'Una historia para tus muros.', legacy:true },
+  { id:'planta',       name:'Planta Arcana',    img:'mueble_planta.webp',       category:'decoracion', rarity:'Raro',   bonus:'Un toque de vida encantada.', legacy:true },
+  { id:'rack-armas',   name:'Rack de Armas',    img:'mueble_rack-armas.webp',   category:'decoracion', rarity:'Épico',  bonus:'Exhibe tus armas más memorables.', legacy:true },
+  { id:'vasija',       name:'Vasija',           img:'mueble_vasija.webp',       category:'decoracion', rarity:'Común',  bonus:'Detalles que completan el santuario.', legacy:true },
 ];
+
+const SALA_CATEGORIES = [
+  ['all', 'Todos'], ['asientos', 'Asientos'], ['luz', 'Luz'],
+  ['muros', 'Muros'], ['piso', 'Piso'], ['decoracion', 'Decoración'],
+];
+
+/* Un solo mueble puede resonar a la vez: decoración con decisión, no bonus gratis apilado. */
+const SALA_RESONANCES = {
+  'trono-arcano':      { effect:'boss_resist', value:.12, label:'+12% resistencia contra jefes' },
+  'mesa-orbe-astral':  { effect:'quest_xp', value:.05, label:'+5% XP de misiones' },
+  'librero-alquimico': { effect:'spell_frag', value:1, label:'+1 fragmento de hechizo en botín' },
+  'chimenea-arcana':   { effect:'pet_rest', value:.25, label:'+25% recuperación de mascotas' },
+  'espejo-dorado':     { effect:'boss_crit', value:.05, label:'+5% crítico contra jefes' },
+  'rack-arsenal':      { effect:'forge_speed', value:.15, label:'Forja 15% más rápida' },
+  'cofre-ancestral':   { effect:'gold', value:.08, label:'+8% oro obtenido' },
+  'arbol-arcano':      { effect:'pet_xp', value:.15, label:'+15% XP de mascota activa' },
+  'candelabro-violeta':{ effect:'drop_rate', value:.10, label:'+10% probabilidad de botín' },
+  'estandarte-arcano': { effect:'faction_xp', value:.10, label:'+10% XP de facción' },
+  'farol-dorado':      { effect:'night_xp', value:.08, label:'+8% XP nocturna' },
+  'tapete-astral':     { effect:'boss_dmg', value:.10, label:'+10% daño contra jefes' },
+};
+
+function getSalaBonus(effect) {
+  if (!hero) return 0;
+  const active = SALA_RESONANCES[_getSala().attunedId];
+  return active?.effect === effect ? active.value : 0;
+}
 
 let _salaSelected       = null;  // id de mueble a colocar
 let _salaSelectedPlaced = null;  // índice de item placed seleccionado para editar
 let _salaDrag           = null;
+let _salaResize          = null;
 let _salaSaveTimer      = null;
+let _salaCategory       = 'all';
 
 function _getSala() {
   try { return JSON.parse(hero.sala_personal || '{}'); } catch { return {}; }
@@ -42,11 +84,31 @@ function _perspScale(y) {
   return 0.45 + (y / 100) * 0.75; // y=0→0.45, y=100→1.2
 }
 
+function _starterSala() {
+  return [
+    { id:'estandarte-arcano',  x:21, y:35, scale:.86 },
+    { id:'trono-arcano',       x:36, y:53, scale:1 },
+    { id:'mesa-orbe-astral',   x:52, y:70, scale:1 },
+    { id:'tapete-astral',      x:52, y:66, scale:1.12 },
+    { id:'cofre-ancestral',    x:70, y:54, scale:.9 },
+    { id:'arbol-arcano',       x:83, y:48, scale:.86 },
+    { id:'candelabro-violeta', x:19, y:71, scale:.82 },
+    { id:'rack-arsenal',       x:82, y:33, scale:.8 },
+    { id:'farol-dorado',       x:78, y:70, scale:.78 },
+  ];
+}
+
 function renderSalaPersonal() {
   const el = document.getElementById('ctab-sala-personal');
   if (!el || !hero) return;
 
   const data   = _getSala();
+  if (!data.seeded) {
+    data.placed = data.placed?.length ? data.placed : _starterSala();
+    data.seeded = true;
+    _saveSala(data).then(() => renderSalaPersonal());
+    return;
+  }
   const placed = data.placed || [];
 
   // Painter's algorithm: items con y mayor van encima
@@ -56,10 +118,20 @@ function renderSalaPersonal() {
 
   const selItem = _salaSelectedPlaced !== null ? placed[_salaSelectedPlaced] : null;
   const selDef  = selItem ? SALA_FURNITURE.find(f => f.id === selItem.id) : null;
+  const placingDef = _salaSelected ? SALA_FURNITURE.find(f => f.id === _salaSelected) : null;
+  const visibleFurniture = SALA_FURNITURE.filter(f => !f.legacy && (_salaCategory === 'all' || f.category === _salaCategory));
 
   el.innerHTML = `
     <div class="sala-layout">
       <div class="sala-room" id="salaRoom">
+        <div class="sala-room-header">
+          <div>
+            <span class="sala-room-kicker">SALA PERSONAL</span>
+            <strong>Santuario Arcano</strong>
+          </div>
+          <span class="sala-room-count">${data.attunedId ? '✦ Resonancia activa' : placed.length + ' objeto' + (placed.length === 1 ? '' : 's')}</span>
+        </div>
+        <div class="sala-placement-grid" aria-hidden="true"></div>
         ${sorted.map(item => {
           const def = SALA_FURNITURE.find(f => f.id === item.id);
           if (!def) return '';
@@ -68,25 +140,52 @@ function renderSalaPersonal() {
           const isSel      = _salaSelectedPlaced === item._orig;
           return `<div class="sala-item${isSel ? ' sala-item-selected' : ''}"
                        data-idx="${item._orig}"
-                       style="left:${item.x}%;top:${item.y}%;z-index:${Math.round(item.y + 1)};--s:${finalScale.toFixed(3)}">
+                       style="left:${item.x}%;top:${item.y}%;z-index:${Math.round(item.y + 1)};--s:${finalScale.toFixed(3)};--r:${item.rotate || 0}deg;--item-size:${def.size || 90}px">
             <div class="sala-shadow"></div>
             <img src="images/${escHtml(def.img)}" alt="${escHtml(def.name)}" draggable="false">
+            ${isSel ? '<button class="sala-resize-handle" type="button" aria-label="Arrastra para cambiar tamaño" title="Arrastra para cambiar tamaño"></button>' : ''}
           </div>`;
         }).join('')}
         <div class="sala-hint" id="salaHint">
           ${_salaSelected
-            ? '🖱 Click para colocar &nbsp;·&nbsp; Esc para cancelar'
+            ? `Coloca ${escHtml(placingDef?.name || 'el mueble')} · Esc para cancelar`
             : _salaSelectedPlaced !== null
-            ? '↕ Rueda para escalar &nbsp;·&nbsp; Arrastra para mover'
-            : 'Selecciona un mueble →'}
+            ? 'Arrastra para mover · rueda para escalar'
+            : 'Elige un objeto para comenzar a decorar'}
+        </div>
+        <div class="sala-toolbar" role="toolbar" aria-label="Controles de sala">
+          <button class="sala-tool-btn" type="button" onclick="salaRotateSelected(-90)">↺<span>Izquierda</span></button>
+          <button class="sala-tool-btn" type="button" onclick="salaRotateSelected(90)">↻<span>Derecha</span></button>
+          <button class="sala-tool-btn" type="button" onclick="salaResizeSelected(-.1)">−<span>Reducir</span></button>
+          <button class="sala-tool-btn" type="button" onclick="salaResizeSelected(.1)">＋<span>Ampliar</span></button>
+          <button class="sala-tool-btn sala-tool-save" type="button" onclick="salaSaveCurrent()">▣<span>Guardar</span></button>
         </div>
       </div>
 
       <div class="sala-picker" id="salaPicker">
+        <div class="sala-picker-top">
+          <span class="sala-picker-kicker">INVENTARIO DE SALA</span>
+          <button class="sala-close-btn" type="button" title="Cancelar selección" onclick="salaClearSelection()">×</button>
+        </div>
+        <div class="sala-category-tabs">
+          ${SALA_CATEGORIES.map(([id, label]) => `<button class="sala-category${_salaCategory === id ? ' sala-category-active' : ''}" type="button" onclick="salaSetCategory('${id}')">${label}</button>`).join('')}
+        </div>
+        <div class="sala-picker-grid">
+          ${visibleFurniture.length ? visibleFurniture.map(f => `
+            <button class="sala-picker-item${_salaSelected === f.id ? ' sala-selected' : ''}"
+                 type="button" onclick="salaSelectFurniture('${f.id}')" title="${escHtml(f.name)}">
+              <img src="images/${escHtml(f.img)}" alt="" onerror="this.style.display='none'">
+              <span class="sala-picker-label">${escHtml(f.name)}</span>
+            </button>`).join('') : '<div class="sala-empty-category">Aún no hay objetos en esta categoría.</div>'}
+        </div>
         ${selItem && selDef ? `
           <div class="sala-props-panel">
-            <div class="sala-props-name">${escHtml(selDef.name)}</div>
-            <img class="sala-props-preview" src="images/${escHtml(selDef.img)}" alt="">
+            <div class="sala-detail-head">
+              <img class="sala-props-preview" src="images/${escHtml(selDef.img)}" alt="">
+              <div><div class="sala-props-name">${escHtml(selDef.name)}</div><span class="sala-rarity">${escHtml(selDef.rarity)}</span></div>
+            </div>
+            <p class="sala-props-bonus">${escHtml(SALA_RESONANCES[selDef.id]?.label || selDef.bonus)}</p>
+            ${SALA_RESONANCES[selDef.id] ? `<button class="sala-attune-btn ${data.attunedId === selDef.id ? 'sala-attuned' : ''}" onclick="salaAttune('${selDef.id}')">${data.attunedId === selDef.id ? '✦ Resonando ahora' : '✦ Activar resonancia'}</button>` : ''}
             <label class="sala-props-label">Tamaño</label>
             <input type="range" class="sala-size-slider" id="salaSizeSlider"
                    min="30" max="230" step="5"
@@ -94,25 +193,14 @@ function renderSalaPersonal() {
                    oninput="salaResizeItem(${_salaSelectedPlaced}, this.value / 100)">
             <div class="sala-props-pct" id="salaSizePct">${Math.round((selItem.scale || 1) * 100)}%</div>
             <button class="btn btn-ghost sala-delete-btn" onclick="salaDeleteItem(${_salaSelectedPlaced})">🗑 Quitar mueble</button>
-            <button class="btn btn-ghost sala-deselect-btn" onclick="salaDeselectPlaced()">← Catálogo</button>
+            <button class="btn btn-ghost sala-deselect-btn" onclick="salaDeselectPlaced()">← Volver al inventario</button>
           </div>
-        ` : `
-          <div class="sala-picker-title">🪑 Muebles</div>
-          <div class="sala-picker-grid">
-            ${SALA_FURNITURE.map(f => `
-              <div class="sala-picker-item${_salaSelected === f.id ? ' sala-selected' : ''}"
-                   onclick="salaSelectFurniture('${f.id}')" title="${escHtml(f.name)}">
-                <img src="images/${escHtml(f.img)}" alt="" onerror="this.style.display='none'">
-                <span class="sala-picker-label">${escHtml(f.name)}</span>
-              </div>`).join('')}
-          </div>
-          <div class="sala-help">Selecciona → haz clic en sala<br>Clic en mueble → editar tamaño<br>Rueda del ratón → escalar</div>
-        `}
+        ` : placingDef ? `<div class="sala-place-card"><img src="images/${escHtml(placingDef.img)}" alt=""><div><strong>${escHtml(placingDef.name)}</strong><span class="sala-rarity">${escHtml(placingDef.rarity)}</span><p>${escHtml(placingDef.bonus)}</p></div><button class="sala-place-btn" type="button" onclick="salaFocusRoom()">Colocar</button></div>` : '<div class="sala-help">Elige un objeto y haz clic en la sala.<br>Selecciona uno colocado para moverlo, girarlo o cambiar su tamaño.</div>'}
       </div>
     </div>`;
 
   _salaBindEvents();
-  if (typeof animSalaItems === 'function') animSalaItems();
+  // No animar transform aquí: GSAP sobrescribe el scale/rotate del editor de sala.
 }
 
 function salaSelectFurniture(id) {
@@ -121,9 +209,70 @@ function salaSelectFurniture(id) {
   renderSalaPersonal();
 }
 
+function salaSetCategory(category) {
+  _salaCategory = category;
+  renderSalaPersonal();
+}
+
+function salaClearSelection() {
+  _salaSelected = null;
+  _salaSelectedPlaced = null;
+  renderSalaPersonal();
+}
+
 function salaDeselectPlaced() {
   _salaSelectedPlaced = null;
   renderSalaPersonal();
+}
+
+async function salaAttune(id) {
+  const data = _getSala();
+  if (!(data.placed || []).some(item => item.id === id) || !SALA_RESONANCES[id]) return;
+  data.attunedId = data.attunedId === id ? null : id;
+  await _saveSala(data);
+  if (typeof toast === 'function') toast('✦', data.attunedId ? 'Resonancia activa: ' + SALA_RESONANCES[id].label : 'Resonancia desactivada.');
+  renderSalaPersonal();
+}
+
+function salaFocusRoom() {
+  document.getElementById('salaRoom')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function salaFocusSelected() {
+  const selected = document.querySelector('.sala-item-selected');
+  if (selected) {
+    selected.classList.add('sala-item-focus');
+    setTimeout(() => selected.classList.remove('sala-item-focus'), 600);
+  } else if (typeof toast === 'function') toast('✦', 'Selecciona un mueble colocado para moverlo.');
+}
+
+function salaRotateSelected(degrees = 90) {
+  if (_salaSelectedPlaced === null) {
+    if (typeof toast === 'function') toast('↻', 'Selecciona un mueble colocado para girarlo.');
+    return;
+  }
+  const data = _getSala();
+  const item = data.placed?.[_salaSelectedPlaced];
+  if (!item) return;
+  item.rotate = ((item.rotate || 0) + degrees + 360) % 360;
+  _saveSala(data);
+  const el = document.querySelector(`.sala-item[data-idx="${_salaSelectedPlaced}"]`);
+  if (el) el.style.setProperty('--r', `${item.rotate}deg`);
+}
+
+function salaResizeSelected(delta) {
+  if (_salaSelectedPlaced === null) {
+    if (typeof toast === 'function') toast('↕', 'Selecciona un mueble colocado para cambiar su tamaño.');
+    return;
+  }
+  const item = _getSala().placed?.[_salaSelectedPlaced];
+  if (!item) return;
+  salaResizeItem(_salaSelectedPlaced, (item.scale || 1) + delta);
+}
+
+function salaSaveCurrent() {
+  _saveSala(_getSala());
+  if (typeof toast === 'function') toast('✦', 'Sala personal guardada.');
 }
 
 function salaResizeItem(idx, scale) {
@@ -158,7 +307,7 @@ function _salaBindEvents() {
 
   // Click empty room: place furniture or deselect
   room.addEventListener('click', e => {
-    if (e.target.closest('.sala-item')) return;
+    if (e.target.closest('.sala-item, .sala-toolbar')) return;
     if (_salaSelected) {
       const rect = room.getBoundingClientRect();
       const x = Math.round(((e.clientX - rect.left) / rect.width)  * 100);
@@ -263,6 +412,31 @@ function _salaBindEvents() {
       }
       _salaDrag = null;
     });
+
+    const resizeHandle = el.querySelector('.sala-resize-handle');
+    if (resizeHandle) {
+      resizeHandle.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        resizeHandle.setPointerCapture(e.pointerId);
+        const item = _getSala().placed?.[idx];
+        if (!item) return;
+        _salaResize = { idx, sx: e.clientX, sy: e.clientY, scale: item.scale || 1 };
+      });
+
+      resizeHandle.addEventListener('pointermove', e => {
+        if (!_salaResize || _salaResize.idx !== idx) return;
+        e.preventDefault();
+        const distance = (e.clientX - _salaResize.sx) - (e.clientY - _salaResize.sy);
+        salaResizeItem(idx, _salaResize.scale + distance / 150);
+      });
+
+      resizeHandle.addEventListener('pointerup', e => {
+        if (!_salaResize || _salaResize.idx !== idx) return;
+        e.preventDefault();
+        _salaResize = null;
+      });
+    }
   });
 
   document.addEventListener('keydown', e => {

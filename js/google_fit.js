@@ -58,9 +58,15 @@ async function handleGoogleFitCallback() {
   renderFitWidget();
 }
 
-async function _fitEnsureToken() {
-  if (_fitToken && Date.now() < (hero?.fit_token_expiry || 0) - 60000) return _fitToken;
-  if (!hero?.fit_refresh_token) return hero?.fit_access_token || null;
+async function _fitEnsureToken(forceRefresh = false) {
+  // El token en memoria se pierde en cada recarga de página — no forzar refresh
+  // solo por eso. Confiar en fit_token_expiry persistido aunque _fitToken sea null.
+  const cached = _fitToken || hero?.fit_access_token || null;
+  if (!forceRefresh && cached && Date.now() < (hero?.fit_token_expiry || 0) - 60000) {
+    _fitToken = cached;
+    return cached;
+  }
+  if (!hero?.fit_refresh_token) return cached; // sin refresh_token, usar lo que haya (mejor que nada)
   const { data: { session } } = await db.auth.getSession();
   const authToken = session?.access_token || SUPA_KEY;
   const resp = await fetch(`${SUPA_URL}/functions/v1/google-oauth`, {
@@ -68,17 +74,29 @@ async function _fitEnsureToken() {
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
     body: JSON.stringify({ action: 'refresh', refresh_token: hero.fit_refresh_token }),
   });
-  if (!resp.ok) return null;
+  if (!resp.ok) return cached; // refresh falló — probar con el token viejo antes de rendirse
   const t = await resp.json();
   _fitToken = t.access_token;
   await saveHero({ fit_access_token: t.access_token, fit_token_expiry: Date.now() + (t.expires_in || 3600) * 1000 });
   return _fitToken;
 }
 
+async function _fitFetchSteps(token, startMs) {
+  return fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      aggregateBy: [{ dataTypeName: 'com.google.step_count.delta' }],
+      bucketByTime: { durationMillis: 86400000 },
+      startTimeMillis: startMs, endTimeMillis: startMs + 86400000,
+    }),
+  });
+}
+
 async function syncGoogleFitSteps(force = false) {
   if (_fitSyncing) return;
-  const token = await _fitEnsureToken();
-  if (!token) { toast('⚠️', 'Token de Google Fit expirado. Reconecta.'); renderFitWidget(); return; }
+  let token = await _fitEnsureToken();
+  if (!token) { toast('⚠️', 'Google Fit no está conectado.'); renderFitWidget(); return; }
   const _d = new Date();
   const today = `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;
   if (!force && hero?.fit_sync_date === today && fitSynced && fitSteps > 0) return;
@@ -89,22 +107,25 @@ async function syncGoogleFitSteps(force = false) {
 
   try {
     const startMs = new Date(today + 'T00:00:00').getTime();
-    const localToday = today;
-    const resp = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        aggregateBy: [{ dataTypeName: 'com.google.step_count.delta' }],
-        bucketByTime: { durationMillis: 86400000 },
-        startTimeMillis: startMs, endTimeMillis: startMs + 86400000,
-      }),
-    });
+    let resp = await _fitFetchSteps(token, startMs);
+
+    // 401 real de credenciales — reintentar UNA vez forzando refresh antes de rendirse
+    if (resp.status === 401) {
+      token = await _fitEnsureToken(true);
+      if (token) resp = await _fitFetchSteps(token, startMs);
+    }
+
     if (!resp.ok) {
       const errBody = await resp.text().catch(() => '');
       console.error('Fit API error', resp.status, errBody);
-      if (resp.status === 401 || resp.status === 403) {
-        toast('🔑', `Google Fit: acceso denegado (${resp.status}). Reconecta.`);
+      if (resp.status === 401) {
+        // Ya reintentamos con refresh y sigue fallando — ahí sí hace falta reconectar
+        toast('🔑', 'Google Fit: sesión vencida. Reconecta.');
         await disconnectGoogleFit();
+      } else if (resp.status === 403) {
+        // 403 no siempre es "expiró" — puede ser permiso/alcance/API deshabilitada.
+        // Desconectar no arregla eso y solo obliga a re-autenticar sin motivo.
+        toast('⚠️', 'Google Fit: acceso denegado (403). Revisa permisos de la app en tu cuenta de Google.');
       } else {
         toast('⚠️', `Google Fit error ${resp.status}. Revisa la consola.`);
       }

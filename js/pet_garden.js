@@ -17,6 +17,104 @@ let _gardenFS           = false;
 let _gardenActive       = false;
 let _gardenFSKeyHandler = null;
 
+const GARDEN_EXPEDITIONS = {
+  forage:  { label: 'Recolectar', icon: '🌿', minutes: 30, desc: 'Busca alimento y pociones.' },
+  crystal: { label: 'Buscar cristales', icon: '💎', minutes: 60, desc: 'Trae fragmentos y oro.' },
+  portal:  { label: 'Cruzar portal', icon: '🌀', minutes: 120, desc: 'Sólo monturas Nv.50. Recompensa rara.' },
+};
+const GARDEN_UPGRADES = [
+  { id:'nest', name:'Nido cálido', icon:'🪺', desc:'Reduce 15% el descanso tras caer.', max:3 },
+  { id:'feeder', name:'Comedero lunar', icon:'🍲', desc:'+5% XP de mascota por nivel.', max:3 },
+  { id:'fountain', name:'Fuente de vínculo', icon:'⛲', desc:'+1 vínculo extra por misión por nivel.', max:3 },
+];
+function _gardenKey(name) { return `dungeon-garden-${name}-${hero?.id || 'guest'}`; }
+function _gardenRead(name, fallback) { try { return JSON.parse(localStorage.getItem(_gardenKey(name)) || JSON.stringify(fallback)); } catch { return fallback; } }
+function _gardenWrite(name, value) { localStorage.setItem(_gardenKey(name), JSON.stringify(value)); }
+function _gardenUpgrades() { return _gardenRead('upgrades', {}); }
+function _gardenEssence() { return Number(_gardenRead('essence', 0)) || 0; }
+function _gardenSetEssence(value) { _gardenWrite('essence', Math.max(0, value)); }
+function getGardenBonus(type) {
+  const upgrades = _gardenUpgrades();
+  if (type === 'pet_xp') return (upgrades.feeder || 0) * .05;
+  if (type === 'bond') return upgrades.fountain || 0;
+  if (type === 'rest') return (upgrades.nest || 0) * .15;
+  return 0;
+}
+function _gardenHarmony() {
+  const list = typeof pets === 'undefined' ? [] : pets.filter(p => p.stage !== 'egg');
+  const mounts = list.filter(p => p.stage === 'mount').length;
+  const rested = list.filter(p => !(typeof isPetResting === 'function' && isPetResting(p))).length;
+  const decor = Object.values(_gardenUpgrades()).reduce((sum, n) => sum + n, 0);
+  return Math.min(100, list.length * 8 + mounts * 10 + rested * 4 + decor * 6);
+}
+function _gardenDailyEvent() {
+  const date = new Date().toISOString().slice(0, 10);
+  const pool = [
+    { id:'fireflies', icon:'✨', name:'Luciérnagas arcanas', desc:'Una mascota encontró esencia entre las flores.', essence:3 },
+    { id:'nest', icon:'🥚', name:'Nido oculto', desc:'Hay alimento olvidado junto a un nido.', food:1 },
+    { id:'crystal', icon:'💜', name:'Cristal cantor', desc:'El jardín vibra con energía de runa.', rune:2 },
+  ];
+  const pick = pool[(date.length + (hero?.id || '').length + date.charCodeAt(9)) % pool.length];
+  return { ...pick, date };
+}
+
+async function gardenClaimDailyEvent() {
+  const event = _gardenDailyEvent();
+  const state = _gardenRead('event', {});
+  if (state.date === event.date && state.claimed) { toast('🌸', 'El evento del jardín ya fue atendido hoy.'); return; }
+  if (event.essence) _gardenSetEssence(_gardenEssence() + event.essence);
+  if (event.rune && typeof addInvItem === 'function') await addInvItem('rune_fragment', 'rune_fragment', event.rune);
+  if (event.food) {
+    const pet = (pets || []).find(p => p.is_active) || (pets || [])[0];
+    if (pet && typeof addInvItem === 'function') await addInvItem('pet_food_' + pet.pet_key, 'pet_food', event.food);
+  }
+  _gardenWrite('event', { date:event.date, claimed:true });
+  toast(event.icon, `${event.name}: recompensa reclamada.`);
+  renderGarden();
+}
+
+function gardenUpgrade(id) {
+  const def = GARDEN_UPGRADES.find(upgrade => upgrade.id === id);
+  if (!def) return;
+  const upgrades = _gardenUpgrades();
+  const level = upgrades[id] || 0;
+  const cost = 4 + level * 4;
+  if (level >= def.max) { toast('🌸', `${def.name} ya está al máximo.`); return; }
+  if (_gardenEssence() < cost) { toast('💜', `Faltan ${cost - _gardenEssence()} esencias del jardín.`); return; }
+  upgrades[id] = level + 1;
+  _gardenWrite('upgrades', upgrades);
+  _gardenSetEssence(_gardenEssence() - cost);
+  toast(def.icon, `${def.name} mejorado a Nv.${level + 1}.`);
+  renderGarden();
+}
+
+function _gardenExpedition() { return _gardenRead('expedition', null); }
+function gardenStartExpedition(petId, type) {
+  const pet = (pets || []).find(p => p.id === petId);
+  const def = GARDEN_EXPEDITIONS[type];
+  if (!pet || !def || pet.stage === 'egg') return;
+  if (type === 'portal' && !(pet.stage === 'mount' && (pet.pet_level || 0) >= 50)) { toast('🌀', 'El portal sólo acepta monturas de Nv.50.'); return; }
+  const current = _gardenExpedition();
+  if (current && current.endsAt > Date.now()) { toast('⏳', 'Ya hay una expedición en marcha.'); return; }
+  _gardenWrite('expedition', { petId, petKey:pet.pet_key, type, endsAt:Date.now() + def.minutes * 60000 });
+  toast(def.icon, `${_petDef(pet.pet_key)?.name || 'Mascota'} partió: ${def.label}.`);
+  _closeGardenModal(); renderGarden();
+}
+
+async function gardenClaimExpedition() {
+  const trip = _gardenExpedition();
+  if (!trip) return;
+  if (trip.endsAt > Date.now()) { toast('⏳', 'La expedición aún no regresa.'); return; }
+  const rewards = trip.type === 'portal' ? { gold:80, essence:8, rune:3, food:1 } : trip.type === 'crystal' ? { gold:28, essence:4, rune:2 } : { gold:12, essence:3, food:1 };
+  if (typeof addGold === 'function') addGold(rewards.gold);
+  if (rewards.rune && typeof addInvItem === 'function') await addInvItem('rune_fragment', 'rune_fragment', rewards.rune);
+  if (rewards.food && typeof addInvItem === 'function') await addInvItem('pet_food_' + trip.petKey, 'pet_food', rewards.food);
+  _gardenSetEssence(_gardenEssence() + rewards.essence);
+  _gardenWrite('expedition', null);
+  toast('🎁', `Expedición resuelta: +${rewards.gold} oro, +${rewards.essence} esencia.`);
+  renderGarden();
+}
+
 function cleanupGarden() {
   if (_gardenFS) {
     _gardenFS = false;
@@ -52,15 +150,44 @@ function renderGarden() {
   }
 
   const tod = typeof getDungeonTOD === 'function' ? getDungeonTOD() : 'morning';
+  const harmony = _gardenHarmony();
+  const essence = _gardenEssence();
+  const event = _gardenDailyEvent();
+  const eventState = _gardenRead('event', {});
+  const trip = _gardenExpedition();
+  const activeTrip = trip && trip.endsAt > Date.now();
+  const tripMins = activeTrip ? Math.ceil((trip.endsAt - Date.now()) / 60000) : 0;
+  const upgrades = _gardenUpgrades();
+  const hasPortalMount = (pets || []).some(p => p.stage === 'mount' && (p.pet_level || 0) >= 50);
 
   container.innerHTML = `
     <div class="garden-wrap" id="gardenWrap">
       <img src="images/jardin_fondo.webp" class="garden-bg-img" alt="Jardín de Mascotas">
       <div class="garden-tod-overlay garden-tod-${tod}"></div>
       <div class="garden-pets-layer" id="gardenPetsLayer"></div>
+      <div class="garden-hud">
+        <div class="garden-harmony"><span>✦ Armonía</span><b>${harmony}%</b><i><em style="width:${harmony}%"></em></i></div>
+        <div class="garden-essence">💜 ${essence} esencia</div>
+      </div>
       <div class="garden-controls">
         <button class="garden-fs-btn" onclick="_gardenToggleFS()" title="Pantalla completa">⛶</button>
       </div>
+    </div>
+    <div class="garden-command-deck">
+      <section class="garden-command-card garden-event-card">
+        <div class="garden-command-title">${event.icon} Suceso del día</div>
+        <b>${event.name}</b><p>${event.desc}</p>
+        <button class="garden-mini-btn" onclick="gardenClaimDailyEvent()" ${eventState.date === event.date && eventState.claimed ? 'disabled' : ''}>${eventState.date === event.date && eventState.claimed ? 'Atendido' : 'Investigar'}</button>
+      </section>
+      <section class="garden-command-card garden-trip-card">
+        <div class="garden-command-title">🧭 Encargo de jardín</div>
+        ${trip ? (activeTrip ? `<b>${GARDEN_EXPEDITIONS[trip.type]?.label || 'Expedición'}</b><p>${tripMins} min restantes · ${_petDef(trip.petKey)?.name || 'Mascota'} está explorando.</p>` : `<b>Tu mascota regresó</b><p>Hay recompensas listas para reclamar.</p><button class="garden-mini-btn" onclick="gardenClaimExpedition()">Reclamar botín</button>`) : `<b>Sin expedición activa</b><p>Selecciona una mascota y envíala desde su ficha.</p>`}
+      </section>
+      <section class="garden-command-card garden-upgrades-card">
+        <div class="garden-command-title">🏡 Refugio del jardín</div>
+        <div class="garden-upgrades-list">${GARDEN_UPGRADES.map(upgrade => { const level = upgrades[upgrade.id] || 0; const cost = 4 + level * 4; return `<button class="garden-upgrade" onclick="gardenUpgrade('${upgrade.id}')" ${level >= upgrade.max ? 'disabled' : ''}><span>${upgrade.icon}</span><span><b>${upgrade.name} · ${level}/${upgrade.max}</b><small>${level >= upgrade.max ? 'Máximo' : upgrade.desc + ' · ' + cost + ' esencia'}</small></span></button>`; }).join('')}</div>
+      </section>
+      ${hasPortalMount ? `<section class="garden-command-card garden-portal-card"><div class="garden-command-title">🌀 Portal cósmico</div><b>Ruta de élite disponible</b><p>Una montura Nv.50 puede cruzarlo desde su ficha.</p></section>` : ''}
     </div>
     <div class="rey-sanctuary" id="reySanctuary" style="display:none" onclick="_closeReySanctuary()">
       <div class="rey-sanctuary-inner" onclick="event.stopPropagation()">
@@ -212,6 +339,9 @@ function _openGardenModal(key) {
   const xpPct    = (isMount && petLvl >= 50) ? 100 : Math.round((petXP / xpMax) * 100);
   const stLabel  = isMount ? '🌟 Montura' : (petLvl >= 15 ? '✨ Nv.15 — Lista!' : '🐣 Bebé');
 
+  const habitat = GARDEN_ZONES[key];
+  const bond = typeof getPetBond === 'function' ? getPetBond(pet) : 0;
+  const canPortal = isMount && petLvl >= 50;
   let actionBtn = '';
   if (isMount && petLvl < 50) {
     const food = typeof getInvCount === 'function' ? getInvCount('pet_food_' + key) : 0;
@@ -239,6 +369,12 @@ function _openGardenModal(key) {
       onclick="_closeGardenModal();setActivePet('${pet.is_active ? '' : pet.id}')">
       ${pet.is_active ? '✅ Mascota activa' : '🐾 Activar'}
     </button>
+    <div class="gm-garden-meta">🏕️ Hábitat ${habitat ? 'asignado' : 'sin asignar'} · 🐾 Vínculo ${bond}</div>
+    <div class="gm-expedition-actions">
+      <button onclick="gardenStartExpedition('${pet.id}','forage')">🌿 Recolectar · 30m</button>
+      <button onclick="gardenStartExpedition('${pet.id}','crystal')">💎 Cristales · 1h</button>
+      ${canPortal ? `<button class="gm-portal-action" onclick="gardenStartExpedition('${pet.id}','portal')">🌀 Portal · 2h</button>` : ''}
+    </div>
     <button class="gm-close-btn" onclick="_closeGardenModal()">Cerrar</button>`;
 
   modal.style.display = 'flex';

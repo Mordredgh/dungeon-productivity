@@ -36,8 +36,8 @@ async function tryRuneDrop() {
   const key  = keys[Math.floor(Math.random() * keys.length)];
   const def  = RUNE_DEFS[key];
   const invKey = 'rune_frag_' + key;
-  if (typeof grantInvItem === 'function') {
-    await grantInvItem(invKey, 1);
+  if (typeof addInvItem === 'function') {
+    await addInvItem(invKey, 'rune_fragment', 1);
   }
   const have = typeof getInvCount === 'function' ? getInvCount(invKey) : 0;
   toast(def.icon, `✨ ¡Fragmento de ${def.name}! (tienes ${have}/${RUNE_FRAG_COST})`);

@@ -657,6 +657,31 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 
 ---
 
+## Bonus pasivo de gremio + reclamo repetible + Fit/Duolingo alimentan zonas (v208, 2026-07-18)
+
+Gerardo preguntó qué más mejorar en Fortaleza (zona) y Gremio (Facciones); pidió también aprovechar
+la conexión con Duolingo. Tres mejoras:
+
+- **Bonus pasivo por rango de gremio.** Antes el rango de Facción era solo decorativo — a diferencia
+  de Zonas, que dan +5/10/15/25% XP según rango. Ahora `FACTION_DEFS[].ranks[].bonus` (0/0.05/0.12)
+  se aplica igual que `getZoneBonus`: `getFactionBonus(q)` en `factions.js`, hookeado en
+  `quests.js completeQuest()` justo después del bonus de zona.
+- **Reclamo de serie repetible cada 7 días** (`FACTION_RECLAIM_COOLDOWN_MS` en config.js) en vez de
+  "una sola vez en la vida" — antes, una vez reclamada la serie de 3 misiones y completada, el
+  gremio quedaba sin más razón para jugarlo. `hero.faction_claims` ahora es histórico (se van
+  agregando entradas `{id, questIds, done, doneAt}`, nunca se borran); `_factionLatestClaim()` mira
+  la última entrada de esa facción para decidir si puede reclamar de nuevo.
+- **Google Fit → Fortaleza, Duolingo → Torre del Saber.** Ambas integraciones ya otorgaban XP suelto
+  (`addXP()`) que no contaba para ninguna zona porque `calcZoneXP()` solo suma XP de misiones
+  completadas, no de XP externo. Nueva función `addZoneExtXP(zoneId, amount)` en `zones.js` guarda
+  XP acumulado externo en `hero.zone_ext_xp` (jsonb, requirió migración) y `calcZoneXP()` lo suma
+  al total de cada zona. `_applyFitXP()` (google_fit.js) alimenta `fortaleza`; `syncDuolingo()`
+  (duolingo.js) alimenta `torre`. Así pasos reales y XP de idiomas hacen subir de rango esas zonas
+  igual que las misiones manuales.
+
+**Migración aplicada 2026-07-18** vía SQL Editor (misma sesión de Chrome logueada, MCP no alcanza
+esta cuenta): `ALTER TABLE dungeon_heroes ADD COLUMN IF NOT EXISTS zone_ext_xp jsonb DEFAULT '{}'::jsonb;`
+
 ## Más variedad: 10 misiones/zona + pool de gremio (v207, 2026-07-18)
 
 Gerardo pidió más variedad tras probar la v206/v205. Dos expansiones:

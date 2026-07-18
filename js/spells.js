@@ -310,15 +310,15 @@ function renderAchievements() {
   // Secret achievements counter banner
   const secretDefs  = ACHIEVEMENT_DEFS.filter(a => a.hidden);
   const secretFound = secretDefs.filter(a => unlocked.includes(a.id)).length;
-  const secretBanner = secretDefs.length
-    ? `<div class="ach-secret-banner">🔮 ${secretFound} / ${secretDefs.length} secretos descubiertos</div>`
+  const secretMeter = secretDefs.length
+    ? `<span class="ach-secret-meter"><span>🔮</span><b>${secretFound}/${secretDefs.length}</b><i>descubiertos</i></span>`
     : '';
 
-  el.innerHTML = secretBanner + ACH_CATS.map(cat => {
+  el.innerHTML = ACH_CATS.map(cat => {
     const cards = cat.ids.map(id => renderCard(achById[id])).filter(Boolean);
     if (!cards.length) return '';
     return `<div class="ach-cat-section">
-      <div class="ach-cat-header">${cat.name}</div>
+      <div class="ach-cat-header">${cat.name}${cat.name.includes('Secretos') ? secretMeter : ''}</div>
       <div class="ach-cat-grid">${cards.join('')}</div>
     </div>`;
   }).join('') + (extraAchs.length ? `<div class="ach-cat-section">

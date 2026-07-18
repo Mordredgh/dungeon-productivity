@@ -52,7 +52,9 @@ function rollLoot(priority) {
   const runeDropMult = typeof getRuneBonus === 'function' ? (1 + getRuneBonus('drop_rate')) : 1;
   const upgradeDropMult = typeof hasGoldUpgrade === 'function' && hasGoldUpgrade('drop_rate') ? 1.05 : 1;
   const masteryDropMult = typeof getMasteryBonus === 'function' ? 1 + getMasteryBonus('suerte') : 1;
-  const fragQty = Math.round((Math.floor(Math.random() * (table.max - table.min + 1)) + table.min + lckBonus) * runeDropMult * upgradeDropMult * masteryDropMult);
+  const salaDropMult = typeof getSalaBonus === 'function' ? 1 + getSalaBonus('drop_rate') : 1;
+  const salaFragment = typeof getSalaBonus === 'function' ? getSalaBonus('spell_frag') : 0;
+  const fragQty = Math.round((Math.floor(Math.random() * (table.max - table.min + 1)) + table.min + lckBonus) * runeDropMult * upgradeDropMult * masteryDropMult * salaDropMult) + salaFragment;
   const potQty  = Math.max(1, Math.ceil(fragQty / 2));
 
   const fragKey = SPELL_FRAGMENT_KEYS[Math.floor(Math.random() * SPELL_FRAGMENT_KEYS.length)];
@@ -172,6 +174,13 @@ function _invItemMeta(key) {
              desc: `Alimento para ${pet?.name || 'montura'}. Ve a Mascotas → Montura para dárselo.`,
              cat: 'pet_food', cost: 0, spellId: null };
   }
+  if (key.startsWith('rune_frag_')) {
+    const type = key.slice(10);
+    const def = typeof RUNE_DEFS !== 'undefined' ? RUNE_DEFS[type] : null;
+    return { name: 'Fragmento: ' + (def?.name || type), icon: def?.icon || '💎', color: def?.color || '#a855f7',
+             desc: 'Fragmento para forjar ' + (def?.name || 'una runa') + ' en el panel de Runas.',
+             cat: 'rune_fragment', cost: 0, spellId: null };
+  }
   return { name: key, icon: '🎁', color: '#94a3b8', desc: '', cat: 'misc', cost: 0, spellId: null };
 }
 
@@ -215,6 +224,14 @@ function showInvItemDetail(key) {
     useBtn.textContent = '🐾 Ir a Mascotas';
     useBtn.disabled = false;
     useBtn.onclick = () => { closeModal('invDetailModal'); switchView('pets'); };
+  } else if (meta.cat === 'pet_egg' || meta.cat === 'pet_food') {
+    useBtn.textContent = '🐾 Abrir Mascotas';
+    useBtn.disabled = false;
+    useBtn.onclick = () => { closeModal('invDetailModal'); switchView('pets'); };
+  } else if (meta.cat === 'rune_fragment') {
+    useBtn.textContent = '💎 Abrir Runas';
+    useBtn.disabled = false;
+    useBtn.onclick = () => { closeModal('invDetailModal'); switchView('runes'); };
   } else {
     useBtn.style.display = 'none';
   }
@@ -239,7 +256,7 @@ function _rmSpawnSparkles() {
 }
 
 /* ── RPG Inventory Grid — Diablo Vault ──────────────────── */
-function renderInventory() {
+function renderInventoryGridLegacy() {
   const el = document.getElementById('inventoryView');
   if (!el) return;
   if (!inventory.length) {

@@ -51,6 +51,67 @@ const SKILL_TREE_DEFS = {
   ],
 };
 
+/* Ramas extra: cada clase gana especialización y la raza aporta un linaje propio. */
+const SKILL_CLASS_EXPANSIONS = {
+  guerrero:[
+    { id:'war_vanguardia', tier:1, name:'Vanguardia', icon:'🛡️', desc:'+5 HP máximo', requires:[] },
+    { id:'war_cazador', tier:2, name:'Cazador de Jefes', icon:'🐲', desc:'+8% XP en misiones épicas', requires:['golpe_critico'] },
+    { id:'war_estandarte', tier:2, name:'Estandarte de Guerra', icon:'🚩', desc:'+8% XP en misiones principales', requires:['resistencia'] },
+    { id:'war_titan', tier:3, name:'Corazón de Titán', icon:'🔥', desc:'+10 HP máximo', requires:['war_cazador','war_estandarte'] },
+  ],
+  mago:[
+    { id:'mag_archivo', tier:1, name:'Archivo Vivo', icon:'📜', desc:'+4% XP en todas las misiones', requires:[] },
+    { id:'mag_ritual', tier:2, name:'Ritual de Luna', icon:'🌙', desc:'+8% XP en misiones épicas', requires:['foco_arcano'] },
+    { id:'mag_alquimia', tier:2, name:'Alquimia Áurea', icon:'⚗️', desc:'+8% Oro en todas las misiones', requires:['sabiduria'] },
+    { id:'mag_nexo', tier:3, name:'Nexo Astral', icon:'🪐', desc:'+8% XP global', requires:['mag_ritual','mag_alquimia'] },
+  ],
+  picaro:[
+    { id:'rog_saqueo', tier:1, name:'Ojo del Saqueador', icon:'👁️', desc:'+6% Oro en todas las misiones', requires:[] },
+    { id:'rog_rastro', tier:2, name:'Rastro Silencioso', icon:'👣', desc:'+8% XP en misiones side', requires:['sombras'] },
+    { id:'rog_contrato', tier:2, name:'Contrato Dorado', icon:'📜', desc:'+8% Oro total', requires:['bolsillos'] },
+    { id:'rog_noche', tier:3, name:'Corona de la Noche', icon:'🌘', desc:'+8% XP side', requires:['rog_rastro','rog_contrato'] },
+  ],
+  clerigo:[
+    { id:'cle_luz', tier:1, name:'Luz Persistente', icon:'🕯️', desc:'+5 HP máximo', requires:[] },
+    { id:'cle_peregrino', tier:2, name:'Paso del Peregrino', icon:'🕊️', desc:'+8% XP en misiones diarias', requires:['fervor'] },
+    { id:'cle_diezmo', tier:2, name:'Diezmo Bendito', icon:'✨', desc:'+6% Oro en todas las misiones', requires:['bendicion'] },
+    { id:'cle_aurora', tier:3, name:'Aurora Inmortal', icon:'🌅', desc:'+10 HP máximo', requires:['cle_peregrino','cle_diezmo'] },
+  ],
+  arquero:[
+    { id:'arc_sendero', tier:1, name:'Sendero Verde', icon:'🌲', desc:'+4% XP en todas las misiones', requires:[] },
+    { id:'arc_cazador', tier:2, name:'Cazador Paciente', icon:'🏹', desc:'+8% XP en misiones semanales', requires:['ojo_agudo'] },
+    { id:'arc_botin', tier:2, name:'Presa Dorada', icon:'🪙', desc:'+8% Oro en todas las misiones', requires:['recarga_rap'] },
+    { id:'arc_halcon', tier:3, name:'Ojo de Halcón', icon:'🦅', desc:'+8% XP semanales', requires:['arc_cazador','arc_botin'] },
+  ],
+  fundador:[
+    { id:'fun_red', tier:1, name:'Red Viva', icon:'🕸️', desc:'+4% XP en todas las misiones', requires:[] },
+    { id:'fun_riesgo', tier:2, name:'Riesgo Calculado', icon:'🎲', desc:'+8% XP en misiones épicas', requires:['caos_creativo'] },
+    { id:'fun_tesoro', tier:2, name:'Capital Inicial', icon:'💰', desc:'+8% Oro en todas las misiones', requires:['red_contactos'] },
+    { id:'fun_legado', tier:3, name:'Legado Fundador', icon:'👑', desc:'+8% XP global', requires:['fun_riesgo','fun_tesoro'] },
+  ],
+};
+const SKILL_RACE_DEFS = {
+  humano:[
+    { id:'race_humano_voluntad', tier:1, name:'Voluntad Humana', icon:'🧭', desc:'+3% XP en todas las misiones', requires:[] },
+    { id:'race_humano_legado', tier:2, name:'Legado Mortal', icon:'🏛️', desc:'+5% Oro en todas las misiones', requires:['race_humano_voluntad'] },
+  ],
+  elfo:[
+    { id:'race_elfo_luna', tier:1, name:'Sangre Lunar', icon:'🌙', desc:'+4% XP en misiones épicas', requires:[] },
+    { id:'race_elfo_raices', tier:2, name:'Raíces Eternas', icon:'🌿', desc:'+5 HP máximo', requires:['race_elfo_luna'] },
+  ],
+  enano:[
+    { id:'race_enano_yunque', tier:1, name:'Hijo del Yunque', icon:'⚒️', desc:'+5% Oro en todas las misiones', requires:[] },
+    { id:'race_enano_granito', tier:2, name:'Piel de Granito', icon:'🪨', desc:'+10 HP máximo', requires:['race_enano_yunque'] },
+  ],
+  orco:[
+    { id:'race_orco_furia', tier:1, name:'Furia Ancestral', icon:'🩸', desc:'+4% XP en misiones principales', requires:[] },
+    { id:'race_orco_clan', tier:2, name:'Juramento de Clan', icon:'🐗', desc:'+6% XP en misiones side', requires:['race_orco_furia'] },
+  ],
+};
+function getAllSkillDefs(cls = hero?.hero_class || 'guerrero', race = heroRace || hero?.race || 'humano') {
+  return [...(SKILL_TREE_DEFS[cls] || []), ...(SKILL_CLASS_EXPANSIONS[cls] || []), ...(SKILL_RACE_DEFS[race] || [])];
+}
+
 function getHeroSkillTree() {
   try { return JSON.parse(hero.skill_tree || '{}'); } catch { return {}; }
 }
@@ -67,7 +128,7 @@ function canLearnSkill(skillDef) {
 
 async function learnSkill(skillId) {
   const cls   = hero.hero_class || 'guerrero';
-  const defs  = SKILL_TREE_DEFS[cls] || [];
+  const defs  = getAllSkillDefs(cls);
   const skill = defs.find(s => s.id === skillId);
   if (!skill || !canLearnSkill(skill)) return;
 
@@ -81,7 +142,9 @@ async function learnSkill(skillId) {
 
 function getSkillTreeXPBonus(type) {
   const cls  = hero?.hero_class || 'guerrero';
-  const defs = SKILL_TREE_DEFS[cls] || [];
+  const defs = getAllSkillDefs(cls);
+  return _skillXPBonus(defs, type);
+  /* Legacy parser retained below for backwards-compatible saved descriptions. */
   let bonus  = 0;
   for (const s of defs) {
     if (!hasSkill(s.id)) continue;
@@ -105,9 +168,25 @@ function getSkillTreeXPBonus(type) {
   return bonus;
 }
 
+function _skillXPBonus(defs, type) {
+  const aliases = { main:['principal','principales'], side:['side','secundaria','secundarias'], weekly:['semanal','semanales'], daily:['diaria','diarias'] };
+  return defs.filter(skill => hasSkill(skill.id)).reduce((total, skill) => {
+    const desc = skill.desc.toLowerCase();
+    const value = Number((desc.match(/\+(\d+)%/) || [])[1] || 0) / 100;
+    if (!value) return total;
+    if (desc.includes('xp en todas') || desc.includes('xp global')) return total + value;
+    return aliases[type]?.some(word => desc.includes(word)) ? total + value : total;
+  }, 0);
+}
+
 function getSkillTreeGoldBonus() {
   const cls  = hero?.hero_class || 'guerrero';
-  const defs = SKILL_TREE_DEFS[cls] || [];
+  const defs = getAllSkillDefs(cls);
+  return defs.filter(skill => hasSkill(skill.id)).reduce((total, skill) => {
+    const desc = skill.desc.toLowerCase();
+    const value = Number((desc.match(/\+(\d+)%/) || [])[1] || 0) / 100;
+    return desc.includes('oro') ? total + value : total;
+  }, 0);
   let bonus  = 0;
   for (const s of defs) {
     if (!hasSkill(s.id)) continue;
@@ -120,7 +199,7 @@ function getSkillTreeGoldBonus() {
 
 function getSkillMaxHP() {
   const cls  = hero?.hero_class || 'guerrero';
-  const defs = SKILL_TREE_DEFS[cls] || [];
+  const defs = getAllSkillDefs(cls);
   let bonus  = 0;
   for (const s of defs) {
     if (!hasSkill(s.id)) continue;
@@ -145,6 +224,9 @@ const _SKT_META = {
 function renderSkillTree() {
   const el = document.getElementById('skillTreeContent');
   if (!el || !hero) return;
+
+  _renderExpandedSkillTree(el);
+  return;
 
   const cls  = hero.hero_class || 'guerrero';
   const defs = SKILL_TREE_DEFS[cls] || [];
@@ -224,4 +306,29 @@ function renderSkillTree() {
         <span class="skt-leg skt-leg-locked">🔒 Bloqueada</span>
       </div>
     </div>`;
+}
+
+function _renderExpandedSkillTree(el) {
+  const cls = hero.hero_class || 'guerrero';
+  const race = heroRace || hero.race || 'humano';
+  const defs = getAllSkillDefs(cls, race);
+  const classDefs = [...(SKILL_TREE_DEFS[cls] || []), ...(SKILL_CLASS_EXPANSIONS[cls] || [])];
+  const raceDefs = SKILL_RACE_DEFS[race] || [];
+  const meta = _SKT_META[cls] || { icon:'⚡', label:cls, color:'var(--accent)' };
+  const raceLabel = { humano:'Humano', elfo:'Elfo', enano:'Enano', orco:'Orco' }[race] || race;
+  const card = skill => {
+    const learned = hasSkill(skill.id);
+    const learnable = canLearnSkill(skill);
+    const reqs = skill.requires.map(id => defs.find(other => other.id === id)?.name).filter(Boolean).join(' · ');
+    const state = learned ? 'sktx-learned' : learnable ? 'sktx-available' : 'sktx-locked';
+    return `<button class="sktx-card ${state}" ${learnable ? `onclick="learnSkill('${skill.id}')"` : 'disabled'} title="${escHtml(skill.desc)}${reqs ? ' · Requiere: ' + escHtml(reqs) : ''}">
+      <span class="sktx-icon">${skill.icon}</span><span class="sktx-copy"><b>${escHtml(skill.name)}</b><small>${escHtml(skill.desc)}</small>${reqs && !learned ? `<em>Requiere: ${escHtml(reqs)}</em>` : ''}</span><span class="sktx-state">${learned ? '✓' : learnable ? '+1' : '🔒'}</span>
+    </button>`;
+  };
+  const tiers = [1,2,3];
+  el.innerHTML = `<section class="sktx-shell" style="--skt-c:${meta.color}">
+    <header class="sktx-header"><div><span>${meta.icon} ${meta.label}</span><h3>Doctrina de combate</h3><p>Ramas de clase y linaje racial. Elige un rumbo, no sólo estadísticas.</p></div><div class="sktx-points">✦ <b>${hero.skill_points || 0}</b><small>puntos disponibles</small></div></header>
+    <div class="sktx-layout"><div class="sktx-main"><div class="sktx-section-title">${meta.icon} Especialización de ${meta.label}</div>${tiers.map(tier => `<div class="sktx-tier"><div class="sktx-tier-label">Rango ${tier}</div><div class="sktx-grid">${classDefs.filter(skill => skill.tier === tier).map(card).join('')}</div></div>`).join('')}</div><aside class="sktx-race"><div class="sktx-section-title">✧ Linaje ${raceLabel}</div><p>Pasivos exclusivos de tu raza.</p>${raceDefs.map(card).join('')}</aside></div>
+    <footer class="sktx-footer"><span>✓ Aprendida</span><span>+1 Disponible</span><span>🔒 Requiere una senda previa</span></footer>
+  </section>`;
 }

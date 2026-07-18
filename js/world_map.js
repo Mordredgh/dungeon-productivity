@@ -84,12 +84,12 @@ function _wmSetAP(n) {
   const today = new Date().toISOString().split('T')[0];
   localStorage.setItem('dungeon-map-ap', JSON.stringify({ date: today, ap: Math.max(0, n) }));
 }
-function wmSpendAP(zoneId) {
+function wmSpendAP(zoneId, route = 'xp') {
   const ap = _wmGetAP();
   if (ap <= 0) { toast('⚡', 'Sin Puntos de Acción. Se renuevan mañana (3/día).'); return; }
   _wmSetAP(ap - 1);
   const expires = Date.now() + 2 * 60 * 60 * 1000;
-  localStorage.setItem('dungeon-map-bonus-' + zoneId, JSON.stringify({ expires }));
+  localStorage.setItem('dungeon-map-bonus-' + zoneId, JSON.stringify({ expires, route }));
   const z = (typeof ZONES !== 'undefined' ? ZONES : []).find(z => z.id === zoneId);
   toast('🗺️', `${z ? z.icon + ' ' + z.name : 'Zona'} activada: +15% XP por 2h (${ap - 1} AP restantes).`);
   _wmOpenZone(zoneId);
@@ -143,4 +143,23 @@ function _wmOpenZone(zoneId) {
       <div class="wm-detail-bonus">${bonusTxt}</div>
       ${apSection}
     </div>`;
+
+  if (apActive) {
+    const label = { xp: '+15% XP', gold: '+20% oro', recovery: '+15 HP' }[mapBonus.route || 'xp'];
+    const activeEl = panel.querySelector('.wm-ap-active');
+    if (activeEl) activeEl.textContent = `⚡ Expedición activa: ${label} · ${apMinsLeft} min restantes`;
+  }
+
+  if (!apActive && ap > 0) {
+    const count = panel.querySelector('.wm-ap-count');
+    count?.insertAdjacentHTML('beforebegin', `
+      <div class="wm-route-title">Elegir enfoque de expedición</div>
+      <div class="wm-route-grid">
+        <button class="wm-ap-btn" onclick="wmSpendAP('${zoneId}','xp')">📜 Saber<small>+15% XP</small></button>
+        <button class="wm-ap-btn" onclick="wmSpendAP('${zoneId}','gold')">💰 Tesoro<small>+20% oro</small></button>
+        <button class="wm-ap-btn" onclick="wmSpendAP('${zoneId}','recovery')">🛡️ Refugio<small>+15 HP</small></button>
+      </div>`);
+    const original = panel.querySelector('.wm-ap-btn');
+    if (original) original.style.display = 'none';
+  }
 }

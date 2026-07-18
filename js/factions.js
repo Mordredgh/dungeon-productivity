@@ -33,6 +33,21 @@ function getFactionBonus(q) {
   return def.ranks[idx].bonus || 0;
 }
 
+function _factionFocusKey() { return `dungeon-faction-focus-${hero?.id || 'guest'}`; }
+function getFactionFocus() { return localStorage.getItem(_factionFocusKey()) || ''; }
+function getFactionFocusBonus(q) {
+  const focused = FACTION_DEFS.find(f => f.id === getFactionFocus());
+  return focused && focused.type === q.type ? .10 : 0;
+}
+function setFactionFocus(factionId) {
+  const def = FACTION_DEFS.find(f => f.id === factionId);
+  if (!def) return;
+  const next = getFactionFocus() === factionId ? '' : factionId;
+  localStorage.setItem(_factionFocusKey(), next);
+  toast(def.icon, next ? `${def.name} es ahora tu rumbo activo: +10% XP en sus misiones.` : 'Rumbo de facción desactivado.');
+  renderFactions();
+}
+
 function _factionClaims() {
   try { return JSON.parse(hero?.faction_claims || '[]'); } catch { return []; }
 }
@@ -103,7 +118,9 @@ async function checkFactionExclusiveProgress(questId) {
   hero.faction_claims = JSON.stringify(claims);
   await saveHero({ faction_claims: hero.faction_claims });
   if (def) {
-    await addXP(def.exclusive.xp, 'side', null);
+    const salaFaction = typeof getSalaBonus === 'function' ? getSalaBonus('faction_xp') : 0;
+    const rewardXP = Math.round(def.exclusive.xp * (1 + salaFaction));
+    await addXP(rewardXP, 'side', null);
     if (typeof addGold === 'function') addGold(def.exclusive.gold);
     toast(def.icon, `¡Serie de ${def.name} completada! +${def.exclusive.xp} XP, +${def.exclusive.gold} oro.`);
   }
@@ -118,6 +135,7 @@ function _factionCardEl(def, claims) {
   const nextRank = def.ranks[rankIdx + 1];
   const pct      = nextRank ? Math.min(100, Math.round(((xp - rank.xp) / (nextRank.xp - rank.xp)) * 100)) : 100;
   const latest   = _factionLatestClaim(def.id, claims);
+  const focused  = getFactionFocus() === def.id;
 
   const card = document.createElement('div');
   card.className = 'faction-card';
@@ -172,7 +190,12 @@ function _factionCardEl(def, claims) {
   }
   btn.addEventListener('click', () => claimFactionExclusive(def.id));
 
-  card.append(hd, desc, barTrack, barLbl, btn);
+  const focusBtn = document.createElement('button');
+  focusBtn.className = 'faction-focus-btn' + (focused ? ' faction-focus-active' : '');
+  focusBtn.textContent = focused ? '✦ Rumbo activo · +10% XP' : 'Fijar rumbo · +10% XP';
+  focusBtn.addEventListener('click', () => setFactionFocus(def.id));
+
+  card.append(hd, desc, barTrack, barLbl, focusBtn, btn);
   return card;
 }
 
