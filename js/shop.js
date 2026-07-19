@@ -65,12 +65,36 @@ function _shopDailyOffer() {
   const item = pool[seed % pool.length];
   return { id:item.id, discount:20, cost:Math.max(1, Math.round(item.cost * .8)) };
 }
+function _weeklyBlueprintOffer() {
+  const week = `${new Date().getFullYear()}-${Math.floor((Date.now() - new Date(new Date().getFullYear(),0,1)) / 604800000)}`;
+  const catalog = (typeof SALA_FURNITURE !== 'undefined' ? SALA_FURNITURE : []).filter(item => !item.legacy && item.price > 0);
+  if (!catalog.length) return null;
+  const seed = Array.from(week).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const furniture = catalog[seed % catalog.length];
+  return { week, furniture, cost:Math.max(250, Math.round(furniture.price * .28)) };
+}
+function _weeklyBlueprintOwned(id) {
+  try { const data = typeof _getWeekData === 'function' ? _getWeekData() : JSON.parse(hero?.week_data || '{}'); return (data.sala_blueprints || []).includes(id); } catch { return false; }
+}
+async function buyWeeklyBlueprint(id, cost) {
+  const offer = _weeklyBlueprintOffer();
+  if (!offer || offer.furniture.id !== id || _weeklyBlueprintOwned(id)) return;
+  if (!spendGold(cost)) return;
+  const data = typeof _getWeekData === 'function' ? _getWeekData() : (() => { try { return JSON.parse(hero.week_data || '{}'); } catch { return {}; } })();
+  data.sala_blueprints = Array.from(new Set([...(data.sala_blueprints || []), id]));
+  hero.week_data = data;
+  await saveHero({ week_data:data });
+  toast('Plano', `Plano de ${offer.furniture.name} adquirido. Ya puedes comprarlo en Sala.`);
+  renderShopItems();
+}
+window.buyWeeklyBlueprint = buyWeeklyBlueprint;
 
 function renderShopItems() {
   const el = document.getElementById('shopItems');
   if (!el) return;
   const gold = getGold();
   const dailyOffer = _shopDailyOffer();
+  const weeklyBlueprint = _weeklyBlueprintOffer();
 
   const cats = [
     { id: 'consumible', label: '⚗️ Consumibles' },
@@ -94,7 +118,7 @@ function renderShopItems() {
     hero?.gold_rush_exp > Date.now() ? '🪙 Oro doble activo' : '',
     hero?.boss_shield ? '🛡️ Escudo de jefe listo' : '',
   ].filter(Boolean);
-  const merchantHeader = `<section class="merchant-ledger"><div><span>GREMIO DE MERCADERES</span><h3>Mercado Arcano</h3><p>${activeBuffs.length ? activeBuffs.join(' · ') : 'Invierte oro en una decisión útil, no en ruido.'}</p></div><div class="merchant-ledger-gold"><b>🪙 ${gold.toLocaleString()}</b><small>oro disponible</small></div></section>`;
+  const merchantHeader = `<section class="merchant-ledger"><div><span>GREMIO DE MERCADERES</span><h3>Mercado Arcano</h3><p>${activeBuffs.length ? activeBuffs.join(' · ') : 'Invierte oro en una decisión útil, no en ruido.'}</p></div><div class="merchant-ledger-gold"><b>🪙 ${gold.toLocaleString()}</b><small>oro disponible</small></div></section>${weeklyBlueprint ? `<section class="weekly-blueprint"><img src="images/${weeklyBlueprint.furniture.img}" alt=""><div><span>PLANO ROTATIVO DE LA SEMANA</span><b>${weeklyBlueprint.furniture.name}</b><small>Desbloquea su compra en tu Sala Personal.</small></div>${_weeklyBlueprintOwned(weeklyBlueprint.furniture.id) ? '<em>Plano adquirido</em>' : `<button onclick="buyWeeklyBlueprint('${weeklyBlueprint.furniture.id}',${weeklyBlueprint.cost})" ${gold < weeklyBlueprint.cost ? 'disabled' : ''}>${weeklyBlueprint.cost.toLocaleString()} oro</button>`}</section>` : ''}`;
 
   if (shopCategory === 'mejoras') { el.innerHTML = merchantHeader + tabs + _renderGoldUpgrades(); return; }
   if (shopCategory === 'marcos')  { el.innerHTML = merchantHeader + tabs + _renderAvatarFrames(); return; }

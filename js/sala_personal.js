@@ -94,6 +94,13 @@ function _starterSala() {
 function _salaOwned(data) {
   return new Set(Array.isArray(data.owned) ? data.owned : (data.placed || []).map(item => item.id));
 }
+function _salaBlueprints() {
+  try {
+    const data = typeof _getWeekData === 'function' ? _getWeekData() : JSON.parse(hero?.week_data || '{}');
+    return new Set(data.sala_blueprints || []);
+  } catch { return new Set(); }
+}
+function hasSalaBlueprint(id) { return id === 'estandarte-arcano' || _salaBlueprints().has(id); }
 
 function renderSalaPersonal() {
   const el = document.getElementById('ctab-sala-personal');
@@ -172,11 +179,12 @@ function renderSalaPersonal() {
         <div class="sala-picker-grid">
           ${visibleFurniture.length ? visibleFurniture.map(f => {
             const isOwned = owned.has(f.id);
+            const hasBlueprint = hasSalaBlueprint(f.id);
             return `<button class="sala-picker-item${_salaSelected === f.id ? ' sala-selected' : ''}${isOwned ? '' : ' sala-locked'}"
                  type="button" onclick="${isOwned ? `salaSelectFurniture('${f.id}')` : `buySalaFurniture('${f.id}')`}" title="${escHtml(f.name)}">
               <img src="images/${escHtml(f.img)}" alt="">
               <span class="sala-picker-label">${escHtml(f.name)}</span>
-              ${isOwned ? '<span class="sala-owned-mark">Propio</span>' : `<span class="sala-price">${f.price.toLocaleString('es-MX')} oro</span>`}
+              ${isOwned ? '<span class="sala-owned-mark">Propio</span>' : hasBlueprint ? `<span class="sala-price">${f.price.toLocaleString('es-MX')} oro</span>` : '<span class="sala-price">Requiere plano</span>'}
             </button>`;
           }).join('') : '<div class="sala-empty-category">Aún no hay objetos en esta categoría.</div>'}
         </div>
@@ -219,6 +227,10 @@ async function buySalaFurniture(id) {
   const furniture = SALA_FURNITURE.find(item => item.id === id && !item.legacy);
   const data = _getSala();
   if (!furniture || _salaOwned(data).has(id)) return salaSelectFurniture(id);
+  if (!hasSalaBlueprint(id)) {
+    if (typeof toast === 'function') toast('Plano', 'Este mueble aún requiere su plano. Revisa el Mercado Arcano semanal.');
+    return;
+  }
   if (typeof spendGold !== 'function' || !spendGold(furniture.price)) {
     if (typeof toast === 'function') toast('✦', `Necesitas ${furniture.price.toLocaleString('es-MX')} oro para ${furniture.name}.`);
     return;
