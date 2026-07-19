@@ -840,8 +840,11 @@
 
 <!-- Edit Quest -->
 <div class="modal-overlay" id="editQuestModal">
-  <div class="modal">
-    <div class="modal-title">✏️ Editar Misión</div>
+  <div class="modal quest-editor-modal">
+    <div class="modal-header">
+      <div class="modal-title">✏️ Editar Misión</div>
+      <button class="modal-close" onclick="closeModal('editQuestModal')" aria-label="Cerrar edición">✕</button>
+    </div>
     <div class="modal-body">
       <input type="hidden" id="editQuestId">
       <div class="form-group">
@@ -883,7 +886,7 @@
         <div style="display:flex;gap:8px;align-items:center">
           <input class="form-input" id="subtaskPrefix" type="text" placeholder="Ej: Dibujo" style="flex:2">
           <input class="form-input" id="subtaskCount" type="number" min="1" max="100" placeholder="20" style="flex:1;min-width:60px">
-          <button class="btn btn-ghost" onclick="generateSubtasks()" type="button" style="white-space:nowrap;flex-shrink:0">+ Generar</button>
+          <button class="btn btn-ghost" onclick="generateSubtasks('editQ')" type="button" style="white-space:nowrap;flex-shrink:0">+ Generar</button>
         </div>
         <div style="font-size:10px;color:var(--text2);margin-top:4px">Genera "Dibujo 1 … Dibujo 20" en las notas. Guarda la misión para activarlas.</div>
       </div>
@@ -930,12 +933,16 @@
         </select>
       </div>
     </div>
-    <div class="modal-footer">
+    <div class="modal-footer quest-modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('editQuestModal')">Cancelar</button>
-      <button class="btn btn-ghost" id="duplicateQuestBtn" title="Duplicar misión">📋 Duplicar</button>
-      <button class="btn btn-ghost" onclick="saveQuestTemplate(document.getElementById('editQuestId').value)" title="Guardar como plantilla">💾 Plantilla</button>
-      <button class="btn btn-danger" id="deleteQuestBtn">Eliminar</button>
-      <button class="btn btn-primary" id="saveQuestBtn">Guardar</button>
+      <div class="quest-modal-actions" id="editQuestActions">
+        <button class="btn btn-ghost" id="duplicateQuestBtn" title="Duplicar misión">📋 Duplicar</button>
+        <button class="btn btn-ghost" onclick="saveQuestTemplate(document.getElementById('editQuestId').value)" title="Guardar como plantilla">💾 Plantilla</button>
+      </div>
+      <div class="quest-modal-actions quest-modal-actions-primary" id="editQuestPrimaryActions">
+        <button class="btn btn-danger" id="deleteQuestBtn">Eliminar</button>
+        <button class="btn btn-primary" id="saveQuestBtn">Guardar cambios</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1072,35 +1079,97 @@
 
 <!-- QUICK ADD MODAL -->
 <div class="modal-overlay" id="quickAddModal">
-  <div class="modal" style="max-width:420px">
+  <div class="modal quest-editor-modal">
     <div class="modal-header">
       <div class="modal-title">⚔️ Nueva Misión</div>
       <button class="modal-close" onclick="closeModal('quickAddModal')">✕</button>
     </div>
-    <div class="modal-body" style="display:flex;flex-direction:column;gap:10px">
-      <input class="form-input" id="qName" placeholder="Nombre de la misión..." type="text" autocomplete="off">
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nombre</label>
+        <input class="form-input" id="qName" placeholder="Nombre de la misión..." type="text" autocomplete="off">
+      </div>
       <div class="form-row">
-        <select class="form-input" id="qType">
+        <div class="form-group">
+          <label class="form-label">Tipo</label>
+          <select class="form-input" id="qType">
           <option value="main">⭐ Principal</option>
           <option value="side">🗡️ Secundaria</option>
           <option value="daily" selected>🌅 Diaria</option>
           <option value="weekly">📅 Semanal</option>
           <option value="habit">⚡ Hábito</option>
-        </select>
-        <select class="form-input" id="qPriority">
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Prioridad</label>
+          <select class="form-input" id="qPriority">
           <option value="mitico">💎 Mítico</option>
           <option value="legendario">🟡 Legendario</option>
           <option value="epico">🟣 Épico</option>
           <option value="normal" selected>🔵 Normal</option>
           <option value="comun">⬜ Común</option>
-        </select>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fecha límite</label>
+        <input class="form-input" type="date" id="qDeadline">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notas / Pergaminos</label>
+        <textarea class="form-input" id="qNotes" rows="3" placeholder="Contexto, pasos o botín esperado..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">⚔️ Generar subtareas en lote</label>
+        <div class="quest-inline-fields">
+          <input class="form-input" id="qSubtaskPrefix" type="text" placeholder="Ej: Dibujo">
+          <input class="form-input" id="qSubtaskCount" type="number" min="1" max="100" placeholder="20">
+          <button class="btn btn-ghost" onclick="generateSubtasks('q')" type="button">+ Generar</button>
+        </div>
+        <div class="form-hint">Las subtareas se añaden a las notas antes de crear la misión.</div>
       </div>
       <div class="form-row">
-        <input class="form-input" type="date" id="qDeadline">
-        <input class="form-input" type="text" id="qNotes" placeholder="Notas rápidas">
+        <div class="form-group">
+          <label class="form-label">Tags (#trabajo)</label>
+          <input class="form-input" id="qTags" type="text" placeholder="#trabajo #salud">
+        </div>
+        <div class="form-group" id="newHabitReminderGroup" style="display:none">
+          <label class="form-label">🔔 Recordatorio</label>
+          <input class="form-input" id="qReminderTime" type="time">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tiempo estimado (min)</label>
+          <input class="form-input" id="qEstTime" type="number" min="5" step="5" placeholder="25">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">🔄 Repetir cada (días)</label>
+          <input class="form-input" id="qRepeat" type="number" min="1" max="365" placeholder="Ej: 3">
+        </div>
+        <div class="form-group">
+          <label class="form-label">📅 Fecha de inicio</label>
+          <input class="form-input" id="qStartDate" type="date">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">🔒 Requiere completar primero</label>
+        <input class="form-input" id="qDependsOn" type="text" placeholder="Nombre exacto de otra misión">
+      </div>
+      <div class="form-group">
+        <label class="form-label">🎯 Vincular a Meta</label>
+        <select class="form-input" id="qGoal"><option value="">Sin meta</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">🗺️ Zona del Dungeon (tag automático)</label>
+        <select class="form-input" id="qZone">
+          <option value="">Auto (por tipo de misión)</option>
+          <option value="estudio">📚 Torre del Saber</option>
+          <option value="ejercicio">🏋️ Fortaleza</option>
+        </select>
       </div>
     </div>
-    <div class="modal-footer">
+    <div class="modal-footer quest-modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('quickAddModal')">Cancelar</button>
       <button class="btn btn-primary" id="addQuestBtn">⚔️ Crear Misión</button>
     </div>

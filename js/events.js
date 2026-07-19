@@ -30,30 +30,69 @@ document.getElementById('historySearch').addEventListener('input', () => {
   _histSearchTimer = setTimeout(() => { historyPage = 1; renderHistory(); }, 200);
 });
 
-document.getElementById('addQuestBtn').addEventListener('click', () => {
-  let name = document.getElementById('qName').value.trim();
+function buildQuestPayload(prefix) {
+  const get = suffix => document.getElementById(prefix + suffix);
+  const nameEl = prefix === 'q' ? get('Name') : get('Name');
+  const typeEl = get('Type');
+  let tags = get('Tags')?.value.trim() || '';
+  const reminder = get('ReminderTime')?.value;
+  if (reminder) {
+    tags = tags.replace(/reminder-\d{1,2}:\d{2}/gi, '').trim();
+    tags = `${tags} reminder-${reminder}`.trim();
+  }
+  const zone = get('Zone')?.value;
+  if (zone) {
+    tags = tags.replace(/\b(estudio|ejercicio)\b/gi, '').replace(/\s+/g, ' ').trim();
+    tags = `${tags} ${zone}`.trim();
+  }
+  return {
+    name: nameEl?.value.trim() || '',
+    type: typeEl?.value || 'daily',
+    priority: get('Priority')?.value || 'normal',
+    deadline: get('Deadline')?.value || null,
+    notes: get('Notes')?.value || null,
+    tags,
+    est_time: get('EstTime')?.value.trim() || '',
+    repeat_days: parseInt(get('Repeat')?.value, 10) || 0,
+    quest_start_date: get('StartDate')?.value || null,
+    depends_on: get('DependsOn')?.value.trim() || null,
+    goal_id: get('Goal')?.value || null,
+    hero_id: hero?.id,
+  };
+}
+
+function syncQuestHabitFields(prefix) {
+  const type = document.getElementById(prefix + 'Type')?.value;
+  const groupId = prefix === 'q' ? 'newHabitReminderGroup' : 'habitReminderGroup';
+  const group = document.getElementById(groupId);
+  if (group) group.style.display = type === 'habit' ? '' : 'none';
+}
+
+document.getElementById('addQuestBtn').addEventListener('click', async () => {
+  const payload = buildQuestPayload('q');
+  let { name, type } = payload;
   if (!name || !hero) { toast('⚠️', 'Escribe el nombre de la misión.'); return; }
-  let type = document.getElementById('qType').value;
   const slashMap = { '/daily':'daily', '/main':'main', '/side':'side', '/weekly':'weekly' };
   for (const [cmd, t] of Object.entries(slashMap)) {
     if (name.toLowerCase().startsWith(cmd + ' ')) { type = t; name = name.slice(cmd.length + 1).trim(); break; }
   }
-  addQuest({
-    name, type,
-    priority: document.getElementById('qPriority').value,
-    deadline: document.getElementById('qDeadline').value || null,
-    notes: document.getElementById('qNotes').value || null,
-    hero_id: hero.id
+  await addQuest({ ...payload, name, type });
+  ['qName','qDeadline','qNotes','qTags','qEstTime','qRepeat','qStartDate','qDependsOn','qReminderTime','qSubtaskPrefix','qSubtaskCount'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
   });
-  document.getElementById('qName').value = '';
-  document.getElementById('qDeadline').value = '';
-  document.getElementById('qNotes').value = '';
+  document.getElementById('qGoal').value = '';
+  document.getElementById('qZone').value = '';
+  document.getElementById('qType').value = 'daily';
+  document.getElementById('qPriority').value = 'normal';
+  syncQuestHabitFields('q');
   closeModal('quickAddModal');
 });
 
 document.getElementById('qName').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('addQuestBtn').click();
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('addQuestBtn').click(); }
 });
+document.getElementById('qType').addEventListener('change', () => syncQuestHabitFields('q'));
+document.getElementById('editQType').addEventListener('change', () => syncQuestHabitFields('editQ'));
 
 document.getElementById('startBtn').addEventListener('click', startTimer);
 document.getElementById('resetBtn').addEventListener('click', resetTimer);

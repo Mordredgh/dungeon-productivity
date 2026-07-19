@@ -57,8 +57,8 @@ async function deleteGoal() {
   toast('🗑️', 'Meta eliminada.');
 }
 
-function populateGoalSelect(selectedId) {
-  const sel = document.getElementById('editQGoal');
+function populateGoalSelect(selectedId, selectId = 'editQGoal') {
+  const sel = document.getElementById(selectId);
   if (!sel) return;
   sel.innerHTML = '<option value="">Sin meta</option>' +
     goals.map(g => `<option value="${g.id}" ${g.id === selectedId ? 'selected' : ''}>${escHtml(g.name)}</option>`).join('');

@@ -1,9 +1,12 @@
 ﻿/* UI */
-function generateSubtasks() {
-  const prefix = (document.getElementById('subtaskPrefix').value.trim()) || 'Ítem';
-  const count  = Math.min(100, Math.max(1, parseInt(document.getElementById('subtaskCount').value) || 0));
+function generateSubtasks(formPrefix = 'editQ') {
+  const isNew = formPrefix === 'q';
+  const prefixInput = document.getElementById(isNew ? 'qSubtaskPrefix' : 'subtaskPrefix');
+  const countInput = document.getElementById(isNew ? 'qSubtaskCount' : 'subtaskCount');
+  const prefix = (prefixInput?.value.trim()) || 'Ítem';
+  const count  = Math.min(100, Math.max(1, parseInt(countInput?.value) || 0));
   if (!count) { toast('⚠️', 'Escribe un número de subtareas'); return; }
-  const notesEl = document.getElementById('editQNotes');
+  const notesEl = document.getElementById(isNew ? 'qNotes' : 'editQNotes');
   const existing = notesEl.value.trimEnd();
   const items = Array.from({ length: count }, (_, i) => `- [ ] ${prefix} ${i + 1}`).join('\n');
   notesEl.value = existing ? existing + '\n' + items : items;
@@ -76,6 +79,10 @@ function setActiveQuest(id) {
 function openModal(id) {
   const el = document.getElementById(id);
   if (!el) return;
+  if (id === 'quickAddModal') {
+    if (typeof populateGoalSelect === 'function') populateGoalSelect('', 'qGoal');
+    if (typeof syncQuestHabitFields === 'function') syncQuestHabitFields('q');
+  }
   el.classList.add('open');
   if (id === 'levelupModal') return; // animLevelUpModal se llama al final de showLevelUp
   if (typeof animModalOpen === 'function') animModalOpen(id);

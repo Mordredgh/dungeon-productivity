@@ -1687,6 +1687,42 @@ img.efx-row-icon { width: 24px; height: 24px; object-fit: contain; }
 
 .modal-footer { display: flex; gap: 8px; margin-top: 22px; justify-content: flex-end; }
 
+/* Formularios de misión: el contenido puede crecer sin perder sus acciones. */
+.quest-editor-modal {
+  max-width: 560px;
+  max-height: min(90vh, 820px);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.quest-editor-modal .modal-header { margin: 0; padding: 24px 28px 16px; flex-shrink: 0; }
+.quest-editor-modal .modal-body { padding: 0 28px 20px; overflow-y: auto; min-height: 0; }
+.quest-modal-footer {
+  margin: 0;
+  padding: 16px 28px 24px;
+  border-top: 1px solid rgba(192,132,252,.18);
+  background: linear-gradient(180deg, rgba(15,15,40,.86), rgba(15,15,40,.98));
+  flex-shrink: 0;
+  align-items: center;
+}
+.quest-modal-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.quest-modal-actions-primary { margin-left: auto; }
+.quest-inline-fields { display: flex; gap: 8px; align-items: center; }
+.quest-inline-fields > :first-child { flex: 2; }
+.quest-inline-fields input[type="number"] { flex: 1; min-width: 64px; }
+.quest-inline-fields .btn { white-space: nowrap; flex-shrink: 0; }
+.form-hint { font-size: 10px; color: var(--text2); margin-top: 4px; }
+@media (max-width: 600px) {
+  .quest-editor-modal .modal-header { padding: 20px 18px 14px; }
+  .quest-editor-modal .modal-body { padding: 0 18px 16px; }
+  .quest-modal-footer { padding: 14px 18px max(18px, env(safe-area-inset-bottom)); flex-wrap: wrap; }
+  .quest-modal-actions { width: 100%; }
+  .quest-modal-actions-primary { margin-left: 0; justify-content: flex-end; }
+  .quest-inline-fields { flex-wrap: wrap; }
+  .quest-inline-fields > :first-child { flex: 1 1 100%; }
+}
+
 .btn { padding: 9px 18px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; transition: var(--transition-spring); border: none; font-weight: 500; }
 
 .btn-primary {
