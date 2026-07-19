@@ -12,6 +12,15 @@ async function loadHero() {
     hero = nh;
   }
   deriveHero();
+  // La curva nueva nunca baja el nivel ya obtenido: ajusta solo el total mínimo
+  // requerido para conservarlo, una vez por héroe y sin columna adicional.
+  const savedLevel = Math.max(1, hero.level || hero._level || 1);
+  const minXPForSavedLevel = xpForLevel(savedLevel - 1);
+  if ((hero.xp_total || 0) < minXPForSavedLevel) {
+    hero.xp_total = minXPForSavedLevel;
+    await db.from('dungeon_heroes').update({ xp_total: minXPForSavedLevel }).eq('id', hero.id);
+    deriveHero();
+  }
   // Init global state from hero record
   heroRace   = hero.race        || 'humano';
   guildName  = hero.guild_name  || '';

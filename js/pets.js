@@ -46,11 +46,14 @@ const _PET_RARITY_XP_MULT = {
 };
 function _petXPForNextLevel(level, def) {
   const mult = def ? (_PET_RARITY_XP_MULT[def.rarity] || 1) : 1;
-  return Math.round((80 + 12 * Math.pow(level, 1.5)) * mult);
+  return Math.round((100 + 15 * Math.pow(level, 1.6)) * mult);
 }
 
-/* XP necesaria para subir de nivel bebé (Nv.1-15, siempre 150) */
-const PET_BABY_XP_PER_LEVEL = 150;
+/* Bebés: curva creciente (antes todos los niveles costaban 150 XP). */
+function petBabyXPForNextLevel(level) {
+  return Math.round(180 + 15 * Math.pow(Math.max(1, level), 1.3));
+}
+const PET_BABY_XP_PER_LEVEL = petBabyXPForNextLevel(1); // compatibilidad para vistas legacy
 
 /* Dar XP a la mascota bebé activa (llamado desde boss defeat y potiones) */
 async function addActivePetXP(xp) {
@@ -65,11 +68,11 @@ async function addActivePetXP(xp) {
   const dungeonPetXP = typeof getDungeonBonus === 'function' ? getDungeonBonus('pet_xp') : 1;
   let newXP  = (active.pet_xp || 0) + Math.round(xp * salaPetXP * gardenPetXP * dungeonPetXP);
   let newLvl = curLvl;
-  while (newLvl < 15 && newXP >= PET_BABY_XP_PER_LEVEL) { newXP -= PET_BABY_XP_PER_LEVEL; newLvl++; }
+  while (newLvl < 15 && newXP >= petBabyXPForNextLevel(newLvl)) { newXP -= petBabyXPForNextLevel(newLvl); newLvl++; }
   await db.from('dungeon_pets').update({ pet_level: newLvl, pet_xp: newXP }).eq('id', active.id);
   active.pet_level = newLvl; active.pet_xp = newXP;
   if (newLvl > curLvl) {
-    const msg = newLvl === 15 ? ' ✨ ¡Lista para evolucionar!' : ` (${newXP}/${PET_BABY_XP_PER_LEVEL} XP)`;
+    const msg = newLvl === 15 ? ' ✨ ¡Lista para evolucionar!' : ` (${newXP}/${petBabyXPForNextLevel(newLvl)} XP)`;
     toast(def.icon, `¡${def.name} subió a Nv.${newLvl}!${msg}`);
   }
   renderActivePet();
@@ -186,13 +189,13 @@ async function feedPet(petId) {
     const xpGain = 50;
     let newXP  = (pet.pet_xp || 0) + xpGain;
     let newLvl = petLvl;
-    while (newLvl < 15 && newXP >= PET_BABY_XP_PER_LEVEL) { newXP -= PET_BABY_XP_PER_LEVEL; newLvl++; }
+    while (newLvl < 15 && newXP >= petBabyXPForNextLevel(newLvl)) { newXP -= petBabyXPForNextLevel(newLvl); newLvl++; }
     await db.from('dungeon_pets').update({ pet_level: newLvl, pet_xp: newXP }).eq('id', petId);
     pet.pet_level = newLvl; pet.pet_xp = newXP;
     if (newLvl > petLvl) {
       toast(def.icon, `¡${def.name} → Nv.${newLvl}!${newLvl === 15 ? ' ✨ ¡Lista para evolucionar!' : ''}`);
     } else {
-      toast('🧪', `+${xpGain} XP → ${def.name} Nv.${newLvl} (${newXP}/${PET_BABY_XP_PER_LEVEL} XP)`);
+      toast('🧪', `+${xpGain} XP → ${def.name} Nv.${newLvl} (${newXP}/${petBabyXPForNextLevel(newLvl)} XP)`);
     }
   } else {
     // Fase evolución: pociones para convertir en Montura
@@ -353,12 +356,13 @@ function renderActivePet() {
             </div>
             ${!isMount ? (() => {
               if (petLvl < 15) {
-                const xpPct = Math.round((petXP / PET_BABY_XP_PER_LEVEL) * 100);
+                const babyNeed = petBabyXPForNextLevel(petLvl);
+                const xpPct = Math.round((petXP / babyNeed) * 100);
                 return `
                 <div class="pet-level-badge">🐣 Nv. ${petLvl} / 15</div>
                 <div class="pet-evo-wrap" style="margin-top:4px">
                   <div class="pet-evo-bar"><div class="pet-evo-fill" style="width:${xpPct}%"></div></div>
-                  <span class="pet-evo-label">${petXP}/${PET_BABY_XP_PER_LEVEL} XP · Pociones +50XP · Jefes +30/100/250</span>
+                  <span class="pet-evo-label">${petXP}/${babyNeed} XP · Pociones +50XP · Jefes +30/100/250</span>
                 </div>
                 <button class="pet-action-btn ${potions>0?'':'pet-btn-disabled'}" style="margin-top:4px"
                   onclick="feedPet('${active.id}')" ${potions>0?'':'disabled'}>🧪 Poción +50 XP (${potions})</button>`;
@@ -580,12 +584,13 @@ function renderPets() {
             const bLvl  = pet.pet_level || 1;
             const bXP   = pet.pet_xp || 0;
             if (bLvl < 15) {
-              const xpPct = Math.round((bXP / PET_BABY_XP_PER_LEVEL) * 100);
+              const babyNeed = petBabyXPForNextLevel(bLvl);
+              const xpPct = Math.round((bXP / babyNeed) * 100);
               return `
               <div class="pet-level-badge">🐣 Nv. ${bLvl} / 15</div>
               <div class="pet-evo-wrap">
                 <div class="pet-evo-bar"><div class="pet-evo-fill" style="width:${xpPct}%"></div></div>
-                <span class="pet-evo-label">${bXP}/${PET_BABY_XP_PER_LEVEL} XP</span>
+                <span class="pet-evo-label">${bXP}/${babyNeed} XP</span>
               </div>
               <button class="pet-action-btn ${potions > 0 ? '' : 'pet-btn-disabled'}"
                 onclick="feedPet('${pet.id}')" ${potions > 0 ? '' : 'disabled'}>

@@ -339,7 +339,7 @@ function _openGardenModal(key) {
   const isMount  = stage === 'mount';
   const petLvl   = pet.pet_level || 1;
   const petXP    = pet.pet_xp    || 0;
-  const xpMax    = isMount ? (typeof _petXPForNextLevel === 'function' ? _petXPForNextLevel(petLvl) : 200) : (typeof PET_BABY_XP_PER_LEVEL !== 'undefined' ? PET_BABY_XP_PER_LEVEL : 150);
+  const xpMax    = isMount ? (typeof _petXPForNextLevel === 'function' ? _petXPForNextLevel(petLvl) : 200) : (typeof petBabyXPForNextLevel === 'function' ? petBabyXPForNextLevel(petLvl) : 200);
   const xpPct    = (isMount && petLvl >= 50) ? 100 : Math.round((petXP / xpMax) * 100);
   const stLabel  = isMount ? '🌟 Montura' : (petLvl >= 15 ? '✨ Nv.15 — Lista!' : '🐣 Bebé');
 

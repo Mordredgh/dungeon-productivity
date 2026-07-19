@@ -182,8 +182,10 @@ const STREAK_REWARD_MILESTONES = [
    La anterior (100 * 1.5^n compuesto) hacía nivel 50 literalmente
    inalcanzable (~12,700 millones de XP acumulada). Esta apunta a
    ~6-9 meses de juego activo consistente para llegar a nivel 50. */
-const LEVEL_FLOOR = 50;
-const LEVEL_QUAD  = 2;
+/* Curva de héroe v2: primeros niveles legibles, nivel medio y alto con peso.
+   Antes: 50 + 2×n². Ahora: 80 + 3.5×n² (~1.6× más XP al inicio y ~1.7× al final). */
+const LEVEL_FLOOR = 80;
+const LEVEL_QUAD  = 3.5;
 const THEMES = ['dark', 'light', 'cyber', 'oled', 'parchment'];
 const THEME_NAMES = { dark: 'Oscuro', light: 'Claro', cyber: 'Cyber', oled: 'OLED', parchment: 'Pergamino' };
 
