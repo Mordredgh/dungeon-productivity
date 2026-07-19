@@ -62,7 +62,8 @@ async function addActivePetXP(xp) {
   if (curLvl >= 15) return;
   const salaPetXP = typeof getSalaBonus === 'function' ? 1 + getSalaBonus('pet_xp') : 1;
   const gardenPetXP = typeof getGardenBonus === 'function' ? 1 + getGardenBonus('pet_xp') : 1;
-  let newXP  = (active.pet_xp || 0) + Math.round(xp * salaPetXP * gardenPetXP);
+  const dungeonPetXP = typeof getDungeonBonus === 'function' ? getDungeonBonus('pet_xp') : 1;
+  let newXP  = (active.pet_xp || 0) + Math.round(xp * salaPetXP * gardenPetXP * dungeonPetXP);
   let newLvl = curLvl;
   while (newLvl < 15 && newXP >= PET_BABY_XP_PER_LEVEL) { newXP -= PET_BABY_XP_PER_LEVEL; newLvl++; }
   await db.from('dungeon_pets').update({ pet_level: newLvl, pet_xp: newXP }).eq('id', active.id);

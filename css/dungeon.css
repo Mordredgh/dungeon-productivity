@@ -3979,6 +3979,7 @@ img.efx-row-icon { width: 24px; height: 24px; object-fit: contain; }
 }
 .dg-week-panel.dg-week-all-ok { border-color:#22c55e; background:color-mix(in srgb,#22c55e 6%,var(--card2)); }
 .dg-week-title { font-size:12px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:.07em; margin-bottom:10px; }
+.dg-title-art,.dg-meter-art { width:16px; height:16px; object-fit:contain; image-rendering:pixelated; vertical-align:middle; margin-right:5px; }
 .dg-week-row   { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
 .dg-week-cond  { display:flex; flex-direction:column; gap:4px; font-size:11px; color:var(--text3); }
 .dg-week-cond.ok  { color:var(--text); }
@@ -4029,11 +4030,17 @@ img.efx-row-icon { width: 24px; height: 24px; object-fit: contain; }
 /* Contenido de la sala */
 .dg-room-body   { padding:16px; position:relative; z-index:2; background:linear-gradient(0deg,rgba(0,0,0,.78) 0%,rgba(0,0,0,.1) 100%); }
 .dg-room-header { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.dg-room-art { width:30px; height:30px; object-fit:cover; object-position:center; border:1px solid color-mix(in srgb,var(--rc) 65%,#fff); border-radius:8px; image-rendering:pixelated; flex-shrink:0; }
+.dg-room-rank,.dg-room-lock { margin-left:auto; color:#f5e9ff; border:1px solid color-mix(in srgb,var(--rc) 65%,#fff); background:rgba(8,5,17,.7); padding:3px 6px; border-radius:999px; font-size:9px; font-weight:800; }
 .dg-room-icon   { font-size:22px; flex-shrink:0; }
 .dg-room-name   { font-family:var(--font-head); font-size:13px; font-weight:700; color:#fff; line-height:1.2; }
 .dg-room-badge  { margin-left:auto; font-size:16px; }
 .dg-room-desc   { font-size:10px; color:rgba(255,255,255,.7); line-height:1.5; margin-bottom:6px; }
 .dg-room-stat   { font-size:10px; color:color-mix(in srgb,var(--rc) 90%,#fff); font-weight:600; }
+.dg-room-perk   { margin-top:5px; font-size:10px; color:#f5e9ff; line-height:1.35; }
+.dg-upgrade-btn { width:100%; margin-top:9px; min-height:29px; border:1px solid color-mix(in srgb,var(--rc) 72%,#fff); border-radius:8px; background:color-mix(in srgb,var(--rc) 20%,rgba(8,5,17,.7)); color:#fff; font:700 10px var(--font-head); cursor:pointer; }
+.dg-upgrade-btn:hover:not(:disabled) { background:color-mix(in srgb,var(--rc) 40%,rgba(8,5,17,.7)); }
+.dg-upgrade-btn:disabled { opacity:.58; cursor:default; }
 .dg-room-enter  { font-size:10px; color:rgba(255,255,255,.45); margin-top:4px; }
 .dg-room-bonus-preview { font-size:10px; color:rgba(255,255,255,.5); margin-top:4px; }
 .dg-room-unlock-req { margin-top:8px; }
@@ -4181,6 +4188,7 @@ img.efx-row-icon { width: 24px; height: 24px; object-fit: contain; }
 }
 .room-unlock-label  { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:color-mix(in srgb,var(--rc) 85%,#fff); margin-bottom:10px; }
 .room-unlock-icon   { font-size:56px; margin-bottom:8px; animation:dg-icon-bounce .6s cubic-bezier(.34,1.56,.64,1) .2s both; }
+.room-unlock-art { width:76px; height:76px; object-fit:cover; border-radius:16px; border:1px solid color-mix(in srgb,var(--rc) 70%,#fff); image-rendering:pixelated; margin-bottom:10px; animation:dg-icon-bounce .6s cubic-bezier(.34,1.56,.64,1) .2s both; }
 @keyframes dg-icon-bounce {
   from { transform:scale(0) rotate(-10deg); } to { transform:scale(1) rotate(0); }
 }

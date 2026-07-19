@@ -102,6 +102,43 @@ function _getUnlockedRooms() {
   return hero.unlocked_rooms || 3;
 }
 
+/* Mejoras persistentes: las salas ya no son puertas decorativas. Cada sala
+   abierta puede evolucionar tres veces usando oro del propio progreso. */
+const ROOM_UPGRADE_COSTS = [120, 280, 520];
+const UPGRADEABLE_ROOMS = new Set(['biblioteca', 'jardin', 'tesoro', 'observatorio', 'arena']);
+function _roomUpgrades() {
+  try { return _getWeekData().room_upgrades || {}; }
+  catch { return {}; }
+}
+function _roomLevel(id) { return Math.min(3, Number(_roomUpgrades()[id] || 0)); }
+function _roomBonusLabel(room, level) {
+  const labels = {
+    biblioteca: `Maná: -${10 + level * 3}% coste`,
+    jardin: `Mascotas: +${5 + level * 2}% XP y hallazgos`,
+    tesoro: `Oro: +${3 + level}% en recompensas`,
+    observatorio: `XP: +${10 + level * 2}% en recompensas`,
+    arena: `Daño al boss: +${15 + level * 4}%`,
+  };
+  return labels[room.id] || (level ? `Sala fortalecida — rango ${level}/3` : 'Sala operativa');
+}
+async function upgradeDungeonRoom(id) {
+  const room = DUNGEON_ROOMS.find(r => r.id === id);
+  if (!room || !hero || !UPGRADEABLE_ROOMS.has(id) || room.sala > _getUnlockedRooms()) return;
+  const upgrades = _roomUpgrades();
+  const level = _roomLevel(id);
+  if (level >= 3) { toast('Sala', `${room.name} ya alcanzó su máximo rango.`); return; }
+  const cost = ROOM_UPGRADE_COSTS[level];
+  if (typeof spendGold !== 'function' || !spendGold(cost)) return;
+  upgrades[id] = level + 1;
+  const weekData = _getWeekData();
+  weekData.room_upgrades = upgrades;
+  hero.week_data = weekData;
+  await saveHero({ week_data: weekData });
+  toast('Sala', `${room.name} mejoró a rango ${level + 1}. ${_roomBonusLabel(room, level + 1)}`);
+  renderDungeonGrows();
+}
+window.upgradeDungeonRoom = upgradeDungeonRoom;
+
 /* ── Tracking semanal ────────────────────────────────────── */
 function trackWeekQuest() {
   if (!hero) return;
@@ -157,7 +194,7 @@ async function checkWeeklyDungeonProgress() {
   }
 
   /* Reiniciar semana */
-  const freshWD = { key:now, quests:0, xp:0, streak_ok:true };
+  const freshWD = { key:now, quests:0, xp:0, streak_ok:true, room_upgrades: wd.room_upgrades || {} };
 
   const patch = { week_data: freshWD };
   if (success) patch.productive_weeks = newWeeks;
@@ -207,11 +244,11 @@ function _showRoomUnlockModal(room, cb) {
     <div class="room-unlock-card" style="--rc:${room.color}">
       <div class="room-unlock-bg" style="background-image:url('images/dungeon_sala${room.sala}.webp')"></div>
       <div class="room-unlock-content">
-        <div class="room-unlock-label">✨ ¡Nueva Sala Descubierta!</div>
-        <div class="room-unlock-icon">${room.icon}</div>
+        <div class="room-unlock-label">Nueva sala descubierta</div>
+        <img class="room-unlock-art" src="images/dungeon_sala${room.sala}.webp" alt="">
         <div class="room-unlock-name">${room.name}</div>
         <div class="room-unlock-flavor">${room.flavor}</div>
-        ${room.bonus ? `<div class="room-unlock-bonus">${room.bonus.icon} ${room.bonus.label}</div>` : ''}
+        ${room.bonus ? `<div class="room-unlock-bonus">${_roomBonusLabel(room, 0)}</div>` : ''}
         <button class="btn room-unlock-btn" onclick="document.getElementById('roomUnlockModal').remove();const _fn=window._dungeonRoomDismiss;window._dungeonRoomDismiss=null;if(_fn)_fn();">
           ¡Explorar!
         </button>
@@ -224,13 +261,14 @@ function _showRoomUnlockModal(room, cb) {
 /* ── getDungeonBonus (mismas keys, ahora por salas) ─────── */
 function getDungeonBonus(type) {
   const rooms = _getUnlockedRooms();
+  const upgrades = _roomUpgrades();
   switch (type) {
-    case 'xp':       return rooms >= 7 ? 1.10 : 1;   // Observatorio
-    case 'mana':     return rooms >= 4 ? 0.90 : 1;   // Biblioteca: -10% coste maná
-    case 'gold':     return rooms >= 6 ? 1.03 : 1;   // Cámara del Tesoro
-    case 'pet_xp':   return rooms >= 5 ? 1.05 : 1;   // Jardín Secreto
-    case 'drop_rate':return rooms >= 5 ? 1.05 : 1;   // Jardín Secreto
-    case 'boss_dmg': return rooms >= 8 ? 1.15 : 1;   // Arena del Boss
+    case 'xp':       return rooms >= 7 ? 1.10 + .02 * (upgrades.observatorio || 0) : 1;
+    case 'mana':     return rooms >= 4 ? .90 - .03 * (upgrades.biblioteca || 0) : 1;
+    case 'gold':     return rooms >= 6 ? 1.03 + .01 * (upgrades.tesoro || 0) : 1;
+    case 'pet_xp':   return rooms >= 5 ? 1.05 + .02 * (upgrades.jardin || 0) : 1;
+    case 'drop_rate':return rooms >= 5 ? 1.05 + .02 * (upgrades.jardin || 0) : 1;
+    case 'boss_dmg': return rooms >= 8 ? 1.15 + .04 * (upgrades.arena || 0) : 1;
     default:         return 1;
   }
 }
@@ -275,27 +313,27 @@ function _renderWeekProgress(q, xp, streak, unlocked, weeks, nextRoom, weeksLeft
   const allOk = qOk && xpOk && streak;
   return `
     <div class="dg-week-panel ${allOk ? 'dg-week-all-ok' : ''}">
-      <div class="dg-week-title">📅 Semana actual${allOk ? ' ✅ ¡Semana productiva!' : ''}</div>
+      <div class="dg-week-title"><img class="dg-title-art" src="images/nav_dungeon.webp" alt="">Semana actual${allOk ? ' · Semana productiva' : ''}</div>
       <div class="dg-week-row">
         <div class="dg-week-cond ${qOk?'ok':''}">
-          <span>${qOk?'✅':'⬜'} Misiones</span>
+          <span><img class="dg-meter-art" src="images/stat_missions.webp" alt="">Misiones</span>
           <div class="dg-week-bar"><div class="dg-week-fill" style="width:${qPct}%"></div></div>
           <span>${q}/${WEEK_REQ.quests}</span>
         </div>
         <div class="dg-week-cond ${xpOk?'ok':''}">
-          <span>${xpOk?'✅':'⬜'} XP</span>
+          <span><img class="dg-meter-art" src="images/stat_xp.webp" alt="">XP</span>
           <div class="dg-week-bar"><div class="dg-week-fill" style="width:${xpPct}%"></div></div>
           <span>${xp}/${WEEK_REQ.xp}</span>
         </div>
         <div class="dg-week-cond ${streak?'ok':'fail'}">
-          <span>${streak?'✅':'❌'} Racha</span>
+          <span><img class="dg-meter-art" src="images/stat_streak.webp" alt="">Racha</span>
           <div class="dg-week-bar"><div class="dg-week-fill" style="width:${streak?100:0}%"></div></div>
           <span>${streak?'Intacta':'Rota'}</span>
         </div>
       </div>
       <div class="dg-week-footer">
-        <span>🏰 Semanas productivas: <strong>${weeks}</strong></span>
-        ${nextRoom ? `<span style="color:var(--text3)">Siguiente: ${nextRoom.icon} ${nextRoom.name} en ${weeksLeft === 0 ? 'esta semana' : weeksLeft + ' semana' + (weeksLeft > 1 ? 's' : '')}</span>` : '<span style="color:#fbbf24">🌟 ¡Todo desbloqueado!</span>'}
+        <span>Semanas productivas: <strong>${weeks}</strong></span>
+        ${nextRoom ? `<span style="color:var(--text3)">Siguiente: ${nextRoom.name} en ${weeksLeft === 0 ? 'esta semana' : weeksLeft + ' semana' + (weeksLeft > 1 ? 's' : '')}</span>` : '<span style="color:#fbbf24">Todo desbloqueado</span>'}
       </div>
     </div>`;
 }
@@ -306,6 +344,9 @@ function _renderRoom(r, isOpen) {
 
   const statText = isOpen && typeof hero !== 'undefined' ? r.stat(hero) : '';
   const ambientEl = _ambientHTML(r.ambient, isOpen);
+  const canUpgrade = UPGRADEABLE_ROOMS.has(r.id);
+  const level = canUpgrade ? _roomLevel(r.id) : 0;
+  const upgradeCost = level < 3 ? ROOM_UPGRADE_COSTS[level] : 0;
 
   if (isOpen) {
     return `
@@ -316,12 +357,14 @@ function _renderRoom(r, isOpen) {
         ${ambientEl}
         <div class="dg-room-body">
           <div class="dg-room-header">
-            <span class="dg-room-icon">${r.icon}</span>
+            <img class="dg-room-art" src="images/dungeon_sala${r.sala}.webp" alt="">
             <span class="dg-room-name">${r.name}</span>
-            ${r.bonus ? `<span class="dg-room-badge" title="${r.bonus.label}">${r.bonus.icon}</span>` : ''}
+            <span class="dg-room-rank">${canUpgrade ? `Rango ${level}/3` : 'Sala base'}</span>
           </div>
           <div class="dg-room-desc">${r.desc}</div>
           <div class="dg-room-stat">${statText}</div>
+          <div class="dg-room-perk">${_roomBonusLabel(r, level)}</div>
+          ${canUpgrade ? `<button class="dg-upgrade-btn" onclick="event.stopPropagation();upgradeDungeonRoom('${r.id}')" ${level >= 3 ? 'disabled' : ''}>${level >= 3 ? 'Rango máximo' : `Fortalecer · ${upgradeCost} oro`}</button>` : ''}
         </div>
         ${r.link ? `<div class="dg-room-enter">Entrar →</div>` : ''}
       </div>`;
@@ -337,7 +380,7 @@ function _renderRoom(r, isOpen) {
       <div class="dg-room-locked-bg" style="background-image:url('images/dungeon_sala${r.sala}.webp')"></div>
       <div class="dg-room-body">
         <div class="dg-room-header">
-          <span class="dg-room-icon">🔒</span>
+          <span class="dg-room-lock">Sellada</span>
           <span class="dg-room-name">${r.name}</span>
         </div>
         <div class="dg-room-desc" style="opacity:.6">${r.flavor}</div>
@@ -347,8 +390,8 @@ function _renderRoom(r, isOpen) {
               <div class="dg-week-fill" style="width:${pct}%;background:${r.color}"></div>
             </div>
             <div style="font-size:10px;color:var(--text3);margin-top:4px">${weeks}/${reqWeeks} semanas productivas</div>
-          </div>` : `<div class="dg-room-stat" style="opacity:.5">🔒 ${reqWeeks} semanas productivas</div>`}
-        ${r.bonus ? `<div class="dg-room-bonus-preview" style="opacity:.5">${r.bonus.icon} Al desbloquear: ${r.bonus.label}</div>` : ''}
+          </div>` : `<div class="dg-room-stat" style="opacity:.5">${reqWeeks} semanas productivas</div>`}
+        ${r.bonus ? `<div class="dg-room-bonus-preview" style="opacity:.5">Al desbloquear: ${_roomBonusLabel(r, 0)}</div>` : ''}
       </div>
     </div>`;
 }

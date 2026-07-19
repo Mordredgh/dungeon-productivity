@@ -241,7 +241,8 @@ function _damageBossCycle(cycle, baseDmg) {
   const weather  = typeof getTodayWeather === 'function' ? getTodayWeather() : '';
   const petMult  = typeof getPetEffect    === 'function' ? (getPetEffect('boss_dmg')   || 1) : 1;
   const runeMult = typeof getRuneBonus    === 'function' ? (1 + getRuneBonus('boss_dmg'))     : 1;
-  const finalDmg = Math.max(1, Math.round((weather === 'storm' ? baseDmg * 2 : baseDmg) * petMult * runeMult));
+  const dungeonMult = typeof getDungeonBonus === 'function' ? getDungeonBonus('boss_dmg') : 1;
+  const finalDmg = Math.max(1, Math.round((weather === 'storm' ? baseDmg * 2 : baseDmg) * petMult * runeMult * dungeonMult));
 
   b.hp = Math.max(0, b.hp - finalDmg);
 
