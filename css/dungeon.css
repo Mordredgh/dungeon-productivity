@@ -49,8 +49,9 @@
   --border: rgba(137,180,250,.1);
   --border2: rgba(203,166,247,.45);
   --text: #cdd6f4;
-  --text2: #7f849c;
-  --text3: #45475a;
+  /* Texto auxiliar con contraste real sobre fondos oscuros. */
+  --text2: #b2b8d0;
+  --text3: #858da9;
   --accent: #89b4fa;
   --accent2: #cba6f7;
   --gold: #f9e2af;
@@ -598,12 +599,12 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 
 .sidebar-item {
-  height: 48px;
-  padding: 5px 2px 4px;
+  height: 52px;
+  padding: 6px 2px 5px;
   border-radius: 8px;
   background: transparent;
   border: 1px solid transparent;
-  color: var(--text3);
+  color: #9aa3c0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -614,22 +615,24 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   position: relative;
   z-index: 1;
 }
-.sidebar-item:hover  { background: rgba(137,180,250,.08); color: var(--text2); z-index: 5; }
+.sidebar-item:hover  { background: rgba(137,180,250,.12); color: #e3e8ff; z-index: 5; }
 .sidebar-item.active {
-  background: rgba(137,180,250,.14);
-  border-color: rgba(137,180,250,.22);
-  color: var(--accent);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  background: linear-gradient(145deg, rgba(126,66,183,.38), rgba(72,35,112,.22));
+  border-color: rgba(216,180,254,.66);
+  color: #f2e6ff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 0 13px rgba(168,85,247,.18);
 }
 
 /* Inline label below icon — uses data-label attribute */
 .sidebar-item::after {
   content: attr(data-label);
   display: block;
-  font-size: 8px;
+  font-size: 9px;
   font-family: var(--font-body);
   color: currentColor;
-  opacity: 0.7;
+  opacity: .96;
+  font-weight: 600;
+  letter-spacing: .01em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -650,7 +653,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 .sb-actions-label {
   font-size: 9px;
-  color: var(--text3);
+  color: #aeb6d2;
   text-transform: uppercase;
   letter-spacing: .1em;
   padding-bottom: 8px;
