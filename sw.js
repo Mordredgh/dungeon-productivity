@@ -1,4 +1,4 @@
-const CACHE = 'dungeon-v253';
+const CACHE = 'dungeon-v254';
 const ASSETS = [
   '/',
   '/index.html',
@@ -321,7 +321,7 @@ const ASSETS = [
   '/images/logro_rico-poder.webp',
   '/images/logro_semana-epica.webp',
   '/images/logro_senor-caos.webp',
-  '/images/logro_seÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±or-tiempo.webp',
+  '/images/logro_seÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±or-tiempo.webp',
   '/images/logro_tesoro-arcano.webp',
   '/images/logro_tiempo-infinito.webp',
   '/images/logro_triple-amenaza.webp',
@@ -397,10 +397,15 @@ const ASSETS = [
   '/images/tool_slots.webp',
   '/images/tool_timer.webp',
 ];
+/* La primera visita no debe descargar cientos de sprites que aÃºn no se ven.
+   El arte se guarda en cachÃ© bajo demanda durante la navegaciÃ³n. */
+const CORE_ASSETS = ASSETS.filter(url => !url.startsWith('/images/') && url !== '/js/adventure_cycle.js');
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
+    caches.open(CACHE)
+      .then(c => Promise.all(CORE_ASSETS.map(url => c.add(url).catch(() => null))))
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -439,7 +444,7 @@ self.addEventListener('notificationclick', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) return;
   if (e.request.url.includes('supabase.co')) return;
-  // HTML: network-first para siempre tener la versiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡s reciente
+  // HTML: network-first para siempre tener la versiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡s reciente
   if (e.request.headers.get('accept')?.includes('text/html')) {
     e.respondWith(
       fetch(e.request).catch(() => caches.match(e.request))
@@ -447,6 +452,14 @@ self.addEventListener('fetch', e => {
     return;
   }
   e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).then(response => {
+        if (!response || !response.ok) return response;
+        const copy = response.clone();
+        caches.open(CACHE).then(cache => cache.put(e.request, copy)).catch(() => null);
+        return response;
+      });
+    })
   );
 });

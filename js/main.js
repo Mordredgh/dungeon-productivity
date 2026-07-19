@@ -14,6 +14,7 @@ async function _bootGuard(label, action) {
 })();
 
 async function bootApp() {
+  if (typeof initPerformanceUX === 'function') initPerformanceUX();
   const savedTheme = localStorage.getItem('dungeon-theme');
   if (savedTheme) document.documentElement.dataset.theme = savedTheme;
   updateTimerUI();
@@ -77,5 +78,4 @@ async function bootApp() {
   if (typeof checkSecretForgeQueue === 'function') await checkSecretForgeQueue();
   if (typeof animBootSequence === 'function') animBootSequence();
   if (typeof showOnboardingIfNeeded === 'function') showOnboardingIfNeeded();
-  if (typeof initPerformanceUX === 'function') initPerformanceUX();
 }

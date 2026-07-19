@@ -120,6 +120,7 @@ function initDotField() {
   let lt = 0;
   (function draw(ts) {
     requestAnimationFrame(draw);
+    if (document.hidden || document.documentElement.classList.contains('performance-lite')) return;
     if (ts - lt < 33) return;
     lt = ts;
     ctx.clearRect(0, 0, W, H);

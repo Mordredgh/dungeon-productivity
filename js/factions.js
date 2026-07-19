@@ -52,6 +52,24 @@ function _factionClaims() {
   try { return JSON.parse(hero?.faction_claims || '[]'); } catch { return []; }
 }
 
+let _legacyFactionCleanupStarted = false;
+async function retireLegacyFactionSeries() {
+  if (_legacyFactionCleanupStarted || !hero) return;
+  _legacyFactionCleanupStarted = true;
+  const legacy = quests.filter(q => !q.done && (q.tags || '').includes('#faccion') && (q.notes || '').includes('serie exclusiva'));
+  if (!legacy.length) return;
+  const ids = legacy.map(q => q.id);
+  const { error } = await db.from('dungeon_quests').delete().in('id', ids).eq('hero_id', hero.id);
+  if (error) { _legacyFactionCleanupStarted = false; return; }
+  quests = quests.filter(q => !ids.includes(q.id));
+  const cleanedClaims = _factionClaims().filter(claim => !(claim.questIds || []).some(id => ids.includes(id)));
+  hero.faction_claims = JSON.stringify(cleanedClaims);
+  await saveHero({ faction_claims: hero.faction_claims });
+  toast('faction', `${ids.length} misión${ids.length === 1 ? '' : 'es'} automática${ids.length === 1 ? '' : 's'} de facción retirada${ids.length === 1 ? '' : 's'}.`);
+  renderQuestList();
+}
+window.retireLegacyFactionSeries = retireLegacyFactionSeries;
+
 function _factionLatestClaim(factionId, claims) {
   const own = claims.filter(c => c.id === factionId);
   return own.length ? own[own.length - 1] : null;
@@ -76,30 +94,13 @@ async function claimFactionExclusive(factionId) {
     }
   }
 
-  const pool  = [...def.exclusive.stepsPool];
-  const steps = [];
-  for (let i = 0; i < 3 && pool.length; i++) {
-    steps.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
-  }
-
-  const questIds = [];
-  for (const step of steps) {
-    const { data } = await db.from('dungeon_quests').insert({
-      hero_id: hero.id,
-      name: step,
-      type: def.type,
-      tags: '#faccion',
-      notes: `Misión de la serie exclusiva de ${def.name}.`,
-      priority: 'epico',
-    }).select().single();
-    if (data) { quests.push(data); questIds.push(data.id); }
-  }
-
-  claims.push({ id: factionId, questIds, done: false, doneAt: null });
+  /* Contrato real: cuenta tres misiones existentes del jugador. Nunca crea
+     tareas artificiales ni decide qué debe hacer el héroe. */
+  const completedAtStart = quests.filter(q => q.done && q.type === def.type).length;
+  claims.push({ id: factionId, completedAtStart, goal: 3, contract: true, done: false, doneAt: null });
   hero.faction_claims = JSON.stringify(claims);
   await saveHero({ faction_claims: hero.faction_claims });
-  toast(def.icon, `¡3 misiones de ${def.name} desbloqueadas! Complétalas para el bono final.`);
-  renderQuestList();
+  toast(def.icon, `Contrato de ${def.name} activo: completa 3 misiones reales de tu lista para el bono final.`);
   renderFactions();
 }
 
@@ -107,12 +108,14 @@ async function claimFactionExclusive(factionId) {
 async function checkFactionExclusiveProgress(questId) {
   if (!hero) return;
   const claims = _factionClaims();
-  const entry = claims.find(c => !c.done && c.questIds && c.questIds.includes(questId));
+  const entry = claims.find(c => !c.done && (c.contract || (c.questIds && c.questIds.includes(questId))));
   if (!entry) return;
-  const allDone = entry.questIds.every(qid => quests.find(q => q.id === qid && q.done));
-  if (!allDone) return;
-
   const def = FACTION_DEFS.find(f => f.id === entry.id);
+  if (!def) return;
+  const allDone = entry.contract
+    ? quests.filter(q => q.done && q.type === def.type).length - (entry.completedAtStart || 0) >= (entry.goal || 3)
+    : entry.questIds.every(qid => quests.find(q => q.id === qid && q.done));
+  if (!allDone) return;
   entry.done = true;
   entry.doneAt = Date.now();
   hero.faction_claims = JSON.stringify(claims);
@@ -182,14 +185,15 @@ function _factionCardEl(def, claims) {
   const canClaim = isMax && !inProgress && !onCooldown;
   btn.disabled = !canClaim;
   if (inProgress) {
-    btn.textContent = '⏳ Serie en progreso — revisa tus misiones';
+    const realProgress = latest.contract ? Math.max(0, quests.filter(q => q.done && q.type === def.type).length - (latest.completedAtStart || 0)) : 0;
+    btn.textContent = latest.contract ? `Contrato activo — ${Math.min(latest.goal || 3, realProgress)}/${latest.goal || 3} misiones reales` : 'Contrato heredado en progreso';
   } else if (onCooldown) {
     const daysLeft = Math.ceil((FACTION_RECLAIM_COOLDOWN_MS - (Date.now() - latest.doneAt)) / 86400000);
-    btn.textContent = `✅ Completada — nueva serie en ${daysLeft}d`;
+    btn.textContent = `Completado — nuevo contrato en ${daysLeft}d`;
   } else if (isMax) {
-    btn.textContent = latest ? '🎁 Reclamar nueva serie' : '🎁 Reclamar serie de misiones';
+    btn.textContent = latest ? 'Activar nuevo contrato' : 'Activar contrato de campaña';
   } else {
-    btn.textContent = '🔒 Rango máximo para desbloquear';
+    btn.textContent = 'Requiere rango máximo';
   }
   btn.addEventListener('click', () => claimFactionExclusive(def.id));
 
@@ -205,6 +209,7 @@ function _factionCardEl(def, claims) {
 function renderFactions() {
   const el = document.getElementById('factionsView');
   if (!el || !hero) return;
+  retireLegacyFactionSeries();
   const claims = _factionClaims();
   el.textContent = '';
   const grid = document.createElement('div');

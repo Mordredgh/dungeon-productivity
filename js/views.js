@@ -210,14 +210,15 @@ function _updateDailyRing() {
 }
 
 const QUEST_ART = { main:'quest_main', side:'quest_side', daily:'quest_daily', weekly:'quest_weekly', epic:'quest_epic', search:'quest_search', chronicle:'quest_chronicle' };
-function _questArt(type, fallback = '✦') {
+function _questArt(type) {
   const image = QUEST_ART[type] || QUEST_ART.side;
-  return `<img class="quest-art" src="images/${image}.webp" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none">${fallback}</span>`;
+  return `<img class="quest-art" src="images/${image}.webp" alt="">`;
 }
 
 function renderQuestList() {
   const el = document.getElementById('questList');
   if (!el) return;
+  if (typeof retireLegacyFactionSeries === 'function') retireLegacyFactionSeries();
 
   const search = (document.getElementById('searchBox').value || '').toLowerCase();
   const today  = new Date().toISOString().split('T')[0];
@@ -301,10 +302,10 @@ function renderQuestList() {
   // Group pending by type with separators
   const typeOrder = ['mitico', 'main', 'weekly', 'side', 'daily'];
   const typeLabelsGroup = { mitico:'Míticas', main:'Misiones Épicas', weekly:'Crónicas Semanales', side:'Encargos', daily:'Búsquedas Diarias' };
-  let html = typeof renderAdventureCycle === 'function' ? renderAdventureCycle() : '';
+  let html = '';
 
   if (pinned.length) {
-    html += `<div class="type-separator">📌 Ancladas<span>${pinned.length}</span></div>`;
+    html += `<div class="type-separator">Ancladas<span>${pinned.length}</span></div>`;
     html += pinned.map(q => renderQuestItem(q, blockedIds.has(q.id))).join('');
   }
 
@@ -320,7 +321,7 @@ function renderQuestList() {
     // Hábitos al final
     const habits = quests.filter(q => q.type === 'habit');
     if (habits.length && typeof renderHabitItem === 'function') {
-      html += `<div class="type-separator">⚡ Hábitos<span>${habits.filter(h=>!h.done).length}</span></div>`;
+      html += `<div class="type-separator">Hábitos<span>${habits.filter(h=>!h.done).length}</span></div>`;
       html += habits.map(q => renderHabitItem(q)).join('');
     }
   } else {
