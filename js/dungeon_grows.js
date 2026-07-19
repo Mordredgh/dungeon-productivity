@@ -286,7 +286,7 @@ function getActiveDungeonEffects() {
   };
   addRoom('observatorio', 'xp', 'stat_xp.webp', 'Conocimiento del Observatorio', 'XP de recompensas');
   addRoom('tesoro', 'gold', 'stat_gold.webp', 'Cámara del Tesoro', 'Oro de recompensas');
-  addRoom('jardin', 'pet_xp', 'nav_mascotas.webp', 'Jardín fortalecido', 'XP de mascotas');
+  addRoom('jardin', 'pet_xp', 'nav_mascotas.webp', 'Jardín fortalecido', 'XP de mascotas y botín');
   addRoom('arena', 'boss_dmg', 'dungeon_sala8.webp', 'Arena del Boss', 'Daño a jefes');
   addRoom('biblioteca', 'mana', 'dungeon_sala4.webp', 'Biblioteca Arcana', 'Coste de maná');
 

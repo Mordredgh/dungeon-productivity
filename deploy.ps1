@@ -4,6 +4,14 @@ $COOLIFY_URL = "http://195.26.247.101:8000"
 $APP_UUID    = "c55fjfme7f49eeob1surogue"
 $TOKEN       = $env:COOLIFY_DUNGEON_TOKEN
 
+function Write-GzipCopy([string]$Path) {
+    $source = [System.IO.File]::OpenRead($Path)
+    $target = [System.IO.File]::Create("$Path.gz")
+    $gzip = [System.IO.Compression.GzipStream]::new($target, [System.IO.Compression.CompressionLevel]::Optimal)
+    try { $source.CopyTo($gzip) }
+    finally { $gzip.Dispose(); $target.Dispose(); $source.Dispose() }
+}
+
 if (-not $TOKEN) {
     Write-Error "Falta COOLIFY_DUNGEON_TOKEN. Corre: [System.Environment]::SetEnvironmentVariable('COOLIFY_DUNGEON_TOKEN','<token>','User')"
     exit 1
@@ -18,6 +26,13 @@ if ($sw -match "dungeon-v(\d+)") {
     $sw = $sw -replace "dungeon-v$old", "dungeon-v$new"
     [System.IO.File]::WriteAllText($swPath, $sw, $utf8NoBom)
     Write-Host "SW: v$old -> v$new"
+}
+
+# 1.5 Precomprimir texto actual. nginx sirve estos .gz cuando el navegador
+# acepta gzip, evitando compresión costosa por solicitud y archivos desfasados.
+@("index.html") + @(Get-ChildItem (Join-Path $PSScriptRoot "css") -Filter *.css | ForEach-Object FullName) + @(Get-ChildItem (Join-Path $PSScriptRoot "js") -Filter *.js | ForEach-Object FullName) | ForEach-Object {
+    $path = if ([System.IO.Path]::IsPathRooted($_)) { $_ } else { Join-Path $PSScriptRoot $_ }
+    Write-GzipCopy $path
 }
 
 # 2. Git add / commit / push

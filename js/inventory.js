@@ -53,8 +53,10 @@ function rollLoot(priority) {
   const upgradeDropMult = typeof hasGoldUpgrade === 'function' && hasGoldUpgrade('drop_rate') ? 1.05 : 1;
   const masteryDropMult = typeof getMasteryBonus === 'function' ? 1 + getMasteryBonus('suerte') : 1;
   const salaDropMult = typeof getSalaBonus === 'function' ? 1 + getSalaBonus('drop_rate') : 1;
+  const dungeonDropMult = typeof getDungeonBonus === 'function' ? getDungeonBonus('drop_rate') : 1;
+  const petSpecDropMult = typeof getActivePetSpecializationBonus === 'function' ? 1 + getActivePetSpecializationBonus('drop_rate') : 1;
   const salaFragment = typeof getSalaBonus === 'function' ? getSalaBonus('spell_frag') : 0;
-  const fragQty = Math.round((Math.floor(Math.random() * (table.max - table.min + 1)) + table.min + lckBonus) * runeDropMult * upgradeDropMult * masteryDropMult * salaDropMult) + salaFragment;
+  const fragQty = Math.round((Math.floor(Math.random() * (table.max - table.min + 1)) + table.min + lckBonus) * runeDropMult * upgradeDropMult * masteryDropMult * salaDropMult * dungeonDropMult * petSpecDropMult) + salaFragment;
   const potQty  = Math.max(1, Math.ceil(fragQty / 2));
 
   const fragKey = SPELL_FRAGMENT_KEYS[Math.floor(Math.random() * SPELL_FRAGMENT_KEYS.length)];

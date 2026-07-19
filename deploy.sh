@@ -11,7 +11,7 @@ APP_UUID="c55fjfme7f49eeob1surogue"
 TOKEN="${COOLIFY_DUNGEON_TOKEN:-}"
 
 # 1. Leer versión actual del SW
-OLD_VER=$(sed -n "1s/.*dungeon-v\([0-9]\+\).*/\1/p" sw.js)
+OLD_VER=$(grep -oE 'dungeon-v[0-9]+' sw.js | head -n 1 | sed 's/dungeon-v//')
 if [ -z "$OLD_VER" ]; then
   echo "❌ No se pudo leer la versión de sw.js"
   exit 1
@@ -23,6 +23,9 @@ echo "📦 Bumping v${OLD_VER} → v${NEW_VER}"
 # precachea el catálogo completo porque degrada la primera carga.
 sed -i "s/dungeon-v${OLD_VER}/dungeon-v${NEW_VER}/" sw.js
 echo "   Cache del Service Worker → v${NEW_VER}"
+
+# Mantener las variantes gzip alineadas con el código que se publica.
+gzip -9 -kf index.html css/*.css js/*.js
 
 # 3. Commit & push
 if [ -z "$MSG" ]; then
