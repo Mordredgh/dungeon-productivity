@@ -24,6 +24,7 @@ const RUNE_DEFS = {
 const RUNE_SOCKET_COUNT = { comun:0, raro:1, epico:2, legendario:3, mitico:3 };
 
 let runes = [];
+let _rnsSelectedRuneId = null;
 
 async function loadRunes() {
   const { data } = await db.from('dungeon_runes').select('*').eq('hero_id', hero.id);
@@ -85,6 +86,7 @@ async function socketRune(runeId, weaponId) {
   await db.from('dungeon_runes').update({ weapon_id: weaponId }).eq('id', runeId);
   weapon.rune_slots = JSON.stringify(slots);
   rune.weapon_id    = weaponId;
+  _rnsSelectedRuneId = null;
 
   const def = RUNE_DEFS[rune.rune_type] || {};
   toast(def.icon || '💎', `${def.name} engastada en ${weapon.name}.`);
@@ -197,15 +199,41 @@ function renderRunePanel() {
     </div>`;
 }
 
+function selectRuneForSocket(runeId) {
+  const isLoose = runes.some(rune => rune.id === runeId && !rune.weapon_id);
+  _rnsSelectedRuneId = isLoose && _rnsSelectedRuneId !== runeId ? runeId : null;
+  renderRunePanel();
+}
+
 function renderRuneSanctum(el) {
   const equipped = (typeof weapons === 'undefined' ? [] : weapons).filter(weapon => weapon.is_equipped);
+  const compatible = equipped.filter(weapon => (RUNE_SOCKET_COUNT[weapon.tier] || 0) > 0);
+  const locked = equipped.filter(weapon => !compatible.includes(weapon));
   const loose = runes.filter(rune => !rune.weapon_id);
+  const selected = loose.find(rune => rune.id === _rnsSelectedRuneId) || null;
+  if (!selected) _rnsSelectedRuneId = null;
+
+  const runeArt = (def, className = 'rns-rune-art') => `<img class="${className}" src="images/${escHtml(def.img)}.webp" alt="${escHtml(def.name)}" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'">`;
+  const weaponArt = weapon => `<img class="rns-weapon-art" src="images/arma_${escHtml(weapon.weapon_key)}_${escHtml(weapon.tier)}.webp" alt="" loading="lazy" decoding="async" onerror="this.style.visibility='hidden'">`;
   const weaponPanel = weapon => {
     const tier = WEAPON_TIERS[weapon.tier] || { color:'#94a3b8', label:weapon.tier };
     const max = RUNE_SOCKET_COUNT[weapon.tier] || 0;
     const slots = (() => { try { return JSON.parse(weapon.rune_slots || '[]'); } catch { return []; } })();
-    return `<article class="rns-weapon" style="--rns:${tier.color}"><div class="rns-weapon-head"><span>⚔️</span><div><b>${escHtml(weapon.name)}</b><small>${tier.label} · ${slots.length}/${max} engastes</small></div></div><div class="rns-sockets">${max ? Array.from({length:max}, (_, index) => { const rune = runes.find(item => item.id === slots[index]); const def = rune && RUNE_DEFS[rune.rune_type]; return rune ? `<button class="rns-socket is-filled" style="--rune:${def.color}" onclick="unsocketRune('${rune.id}')" title="Extraer ${escHtml(def.name)}">${def.icon}</button>` : `<span class="rns-socket">◇</span>`; }).join('') : '<span class="rns-no-socket">Esta pieza aún no admite runas</span>'}</div></article>`;
+    const hasRoom = slots.length < max;
+    return `<article class="rns-weapon" style="--rns:${tier.color}">
+      <div class="rns-weapon-head">${weaponArt(weapon)}<div><b>${escHtml(weapon.name)}</b><small>${tier.label} · ${slots.length}/${max} engastes</small></div></div>
+      <div class="rns-sockets">${Array.from({length:max}, (_, index) => { const rune = runes.find(item => item.id === slots[index]); const def = rune && RUNE_DEFS[rune.rune_type]; return rune ? `<button class="rns-socket is-filled" style="--rune:${def.color}" onclick="unsocketRune('${rune.id}')" title="Extraer ${escHtml(def.name)}">${runeArt(def, 'rns-socket-art')}</button>` : `<span class="rns-socket" aria-label="Ranura vacía"></span>`; }).join('')}</div>
+      <div class="rns-weapon-action">${selected && hasRoom ? `<button type="button" onclick="socketRune('${selected.id}','${weapon.id}')">Engastar ${escHtml((RUNE_DEFS[selected.rune_type] || {}).name || 'runa')}</button>` : selected ? '<span>Ranuras llenas</span>' : '<span>Selecciona una runa abajo</span>'}</div>
+    </article>`;
   };
-  const runeCard = rune => { const def = RUNE_DEFS[rune.rune_type] || {}; return `<article class="rns-rune" style="--rns:${def.color || '#94a3b8'}"><div class="rns-gem">${def.icon || '💎'}</div><b>${escHtml(def.name || rune.rune_type)}</b><p>${escHtml(def.desc || '')}</p>${equipped.some(weapon => RUNE_SOCKET_COUNT[weapon.tier] > 0) ? `<select onchange="if(this.value)socketRune('${rune.id}',this.value)"><option value="">Elegir arma</option>${equipped.filter(weapon => RUNE_SOCKET_COUNT[weapon.tier] > 0).map(weapon => `<option value="${weapon.id}">${escHtml(weapon.name)}</option>`).join('')}</select>` : ''}</article>`; };
-  el.innerHTML = `<section class="rns-shell"><header class="rns-header"><div><span>ALTAR DE ENGASTE</span><h3>Runas y resonancias</h3><p>Une un fragmento de poder a tu arsenal. Extraer una runa nunca la destruye.</p></div><div class="rns-count"><b>✦ ${loose.length}</b><small>runas libres</small></div></header><div class="rns-layout"><section><h4>Armas vinculadas</h4>${equipped.length ? equipped.map(weaponPanel).join('') : '<div class="rns-empty">Equipa un arma con ranuras para iniciar un ritual.</div>'}</section><section class="rns-altar"><div class="rns-circle"><span>✦</span><i></i><i></i><i></i></div><b>Elige una runa</b><p>Su color indica su afinidad.</p></section></div><section class="rns-library"><h4>Runas sin vínculo</h4><div>${loose.length ? loose.map(runeCard).join('') : '<div class="rns-empty">No tienes runas libres. Forja fragmentos en el Herrero.</div>'}</div></section></section>`;
+  const runeCard = rune => {
+    const def = RUNE_DEFS[rune.rune_type] || { name:rune.rune_type, desc:'', color:'#94a3b8', img:'runa_arcana' };
+    const selectedClass = rune.id === _rnsSelectedRuneId ? ' is-selected' : '';
+    return `<button type="button" class="rns-rune${selectedClass}" style="--rns:${def.color}" onclick="selectRuneForSocket('${rune.id}')">${runeArt(def)}<span><b>${escHtml(def.name)}</b><p>${escHtml(def.desc || '')}</p></span><em>${rune.id === _rnsSelectedRuneId ? 'Seleccionada' : 'Elegir runa'}</em></button>`;
+  };
+  const altarArt = selected ? runeArt(RUNE_DEFS[selected.rune_type] || { img:'runa_arcana', name:'Runa' }, 'rns-altar-art') : '<img class="rns-altar-art is-idle" src="images/runa_arcana.webp" alt="" loading="lazy" decoding="async">';
+  el.innerHTML = `<section class="rns-shell"><header class="rns-header"><div><span>ALTAR DE ENGASTE</span><h3>Runas y resonancias</h3><p>Elige una runa, después una pieza Rara o superior y engástala. Extraerla no la destruye.</p></div><div class="rns-count">${runeArt({ img:'runa_arcana', name:'Runas libres' }, 'rns-count-art')}<b>${loose.length}</b><small>runas libres</small></div></header>
+    <ol class="rns-steps"><li class="${selected ? 'is-done' : ''}"><b>1</b> Elige una runa</li><li class="${selected ? 'is-ready' : ''}"><b>2</b> Elige equipo compatible</li><li><b>3</b> Confirma el engaste</li></ol>
+    <div class="rns-layout"><section><h4>Equipo compatible</h4><p class="rns-section-help">Sólo el equipo Raro, Épico, Legendario o Mítico tiene ranuras.</p>${compatible.length ? compatible.map(weaponPanel).join('') : '<div class="rns-empty">Equipa una pieza Rara o superior para abrir una ranura.</div>'}${locked.length ? `<p class="rns-locked-note">${locked.length} pieza${locked.length > 1 ? 's' : ''} Común sin ranuras · mejora su rango en Herrero.</p>` : ''}</section><section class="rns-altar">${altarArt}<b>${selected ? escHtml((RUNE_DEFS[selected.rune_type] || {}).name || 'Runa seleccionada') : 'Paso 1: elige una runa'}</b><p>${selected ? 'Ahora pulsa “Engastar” en una pieza compatible.' : 'Las runas libres aparecen abajo.'}</p></section></div>
+    <section class="rns-library"><h4>Runas libres · paso 1</h4><div>${loose.length ? loose.map(runeCard).join('') : '<div class="rns-empty">No tienes runas libres. Los jefes dejan fragmentos; júntalos y fórjalos en el Herrero.</div>'}</div></section></section>`;
 }
