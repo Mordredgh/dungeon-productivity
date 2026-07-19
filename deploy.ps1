@@ -11,11 +11,12 @@ if (-not $TOKEN) {
 
 # 1. Bump SW cache version
 $swPath = Join-Path $PSScriptRoot "sw.js"
-$sw = Get-Content $swPath -Raw
+$utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+$sw = [System.IO.File]::ReadAllText($swPath, $utf8NoBom)
 if ($sw -match "dungeon-v(\d+)") {
     $old = [int]$Matches[1]; $new = $old + 1
     $sw = $sw -replace "dungeon-v$old", "dungeon-v$new"
-    [System.IO.File]::WriteAllText($swPath, $sw, [System.Text.UTF8Encoding]::new($false))
+    [System.IO.File]::WriteAllText($swPath, $sw, $utf8NoBom)
     Write-Host "SW: v$old -> v$new"
 }
 
