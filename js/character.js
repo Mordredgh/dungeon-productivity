@@ -243,7 +243,9 @@ function _chrEqRowHtml(slotKey, label, icon, weapon, fallbackView) {
   const glow = (weapon.tier === 'legendario' || weapon.tier === 'mitico') ? 'anim-pulse-glow' : '';
   return `
     <div class="chr-eq-row chr-eq-filled ${glow}" onclick="unequipWeapon('${weapon.id}')" title="Click para desequipar">
-      <span class="chr-eq-icon">${def.icon}</span>
+      <img src="images/arma_${weapon.weapon_key}_${weapon.tier}.webp" class="chr-eq-item-img" alt=""
+           onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+      <span class="chr-eq-icon" style="display:none">${def.icon}</span>
       <div class="chr-eq-info">
         <div class="chr-eq-name">${escHtml(weapon.name)}</div>
         <div class="chr-eq-tier" style="color:${tier.color}">${tier.label}</div>
@@ -279,7 +281,9 @@ function _chrArmorRowHtml(slotKey, label, icon) {
   const glow = (eq.tier === 'legendario' || eq.tier === 'mitico') ? 'anim-pulse-glow' : '';
   return `
     <div class="chr-eq-row chr-eq-filled ${glow}" onclick="unequipWeapon('${eq.id}')" title="Click para desequipar">
-      <span class="chr-eq-icon">${icon}</span>
+      <img src="images/arma_${eq.weapon_key}_${eq.tier}.webp" class="chr-eq-item-img" alt=""
+           onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+      <span class="chr-eq-icon" style="display:none">${icon}</span>
       <div class="chr-eq-info">
         <div class="chr-eq-name">${escHtml(eq.name)}</div>
         <div class="chr-eq-tier" style="color:${tier.color}">${statLine || tier.label}</div>
@@ -320,7 +324,6 @@ function renderCharacterSheet() {
           <img src="images/char_${cls}_${race}.webp" class="char-portrait-img" alt=""
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="char-portrait-emoji" style="display:none">${hero.avatar || '🧙'}</div>
-          ${_chrPortraitBadgesHtml(equipped)}
         </div>
         <div class="chr-portrait-overlay">
           <div class="chr-hero-name">${escHtml(hero.name || 'Héroe')}</div>

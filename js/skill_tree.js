@@ -124,6 +124,11 @@ function getHeroSkillTree() {
   try { return JSON.parse(hero.skill_tree || '{}'); } catch { return {}; }
 }
 
+function _sktArt(skill, cls, race) {
+  const image = String(skill?.id || '').startsWith('race_') ? `raza_${race}` : `habilidad_${cls}`;
+  return `<img class="skt-art" src="images/${image}.webp" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none">${skill?.icon || '✦'}</span>`;
+}
+
 function hasSkill(skillId) {
   return !!getHeroSkillTree()[skillId];
 }
@@ -334,6 +339,7 @@ function renderSkillTree() {
 
 function _injectDoctrineChooser(el) {
   const cls = hero?.hero_class || 'guerrero';
+  const race = heroRace || hero?.race || 'humano';
   const choices = CLASS_DOCTRINES[cls] || [];
   const selected = getHeroDoctrine();
   const shell = el.querySelector('.skt3-shell');
@@ -341,7 +347,7 @@ function _injectDoctrineChooser(el) {
   if (!shell || !board || !choices.length) return;
   const section = document.createElement('section');
   section.className = 'skt3-doctrine';
-  section.innerHTML = `<div><span>DOCTRINA DE CLASE</span><b>${selected ? 'Rumbo sellado' : 'Elige una senda permanente'}</b><small>${selected ? 'Una doctrina define la identidad de este héroe.' : 'No cuesta puntos; no se puede cambiar después.'}</small></div><div class="skt3-doctrine-options">${choices.map(choice => `<button class="${selected === choice.id ? 'selected' : ''}" ${selected ? 'disabled' : `onclick="chooseDoctrine('${choice.id}')"`}><i>${choice.icon}</i><b>${choice.name}</b><small>${choice.desc}</small></button>`).join('')}</div>`;
+  section.innerHTML = `<div><span>DOCTRINA DE CLASE</span><b>${selected ? 'Rumbo sellado' : 'Elige una senda permanente'}</b><small>${selected ? 'Una doctrina define la identidad de este héroe.' : 'No cuesta puntos; no se puede cambiar después.'}</small></div><div class="skt3-doctrine-options">${choices.map(choice => `<button class="${selected === choice.id ? 'selected' : ''}" ${selected ? 'disabled' : `onclick="chooseDoctrine('${choice.id}')"`}><i>${_sktArt(choice, cls, race)}</i><b>${choice.name}</b><small>${choice.desc}</small></button>`).join('')}</div>`;
   shell.insertBefore(section, board);
 }
 
@@ -384,7 +390,7 @@ function _renderSkillTreeConstellation(el) {
     const learned = hasSkill(skill.id);
     const ready = canLearnSkill(skill);
     const req = skill.requires.map(id => all.find(item => item.id === id)?.name).filter(Boolean).join(' · ');
-    return `<button class="skt3-node ${learned ? 'is-learned' : ready ? 'is-ready' : 'is-locked'}" ${ready ? `onclick="learnSkill('${skill.id}')"` : 'disabled'} title="${escHtml(skill.desc)}${req ? ' · Requiere: ' + escHtml(req) : ''}"><span class="skt3-orb">${skill.icon}</span><b>${escHtml(skill.name)}</b><small>${escHtml(skill.desc)}</small>${!learned && req ? `<em>${escHtml(req)}</em>` : ''}</button>`;
+    return `<button class="skt3-node ${learned ? 'is-learned' : ready ? 'is-ready' : 'is-locked'}" ${ready ? `onclick="learnSkill('${skill.id}')"` : 'disabled'} title="${escHtml(skill.desc)}${req ? ' · Requiere: ' + escHtml(req) : ''}"><span class="skt3-orb">${_sktArt(skill, cls, race)}</span><b>${escHtml(skill.name)}</b><small>${escHtml(skill.desc)}</small>${!learned && req ? `<em>${escHtml(req)}</em>` : ''}</button>`;
   };
   const connector = `<svg class="skt3-lines" viewBox="0 0 1000 500" preserveAspectRatio="none" aria-hidden="true"><g>
     <path d="M170 410 L170 310 M500 410 L380 310 M830 410 L620 310 M380 310 L330 175 M620 310 L670 175 M330 175 L450 58 M670 175 L550 58"/>

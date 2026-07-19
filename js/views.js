@@ -72,6 +72,8 @@ function renderHeroUI() {
   // Avatar ring by class + marco cosmético equipado
   const frameDef = typeof AVATAR_FRAMES !== 'undefined' ? AVATAR_FRAMES.find(f => f.id === hero.equipped_frame) : null;
   avatarBtn.className = 'hero-avatar-btn avatar-class-' + (hero.hero_class || 'guerrero') + (frameDef ? ' ' + frameDef.cssClass : '');
+  const avatarRing = avatarBtn.closest('.sb-avatar-ring');
+  avatarRing?.classList.toggle('has-cosmetic-frame', !!frameDef);
 
   document.getElementById('heroName').textContent = hero.name || 'Héroe';
   const title = getDynamicTitle(hero);
@@ -207,6 +209,12 @@ function _updateDailyRing() {
   }
 }
 
+const QUEST_ART = { main:'quest_main', side:'quest_side', daily:'quest_daily', weekly:'quest_weekly', epic:'quest_epic', search:'quest_search', chronicle:'quest_chronicle' };
+function _questArt(type, fallback = '✦') {
+  const image = QUEST_ART[type] || QUEST_ART.side;
+  return `<img class="quest-art" src="images/${image}.webp" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none">${fallback}</span>`;
+}
+
 function renderQuestList() {
   const el = document.getElementById('questList');
   if (!el) return;
@@ -292,7 +300,7 @@ function renderQuestList() {
 
   // Group pending by type with separators
   const typeOrder = ['mitico', 'main', 'weekly', 'side', 'daily'];
-  const typeLabelsGroup = { mitico:'💎 Míticas', main:'⚔️ Misiones Épicas', weekly:'📜 Crónicas Semanales', side:'🗡️ Encargos', daily:'🌅 Búsquedas Diarias' };
+  const typeLabelsGroup = { mitico:'Míticas', main:'Misiones Épicas', weekly:'Crónicas Semanales', side:'Encargos', daily:'Búsquedas Diarias' };
   let html = typeof renderAdventureCycle === 'function' ? renderAdventureCycle() : '';
 
   if (pinned.length) {
@@ -306,7 +314,7 @@ function renderQuestList() {
       if (type === 'mitico') group = pending.filter(q => q.priority === 'mitico');
       else group = pending.filter(q => q.type === type && q.priority !== 'mitico');
       if (!group.length) return;
-      html += `<div class="type-separator">${typeLabelsGroup[type]}<span>${group.length}</span></div>`;
+      html += `<div class="type-separator">${_questArt(type === 'mitico' ? 'epic' : type)}${typeLabelsGroup[type]}<span>${group.length}</span></div>`;
       html += group.map(q => renderQuestItem(q, blockedIds.has(q.id))).join('');
     });
     // Hábitos al final
@@ -344,7 +352,7 @@ function renderQuestItem(q, blocked = false) {
   const isOverdue = q.deadline && !q.done && q.deadline < today;
   const deadlineDiff = q.deadline ? Math.round((new Date(q.deadline + 'T00:00:00') - new Date(today + 'T00:00:00')) / 86400000) : null;
   const isUrgent = deadlineDiff !== null && !q.done && deadlineDiff >= 0 && deadlineDiff <= 1;
-  const typeLabels = { main: '⚔️ Épica', side: '🗡️ Encargo', daily: '🌅 Búsqueda', weekly: '📜 Crónica' };
+  const typeLabels = { main: 'Épica', side: 'Encargo', daily: 'Búsqueda', weekly: 'Crónica' };
   const diffEmoji = { easy: '🟢', normal: '', hard: '🔴' };
   const diffLabel = { easy: ' Fácil', normal: '', hard: ' Difícil' };
 
@@ -416,7 +424,7 @@ function renderQuestItem(q, blocked = false) {
     <div class="quest-body">
       <div class="quest-name">${escHtml(q.name)}${diff !== 'normal' ? ` <span style="font-size:10px">${diffEmoji[diff]}${diffLabel[diff]}</span>` : ''}</div>
       <div class="quest-meta">
-        <span class="badge badge-type-${q.type}">${typeLabels[q.type] || q.type}</span>
+        <span class="badge badge-type-${q.type}">${_questArt(q.type)}${typeLabels[q.type] || q.type}</span>
         ${q.priority ? `<span class="badge badge-rarity-${q.priority}">${RARITY_LABELS[q.priority] || q.priority}</span>` : ''}
         ${q.deadline ? `<span class="deadline-badge ${isOverdue ? 'overdue' : isUrgent ? 'urgent' : ''}">${formatRelativeDate(q.deadline)}</span>` : ''}
         <span class="xp-reward">+${xp} XP</span>

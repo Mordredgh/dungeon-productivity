@@ -318,16 +318,16 @@
           </div>
 
           <div class="quest-toolbar">
-            <input class="search-box" id="searchBox" placeholder="🔍 Buscar misiones..." type="text">
+            <input class="search-box" id="searchBox" placeholder="Buscar misiones..." type="text">
             <button class="add-quest-trigger-btn" onclick="openModal('quickAddModal')" title="Nueva misión (N)">➕ Nueva</button>
             <div class="filter-tabs">
-              <button class="filter-tab" data-filter="today" id="ft-today" style="color:var(--gold)">📅 Hoy</button>
+              <button class="filter-tab" data-filter="today" id="ft-today" style="color:var(--gold)"><img class="filter-art" src="images/quest_daily.webp" alt="">Hoy</button>
               <button class="filter-tab active" data-filter="all" id="ft-all">Todas</button>
-              <button class="filter-tab" data-filter="main" id="ft-main">⚔️ Épicas</button>
-              <button class="filter-tab" data-filter="side" id="ft-side">🗡️ Encargos</button>
-              <button class="filter-tab" data-filter="daily" id="ft-daily">🌅 Búsquedas</button>
-              <button class="filter-tab" data-filter="weekly" id="ft-weekly">📜 Crónicas</button>
-              <button class="filter-tab" data-filter="mitico" id="ft-mitico" style="color:var(--red)">💎 Mítico</button>
+              <button class="filter-tab" data-filter="main" id="ft-main"><img class="filter-art" src="images/quest_main.webp" alt="">Épicas</button>
+              <button class="filter-tab" data-filter="side" id="ft-side"><img class="filter-art" src="images/quest_side.webp" alt="">Encargos</button>
+              <button class="filter-tab" data-filter="daily" id="ft-daily"><img class="filter-art" src="images/quest_daily.webp" alt="">Búsquedas</button>
+              <button class="filter-tab" data-filter="weekly" id="ft-weekly"><img class="filter-art" src="images/quest_weekly.webp" alt="">Crónicas</button>
+              <button class="filter-tab" data-filter="mitico" id="ft-mitico" style="color:var(--red)"><img class="filter-art" src="images/quest_epic.webp" alt="">Mítico</button>
             </div>
             <select class="sort-select" id="sortSelect">
               <option value="created">Recientes</option>
@@ -502,10 +502,10 @@
             <input id="historySearch" placeholder="🔍 Buscar historial..." style="flex:1;min-width:120px;border-radius:var(--radius-sm);font-size:13px;padding:7px 12px">
             <div class="filter-tabs" style="flex-shrink:0">
               <button class="filter-tab active" data-hfilter="all">Todas</button>
-              <button class="filter-tab" data-hfilter="main">⚔️ Épicas</button>
-              <button class="filter-tab" data-hfilter="side">🗡️ Encargos</button>
-              <button class="filter-tab" data-hfilter="daily">🌅 Búsquedas</button>
-              <button class="filter-tab" data-hfilter="weekly">📜 Crónicas</button>
+              <button class="filter-tab" data-hfilter="main"><img class="filter-art" src="images/quest_main.webp" alt="">Épicas</button>
+              <button class="filter-tab" data-hfilter="side"><img class="filter-art" src="images/quest_side.webp" alt="">Encargos</button>
+              <button class="filter-tab" data-hfilter="daily"><img class="filter-art" src="images/quest_daily.webp" alt="">Búsquedas</button>
+              <button class="filter-tab" data-hfilter="weekly"><img class="filter-art" src="images/quest_weekly.webp" alt="">Crónicas</button>
             </div>
           </div>
           <div id="historyContent">

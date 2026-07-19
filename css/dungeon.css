@@ -491,6 +491,29 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   background: var(--bg3) !important;
   box-shadow: none !important;
 }
+.sb-avatar-ring.has-cosmetic-frame {
+  padding: 0;
+  border-radius: 14px;
+  background: transparent;
+  box-shadow: none;
+}
+.sb-avatar-ring.has-cosmetic-frame .daily-ring-svg { display: none; }
+.sb-avatar-ring.has-cosmetic-frame .hero-avatar-btn {
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  overflow: visible;
+}
+.sb-avatar-ring.has-cosmetic-frame .hero-avatar-img {
+  position: relative;
+  z-index: 1;
+  border-radius: 9px !important;
+}
+.sb-avatar-ring.has-cosmetic-frame .hero-avatar-btn[class*="frame-"]::after {
+  inset: -11px;
+  z-index: 3;
+}
+.sb-avatar-ring.has-cosmetic-frame .avatar-level-badge { z-index: 4; }
 
 .sb-profile .hero-name {
   font-size: 14px;
@@ -3265,7 +3288,7 @@ img.efx-row-icon { width: 24px; height: 24px; object-fit: contain; }
    ============================================================ */
 .hero-avatar-img {
   width:100%; height:100%; object-fit:cover;
-  border-radius:50%; display:block;
+  border-radius:7px; display:block;
 }
 .hero-avatar-emoji { font-size:22px; line-height:1; }
 
@@ -6454,6 +6477,11 @@ img.efx-row-icon { width: 24px; height: 24px; object-fit: contain; }
 .chr-eq-row.chr-eq-filled { border-color: rgba(255,255,255,.1); }
 .chr-eq-icon { font-size: 15px; flex-shrink: 0; width: 20px; text-align: center; }
 .chr-eq-slot-img { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; }
+.chr-eq-item-img { width: 28px; height: 28px; object-fit: contain; image-rendering: pixelated; flex-shrink: 0; }
+.quest-art { width: 16px; height: 16px; object-fit: contain; image-rendering: pixelated; vertical-align: middle; margin-right: 4px; }
+.type-separator .quest-art { width: 18px; height: 18px; }
+.filter-tab { display: inline-flex; align-items: center; gap: 4px; }
+.filter-art { width: 16px; height: 16px; object-fit: contain; image-rendering: pixelated; }
 .chr-eq-info { flex: 1; min-width: 0; }
 .chr-eq-name {
   font-size: 11px;
@@ -6545,6 +6573,8 @@ img.efx-row-icon { width: 24px; height: 24px; object-fit: contain; }
 .chr-mastery-icon img, .rpg-item-art { width: 42px; height: 42px; object-fit: contain; image-rendering: pixelated; }
 .bb-move-art { width: 25px; height: 25px; object-fit: contain; image-rendering: pixelated; vertical-align: middle; }
 .pet-ability-art { width: 18px; height: 18px; object-fit: contain; image-rendering: pixelated; vertical-align: middle; }
+.skt-art { width: 32px; height: 32px; object-fit: contain; image-rendering: pixelated; vertical-align: middle; }
+.skt3-doctrine-options .skt-art { width: 24px; height: 24px; }
 .chr-mastery-name { font-size: 11px; font-weight: 600; color: var(--text); }
 .chr-mastery-rank { color: var(--text3); font-weight: 400; }
 .chr-mastery-desc { font-size: 10px; color: var(--text3); margin: 4px 0 6px; min-height: 26px; }
