@@ -17,25 +17,121 @@ const RACE_LABELS = {
 
 /* ── Selección visual de clase / raza (auto-save) ──────────── */
 async function selectHeroClass(cls) {
-  const inp = document.getElementById('charEditClass');
-  if (inp) inp.value = cls;
-  document.querySelectorAll('.chr-class-pill').forEach(el =>
-    el.classList.toggle('chr-selected', el.dataset.cls === cls));
-  _charPreviewPortrait();
-  await saveHero({ hero_class: cls });
-  renderHeroUI();
-  if (typeof applyClassTheme === 'function') applyClassTheme();
+  requestHeroClassChange(cls, CLASS_LABELS[cls]?.name || cls);
 }
 
 async function selectHeroRace(race) {
+  if (!RACE_LABELS[race]) return;
+  const current = heroRace || hero.race || 'humano';
+  if (race === current) return;
+  if (getHeroProgression().raceLocked) {
+    toast('🔒', 'Tu raza está sellada. Alcanza nivel 50 y haz Prestigio para renacer bajo otra.');
+    return;
+  }
   const inp = document.getElementById('charEditRace');
   if (inp) inp.value = race;
   heroRace = race;
   document.querySelectorAll('.chr-race-pill').forEach(el =>
     el.classList.toggle('chr-selected', el.dataset.race === race));
   _charPreviewPortrait();
-  await saveHero({ race });
+  const tree = (() => { try { return JSON.parse(hero.skill_tree || '{}'); } catch { return {}; } })();
+  tree.__progression = { ...getHeroProgression(), raceLocked:true };
+  await saveHero({ race, skill_tree:JSON.stringify(tree) });
+  toast('✨', `${RACE_LABELS[race].name} elegida. Tu raza queda sellada hasta el próximo Prestigio.`);
 }
+
+function showRaceLockedMessage() {
+  toast('🔒', 'Raza sellada: alcanza nivel 50 y realiza Prestigio para elegir otra.');
+}
+
+function requestHeroClassChange(cls, label) {
+  if (!hero || cls === hero.hero_class) return;
+  const quote = getClassChangeQuote(cls);
+  if (!quote.allowed) {
+    if (quote.reason === 'cooldown') toast('⏳', `Cambio de clase disponible en ${_formatCooldown(quote.until)}.`);
+    return;
+  }
+  document.getElementById('classChangeModal')?.remove();
+  const learned = Object.entries((() => { try { return JSON.parse(hero.skill_tree || '{}'); } catch { return {}; } })())
+    .filter(([id, learned]) => !id.startsWith('__') && learned === true).length;
+  const price = quote.free ? 'Gratis · cambio único' : `${CLASS_CHANGE_GOLD_COST.toLocaleString()} oro`;
+  const modal = document.createElement('div');
+  modal.className = 'prestige-choice-overlay';
+  modal.id = 'classChangeModal';
+  modal.innerHTML = `<section class="prestige-choice-card progression-confirm" role="dialog" aria-modal="true" aria-label="Confirmar cambio de clase">
+    <span>JURAMENTO DE CLASE</span><h2>${escHtml(label)}</h2>
+    <p><b>${price}</b>. Recibirás ${learned} punto${learned === 1 ? '' : 's'} reembolsado${learned === 1 ? '' : 's'} del árbol actual. El siguiente cambio queda bloqueado durante 7 días.</p>
+    <div class="progression-summary"><span>Se conserva: raza, nivel, XP, oro, equipo, logros, mascotas y colecciones.</span><span>Se reinicia: sólo el árbol de habilidades de clase.</span></div>
+    <div class="progression-confirm-actions"><button type="button" class="btn btn-ghost" onclick="document.getElementById('classChangeModal').remove()">Cancelar</button><button type="button" class="btn btn-primary" onclick="confirmHeroClassChange('${cls}')">Cambiar clase</button></div>
+  </section>`;
+  document.body.appendChild(modal);
+}
+
+async function confirmHeroClassChange(cls) {
+  const quote = getClassChangeQuote(cls);
+  if (!quote.allowed) { document.getElementById('classChangeModal')?.remove(); return; }
+  if (!quote.free && (typeof getGold !== 'function' || getGold() < quote.cost)) {
+    toast('💸', `Necesitas ${quote.cost.toLocaleString()} oro para cambiar de clase.`);
+    return;
+  }
+  const progression = { ...getHeroProgression(), classFreeChangeUsed:true, classChangeCooldownUntil:Date.now() + CLASS_CHANGE_COOLDOWN_MS };
+  const reset = buildClassReset(progression);
+  if (!quote.free) setGold(getGold() - quote.cost);
+  await saveHero({ hero_class:cls, skill_tree:JSON.stringify(reset.tree), skill_points:reset.skillPoints });
+  document.getElementById('classChangeModal')?.remove();
+  const inp = document.getElementById('charEditClass');
+  if (inp) inp.value = cls;
+  _charPreviewPortrait();
+  if (typeof applyClassTheme === 'function') applyClassTheme();
+  toast('⚔️', `Clase cambiada. ${reset.refunded} punto${reset.refunded === 1 ? '' : 's'} del árbol reembolsado${reset.refunded === 1 ? '' : 's'}.`);
+  renderHeroUI();
+  renderCharacterSheet();
+}
+window.confirmHeroClassChange = confirmHeroClassChange;
+
+let _initialIdentity = { race:null, heroClass:null };
+function openInitialIdentitySelection() {
+  if (!hero || hero.race || getHeroProgression().raceLocked || document.getElementById('initialIdentityModal')) return;
+  _initialIdentity = { race:null, heroClass:hero.hero_class || 'guerrero' };
+  const modal = document.createElement('div');
+  modal.className = 'prestige-choice-overlay';
+  modal.id = 'initialIdentityModal';
+  modal.innerHTML = `<section class="prestige-choice-card progression-confirm" role="dialog" aria-modal="true" aria-label="Elige identidad de héroe">
+    <span>PRIMER JURAMENTO</span><h2>Forja tu identidad</h2><p>Elige una clase y una raza. La clase podrá cambiarse una vez gratis; la raza quedará sellada hasta Prestigio en nivel 50.</p>
+    <h3 class="progression-subhead">Clase</h3><div class="progression-identity-grid">${Object.entries(CLASS_LABELS).map(([id, def]) => `<button type="button" data-initial-class="${id}" onclick="chooseInitialClass('${id}')"><img src="images/${def.img}.webp" alt=""><b>${def.name}</b><small>${def.bonus || ''}</small></button>`).join('')}</div>
+    <h3 class="progression-subhead">Raza</h3><div class="progression-identity-grid">${Object.entries(RACE_LABELS).map(([id, def]) => `<button type="button" data-initial-race="${id}" onclick="chooseInitialRace('${id}')"><img src="images/${def.img}.webp" alt=""><b>${def.name}</b><small>${def.bonus || ''}</small></button>`).join('')}</div>
+    <div class="progression-confirm-actions"><button type="button" class="btn btn-primary" onclick="confirmInitialIdentity()">Comenzar aventura</button></div>
+  </section>`;
+  document.body.appendChild(modal);
+  chooseInitialClass(_initialIdentity.heroClass);
+}
+function chooseInitialClass(heroClass) {
+  if (!CLASS_LABELS[heroClass]) return;
+  _initialIdentity.heroClass = heroClass;
+  document.querySelectorAll('#initialIdentityModal [data-initial-class]').forEach(el => el.classList.toggle('progression-picked', el.dataset.initialClass === heroClass));
+}
+function chooseInitialRace(race) {
+  if (!RACE_LABELS[race]) return;
+  _initialIdentity.race = race;
+  document.querySelectorAll('#initialIdentityModal [data-initial-race]').forEach(el => el.classList.toggle('progression-picked', el.dataset.initialRace === race));
+}
+async function confirmInitialIdentity() {
+  const { race, heroClass } = _initialIdentity;
+  if (!RACE_LABELS[race]) { toast('🔒', 'Elige una raza para comenzar.'); return; }
+  const tree = (() => { try { return JSON.parse(hero.skill_tree || '{}'); } catch { return {}; } })();
+  tree.__progression = { ...getHeroProgression(), raceLocked:true };
+  await saveHero({ race, hero_class:heroClass, skill_tree:JSON.stringify(tree) });
+  heroRace = race;
+  document.getElementById('initialIdentityModal')?.remove();
+  if (typeof applyClassTheme === 'function') applyClassTheme();
+  toast('✨', `${RACE_LABELS[race].name} ${CLASS_LABELS[heroClass].name}: tu aventura comienza.`);
+  renderHeroUI();
+  renderCharacterSheet();
+}
+window.openInitialIdentitySelection = openInitialIdentitySelection;
+window.chooseInitialClass = chooseInitialClass;
+window.chooseInitialRace = chooseInitialRace;
+window.confirmInitialIdentity = confirmInitialIdentity;
 
 function _cspToggleNightmare() {
   const cb = document.getElementById('charEditNightmare');
@@ -405,8 +501,9 @@ function renderCharacterSheet() {
       <div class="chr-section">
         <div class="chr-section-hd">Raza</div>
         <div class="chr-race-grid">
+          ${getHeroProgression().raceLocked ? '<span class="chr-race-lock">🔒 Sellada hasta Prestigio Nv. 50</span>' : '<span class="chr-race-lock chr-race-open">Elige una raza; esta decisión será permanente.</span>'}
           ${Object.entries(RACE_LABELS).map(([k, d]) => `
-            <div class="chr-race-pill${k === race ? ' chr-selected' : ''}" data-race="${k}" onclick="selectHeroRace('${k}')">
+            <div class="chr-race-pill${k === race ? ' chr-selected' : ''}${getHeroProgression().raceLocked && k !== race ? ' chr-locked' : ''}" data-race="${k}" onclick="${getHeroProgression().raceLocked ? 'showRaceLockedMessage()' : `selectHeroRace('${k}')`}">
               <img src="images/${d.img}.webp" class="chr-pill-icon-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="chr-pill-icon" style="display:none">${d.icon}</span>
               <span class="chr-pill-name">${d.name}</span>
             </div>`).join('')}
@@ -427,7 +524,7 @@ function renderCharacterSheet() {
         ${canPrestige()
           ? `<button class="chr-prestige-btn" onclick="doPrestige()">⭐ Ascender</button>`
           : ''}
-      </div>` : ''}
+      </div>` : (canPrestige() ? `<div class="chr-section"><div class="chr-section-hd">Ascensión disponible</div><button class="chr-prestige-btn" onclick="doPrestige()">⭐ Alcanzaste Nv. 50 · Ascender</button></div>` : '')}
 
       ${(hero.prestige || 0) > 0 || (hero.mastery_points || 0) > 0 ? `
       <div class="chr-section">
@@ -468,19 +565,15 @@ async function adoptSecretClass(key) {
   const unlocked = (() => { try { return JSON.parse(hero.secret_classes || '[]'); } catch { return []; } })();
   if (!unlocked.includes(key)) { toast('🔒', 'Primero debes desbloquear esa clase.'); return; }
   const def = (typeof SECRET_CLASS_DEFS !== 'undefined' ? SECRET_CLASS_DEFS : []).find(d => d.key === key);
-  await saveHero({ hero_class: key });
-  if (typeof applyClassTheme === 'function') applyClassTheme();
-  toast(def?.icon || '🔮', `¡Adoptaste la clase ${def?.name || key}!`);
-  renderHeroUI();
-  renderCharacterSheet();
+  requestHeroClassChange(key, def?.name || key);
 }
 
 /* ── saveCharacterSheet (clase + raza, por compatibilidad) ─────── */
 async function saveCharacterSheet() {
   const cls  = document.getElementById('charEditClass')?.value;
   const race = document.getElementById('charEditRace')?.value;
-  if (cls)  { await saveHero({ hero_class: cls }); if (typeof applyClassTheme === 'function') applyClassTheme(); }
-  if (race) { heroRace = race; await saveHero({ race }); }
+  if (cls && cls !== hero.hero_class) requestHeroClassChange(cls, CLASS_LABELS[cls]?.name || cls);
+  if (race && race !== (heroRace || hero.race)) await selectHeroRace(race);
   renderHeroUI();
 }
 

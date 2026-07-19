@@ -34,6 +34,7 @@ async function loadHero() {
   localStorage.removeItem('dungeon-gold');
   try { localStorage.setItem('dungeon-cache-hero', JSON.stringify(hero)); } catch {}
   applyClassTheme();
+  if (!hero.race) setTimeout(() => window.openInitialIdentitySelection?.(), 0);
 }
 
 function applyClassTheme() {
@@ -63,6 +64,55 @@ function calcLevel(totalXP) {
 }
 
 function canPrestige() { return !!hero && (hero._level || 1) >= 50; }
+
+const CLASS_CHANGE_GOLD_COST = 20000;
+const CLASS_CHANGE_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
+
+function _heroSkillTree() {
+  try { return JSON.parse(hero?.skill_tree || '{}'); } catch { return {}; }
+}
+
+// El metadato viaja con skill_tree, una columna JSON ya persistente. Las claves
+// con "__" son de sistema y nunca se interpretan como habilidades aprendidas.
+function getHeroProgression() {
+  const meta = _heroSkillTree().__progression || {};
+  return {
+    raceLocked: meta.raceLocked ?? !!hero?.race,
+    classFreeChangeUsed: !!meta.classFreeChangeUsed,
+    classChangeCooldownUntil: Number(meta.classChangeCooldownUntil || 0),
+    lastPrestigeAt: Number(meta.lastPrestigeAt || 0),
+  };
+}
+
+function getClassChangeQuote(nextClass, now = Date.now()) {
+  if (!hero || !nextClass || nextClass === hero.hero_class) return { allowed:false, reason:'same-class' };
+  const progression = getHeroProgression();
+  if (progression.classChangeCooldownUntil > now) {
+    return { allowed:false, reason:'cooldown', until:progression.classChangeCooldownUntil };
+  }
+  return {
+    allowed:true,
+    free:!progression.classFreeChangeUsed,
+    cost:progression.classFreeChangeUsed ? CLASS_CHANGE_GOLD_COST : 0,
+  };
+}
+
+function buildClassReset(nextProgression) {
+  const current = _heroSkillTree();
+  const refunded = Object.entries(current)
+    .filter(([id, learned]) => !id.startsWith('__') && learned === true).length;
+  const permanent = Object.fromEntries(Object.entries(current).filter(([id]) => id.startsWith('__') && id !== '__progression'));
+  return {
+    refunded,
+    skillPoints:(hero?.skill_points || 0) + refunded,
+    tree:{ ...permanent, __progression:nextProgression },
+  };
+}
+
+function _formatCooldown(until) {
+  const hours = Math.ceil(Math.max(0, until - Date.now()) / 3600000);
+  return `${Math.floor(hours / 24)}d ${hours % 24}h`;
+}
 
 /* Curva de diminishing returns — lineal +5%/prestige hasta el 10,
    luego se aplana asintóticamente hacia +100% adicional (nunca lo alcanza). */
@@ -103,15 +153,55 @@ window.choosePrestigeDoctrine = choosePrestigeDoctrine;
 async function doPrestige() {
   if (!canPrestige()) return;
   if (!getPrestigeDoctrine()) { openPrestigeDoctrine(); return; }
+  openPrestigeConfirmation();
+}
+
+let _prestigeRaceChoice = null;
+function openPrestigeConfirmation() {
+  document.getElementById('prestigeConfirmModal')?.remove();
+  const currentRace = heroRace || hero.race || 'humano';
+  const choices = Object.entries(typeof RACE_LABELS === 'undefined' ? {} : RACE_LABELS)
+    .filter(([id]) => id !== currentRace);
+  const modal = document.createElement('div');
+  modal.className = 'prestige-choice-overlay';
+  modal.id = 'prestigeConfirmModal';
+  modal.innerHTML = `<section class="prestige-choice-card progression-confirm" role="dialog" aria-modal="true" aria-label="Confirmar prestigio">
+    <span>ASCENSIÓN · NIVEL 50</span><h2>Renace bajo otra raza</h2>
+    <p>Conservas logros, colección, arte, muebles, cosméticos, oro y maestrías. Se reinician nivel, XP, atributos y habilidades.</p>
+    <div class="prestige-choice-grid progression-race-grid">${choices.map(([id, def]) => `<button type="button" data-race="${id}" onclick="choosePrestigeRace('${id}')"><img src="images/${def.img}.webp" alt=""><b>${def.name}</b><small>${def.bonus || ''}</small></button>`).join('')}</div>
+    <div class="progression-confirm-actions"><button type="button" class="btn btn-ghost" onclick="document.getElementById('prestigeConfirmModal').remove()">Cancelar</button><button type="button" class="btn btn-primary" onclick="confirmPrestige()">Confirmar Prestigio</button></div>
+  </section>`;
+  document.body.appendChild(modal);
+}
+function choosePrestigeRace(race) {
+  if (!RACE_LABELS?.[race]) return;
+  _prestigeRaceChoice = race;
+  document.querySelectorAll('#prestigeConfirmModal [data-race]').forEach(el => el.classList.toggle('progression-picked', el.dataset.race === race));
+}
+async function confirmPrestige() {
+  if (!canPrestige() || !getPrestigeDoctrine()) return;
+  const race = _prestigeRaceChoice;
+  if (!RACE_LABELS?.[race]) { toast('🔒', 'Elige la raza con la que renacerás.'); return; }
   const newPrestige  = (hero.prestige || 0) + 1;
   const newMastery   = (hero.mastery_points || 0) + 1;
-  await saveHero({ prestige: newPrestige, mastery_points: newMastery, xp_total: 0, level: 1 });
+  const progression = { ...getHeroProgression(), raceLocked:true, lastPrestigeAt:Date.now() };
+  const reset = buildClassReset(progression);
+  await saveHero({
+    prestige:newPrestige, mastery_points:newMastery, xp_total:0, xp:0, level:1,
+    str:0, intel:0, agi:0, con:0, lck:0, attr_points:0, hp:100, hp_max:100,
+    skill_points:0, skill_tree:JSON.stringify(reset.tree), race,
+  });
+  heroRace = race;
+  _prestigeRaceChoice = null;
+  document.getElementById('prestigeConfirmModal')?.remove();
   const pct = Math.round(getPrestigeXPBonus(newPrestige) * 100);
-  toast('⭐', `¡Ascensión ${newPrestige}! +${pct}% XP permanente · +1 punto de Maestría. Nivel reiniciado.`);
+  toast('⭐', `¡Ascensión ${newPrestige}! Renaciste como ${RACE_LABELS[race].name} · +${pct}% XP permanente.`);
   spawnConfetti();
   renderHeroUI();
   if (typeof renderCharacterSheet === 'function') renderCharacterSheet();
 }
+window.choosePrestigeRace = choosePrestigeRace;
+window.confirmPrestige = confirmPrestige;
 
 async function spendMasteryPoint(nodeId) {
   if (!hero || (hero.mastery_points || 0) <= 0) return;
