@@ -17,18 +17,30 @@ function getInvCount(key) {
 }
 
 async function addInvItem(key, type, qty) {
-  if (!hero || qty <= 0) return;
+  if (!hero || qty <= 0) return { ok:false, error:'invalid-request' };
   const existing = inventory.find(r => r.item_key === key);
   const newQty = (existing ? existing.quantity : 0) + qty;
+  const row = { hero_id: hero.id, item_key: key, item_type: type, quantity: newQty, updated_at: new Date().toISOString() };
 
-  const { error } = await db.from('dungeon_inventory').upsert(
-    { hero_id: hero.id, item_key: key, item_type: type, quantity: newQty, updated_at: new Date().toISOString() },
-    { onConflict: 'hero_id,item_key' }
-  );
+  let { error } = await db.from('dungeon_inventory').upsert(row, { onConflict: 'hero_id,item_key' });
+  // Algunos despliegues antiguos no tienen el índice hero_id,item_key. En ese
+  // caso Supabase rechaza upsert (42P10), aunque insert/update normal funciona.
+  if (error?.code === '42P10') {
+    if (existing) {
+      ({ error } = await db.from('dungeon_inventory')
+        .update({ quantity:newQty, updated_at:row.updated_at })
+        .eq('hero_id', hero.id).eq('item_key', key));
+    } else {
+      ({ error } = await db.from('dungeon_inventory').insert(row));
+    }
+  }
   if (!error) {
     if (existing) existing.quantity = newQty;
     else inventory.push({ hero_id: hero.id, item_key: key, item_type: type, quantity: newQty });
+    return { ok:true, quantity:newQty };
   }
+  console.error('No se pudo guardar objeto de inventario', { key, type, error });
+  return { ok:false, error };
 }
 
 async function consumeInvItem(key, qty) {
@@ -37,11 +49,15 @@ async function consumeInvItem(key, qty) {
   if (!existing || existing.quantity < qty) return false;
   const newQty = existing.quantity - qty;
 
-  const { error } = await db.from('dungeon_inventory').upsert(
-    { hero_id: hero.id, item_key: key, item_type: existing.item_type, quantity: newQty, updated_at: new Date().toISOString() },
-    { onConflict: 'hero_id,item_key' }
-  );
+  const row = { hero_id: hero.id, item_key: key, item_type: existing.item_type, quantity: newQty, updated_at: new Date().toISOString() };
+  let { error } = await db.from('dungeon_inventory').upsert(row, { onConflict: 'hero_id,item_key' });
+  if (error?.code === '42P10') {
+    ({ error } = await db.from('dungeon_inventory')
+      .update({ quantity:newQty, updated_at:row.updated_at })
+      .eq('hero_id', hero.id).eq('item_key', key));
+  }
   if (!error) { existing.quantity = newQty; return true; }
+  console.error('No se pudo consumir objeto de inventario', { key, qty, error });
   return false;
 }
 

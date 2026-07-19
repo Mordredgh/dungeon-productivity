@@ -29,6 +29,15 @@ function renderGold() {
 
 let shopCategory = 'consumible';
 
+function _cancelInventoryPurchase(goldBefore) {
+  // addGold() aplica multiplicadores de recompensa; un reembolso debe devolver
+  // exactamente el saldo previo, nunca conceder oro adicional.
+  setGold(goldBefore);
+  toast('⚠️', 'Compra cancelada: el objeto no se guardó. Tu oro fue devuelto.');
+  renderShopItems();
+  if (typeof renderInventory === 'function') renderInventory();
+}
+
 function openShop() { switchView('shop'); }
 
 function renderShopView() {
@@ -227,9 +236,10 @@ async function equipAvatarFrame(id) {
 }
 
 async function buyItem(id, cost) {
-  if (!spendGold(cost)) return;
   const item = SHOP_ITEMS.find(i => i.id === id);
   if (!item) return;
+  const goldBefore = getGold();
+  if (!spendGold(cost)) return;
 
   /* ── Consumibles clásicos ───────────────────────── */
   if (id === 'potion') {
@@ -278,27 +288,31 @@ async function buyItem(id, cost) {
   /* ── Huevos de mascota ──────────────────────────── */
   } else if (id.startsWith('egg_')) {
     const petKey = id.replace('egg_', '');
-    await addInvItem('pet_egg_' + petKey, 'pet_egg', 1);
+    const delivery = await addInvItem('pet_egg_' + petKey, 'pet_egg', 1);
+    if (!delivery?.ok) { _cancelInventoryPurchase(goldBefore); return; }
     toast('🥚', `¡Huevo de ${item.name} adquirido! Ve a Mascotas para eclosionarlo.`);
 
   /* ── Fragmentos de hechizo ──────────────────────── */
   } else if (id.startsWith('frag_')) {
     const spellKey = id.replace('frag_', '');
     const qty = item.qty || 5;
-    await addInvItem('spell_' + spellKey, 'spell_fragment', qty);
+    const delivery = await addInvItem('spell_' + spellKey, 'spell_fragment', qty);
+    if (!delivery?.ok) { _cancelInventoryPurchase(goldBefore); return; }
     if (typeof renderSpells === 'function') renderSpells();
     toast('✨', `+${qty} fragmentos de ${item.name}.`);
 
   /* ── Pociones de mascota ────────────────────────── */
   } else if (id.startsWith('pot_')) {
     const petKey = id.replace('pot_', '');
-    await addInvItem('pet_potion_' + petKey, 'pet_potion', 1);
+    const delivery = await addInvItem('pet_potion_' + petKey, 'pet_potion', 1);
+    if (!delivery?.ok) { _cancelInventoryPurchase(goldBefore); return; }
     toast('🧪', `+1 Poción de ${item.name}.`);
 
   /* ── Alimento de mascota ────────────────────────── */
   } else if (id.startsWith('food_')) {
     const petKey = id.replace('food_', '');
-    await addInvItem('pet_food_' + petKey, 'pet_food', 1);
+    const delivery = await addInvItem('pet_food_' + petKey, 'pet_food', 1);
+    if (!delivery?.ok) { _cancelInventoryPurchase(goldBefore); return; }
     if (typeof renderPets === 'function') renderPets();
     if (typeof renderActivePet === 'function') renderActivePet();
     toast('🍖', `Alimento adquirido. Ve a Mascotas → montura para dárselo.`);
