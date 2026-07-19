@@ -4882,6 +4882,7 @@ img.efx-row-icon { width: 24px; height: 24px; object-fit: contain; }
 .ch-icon { display:grid; place-items:center; width:32px; height:32px; font-size:24px; line-height:1; flex-shrink:0; }
 .ch-icon img { width:32px; height:32px; object-fit:contain; image-rendering:pixelated; }
 .bb-pet-chip-art { width:22px; height:22px; object-fit:contain; image-rendering:pixelated; vertical-align:middle; }
+.bb-prep-panel,.bb-prep-active { margin:8px 0; padding:8px; border:1px solid rgba(216,180,254,.28); border-radius:9px; background:rgba(55,27,85,.14); color:#d9cbe7; font-size:10px; }.bb-prep-panel>span { display:block; margin-bottom:6px; color:#c084fc; font:700 9px var(--font-head); text-transform:uppercase; }.bb-prep-panel>div { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; }.bb-prep-panel button { padding:6px; border:1px solid rgba(216,180,254,.2); border-radius:6px; background:rgba(8,6,18,.18); color:#eee5f6; cursor:pointer; text-align:left; }.bb-prep-panel button:hover { border-color:#c084fc; background:rgba(124,58,237,.18); }.bb-prep-panel b,.bb-prep-panel small,.bb-prep-active b,.bb-prep-active span { display:block; }.bb-prep-panel b,.bb-prep-active b { font-size:9px; }.bb-prep-panel small,.bb-prep-active span { margin-top:2px; color:var(--text3); font-size:8px; }.bb-prep-active { border-color:rgba(110,231,183,.42); }.bb-prep-active b { color:#a7f3d0; }
 .ch-info { flex: 1; min-width: 0; }
 .ch-name { font-weight: 600; font-size: 14px; color: var(--text); }
 .ch-desc { font-size: 11px; color: var(--text2); margin-top: 2px; }

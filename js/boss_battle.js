@@ -101,6 +101,21 @@ let _bbSpeed = 1;
 /* ── Último golpe fue crítico (leído justo tras _bbApplyVariance/_bbBossDmg) ── */
 let _bbLastCrit = false;
 
+const BOSS_PREPARATIONS = {
+  ruptura: { name:'Ruptura rúnica', desc:'+8% daño al jefe', effect:'boss_dmg', value:.08 },
+  guardia: { name:'Guardia de santuario', desc:'-20% daño recibido', effect:'boss_guard', value:.20 },
+  reserva: { name:'Reserva de combate', desc:'+2 energía contra este jefe', effect:'energy', value:2 },
+};
+function _bbPrepKey(cycle) { return `dungeon-boss-prep-${cycle}-${typeof _bossPeriodKey === 'function' ? _bossPeriodKey(cycle) : new Date().toISOString().slice(0,10)}`; }
+function getBossPreparation(cycle = _bbCycle) { return cycle ? (localStorage.getItem(_bbPrepKey(cycle)) || '') : ''; }
+function chooseBossPreparation(id) {
+  if (!BOSS_PREPARATIONS[id] || !_bbCycle || getBossPreparation()) return;
+  localStorage.setItem(_bbPrepKey(_bbCycle), id);
+  if (typeof toast === 'function') toast('Preparación', `${BOSS_PREPARATIONS[id].name}: ${BOSS_PREPARATIONS[id].desc}.`);
+  _bbRender();
+}
+window.chooseBossPreparation = chooseBossPreparation;
+
 function _bbResetBattleModifiers() {
   _bbPetAtkStage = 0;
   _bbPetDefStage = 0;
@@ -187,7 +202,8 @@ function _bbAttackKey(cycle) {
 /* La batalla debe permitir una sesión táctica real, no cinco clics y fuera. */
 function _bbMaxAttacks() {
   const strategyBonus = typeof hasGoldUpgrade === 'function' && hasGoldUpgrade('war_table') ? 3 : 0;
-  return 12 + strategyBonus + (typeof getMasteryBonus === 'function' ? getMasteryBonus('voluntad') : 0);
+  const prepBonus = getBossPreparation() === 'reserva' ? BOSS_PREPARATIONS.reserva.value : 0;
+  return 12 + strategyBonus + prepBonus + (typeof getMasteryBonus === 'function' ? getMasteryBonus('voluntad') : 0);
 }
 function _bbLeft(cycle) { try { return Math.max(0, _bbMaxAttacks() - parseInt(localStorage.getItem(_bbAttackKey(cycle)) || '0', 10)); } catch { return _bbMaxAttacks(); } }
 function _bbUse(cycle)  { try { const k = _bbAttackKey(cycle); localStorage.setItem(k, String((parseInt(localStorage.getItem(k)||'0',10))+1)); } catch {} }
@@ -249,7 +265,8 @@ function _damageBossCycle(cycle, baseDmg) {
   const doctrineMult = typeof getPrestigeDoctrineBonus === 'function' ? 1 + getPrestigeDoctrineBonus('boss_dmg') : 1;
   const equipmentResonanceMult = typeof getEquipmentResonanceBonus === 'function' ? 1 + getEquipmentResonanceBonus('boss_dmg') : 1;
   const campaignMult = cycle === 'weekly' && typeof getWeeklyCampaignBonus === 'function' ? 1 + getWeeklyCampaignBonus('boss_dmg') : 1;
-  const finalDmg = Math.max(1, Math.round((weather === 'storm' ? baseDmg * 2 : baseDmg) * petMult * petSpecMult * runeMult * dungeonMult * doctrineMult * equipmentResonanceMult * campaignMult));
+  const prepMult = getBossPreparation(cycle) === 'ruptura' ? 1 + BOSS_PREPARATIONS.ruptura.value : 1;
+  const finalDmg = Math.max(1, Math.round((weather === 'storm' ? baseDmg * 2 : baseDmg) * petMult * petSpecMult * runeMult * dungeonMult * doctrineMult * equipmentResonanceMult * campaignMult * prepMult));
 
   b.hp = Math.max(0, b.hp - finalDmg);
 
@@ -268,6 +285,7 @@ function _damageBossCycle(cycle, baseDmg) {
       if (typeof trackBossKill    === 'function') trackBossKill();
       if (typeof addActivePetXP   === 'function') addActivePetXP({ daily:30, weekly:100, monthly:250 }[cycle] || 30);
       if (typeof tryRuneDrop === 'function' && Math.random() < (reward.runeChance || 0)) setTimeout(() => tryRuneDrop('boss'), 1400);
+      if (getBossPreparation(cycle) === 'ruptura' && typeof addInvItem === 'function') await addInvItem('rune_fragment', 'rune_fragment', 1);
       if (typeof updateBossBanner === 'function') updateBossBanner();
     }, 800);
   }
@@ -595,8 +613,14 @@ function _bbRender() {
       <span class="bb-move-dmg">×${potionCount}</span>
     </button>`;
 
+  const prepId = getBossPreparation(_bbCycle);
+  const prepHtml = prepId
+    ? `<div class="bb-prep-active"><b>${BOSS_PREPARATIONS[prepId].name}</b><span>${BOSS_PREPARATIONS[prepId].desc}</span></div>`
+    : `<div class="bb-prep-panel"><span>Preparación táctica · elige una vez por jefe</span><div>${Object.entries(BOSS_PREPARATIONS).map(([id, prep]) => `<button type="button" onclick="chooseBossPreparation('${id}')"><b>${prep.name}</b><small>${prep.desc}</small></button>`).join('')}</div></div>`;
+
   if (movePanelEl) movePanelEl.innerHTML = `
     ${petChipsHtml}
+    ${prepHtml}
     <div class="bb-actions-grid">${movesHtml}${heroSkillHtml}${potionHtml}</div>
     <div class="bb-attacks-counter${attacksLeft === 0 ? ' exhausted' : ''}">
       ⚔️ ${attacksLeft}/${_bbMaxAttacks()} energía de combate · <span>${resetMsg}</span>
@@ -757,7 +781,8 @@ async function _bbBossCounterAttack() {
   await _bbDelay(150);
   if (bossSpriteEl2) bossSpriteEl2.style.transform = '';
 
-  const bossDmg      = _bbBossDmg();
+  const guardMult    = getBossPreparation(_bbCycle) === 'guardia' ? 1 - BOSS_PREPARATIONS.guardia.value : 1;
+  const bossDmg      = Math.max(1, Math.round(_bbBossDmg() * guardMult));
   if (_bbLastCrit) toast('💥', '¡Golpe crítico del jefe!', 1000);
   // Bono de set Druida: mascota no cae en batalla durante 48h tras equipar
   const druidaShield = typeof isDruidaProtectionActive === 'function' && isDruidaProtectionActive();
