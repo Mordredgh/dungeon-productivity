@@ -247,7 +247,8 @@ function _damageBossCycle(cycle, baseDmg) {
   const runeMult = typeof getRuneBonus    === 'function' ? (1 + getRuneBonus('boss_dmg'))     : 1;
   const dungeonMult = typeof getDungeonBonus === 'function' ? getDungeonBonus('boss_dmg') : 1;
   const doctrineMult = typeof getPrestigeDoctrineBonus === 'function' ? 1 + getPrestigeDoctrineBonus('boss_dmg') : 1;
-  const finalDmg = Math.max(1, Math.round((weather === 'storm' ? baseDmg * 2 : baseDmg) * petMult * petSpecMult * runeMult * dungeonMult * doctrineMult));
+  const equipmentResonanceMult = typeof getEquipmentResonanceBonus === 'function' ? 1 + getEquipmentResonanceBonus('boss_dmg') : 1;
+  const finalDmg = Math.max(1, Math.round((weather === 'storm' ? baseDmg * 2 : baseDmg) * petMult * petSpecMult * runeMult * dungeonMult * doctrineMult * equipmentResonanceMult));
 
   b.hp = Math.max(0, b.hp - finalDmg);
 

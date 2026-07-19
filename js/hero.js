@@ -167,9 +167,10 @@ async function addXP(amount, type, sourceEl) {
   const seasonalMult   = typeof getSeasonalXPMult  === 'function' ? getSeasonalXPMult() : 1;
   const dungeonXPMult = typeof getDungeonBonus==='function' ? getDungeonBonus('xp') : 1;
   const doctrineXPMult = 1 + getPrestigeDoctrineBonus('xp');
+  const equipmentResonanceMult = typeof getEquipmentResonanceBonus === 'function' ? 1 + getEquipmentResonanceBonus('xp') : 1;
   const h = new Date().getHours();
   const nightRuneMult = (typeof getRuneBonus==='function' && (h >= 20 || h < 5)) ? (1 + getRuneBonus('night_xp')) : 1;
-  let finalXP = Math.round(amount * classXPBonus(type || 'side') * xpMultiplier * todMult * skillMult * runeMult * weaponMult * mountAtkMult * seasonalMult * dungeonXPMult * doctrineXPMult * nightRuneMult);
+  let finalXP = Math.round(amount * classXPBonus(type || 'side') * xpMultiplier * todMult * skillMult * runeMult * weaponMult * mountAtkMult * seasonalMult * dungeonXPMult * doctrineXPMult * equipmentResonanceMult * nightRuneMult);
 
   if (typeof trackWeekXP === 'function') trackWeekXP(finalXP);
   const prevLevel = calcLevel(hero.xp_total || 0);

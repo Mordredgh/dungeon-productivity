@@ -15,7 +15,8 @@ function addGold(n) {
   const masteryGoldMult = n > 0 && typeof getMasteryBonus === 'function' ? 1 + getMasteryBonus('fortuna') : 1;
   const doctrineGoldMult = n > 0 && typeof getPrestigeDoctrineBonus === 'function' ? 1 + getPrestigeDoctrineBonus('gold') : 1;
   const salaGoldMult = n > 0 && typeof getSalaBonus === 'function' ? 1 + getSalaBonus('gold') : 1;
-  setGold(getGold() + Math.round(n * bonus * agiBonus * starBonus * upgradeBonus * masteryGoldMult * doctrineGoldMult * salaGoldMult));
+  const equipmentResonanceMult = n > 0 && typeof getEquipmentResonanceBonus === 'function' ? 1 + getEquipmentResonanceBonus('gold') : 1;
+  setGold(getGold() + Math.round(n * bonus * agiBonus * starBonus * upgradeBonus * masteryGoldMult * doctrineGoldMult * salaGoldMult * equipmentResonanceMult));
 }
 function spendGold(n) { if (getGold() < n) { toast('💸', 'Oro insuficiente.'); return false; } addGold(-n); return true; }
 
