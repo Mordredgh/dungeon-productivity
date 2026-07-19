@@ -6,6 +6,8 @@ const character = fs.readFileSync('js/character.js', 'utf8');
 const quests = fs.readFileSync('js/quests.js', 'utf8');
 const inventory = fs.readFileSync('js/inventory.js', 'utf8');
 const habits = fs.readFileSync('js/habits.js', 'utf8');
+const dbClient = fs.readFileSync('js/db.js', 'utf8');
+const timer = fs.readFileSync('js/timer.js', 'utf8');
 const auth = fs.readFileSync('js/auth.js', 'utf8');
 const beta = fs.readFileSync('js/beta.js', 'utf8');
 const economyMigration = fs.readFileSync('supabase/migrations/20260719_server_authoritative_economy.sql', 'utf8');
@@ -33,6 +35,10 @@ assert.match(economyMigration, /create table if not exists public\.dungeon_rewar
 assert.match(economyMigration, /create or replace function public\.complete_dungeon_quest/i, 'la recompensa de misión se calcula dentro de Supabase');
 assert.match(economyMigration, /security definer/i, 'la operación económica se ejecuta únicamente mediante una función controlada');
 assert.match(economyMigration, /unique\s*\(hero_id, source, source_id\)/i, 'el mismo evento de recompensa no puede acreditarse dos veces');
+assert.match(economyMigration, /start_dungeon_pomodoro/i, 'un pomodoro inicia con sello horario del servidor');
+assert.match(economyMigration, /complete_dungeon_pomodoro/i, 'un pomodoro sólo recompensa mediante una sesión validada');
+assert.match(dbClient, /db\.rpc\('complete_dungeon_pomodoro'/, 'el cliente no inserta pomodoros recompensados directamente');
+assert.match(timer, /db\.rpc\('start_dungeon_pomodoro'/, 'el temporizador solicita sello inicial al servidor');
 assert.match(fs.readFileSync('js/ui.js', 'utf8'), /initModalAccessibility/, 'los modales ocultos quedan fuera del árbol accesible');
 assert.match(fs.readFileSync('deploy.ps1', 'utf8'), /Assets HTML: v\$new/, 'cada deploy renueva el fingerprint de JS y CSS');
 

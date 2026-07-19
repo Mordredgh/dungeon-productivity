@@ -208,3 +208,47 @@ $$;
 
 revoke all on function public.undo_dungeon_quest(uuid) from public;
 grant execute on function public.undo_dungeon_quest(uuid) to authenticated;
+
+-- Pomodoros: el servidor sella el inicio y sólo acredita al vencer la duración.
+create table if not exists public.dungeon_pomodoro_sessions (
+  id uuid primary key default gen_random_uuid(),
+  hero_id uuid not null references public.dungeon_heroes(id) on delete cascade,
+  duration integer not null check (duration in (15,25,45,60)),
+  started_at timestamptz not null default now(),
+  completed_at timestamptz,
+  unique (hero_id, completed_at)
+);
+alter table public.dungeon_pomodoro_sessions enable row level security;
+
+create or replace function public.start_dungeon_pomodoro(p_duration integer)
+returns uuid language plpgsql security definer set search_path = public as $$
+declare v_hero uuid; v_session uuid;
+begin
+  select id into v_hero from public.dungeon_heroes where user_id=auth.uid();
+  if v_hero is null then raise exception 'Héroe no encontrado'; end if;
+  if p_duration not in (15,25,45,60) then raise exception 'Duración inválida'; end if;
+  insert into public.dungeon_pomodoro_sessions(hero_id,duration) values(v_hero,p_duration) returning id into v_session;
+  return v_session;
+end; $$;
+
+create or replace function public.complete_dungeon_pomodoro(p_session_id uuid)
+returns table (id uuid, started_at timestamptz, duration integer, xp_awarded integer, gold_awarded integer, pomodoros_done integer, xp_total integer, gold integer)
+language plpgsql security definer set search_path = public as $$
+declare v_hero public.dungeon_heroes%rowtype; v_session public.dungeon_pomodoro_sessions%rowtype; v_done integer; v_gold integer := 0; v_pom_id uuid;
+begin
+  select * into v_hero from public.dungeon_heroes where user_id=auth.uid() for update;
+  if not found then raise exception 'Héroe no encontrado'; end if;
+  select * into v_session from public.dungeon_pomodoro_sessions where id=p_session_id and hero_id=v_hero.id for update;
+  if not found or v_session.completed_at is not null then raise exception 'Sesión inválida'; end if;
+  if now() < v_session.started_at + make_interval(mins => v_session.duration) then raise exception 'El pomodoro aún no termina'; end if;
+  v_done := coalesce(v_hero.pomodoros_done,0)+1;
+  if v_done % 4 = 0 then v_gold := 30; end if;
+  update public.dungeon_pomodoro_sessions set completed_at=now() where id=v_session.id;
+  insert into public.dungeon_pomodoros(hero_id,duration,completed,started_at) values(v_hero.id,v_session.duration,true,v_session.started_at) returning id into v_pom_id;
+  update public.dungeon_heroes set pomodoros_done=v_done,xp_total=coalesce(v_hero.xp_total,0)+15,gold=coalesce(v_hero.gold,0)+v_gold where id=v_hero.id;
+  return query select v_pom_id,v_session.started_at,v_session.duration,15,v_gold,v_done,coalesce(v_hero.xp_total,0)+15,coalesce(v_hero.gold,0)+v_gold;
+end; $$;
+
+revoke all on function public.start_dungeon_pomodoro(integer) from public;
+revoke all on function public.complete_dungeon_pomodoro(uuid) from public;
+grant execute on function public.start_dungeon_pomodoro(integer), public.complete_dungeon_pomodoro(uuid) to authenticated;

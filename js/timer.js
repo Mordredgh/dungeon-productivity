@@ -1,6 +1,11 @@
 ﻿/* TIMER */
-function startTimer() {
+async function startTimer() {
   if (timer.running) { pauseTimer(); return; }
+  if (timer.phase === 'focus' && !timer.serverPomSession) {
+    const { data, error } = await db.rpc('start_dungeon_pomodoro', { p_duration: timer.duration });
+    if (error || !data) { toast('⚠️', 'No se pudo iniciar el pomodoro seguro. Inténtalo de nuevo.'); return; }
+    timer.serverPomSession = data;
+  }
   timer.running = true;
   document.getElementById('startBtn').textContent = '⏸';
   timer.interval = setInterval(tickTimer, 1000);
@@ -33,12 +38,12 @@ function tickTimer() {
   updateTimerUI();
 }
 
-function advancePhase() {
+async function advancePhase() {
   pauseTimer();
   playBeep(timer.phase === 'focus' ? 'complete' : 'start');
 
   if (timer.phase === 'focus') {
-    savePom();
+    if (!await savePom()) { timer.seconds = 0; updateTimerUI(); return; }
     timer.pomsDone++;
     updatePomDots();
     const isLong = timer.pomsDone % 4 === 0;

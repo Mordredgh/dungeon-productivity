@@ -42,24 +42,19 @@ async function loadPomodoros() {
 }
 
 async function savePom() {
-  const doubleXP = timer._nextPomDouble;
-  timer._nextPomDouble = false;
-  const rec = { hero_id: hero.id, duration: timer.duration, completed: true, started_at: new Date().toISOString() };
-  const { data } = await db.from('dungeon_pomodoros').insert(rec).select().single();
-  pomodoros.unshift(data);
+  if (!timer.serverPomSession) return false;
+  const { data: rows, error } = await db.rpc('complete_dungeon_pomodoro', { p_session_id: timer.serverPomSession });
+  const reward = Array.isArray(rows) ? rows[0] : rows;
+  if (error || !reward) { toast('⚠️', 'No se pudo validar el pomodoro. El progreso se mantiene.'); return false; }
+  timer.serverPomSession = null;
+  const rec = { id: reward.id, hero_id: hero.id, duration: reward.duration, completed: true, started_at: reward.started_at };
+  pomodoros.unshift(rec);
+  Object.assign(hero, { xp_total:Number(reward.xp_total || hero.xp_total), gold:Number(reward.gold || hero.gold), pomodoros_done:Number(reward.pomodoros_done || hero.pomodoros_done) });
+  deriveHero(); renderGold(); renderHeroUI();
 
-  const petPomBonus = typeof getPetEffect === 'function' ? (getPetEffect('pom_xp') || 0) : 0;
-  const xpAmt = (doubleXP ? POM_XP * 2 : POM_XP) + petPomBonus;
-  await addXP(xpAmt, 'pom', null);
-  if (doubleXP) toast('🧠', `¡Mente de Acero! +${xpAmt} XP del pomodoro.`);
-
-  const newTotal = (hero.pomodoros_done || 0) + 1;
-  await saveHero({ pomodoros_done: newTotal });
-
-  // Cada 4 pomodoros = ciclo completo → oro + drops + daño al jefe
-  if (newTotal % 4 === 0) {
-    const cycleNum = Math.floor(newTotal / 4);
-    const goldAmt  = 30;
+  if (Number(reward.gold_awarded || 0) > 0) {
+    const cycleNum = Math.floor(Number(reward.pomodoros_done) / 4);
+    const goldAmt = Number(reward.gold_awarded);
 
     if (typeof damageBoss === 'function') damageBoss(20);
 
@@ -82,4 +77,5 @@ async function savePom() {
   checkAchievements();
   renderStats();
   updatePomGoalUI();
+  return true;
 }
