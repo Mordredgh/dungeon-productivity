@@ -278,17 +278,9 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .hero-avatar-btn .hero-avatar-img,
 .hero-avatar-btn .hero-avatar-emoji { border-radius: 7px; }
 .hero-avatar-btn[class*="frame-"]::after {
-  content: '';
-  position: absolute;
-  inset: -6px;
-  z-index: 3;
-  pointer-events: none;
-  background: center / contain no-repeat;
+  /* El retrato no lleva una ilustración superpuesta: tapaba la silueta. */
+  display: none;
 }
-.hero-avatar-btn.frame-bronce::after { background-image: url('../images/frame_bronce.webp'); }
-.hero-avatar-btn.frame-plata::after { background-image: url('../images/frame_plata.webp'); }
-.hero-avatar-btn.frame-oro::after { background-image: url('../images/frame_oro.webp'); }
-.hero-avatar-btn.frame-arcano::after { background-image: url('../images/frame_arcano.webp'); }
 
 .hero-avatar-btn:hover { transform: scale(1.08); }
 
@@ -492,27 +484,28 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
   box-shadow: none !important;
 }
 .sb-avatar-ring.has-cosmetic-frame {
-  padding: 0;
-  border-radius: 14px;
+  padding: 2px;
+  border-radius: 13px;
   background: transparent;
   box-shadow: none;
 }
 .sb-avatar-ring.has-cosmetic-frame .daily-ring-svg { display: none; }
 .sb-avatar-ring.has-cosmetic-frame .hero-avatar-btn {
-  border: 0 !important;
-  border-radius: 10px !important;
-  background: transparent !important;
-  overflow: visible;
+  border: 2px solid var(--frame-color, #a855f7) !important;
+  border-radius: 11px !important;
+  background: rgba(12,7,22,.6) !important;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.13), 0 0 14px color-mix(in srgb, var(--frame-color, #a855f7) 35%, transparent) !important;
 }
 .sb-avatar-ring.has-cosmetic-frame .hero-avatar-img {
   position: relative;
   z-index: 1;
-  border-radius: 9px !important;
+  border-radius: 8px !important;
 }
-.sb-avatar-ring.has-cosmetic-frame .hero-avatar-btn[class*="frame-"]::after {
-  inset: -11px;
-  z-index: 3;
-}
+.sb-avatar-ring.has-cosmetic-frame .hero-avatar-btn.frame-bronce { --frame-color:#c98248; }
+.sb-avatar-ring.has-cosmetic-frame .hero-avatar-btn.frame-plata { --frame-color:#cbd5e1; }
+.sb-avatar-ring.has-cosmetic-frame .hero-avatar-btn.frame-oro { --frame-color:#fbbf24; }
+.sb-avatar-ring.has-cosmetic-frame .hero-avatar-btn.frame-arcano { --frame-color:#c084fc; }
 .sb-avatar-ring.has-cosmetic-frame .avatar-level-badge { z-index: 4; }
 
 .sb-profile .hero-name {
@@ -583,6 +576,13 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 }
 .sb-stat-card:hover { border-color: rgba(137,180,250,.3); background: rgba(137,180,250,.14); }
 .sb-stat-val { font-size: 13px; font-weight: 700; color: var(--text); font-family: var(--font-head); line-height: 1.2; }
+.sb-stat-art,.sb-resource-art,.char-tab-art,.nav-art,.view-tab-art { width:16px; height:16px; object-fit:contain; image-rendering:pixelated; vertical-align:middle; }
+.sb-resource-art { width:13px; height:13px; margin-right:3px; }
+.sb-stat-art { width:14px; height:14px; margin-right:3px; }
+.char-tab-art { width:17px; height:17px; margin-right:5px; }
+.weather-art,.clock-art { width:16px; height:16px; object-fit:contain; image-rendering:pixelated; vertical-align:middle; }
+.weather-detail-icon.weather-art { width:34px; height:34px; }
+.chr-qs-v img { width:15px; height:15px; object-fit:contain; image-rendering:pixelated; vertical-align:-2px; margin-right:3px; }
 .sb-stat-lbl { font-size: 8px; color: var(--text3); margin-top: 2px; display: block; }
 
 .sb-divider { height: 1px; background: rgba(137,180,250,.08); flex-shrink: 0; }

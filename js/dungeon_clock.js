@@ -70,7 +70,8 @@ function updateDungeonClock() {
   if (!chip) return;
 
   const hasBonus = def.xpMult > 1 || def.goldMult > 1;
-  chip.innerHTML = `${def.icon} <span class="clock-name">${def.name}</span>`;
+  const art = tod === 'midnight' || tod === 'evening' ? 'clima_eclipse' : tod === 'dusk' || tod === 'dawn' ? 'clima_arcoiris' : 'clima_despejado';
+  chip.innerHTML = `<img class="clock-art" src="images/${art}.webp" alt=""> <span class="clock-name">${def.name}</span>`;
   chip.title     = def.desc;
   chip.classList.toggle('clock-bonus', hasBonus);
 }

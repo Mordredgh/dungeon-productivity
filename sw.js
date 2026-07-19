@@ -1,4 +1,4 @@
-const CACHE = 'dungeon-v252';
+const CACHE = 'dungeon-v253';
 const ASSETS = [
   '/',
   '/index.html',
@@ -321,7 +321,7 @@ const ASSETS = [
   '/images/logro_rico-poder.webp',
   '/images/logro_semana-epica.webp',
   '/images/logro_senor-caos.webp',
-  '/images/logro_seÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±or-tiempo.webp',
+  '/images/logro_seÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±or-tiempo.webp',
   '/images/logro_tesoro-arcano.webp',
   '/images/logro_tiempo-infinito.webp',
   '/images/logro_triple-amenaza.webp',
@@ -439,7 +439,7 @@ self.addEventListener('notificationclick', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) return;
   if (e.request.url.includes('supabase.co')) return;
-  // HTML: network-first para siempre tener la versiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡s reciente
+  // HTML: network-first para siempre tener la versiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡s reciente
   if (e.request.headers.get('accept')?.includes('text/html')) {
     e.respondWith(
       fetch(e.request).catch(() => caches.match(e.request))

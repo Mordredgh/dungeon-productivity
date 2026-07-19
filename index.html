@@ -136,7 +136,7 @@
       </div>
       <div id="dailyGoalBar" class="daily-goal-bar" style="display:none">
         <div class="dgb-label">
-          <span>🎯 Meta diaria</span>
+          <span><img class="sb-resource-art" src="images/stat_missions.webp" alt="">Meta diaria</span>
           <span id="dgbText">0 / 300 XP</span>
         </div>
         <div class="dgb-track"><div class="dgb-fill" id="dgbFill" style="width:0%"></div></div>
@@ -189,21 +189,21 @@
       <div class="sb-bars">
         <div class="sb-bar-block">
           <div class="sb-bar-header">
-            <span class="sb-bar-lbl">✨</span>
+            <img class="sb-resource-art" src="images/stat_xp.webp" alt="">
             <span class="sb-bar-val" id="xpLabel">0/100</span>
           </div>
           <div class="xp-bar sb-bar"><div class="xp-bar-fill" id="xpBarFill" style="width:0%"></div></div>
         </div>
         <div class="sb-bar-block">
           <div class="sb-bar-header">
-            <span class="sb-bar-lbl">❤️</span>
+            <img class="sb-resource-art" src="images/stat_hp.webp" alt="">
             <span class="sb-bar-val" id="hpLabel">100/100</span>
           </div>
           <div class="hp-bar sb-bar"><div class="hp-bar-fill" id="hpBarFill" style="width:100%"></div></div>
         </div>
         <div class="sb-bar-block">
           <div class="sb-bar-header">
-            <span class="sb-bar-lbl">🔵</span>
+            <img class="sb-resource-art" src="images/stat_mana.webp" alt="">
             <span class="sb-bar-val" id="manaLabel">0 / 100</span>
           </div>
           <div class="mana-bar sb-bar"><div class="mana-bar-fill" id="manaBarFill" style="width:0%"></div></div>
@@ -217,11 +217,11 @@
           <div class="sb-stat-lbl">Nivel</div>
         </div>
         <div class="sb-stat-card">
-          <div class="sb-stat-val"><span id="statStreak">0</span>🔥</div>
+          <div class="sb-stat-val"><img class="sb-stat-art" src="images/stat_streak.webp" alt=""><span id="statStreak">0</span></div>
           <div class="sb-stat-lbl">Racha</div>
         </div>
         <div class="sb-stat-card" id="goldDisplay" onclick="switchView('shop')" style="cursor:pointer" title="Tienda del Gremio">
-          <div class="sb-stat-val gold-display">🪙 0</div>
+          <div class="sb-stat-val gold-display"><img class="sb-stat-art" src="images/stat_gold.webp" alt="">0</div>
           <div class="sb-stat-lbl">Oro</div>
         </div>
       </div>
@@ -254,9 +254,9 @@
         <button class="sidebar-item" data-view="integrations" onclick="switchView('integrations')" title="Integraciones" data-label="APIs"><img src="images/nav_integraciones.webp" class="si-icon-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="si-icon" style="display:none">🔗</span></button>
         <div class="sb-nav-sep"></div>
         <!-- Fila 5: exploración -->
-        <button class="sidebar-item" data-view="zones" onclick="switchView('zones')" title="Zonas del Dungeon" data-label="Zonas"><span class="si-icon">🗺️</span></button>
+        <button class="sidebar-item" data-view="zones" onclick="switchView('zones')" title="Zonas del Dungeon" data-label="Zonas"><img src="images/nav_zones.webp" class="si-icon-img" alt=""></button>
         <button class="sidebar-item" data-view="worldmap" onclick="switchView('worldmap')" title="Mapa del Mundo" data-label="Mapa"><img src="images/nav_mundo.webp" class="si-icon-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="si-icon" style="display:none">🌍</span></button>
-        <button class="sidebar-item" data-view="factions" onclick="switchView('factions')" title="Facciones del Dungeon" data-label="Facciones"><span class="si-icon">🏛️</span></button>
+        <button class="sidebar-item" data-view="factions" onclick="switchView('factions')" title="Facciones del Dungeon" data-label="Facciones"><img src="images/nav_facciones.webp" class="si-icon-img" alt=""></button>
         <button class="sidebar-item" data-view="config" onclick="switchView('config')" title="Configuración" data-label="Config"><img src="images/nav_config.webp" class="si-icon-img" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="si-icon" style="display:none">⚙️</span></button>
       </div>
 
@@ -286,12 +286,12 @@
 
       <!-- CHARACTER HUB TAB BAR — fuera del .view para evitar conflictos de padding/z-index -->
       <nav class="char-hub-tabs" id="charHubTabs" style="display:none">
-        <button class="char-tab active" data-ctab="sheet"    onclick="switchCharTab('sheet')">🛡️ Personaje</button>
-        <button class="char-tab"        data-ctab="skills"   onclick="switchCharTab('skills')">🌳 Habilidades</button>
-        <button class="char-tab"        data-ctab="runes"    onclick="switchCharTab('runes')">💎 Runas</button>
-        <button class="char-tab"        data-ctab="bestiary" onclick="switchCharTab('bestiary')">📖 Bestiario</button>
-        <button class="char-tab"        data-ctab="smithy"      onclick="switchCharTab('smithy')">⚒️ Herrero</button>
-        <button class="char-tab"        data-ctab="sala-personal" onclick="switchCharTab('sala-personal')">🏠 Sala</button>
+        <button class="char-tab active" data-ctab="sheet"    onclick="switchCharTab('sheet')"><img class="char-tab-art" src="images/nav_personaje.webp" alt="">Personaje</button>
+        <button class="char-tab"        data-ctab="skills"   onclick="switchCharTab('skills')"><img class="char-tab-art" src="images/nav_habilidades.webp" alt="">Habilidades</button>
+        <button class="char-tab"        data-ctab="runes"    onclick="switchCharTab('runes')"><img class="char-tab-art" src="images/nav_runas.webp" alt="">Runas</button>
+        <button class="char-tab"        data-ctab="bestiary" onclick="switchCharTab('bestiary')"><img class="char-tab-art" src="images/nav_bestiario.webp" alt="">Bestiario</button>
+        <button class="char-tab"        data-ctab="smithy"      onclick="switchCharTab('smithy')"><img class="char-tab-art" src="images/tool_herrero.webp" alt="">Herrero</button>
+        <button class="char-tab"        data-ctab="sala-personal" onclick="switchCharTab('sala-personal')"><img class="char-tab-art" src="images/nav_sala.webp" alt="">Sala</button>
       </nav>
 
       <div class="views">

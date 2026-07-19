@@ -346,10 +346,10 @@ function renderCharacterSheet() {
       </div>
 
       <div class="chr-quickstats">
-        <div class="chr-qs"><span class="chr-qs-v">🪙 ${gold.toLocaleString()}</span><span class="chr-qs-l">Oro</span></div>
-        <div class="chr-qs"><span class="chr-qs-v">🔥 ${hero.streak || 0}</span><span class="chr-qs-l">Racha</span></div>
-        <div class="chr-qs"><span class="chr-qs-v">✅ ${hero.quests_done || 0}</span><span class="chr-qs-l">Misiones</span></div>
-        <div class="chr-qs"><span class="chr-qs-v">🏆 ${hero.longest_streak || 0}</span><span class="chr-qs-l">Mejor racha</span></div>
+        <div class="chr-qs"><span class="chr-qs-v"><img src="images/stat_gold.webp" alt="">${gold.toLocaleString()}</span><span class="chr-qs-l">Oro</span></div>
+        <div class="chr-qs"><span class="chr-qs-v"><img src="images/stat_streak.webp" alt="">${hero.streak || 0}</span><span class="chr-qs-l">Racha</span></div>
+        <div class="chr-qs"><span class="chr-qs-v"><img src="images/stat_missions.webp" alt="">${hero.quests_done || 0}</span><span class="chr-qs-l">Misiones</span></div>
+        <div class="chr-qs"><span class="chr-qs-v"><img src="images/stat_record.webp" alt="">${hero.longest_streak || 0}</span><span class="chr-qs-l">Mejor racha</span></div>
       </div>
 
       <div id="heroScoreWidget" class="hero-score-widget" style="margin-top:8px"></div>
