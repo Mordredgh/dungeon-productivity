@@ -131,6 +131,39 @@ function getActivePetBondBonus() {
   const active = pets.find(p => p.is_active && p.stage !== 'egg');
   return active ? getPetBondRank(active).bonus : 0;
 }
+
+/* Especialización de montura. Se guarda junto al vínculo local, igual que este,
+   para no forzar una migración de base de datos y conservar la decisión del jugador. */
+const PET_SPECIALIZATIONS = {
+  cazador: { name:'Cazador de jefes', art:'pet_power_dragon.webp', effect:'boss_dmg', value:.08, text:'+8% daño contra jefes' },
+  rastreador: { name:'Rastreador arcano', art:'pet_power_nature.webp', effect:'drop_rate', value:.08, text:'+8% probabilidad de botín' },
+  guardian: { name:'Guardián del vínculo', art:'pet_power_shadow.webp', effect:'pet_rest', value:.18, text:'+18% recuperación tras combate' },
+};
+function _petSpecKey(petId) { return `dungeon-pet-specialization-${hero?.id || 'guest'}-${petId}`; }
+function getPetSpecialization(pet) {
+  const key = pet?.id ? localStorage.getItem(_petSpecKey(pet.id)) : null;
+  return PET_SPECIALIZATIONS[key] ? key : null;
+}
+function getActivePetSpecializationBonus(effect) {
+  const active = pets.find(p => p.is_active && p.stage === 'mount');
+  const spec = PET_SPECIALIZATIONS[getPetSpecialization(active)];
+  return spec?.effect === effect ? spec.value : 0;
+}
+function openPetSpecialization(petId) {
+  const pet = pets.find(item => item.id === petId);
+  if (!pet || pet.stage !== 'mount') return;
+  let modal = document.getElementById('petSpecializationModal');
+  if (!modal) { modal = document.createElement('div'); modal.id = 'petSpecializationModal'; modal.className = 'prestige-choice-overlay'; document.body.appendChild(modal); }
+  const selected = getPetSpecialization(pet);
+  modal.innerHTML = `<section class="prestige-choice-card pet-spec-card" role="dialog" aria-modal="true" aria-label="Especialización de mascota"><button class="onboarding-close" type="button" onclick="document.getElementById('petSpecializationModal')?.remove()">×</button><span class="sala-room-kicker">MONTURA EVOLUCIONADA</span><h2>Elige su senda</h2><p>La especialización define el apoyo de esta montura. Puedes cambiarla fuera de combate.</p><div class="prestige-choice-grid">${Object.entries(PET_SPECIALIZATIONS).map(([key, spec]) => `<button class="prestige-choice${selected === key ? ' is-selected' : ''}" type="button" onclick="choosePetSpecialization('${petId}','${key}')"><img src="images/${spec.art}" alt=""><strong>${spec.name}</strong><span>${spec.text}</span></button>`).join('')}</div></section>`;
+}
+function choosePetSpecialization(petId, key) {
+  if (!PET_SPECIALIZATIONS[key]) return;
+  localStorage.setItem(_petSpecKey(petId), key);
+  document.getElementById('petSpecializationModal')?.remove();
+  if (typeof toast === 'function') toast('✦', `Senda elegida: ${PET_SPECIALIZATIONS[key].name}.`);
+  renderPets(); renderActivePet();
+}
 function addActivePetBond(amount = 1) {
   const active = pets.find(p => p.is_active && p.stage !== 'egg');
   if (!active || amount <= 0) return;
@@ -208,6 +241,7 @@ async function feedPet(petId) {
     if (willEvo) {
       toast('🌟', `¡${def.name} evolucionó a Montura! Nv.1 — aliméntala para subir de nivel.`);
       checkReyTempestad();
+      setTimeout(() => openPetSpecialization(pet.id), 100);
     } else {
       toast('✨', `Poción de evolución: ${newFed}/${def.evolve} — ${def.name} Nv.15`);
     }
@@ -384,6 +418,8 @@ function renderActivePet() {
               const xpPct = lvl >= 50 ? 100 : Math.round((xp / need) * 100);
               const st    = getPetStatAtLevel(def, lvl);
               const food  = typeof getInvCount === 'function' ? getInvCount('pet_food_' + active.pet_key) : 0;
+              const specKey = getPetSpecialization(active);
+              const spec = PET_SPECIALIZATIONS[specKey];
               return `
               <div class="pet-level-badge">⭐ Nv. ${lvl} / 50</div>
               <div class="pet-evo-wrap" style="margin-top:4px">
@@ -396,6 +432,7 @@ function renderActivePet() {
                 <div class="pet-stat-cell" title="Bonus Oro de misiones">⚡ <b>${st.spd}%</b></div>
                 <div class="pet-stat-cell" title="Probabilidad de loot">🍀 <b>${st.lck}%</b></div>
               </div>
+              <button class="pet-specialization" type="button" onclick="openPetSpecialization('${active.id}')">${spec ? `<img src="images/${spec.art}" alt=""><span>${spec.name}<small>${spec.text}</small></span>` : '<span>Elegir especialización de montura</span>'}</button>
               ${lvl < 50 ? `<button class="pet-action-btn ${food>0?'':'pet-btn-disabled'}" style="margin-top:4px"
                 onclick="feedPetFood('${active.id}')" ${food>0?'':'disabled'}>🍖 Alimentar (${food})</button>` : ''}
               <div style="font-size:9px;color:var(--text3);margin-top:2px">Alimento en Tienda → 🍖 Alimento</div>`;

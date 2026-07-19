@@ -311,10 +311,12 @@ function renderClassSkillBtn() {
   const skill = CLASS_SKILLS[hero.hero_class];
   if (!skill) { el.style.display = 'none'; return; }
   const mana = hero.mana || 0;
-  const canUse = mana >= MANA_SKILL_COST;
+  const doctrineMana = typeof getPrestigeDoctrineBonus === 'function' ? Math.max(.55, 1 - getPrestigeDoctrineBonus('mana')) : 1;
+  const manaCost = Math.ceil(MANA_SKILL_COST * doctrineMana);
+  const canUse = mana >= manaCost;
   el.style.display = 'flex';
   el.disabled = !canUse;
-  el.title = canUse ? skill.desc : `Necesitas ${MANA_SKILL_COST} maná (tienes ${mana})`;
+  el.title = canUse ? skill.desc : `Necesitas ${manaCost} maná (tienes ${mana})`;
 
   el.textContent = '';
   const img = document.createElement('img');
@@ -333,19 +335,21 @@ function renderClassSkillBtn() {
   name.textContent = skill.name;
   const manaLbl = document.createElement('span');
   manaLbl.className = 'class-skill-mana';
-  manaLbl.textContent = `💙 ${mana}/${MANA_SKILL_COST}`;
+  manaLbl.textContent = `💙 ${mana}/${manaCost}`;
   info.append(name, manaLbl);
   el.append(img, emoji, info);
 }
 async function useClassSkill() {
   if (!hero) return;
   const mana = hero.mana || 0;
-  if (mana < MANA_SKILL_COST) {
+  const doctrineMana = typeof getPrestigeDoctrineBonus === 'function' ? Math.max(.55, 1 - getPrestigeDoctrineBonus('mana')) : 1;
+  const manaCost = Math.ceil(MANA_SKILL_COST * doctrineMana);
+  if (mana < manaCost) {
     toast('💙', `Maná insuficiente (${mana}/${hero.mana_max||100}). Completa hábitos (+10) y pomodoros (+20).`);
     return;
   }
   // Consume mana
-  hero.mana = mana - MANA_SKILL_COST;
+  hero.mana = mana - manaCost;
   saveHero({ mana: hero.mana });
   renderClassSkillBtn();
   if (typeof renderHeroUI === 'function') renderHeroUI();

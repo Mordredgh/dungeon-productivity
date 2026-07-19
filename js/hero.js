@@ -72,8 +72,37 @@ function getPrestigeXPBonus(prestige) {
   return 0.5 + (1 - Math.exp(-(prestige - 10) * 0.04)) * 0.5;
 }
 
+const PRESTIGE_DOCTRINES = {
+  conquistador: { name:'Senda del Conquistador', desc:'+3% daño contra jefes por ascensión', bonus:'boss_dmg', value:.03 },
+  arcanista:    { name:'Senda del Arcanista', desc:'-3% coste de maná por ascensión', bonus:'mana', value:.03 },
+  mercader:     { name:'Senda del Mercader', desc:'+3% oro ganado por ascensión', bonus:'gold', value:.03 },
+};
+function _masteryRanks() { try { return JSON.parse(hero?.mastery_ranks || '{}'); } catch { return {}; } }
+function getPrestigeDoctrine() { return PRESTIGE_DOCTRINES[_masteryRanks().__doctrine] || null; }
+function getPrestigeDoctrineBonus(type) {
+  const doctrine = getPrestigeDoctrine();
+  return doctrine?.bonus === type ? doctrine.value * (hero?.prestige || 0) : 0;
+}
+function openPrestigeDoctrine() {
+  const modal = document.createElement('div');
+  modal.className = 'prestige-choice-overlay';
+  modal.id = 'prestigeDoctrineModal';
+  modal.innerHTML = `<section class="prestige-choice-card" role="dialog" aria-modal="true" aria-label="Elige doctrina de ascensión"><span>PRIMERA ASCENSIÓN</span><h2>Elige tu senda permanente</h2><p>Esta decisión define el bono de todas tus ascensiones futuras.</p><div class="prestige-choice-grid">${Object.entries(PRESTIGE_DOCTRINES).map(([id, def]) => `<button onclick="choosePrestigeDoctrine('${id}')"><b>${def.name}</b><small>${def.desc}</small></button>`).join('')}</div></section>`;
+  document.body.appendChild(modal);
+}
+async function choosePrestigeDoctrine(id) {
+  if (!PRESTIGE_DOCTRINES[id] || getPrestigeDoctrine()) return;
+  const ranks = _masteryRanks();
+  ranks.__doctrine = id;
+  await saveHero({ mastery_ranks: JSON.stringify(ranks) });
+  document.getElementById('prestigeDoctrineModal')?.remove();
+  await doPrestige();
+}
+window.choosePrestigeDoctrine = choosePrestigeDoctrine;
+
 async function doPrestige() {
   if (!canPrestige()) return;
+  if (!getPrestigeDoctrine()) { openPrestigeDoctrine(); return; }
   const newPrestige  = (hero.prestige || 0) + 1;
   const newMastery   = (hero.mastery_points || 0) + 1;
   await saveHero({ prestige: newPrestige, mastery_points: newMastery, xp_total: 0, level: 1 });
@@ -137,9 +166,10 @@ async function addXP(amount, type, sourceEl) {
   const mountAtkMult   = typeof getPetMountStat    === 'function' ? (1 + getPetMountStat('atk') / 100) : 1;
   const seasonalMult   = typeof getSeasonalXPMult  === 'function' ? getSeasonalXPMult() : 1;
   const dungeonXPMult = typeof getDungeonBonus==='function' ? getDungeonBonus('xp') : 1;
+  const doctrineXPMult = 1 + getPrestigeDoctrineBonus('xp');
   const h = new Date().getHours();
   const nightRuneMult = (typeof getRuneBonus==='function' && (h >= 20 || h < 5)) ? (1 + getRuneBonus('night_xp')) : 1;
-  let finalXP = Math.round(amount * classXPBonus(type || 'side') * xpMultiplier * todMult * skillMult * runeMult * weaponMult * mountAtkMult * seasonalMult * dungeonXPMult * nightRuneMult);
+  let finalXP = Math.round(amount * classXPBonus(type || 'side') * xpMultiplier * todMult * skillMult * runeMult * weaponMult * mountAtkMult * seasonalMult * dungeonXPMult * doctrineXPMult * nightRuneMult);
 
   if (typeof trackWeekXP === 'function') trackWeekXP(finalXP);
   const prevLevel = calcLevel(hero.xp_total || 0);

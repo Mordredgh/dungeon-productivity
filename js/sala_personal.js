@@ -6,18 +6,18 @@
    ─────────────────────────────────────────────────────────── */
 
 const SALA_FURNITURE = [
-  { id:'trono-arcano',       name:'Trono Arcano',        img:'mueble_trono_arcano.webp',        category:'asientos',   rarity:'Legendario', bonus:'Un asiento digno del Señor del Santuario.', size:132 },
-  { id:'mesa-orbe-astral',   name:'Mesa de Orbe Astral', img:'mueble_mesa_orbe_astral.webp',    category:'decoracion', rarity:'Épico',       bonus:'+5% XP en descanso.', size:142 },
-  { id:'librero-alquimico',  name:'Librero Alquímico',   img:'mueble_librero_alquimico.webp',   category:'decoracion', rarity:'Raro',        bonus:'Resguarda fórmulas, tomos y elixires.', size:138 },
-  { id:'chimenea-arcana',    name:'Chimenea Arcana',     img:'mueble_chimenea_arcana.webp',     category:'decoracion', rarity:'Épico',       bonus:'Una llama violeta para tus vigilias.', size:142 },
-  { id:'espejo-dorado',      name:'Espejo Dorado',       img:'mueble_espejo_dorado.webp',       category:'muros',      rarity:'Épico',       bonus:'Refleja un poder que aún no dominas.', size:126 },
-  { id:'rack-arsenal',       name:'Rack del Arsenal',    img:'mueble_rack_arsenal.webp',        category:'decoracion', rarity:'Raro',        bonus:'Exhibe las armas de tus aventuras.', size:132 },
-  { id:'cofre-ancestral',    name:'Cofre Ancestral',     img:'mueble_cofre_ancestral.webp',     category:'decoracion', rarity:'Raro',        bonus:'Guarda los trofeos de la campaña.', size:116 },
-  { id:'arbol-arcano',       name:'Árbol Arcano',        img:'mueble_arbol_arcano.webp',        category:'decoracion', rarity:'Épico',       bonus:'Vida mágica que florece en tu sala.', size:136 },
-  { id:'candelabro-violeta', name:'Candelabro Violeta',  img:'mueble_candelabro_violeta.webp',  category:'luz',        rarity:'Raro',        bonus:'Ilumina los secretos del santuario.', size:112 },
-  { id:'estandarte-arcano',  name:'Estandarte Arcano',   img:'mueble_estandarte_arcano.webp',   category:'muros',      rarity:'Común',       bonus:'Marca tu dominio sobre esta estancia.', size:116 },
-  { id:'farol-dorado',       name:'Farol Dorado',        img:'mueble_farol_dorado.webp',        category:'luz',        rarity:'Raro',        bonus:'Una luz cálida contra la oscuridad.', size:112 },
-  { id:'tapete-astral',      name:'Tapete Astral',       img:'mueble_tapete_astral.webp',       category:'piso',       rarity:'Épico',       bonus:'El centro ritual de tu santuario.', size:158 },
+  { id:'trono-arcano',       name:'Trono Arcano',        img:'mueble_trono_arcano.webp',        category:'asientos',   rarity:'Legendario', price:5000, bonus:'Un asiento digno del Señor del Santuario.', size:132 },
+  { id:'mesa-orbe-astral',   name:'Mesa de Orbe Astral', img:'mueble_mesa_orbe_astral.webp',    category:'decoracion', rarity:'Épico',       price:2800, bonus:'+5% XP en descanso.', size:142 },
+  { id:'librero-alquimico',  name:'Librero Alquímico',   img:'mueble_librero_alquimico.webp',   category:'decoracion', rarity:'Raro',        price:1400, bonus:'Resguarda fórmulas, tomos y elixires.', size:138 },
+  { id:'chimenea-arcana',    name:'Chimenea Arcana',     img:'mueble_chimenea_arcana.webp',     category:'decoracion', rarity:'Épico',       price:3200, bonus:'Una llama violeta para tus vigilias.', size:142 },
+  { id:'espejo-dorado',      name:'Espejo Dorado',       img:'mueble_espejo_dorado.webp',       category:'muros',      rarity:'Épico',       price:2600, bonus:'Refleja un poder que aún no dominas.', size:126 },
+  { id:'rack-arsenal',       name:'Rack del Arsenal',    img:'mueble_rack_arsenal.webp',        category:'decoracion', rarity:'Raro',        price:1800, bonus:'Exhibe las armas de tus aventuras.', size:132 },
+  { id:'cofre-ancestral',    name:'Cofre Ancestral',     img:'mueble_cofre_ancestral.webp',     category:'decoracion', rarity:'Raro',        price:1900, bonus:'Guarda los trofeos de la campaña.', size:116 },
+  { id:'arbol-arcano',       name:'Árbol Arcano',        img:'mueble_arbol_arcano.webp',        category:'decoracion', rarity:'Épico',       price:3000, bonus:'Vida mágica que florece en tu sala.', size:136 },
+  { id:'candelabro-violeta', name:'Candelabro Violeta',  img:'mueble_candelabro_violeta.webp',  category:'luz',        rarity:'Raro',        price:1200, bonus:'Ilumina los secretos del santuario.', size:112 },
+  { id:'estandarte-arcano',  name:'Estandarte Arcano',   img:'mueble_estandarte_arcano.webp',   category:'muros',      rarity:'Común',       price:0, bonus:'Marca tu dominio sobre esta estancia.', size:116 },
+  { id:'farol-dorado',       name:'Farol Dorado',        img:'mueble_farol_dorado.webp',        category:'luz',        rarity:'Raro',        price:1500, bonus:'Una luz cálida contra la oscuridad.', size:112 },
+  { id:'tapete-astral',      name:'Tapete Astral',       img:'mueble_tapete_astral.webp',       category:'piso',       rarity:'Épico',       price:2400, bonus:'El centro ritual de tu santuario.', size:158 },
   // Legacy: conserva los muebles ya guardados por versiones anteriores.
   { id:'sillon',       name:'Sillón',          img:'mueble_sillon.webp',       category:'asientos',   rarity:'Raro',   bonus:'Un rincón digno de un héroe.', legacy:true },
   { id:'candelabro',   name:'Candelabro',       img:'mueble_candelabro.webp',   category:'luz',        rarity:'Común',  bonus:'Ilumina los secretos de la sala.', legacy:true },
@@ -87,15 +87,12 @@ function _perspScale(y) {
 function _starterSala() {
   return [
     { id:'estandarte-arcano',  x:21, y:35, scale:.86 },
-    { id:'trono-arcano',       x:36, y:53, scale:1 },
-    { id:'mesa-orbe-astral',   x:52, y:70, scale:1 },
-    { id:'tapete-astral',      x:52, y:66, scale:1.12 },
-    { id:'cofre-ancestral',    x:70, y:54, scale:.9 },
-    { id:'arbol-arcano',       x:83, y:48, scale:.86 },
     { id:'candelabro-violeta', x:19, y:71, scale:.82 },
-    { id:'rack-arsenal',       x:82, y:33, scale:.8 },
-    { id:'farol-dorado',       x:78, y:70, scale:.78 },
   ];
+}
+
+function _salaOwned(data) {
+  return new Set(Array.isArray(data.owned) ? data.owned : (data.placed || []).map(item => item.id));
 }
 
 function renderSalaPersonal() {
@@ -105,11 +102,13 @@ function renderSalaPersonal() {
   const data   = _getSala();
   if (!data.seeded) {
     data.placed = data.placed?.length ? data.placed : _starterSala();
+    data.owned = Array.from(_salaOwned(data));
     data.seeded = true;
     _saveSala(data).then(() => renderSalaPersonal());
     return;
   }
   const placed = data.placed || [];
+  const owned = _salaOwned(data);
 
   // Painter's algorithm: items con y mayor van encima
   const sorted = placed
@@ -171,12 +170,15 @@ function renderSalaPersonal() {
           ${SALA_CATEGORIES.map(([id, label]) => `<button class="sala-category${_salaCategory === id ? ' sala-category-active' : ''}" type="button" onclick="salaSetCategory('${id}')">${label}</button>`).join('')}
         </div>
         <div class="sala-picker-grid">
-          ${visibleFurniture.length ? visibleFurniture.map(f => `
-            <button class="sala-picker-item${_salaSelected === f.id ? ' sala-selected' : ''}"
-                 type="button" onclick="salaSelectFurniture('${f.id}')" title="${escHtml(f.name)}">
-              <img src="images/${escHtml(f.img)}" alt="" onerror="this.style.display='none'">
+          ${visibleFurniture.length ? visibleFurniture.map(f => {
+            const isOwned = owned.has(f.id);
+            return `<button class="sala-picker-item${_salaSelected === f.id ? ' sala-selected' : ''}${isOwned ? '' : ' sala-locked'}"
+                 type="button" onclick="${isOwned ? `salaSelectFurniture('${f.id}')` : `buySalaFurniture('${f.id}')`}" title="${escHtml(f.name)}">
+              <img src="images/${escHtml(f.img)}" alt="">
               <span class="sala-picker-label">${escHtml(f.name)}</span>
-            </button>`).join('') : '<div class="sala-empty-category">Aún no hay objetos en esta categoría.</div>'}
+              ${isOwned ? '<span class="sala-owned-mark">Propio</span>' : `<span class="sala-price">${f.price.toLocaleString('es-MX')} oro</span>`}
+            </button>`;
+          }).join('') : '<div class="sala-empty-category">Aún no hay objetos en esta categoría.</div>'}
         </div>
         ${selItem && selDef ? `
           <div class="sala-props-panel">
@@ -204,7 +206,27 @@ function renderSalaPersonal() {
 }
 
 function salaSelectFurniture(id) {
+  if (!_salaOwned(_getSala()).has(id)) {
+    if (typeof toast === 'function') toast('✦', 'Primero compra esta pieza para tu santuario.');
+    return;
+  }
   _salaSelected       = _salaSelected === id ? null : id;
+  _salaSelectedPlaced = null;
+  renderSalaPersonal();
+}
+
+async function buySalaFurniture(id) {
+  const furniture = SALA_FURNITURE.find(item => item.id === id && !item.legacy);
+  const data = _getSala();
+  if (!furniture || _salaOwned(data).has(id)) return salaSelectFurniture(id);
+  if (typeof spendGold !== 'function' || !spendGold(furniture.price)) {
+    if (typeof toast === 'function') toast('✦', `Necesitas ${furniture.price.toLocaleString('es-MX')} oro para ${furniture.name}.`);
+    return;
+  }
+  data.owned = [..._salaOwned(data), id];
+  await _saveSala(data);
+  if (typeof toast === 'function') toast('✦', `${furniture.name} ya forma parte de tu santuario.`);
+  _salaSelected = id;
   _salaSelectedPlaced = null;
   renderSalaPersonal();
 }

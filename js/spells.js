@@ -169,7 +169,8 @@ async function castSpell(spellId) {
     toast('❌', `Necesitas ${cost} fragmentos de ${spell.name} (tienes ${have}).`);
     return;
   }
-  const manaCost = (!freeHeal && spell.mana) ? Math.floor(spell.mana * (typeof getDungeonBonus==='function' ? getDungeonBonus('mana') : 1)) : 0;
+  const doctrineMana = typeof getPrestigeDoctrineBonus === 'function' ? Math.max(.55, 1 - getPrestigeDoctrineBonus('mana')) : 1;
+  const manaCost = (!freeHeal && spell.mana) ? Math.floor(spell.mana * (typeof getDungeonBonus==='function' ? getDungeonBonus('mana') : 1) * doctrineMana) : 0;
   if (manaCost && (hero.mana || 0) < manaCost) {
     toast('💧', `Maná insuficiente (necesitas ${manaCost}, tienes ${hero.mana || 0}).`);
     return;
