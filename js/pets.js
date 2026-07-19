@@ -574,7 +574,7 @@ function renderPets() {
       html += `
       <div class="pet-card">
         <div class="pet-card-visual">
-          <img src="${imgUrl}" class="pet-card-img" alt="${escHtml(def.name)}"
+          <img src="${imgUrl}" class="pet-card-img" alt="${escHtml(def.name)}" loading="lazy" decoding="async"
                onerror="this.src='${CDN}dungeon/pet_egg_${def.key}.png';this.onerror=null">
           ${qty > 1 ? `<span class="pet-qty-badge">×${qty}</span>` : ''}
         </div>
@@ -602,7 +602,7 @@ function renderPets() {
         html += `
         <div class="pet-card ${isActive ? 'pet-card-active' : ''} ${pet.is_shiny ? 'pet-card-shiny' : ''}">
           <div class="pet-card-visual">
-            <img src="${imgUrl}" class="pet-card-img" alt="${escHtml(def.name)}"
+            <img src="${imgUrl}" class="pet-card-img" alt="${escHtml(def.name)}" loading="lazy" decoding="async"
                  onerror="this.src='${CDN}dungeon/pet_${pet.stage}_${def.key}.png';this.onerror=null">
             ${isMount ? `<span class="pet-mount-crown">🌟</span>` : ''}
             ${pet.is_shiny ? `<span class="pet-shiny-badge" title="¡Shiny!">✨</span>` : ''}

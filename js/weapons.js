@@ -156,7 +156,7 @@ function renderInventoryLegacy() {
     const glow = !forging && (w.tier === 'legendario' || w.tier === 'mitico') ? 'anim-pulse-glow' : '';
     return `
       <div class="inv-weapon-card ${w.is_equipped ? 'inv-weapon-equipped' : ''} ${forging ? 'inv-weapon-forging' : ''} ${glow}" style="--wc:${tier.color}">
-        <img src="${img}" class="inv-weapon-img" alt="${escHtml(w.name)}" style="${forging ? 'opacity:.4;filter:grayscale(1)' : ''}"
+        <img src="${img}" class="inv-weapon-img" alt="${escHtml(w.name)}" loading="lazy" decoding="async" style="${forging ? 'opacity:.4;filter:grayscale(1)' : ''}"
              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <div class="inv-weapon-emoji" style="display:none">${def.icon}</div>
         <div class="inv-weapon-info">
@@ -192,7 +192,7 @@ function renderInventoryLegacy() {
     const img = CDN + 'dungeon/' + _iKey + '.png';
     return `
       <div class="inv-item-row">
-        <img src="${img}" class="inv-item-img" alt=""
+        <img src="${img}" class="inv-item-img" alt="" loading="lazy" decoding="async"
              onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
         <span style="display:none;font-size:18px">📦</span>
         <span class="inv-item-name">${escHtml(labelFn(i))}</span>
@@ -335,7 +335,7 @@ function _vaultEquipmentCard(weapon) {
   const slotLabel = { main_hand:'Mano principal', off_hand:'Mano secundaria', body:'Pecho', head:'Casco', feet:'Botas', hands:'Guantes', legs:'Grebas' }[def.slot] || def.slot;
   return `
     <article class="vault-gear-card ${weapon.is_equipped ? 'is-equipped' : ''} ${forging ? 'is-forging' : ''}" style="--vault-tier:${tier.color}">
-      <div class="vault-gear-art"><img src="images/arma_${weapon.weapon_key}_${weapon.tier}.webp" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span style="display:none">${def.icon}</span></div>
+      <div class="vault-gear-art"><img src="images/arma_${weapon.weapon_key}_${weapon.tier}.webp" alt="" loading="lazy" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span style="display:none">${def.icon}</span></div>
       <div class="vault-gear-info">
         <div class="vault-gear-top"><span class="vault-gear-name">${escHtml(weapon.name)}</span><span class="vault-tier">${tier.label}</span></div>
         <div class="vault-gear-meta">${weapon.is_equipped ? 'Equipado · ' : ''}${slotLabel}</div>

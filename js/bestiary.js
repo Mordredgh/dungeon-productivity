@@ -89,7 +89,7 @@ function renderBestiary() {
         <span class="bst-rarity-label" style="color:${clr}">${RARITY_LABEL[b.rarity] || b.rarity}</span>
       </div>
       <div class="bst-img-wrap">
-        <img src="${img}" class="bst-img${known ? '' : ' bst-silhouette'}" alt=""
+        <img src="${img}" class="bst-img${known ? '' : ' bst-silhouette'}" alt="" loading="lazy" decoding="async"
              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <div class="bst-img-fallback" style="display:none">${known ? (b.emoji || '👹') : '❓'}</div>
         ${known ? '' : `<div class="bst-unknown-overlay"><span class="bst-q">?</span></div>`}
@@ -134,7 +134,7 @@ function renderBestiaryCodex(el) {
     if (!boss) return `<div class="bstd-empty"><span>📖</span><b>Aún no hay registros</b><p>Derrota a un jefe para abrir el primer capítulo del códice.</p></div>`;
     const color = BESTIARY_RARITY_CLR[boss.rarity] || '#9ca3af';
     const chart = typeof BOSS_ELEMENT_CHART === 'undefined' ? null : BOSS_ELEMENT_CHART[boss.element];
-    return `<div class="bstd-art" style="--bstd:${color}"><img src="images/boss_${boss.key}.webp" alt="${escHtml(boss.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span style="display:none">${boss.emoji || '👹'}</span></div><article class="bstd-page"><span class="bstd-rarity" style="color:${color}">${boss.rarity}</span><h3>${escHtml(boss.name)}</h3><div class="bstd-seal"><span>${boss.element}</span><span>${boss.hp} HP</span></div><p>${escHtml(getBossLore(boss))}</p>${chart ? `<div class="bstd-tactics"><b>Margen del cronista</b><span>Débil ante <strong>${chart.weakTo?.join(', ') || '—'}</strong></span><span>Resiste <strong>${chart.resists?.join(', ') || '—'}</strong></span></div>` : ''}</article>`;
+    return `<div class="bstd-art" style="--bstd:${color}"><img src="images/boss_${boss.key}.webp" alt="${escHtml(boss.name)}" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span style="display:none">${boss.emoji || '👹'}</span></div><article class="bstd-page"><span class="bstd-rarity" style="color:${color}">${boss.rarity}</span><h3>${escHtml(boss.name)}</h3><div class="bstd-seal"><span>${boss.element}</span><span>${boss.hp} HP</span></div><p>${escHtml(getBossLore(boss))}</p>${chart ? `<div class="bstd-tactics"><b>Margen del cronista</b><span>Débil ante <strong>${chart.weakTo?.join(', ') || '—'}</strong></span><span>Resiste <strong>${chart.resists?.join(', ') || '—'}</strong></span></div>` : ''}</article>`;
   };
   const card = boss => { const isKnown = defeated.includes(boss.key); const color = BESTIARY_RARITY_CLR[boss.rarity] || '#64748b'; return `<button class="bstd-spine ${isKnown ? 'is-known' : ''} ${boss.key === _bestiarySelectedKey ? 'is-current' : ''}" style="--bstd:${color}" ${isKnown ? `onclick="selectBestiaryEntry('${boss.key}')"` : 'disabled'}><span>${isKnown ? boss.emoji || '✦' : '?'}</span><b>${isKnown ? escHtml(boss.name) : 'Registro sellado'}</b><small>${boss.rarity}</small></button>`; };
   el.innerHTML = `<section class="bstd-shell"><header class="bstd-header"><div><span>ARCHIVO DE ARCANUM</span><h3>Bestiario del Dungeon</h3></div><div class="bstd-progress"><b>${defeated.length}/${all.length}</b><i><em style="width:${pct}%"></em></i><small>${pct}% descifrado</small></div></header><div class="bstd-layout"><aside class="bstd-shelf">${all.map(card).join('')}</aside><main class="bstd-detail">${entry(selected)}</main></div></section>`;

@@ -148,7 +148,7 @@ function renderSalaPersonal() {
                        data-idx="${item._orig}"
                        style="left:${item.x}%;top:${item.y}%;z-index:${Math.round(item.y + 1)};--s:${finalScale.toFixed(3)};--r:${item.rotate || 0}deg;--item-size:${def.size || 90}px">
             <div class="sala-shadow"></div>
-            <img src="images/${escHtml(def.img)}" alt="${escHtml(def.name)}" draggable="false">
+            <img src="images/${escHtml(def.img)}" alt="${escHtml(def.name)}" draggable="false" loading="lazy" decoding="async">
             ${isSel ? '<button class="sala-resize-handle" type="button" aria-label="Arrastra para cambiar tamaño" title="Arrastra para cambiar tamaño"></button>' : ''}
           </div>`;
         }).join('')}

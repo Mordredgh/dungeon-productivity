@@ -143,7 +143,7 @@ function renderChallenges() {
       return `
         <div class="ch-card ${c.completed ? 'ch-done' : ''}">
           <div class="ch-header">
-            <span class="ch-icon"><img src="images/${def.img}" alt="" onerror="this.parentElement.textContent='${def.icon}'"></span>
+            <span class="ch-icon"><img src="images/${def.img}" alt="" loading="lazy" decoding="async" onerror="this.parentElement.textContent='${def.icon}'"></span>
             <div class="ch-info">
               <div class="ch-name">${escHtml(def.name)}</div>
               <div class="ch-desc">${escHtml(def.desc)}</div>
@@ -169,7 +169,7 @@ function renderChallenges() {
     html += available.map(def => `
       <div class="ch-card ch-available">
         <div class="ch-header">
-          <span class="ch-icon"><img src="images/${def.img}" alt="" onerror="this.parentElement.textContent='${def.icon}'"></span>
+          <span class="ch-icon"><img src="images/${def.img}" alt="" loading="lazy" decoding="async" onerror="this.parentElement.textContent='${def.icon}'"></span>
           <div class="ch-info">
             <div class="ch-name">${escHtml(def.name)}</div>
             <div class="ch-desc">${escHtml(def.desc)}</div>
