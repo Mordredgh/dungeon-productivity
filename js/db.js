@@ -14,14 +14,21 @@ async function initDB() {
 
   if (!quests.length) showSkeleton();
   await Promise.all([loadHero(), loadQuests(), loadPomodoros()]);
-  await Promise.all([
+
+  /* Hero + misiones son el camino crítico. Inventario, mascotas, metas y
+     runas sólo se necesitan al abrir sus vistas; no deben retrasar el primer
+     render del tablero. La segunda pasada refresca las vistas al terminar. */
+  renderAll();
+  const hydrateSecondaryData = () => Promise.all([
     loadInventory(),
     loadPets(),
     typeof loadWeapons === 'function' ? loadWeapons() : Promise.resolve(),
     typeof loadGoals === 'function' ? loadGoals() : Promise.resolve(),
     typeof loadRunes === 'function' ? loadRunes() : Promise.resolve(),
-  ]);
-  renderAll();
+  ]).then(() => renderAll()).catch(error => console.warn('[Dungeon] hidratación secundaria', error));
+  if ('requestIdleCallback' in window) window.requestIdleCallback(hydrateSecondaryData, { timeout: 1800 });
+  else setTimeout(hydrateSecondaryData, 250);
+
   scheduleRandomEvent();
   checkDailyStreak();
   if (typeof checkWeeklyDungeonProgress === 'function') checkWeeklyDungeonProgress();
