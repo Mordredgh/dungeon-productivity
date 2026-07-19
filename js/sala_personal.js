@@ -36,6 +36,14 @@ const SALA_CATEGORIES = [
   ['muros', 'Muros'], ['piso', 'Piso'], ['decoracion', 'Decoración'],
 ];
 
+// La propiedad de una pieza no depende de que esté sobre el lienzo. `placed`
+// guarda sólo la disposición visual; `owned` es el inventario permanente.
+// Esta versión también repara los dos muebles que se perdieron durante la
+// migración inicial del inventario de sala.
+const SALA_OWNERSHIP_VERSION = 2;
+const SALA_STARTER_IDS = ['estandarte-arcano', 'candelabro-violeta'];
+const SALA_OWNERSHIP_REPAIR_IDS = ['trono-arcano', 'espejo-dorado'];
+
 /* Un solo mueble puede resonar a la vez: decoración con decisión, no bonus gratis apilado. */
 const SALA_RESONANCES = {
   'trono-arcano':      { effect:'boss_resist', value:.12, label:'+12% resistencia contra jefes' },
@@ -92,7 +100,22 @@ function _starterSala() {
 }
 
 function _salaOwned(data) {
-  return new Set(Array.isArray(data.owned) ? data.owned : (data.placed || []).map(item => item.id));
+  return new Set([
+    ...(Array.isArray(data.owned) ? data.owned : []),
+    ...(data.placed || []).map(item => item.id),
+    ...(data.attunedId ? [data.attunedId] : []),
+  ]);
+}
+
+function _normalizeSalaOwnership(data) {
+  const before = Array.isArray(data.owned) ? data.owned : [];
+  const needsRepair = Number(data.ownershipVersion || 0) < SALA_OWNERSHIP_VERSION;
+  const repaired = needsRepair ? [...SALA_STARTER_IDS, ...SALA_OWNERSHIP_REPAIR_IDS] : [];
+  const after = [...new Set([...before, ...(data.placed || []).map(item => item.id), ...(data.attunedId ? [data.attunedId] : []), ...repaired])];
+  const changed = before.length !== after.length || before.some(id => !after.includes(id)) || needsRepair;
+  data.owned = after;
+  data.ownershipVersion = SALA_OWNERSHIP_VERSION;
+  return changed;
 }
 function _salaBlueprints() {
   try {
@@ -111,9 +134,13 @@ function renderSalaPersonal() {
     data.placed = data.placed?.length ? data.placed : _starterSala();
     data.owned = Array.from(_salaOwned(data));
     data.seeded = true;
+    data.ownershipVersion = SALA_OWNERSHIP_VERSION;
     _saveSala(data).then(() => renderSalaPersonal());
     return;
   }
+  // Compatibilidad: una pieza ya colocada, activa o retirada nunca puede
+  // desaparecer del inventario por un guardado viejo o incompleto.
+  if (_normalizeSalaOwnership(data)) _saveSala(data);
   const placed = data.placed || [];
   const owned = _salaOwned(data);
 
@@ -329,9 +356,16 @@ function salaResizeItem(idx, scale) {
 async function salaDeleteItem(idx) {
   const data  = _getSala();
   data.placed = (data.placed || []);
+  const removed = data.placed[idx];
+  if (!removed) return;
+  // Primero devolvemos la pieza al inventario y sólo entonces la quitamos del
+  // lienzo. Así quitar un mueble nunca lo vende ni vuelve a pedir su plano.
+  data.owned = [..._salaOwned(data), removed.id];
+  data.ownershipVersion = SALA_OWNERSHIP_VERSION;
   data.placed.splice(idx, 1);
   _salaSelectedPlaced = null;
   await _saveSala(data);
+  if (typeof toast === 'function') toast('Inventario', `${SALA_FURNITURE.find(item => item.id === removed.id)?.name || 'El mueble'} regresó a tu inventario de sala.`);
   renderSalaPersonal();
 }
 
