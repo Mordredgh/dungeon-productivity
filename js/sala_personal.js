@@ -40,9 +40,19 @@ const SALA_CATEGORIES = [
 // guarda sólo la disposición visual; `owned` es el inventario permanente.
 // Esta versión también repara los dos muebles que se perdieron durante la
 // migración inicial del inventario de sala.
-const SALA_OWNERSHIP_VERSION = 2;
+// v3 vuelve a ejecutar la reparación en perfiles que ya recibieron la
+// migración v2 pero conservaron el estado roto anterior.
+const SALA_OWNERSHIP_VERSION = 3;
 const SALA_STARTER_IDS = ['estandarte-arcano', 'candelabro-violeta'];
 const SALA_OWNERSHIP_REPAIR_IDS = ['trono-arcano', 'espejo-dorado'];
+
+// La sala usa PNG con canal alfa real. Conservamos el nombre WebP en el
+// catálogo histórico para no invalidar estados guardados, pero toda vista
+// resuelve su equivalente PNG antes de dibujarlo.
+function _salaArtPath(furniture) {
+  const file = String(furniture?.img || '').replace(/\.webp$/i, '.png');
+  return `images/${escHtml(file)}`;
+}
 
 /* Un solo mueble puede resonar a la vez: decoración con decisión, no bonus gratis apilado. */
 const SALA_RESONANCES = {
@@ -175,7 +185,7 @@ function renderSalaPersonal() {
                        data-idx="${item._orig}"
                        style="left:${item.x}%;top:${item.y}%;z-index:${Math.round(item.y + 1)};--s:${finalScale.toFixed(3)};--r:${item.rotate || 0}deg;--item-size:${def.size || 90}px">
             <div class="sala-shadow"></div>
-            <img src="images/${escHtml(def.img)}" alt="${escHtml(def.name)}" draggable="false" loading="lazy" decoding="async">
+            <img src="${_salaArtPath(def)}" alt="${escHtml(def.name)}" draggable="false" loading="lazy" decoding="async">
             ${isSel ? '<button class="sala-resize-handle" type="button" aria-label="Arrastra para cambiar tamaño" title="Arrastra para cambiar tamaño"></button>' : ''}
           </div>`;
         }).join('')}
@@ -209,7 +219,7 @@ function renderSalaPersonal() {
             const hasBlueprint = hasSalaBlueprint(f.id);
             return `<button class="sala-picker-item${_salaSelected === f.id ? ' sala-selected' : ''}${isOwned ? '' : ' sala-locked'}"
                  type="button" onclick="${isOwned ? `salaSelectFurniture('${f.id}')` : `buySalaFurniture('${f.id}')`}" title="${escHtml(f.name)}">
-              <img src="images/${escHtml(f.img)}" alt="">
+              <img src="${_salaArtPath(f)}" alt="">
               <span class="sala-picker-label">${escHtml(f.name)}</span>
               ${isOwned ? '<span class="sala-owned-mark">Propio</span>' : hasBlueprint ? `<span class="sala-price">${f.price.toLocaleString('es-MX')} oro</span>` : '<span class="sala-price">Requiere plano</span>'}
             </button>`;
@@ -218,7 +228,7 @@ function renderSalaPersonal() {
         ${selItem && selDef ? `
           <div class="sala-props-panel">
             <div class="sala-detail-head">
-              <img class="sala-props-preview" src="images/${escHtml(selDef.img)}" alt="">
+              <img class="sala-props-preview" src="${_salaArtPath(selDef)}" alt="">
               <div><div class="sala-props-name">${escHtml(selDef.name)}</div><span class="sala-rarity">${escHtml(selDef.rarity)}</span></div>
             </div>
             <p class="sala-props-bonus">${escHtml(SALA_RESONANCES[selDef.id]?.label || selDef.bonus)}</p>
@@ -232,7 +242,7 @@ function renderSalaPersonal() {
             <button class="btn btn-ghost sala-delete-btn" onclick="salaDeleteItem(${_salaSelectedPlaced})">🗑 Quitar mueble</button>
             <button class="btn btn-ghost sala-deselect-btn" onclick="salaDeselectPlaced()">← Volver al inventario</button>
           </div>
-        ` : placingDef ? `<div class="sala-place-card"><img src="images/${escHtml(placingDef.img)}" alt=""><div><strong>${escHtml(placingDef.name)}</strong><span class="sala-rarity">${escHtml(placingDef.rarity)}</span><p>${escHtml(placingDef.bonus)}</p></div><button class="sala-place-btn" type="button" onclick="salaFocusRoom()">Colocar</button></div>` : '<div class="sala-help">Elige un objeto y haz clic en la sala.<br>Selecciona uno colocado para moverlo, girarlo o cambiar su tamaño.</div>'}
+        ` : placingDef ? `<div class="sala-place-card"><img src="${_salaArtPath(placingDef)}" alt=""><div><strong>${escHtml(placingDef.name)}</strong><span class="sala-rarity">${escHtml(placingDef.rarity)}</span><p>${escHtml(placingDef.bonus)}</p></div><button class="sala-place-btn" type="button" onclick="salaFocusRoom()">Colocar</button></div>` : '<div class="sala-help">Elige un objeto y haz clic en la sala.<br>Selecciona uno colocado para moverlo, girarlo o cambiar su tamaño.</div>'}
       </div>
     </div>`;
 

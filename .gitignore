@@ -3,5 +3,6 @@ Thumbs.db
 images_png_backup/
 trivy-report.txt
 assets/node_modules/
+tmp/
 .env
 .env.*
