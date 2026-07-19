@@ -4799,6 +4799,10 @@ img.efx-row-icon { width: 24px; height: 24px; object-fit: contain; }
   margin-top: 20px; font-size: 11px; color: var(--text3);
   letter-spacing: .04em;
 }
+.login-recovery { display:block; margin:12px auto 0; border:0; background:transparent; color:var(--text2); font:500 12px var(--font-body); cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+.login-recovery:hover { color:var(--gold); }
+.login-recovery-panel { display:grid; gap:10px; margin-top:14px; text-align:left; }
+.login-recovery-panel p { margin:0; color:var(--text2); font-size:12px; line-height:1.45; }
 .login-spinner {
   display: inline-block; width: 14px; height: 14px;
   border: 2px solid rgba(255,255,255,.3); border-top-color: #fff;

@@ -5,7 +5,7 @@ async function loadHero() {
     hero = data[0];
   } else {
     const { data: nh } = await db.from('dungeon_heroes').insert({
-      name: 'Gerardo el Emprendedor', hero_class: 'fundador', avatar: '🧙',
+      name: 'Héroe sin nombre', hero_class: 'guerrero', avatar: '🧙',
       xp: 0, xp_total: 0, level: 1, hp: 100, hp_max: 100,
       streak: 0, longest_streak: 0, achievements: '[]', spells: '{}'
     }).select().single();
@@ -52,9 +52,20 @@ function deriveHero() {
 }
 
 async function saveHero(patch) {
+  if (!hero?.id) return false;
+  const before = { ...hero };
   Object.assign(hero, patch);
   deriveHero();
-  await db.from('dungeon_heroes').update(patch).eq('id', hero.id);
+  const { error } = await db.from('dungeon_heroes').update(patch).eq('id', hero.id);
+  if (error) {
+    Object.assign(hero, before);
+    deriveHero();
+    try { renderHeroUI(); } catch {}
+    toast('⚠️', 'No se pudo guardar tu progreso. Revisa la conexión e inténtalo de nuevo.');
+    return false;
+  }
+  try { localStorage.setItem('dungeon-cache-hero', JSON.stringify(hero)); } catch {}
+  return true;
 }
 
 function calcLevel(totalXP) {

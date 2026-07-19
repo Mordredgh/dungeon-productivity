@@ -26,6 +26,14 @@ if ($sw -match "dungeon-v(\d+)") {
     $sw = $sw -replace "dungeon-v$old", "dungeon-v$new"
     [System.IO.File]::WriteAllText($swPath, $sw, $utf8NoBom)
     Write-Host "SW: v$old -> v$new"
+
+    # Un despliegue es una versión única: evita que HTML nuevo pida JS/CSS
+    # de una versión previa en pestañas con caché agresiva.
+    $indexPath = Join-Path $PSScriptRoot "index.html"
+    $index = [System.IO.File]::ReadAllText($indexPath, $utf8NoBom)
+    $index = [regex]::Replace($index, '([?&]v=)\d+', { param($m) $m.Groups[1].Value + $new })
+    [System.IO.File]::WriteAllText($indexPath, $index, $utf8NoBom)
+    Write-Host "Assets HTML: v$new"
 }
 
 # 1.5 Precomprimir texto actual. nginx sirve estos .gz cuando el navegador

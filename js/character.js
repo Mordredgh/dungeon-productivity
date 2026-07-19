@@ -98,6 +98,7 @@ function openInitialIdentitySelection() {
   modal.id = 'initialIdentityModal';
   modal.innerHTML = `<section class="prestige-choice-card progression-confirm" role="dialog" aria-modal="true" aria-label="Elige identidad de héroe">
     <span>PRIMER JURAMENTO</span><h2>Forja tu identidad</h2><p>Elige una clase y una raza. La clase podrá cambiarse una vez gratis; la raza quedará sellada hasta Prestigio en nivel 50.</p>
+    <label class="progression-subhead" for="initialHeroName">Nombre del héroe</label><input id="initialHeroName" class="form-input" maxlength="40" placeholder="Ej: Aria la Valiente" autocomplete="nickname">
     <h3 class="progression-subhead">Clase</h3><div class="progression-identity-grid">${Object.entries(CLASS_LABELS).map(([id, def]) => `<button type="button" data-initial-class="${id}" onclick="chooseInitialClass('${id}')"><img src="images/${def.img}.webp" alt=""><b>${def.name}</b><small>${def.bonus || ''}</small></button>`).join('')}</div>
     <h3 class="progression-subhead">Raza</h3><div class="progression-identity-grid">${Object.entries(RACE_LABELS).map(([id, def]) => `<button type="button" data-initial-race="${id}" onclick="chooseInitialRace('${id}')"><img src="images/${def.img}.webp" alt=""><b>${def.name}</b><small>${def.bonus || ''}</small></button>`).join('')}</div>
     <div class="progression-confirm-actions"><button type="button" class="btn btn-primary" onclick="confirmInitialIdentity()">Comenzar aventura</button></div>
@@ -118,9 +119,12 @@ function chooseInitialRace(race) {
 async function confirmInitialIdentity() {
   const { race, heroClass } = _initialIdentity;
   if (!RACE_LABELS[race]) { toast('🔒', 'Elige una raza para comenzar.'); return; }
+  const heroName = (document.getElementById('initialHeroName')?.value || '').trim();
+  if (heroName.length < 2) { toast('✍️', 'Escribe un nombre para tu héroe.'); return; }
   const tree = (() => { try { return JSON.parse(hero.skill_tree || '{}'); } catch { return {}; } })();
   tree.__progression = { ...getHeroProgression(), raceLocked:true };
-  await saveHero({ race, hero_class:heroClass, skill_tree:JSON.stringify(tree) });
+  const saved = await saveHero({ name:heroName, race, hero_class:heroClass, skill_tree:JSON.stringify(tree) });
+  if (!saved) return;
   heroRace = race;
   document.getElementById('initialIdentityModal')?.remove();
   if (typeof applyClassTheme === 'function') applyClassTheme();

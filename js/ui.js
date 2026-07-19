@@ -79,6 +79,10 @@ function setActiveQuest(id) {
 function openModal(id) {
   const el = document.getElementById(id);
   if (!el) return;
+  el._returnFocus = document.activeElement;
+  el.setAttribute('aria-hidden', 'false');
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-modal', 'true');
   if (id === 'quickAddModal') {
     if (typeof populateGoalSelect === 'function') populateGoalSelect('', 'qGoal');
     if (typeof syncQuestHabitFields === 'function') syncQuestHabitFields('q');
@@ -86,6 +90,7 @@ function openModal(id) {
   el.classList.add('open');
   if (id === 'levelupModal') return; // animLevelUpModal se llama al final de showLevelUp
   if (typeof animModalOpen === 'function') animModalOpen(id);
+  requestAnimationFrame(() => el.querySelector('button, input, select, textarea, [tabindex]:not([tabindex="-1"])')?.focus());
 }
 function closeModal(id) {
   const el = document.getElementById(id);
@@ -98,6 +103,16 @@ function closeModal(id) {
     if (box) { gsap.killTweensOf(box); gsap.set(box, { clearProps: 'opacity,transform' }); }
   }
   el.classList.remove('open'); // CSS transition: opacity .25s handles the visual fade
+  el.setAttribute('aria-hidden', 'true');
+  el._returnFocus?.focus?.();
+}
+
+function initModalAccessibility() {
+  document.querySelectorAll('.modal-overlay').forEach(el => {
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    el.setAttribute('aria-hidden', el.classList.contains('open') ? 'false' : 'true');
+  });
 }
 
 function showLevelUp(lvl) {

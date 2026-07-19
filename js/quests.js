@@ -33,7 +33,11 @@ async function completeQuest(id, el) {
   }
 
   const now = new Date().toISOString();
-  await db.from('dungeon_quests').update({ done: true, done_at: now }).eq('id', id);
+  const { error } = await db.from('dungeon_quests').update({ done: true, done_at: now }).eq('id', id);
+  if (error) {
+    toast('⚠️', 'No se pudo completar la misión. Tu recompensa no fue aplicada.');
+    return;
+  }
   q.done = true; q.done_at = now;
 
   const _isDailySpecial = (q.tags || '').includes('mision-del-dia');
@@ -349,13 +353,15 @@ async function deleteQuest(id) {
 }
 
 async function updateQuest(id, patch) {
-  await db.from('dungeon_quests').update(patch).eq('id', id);
+  const { error } = await db.from('dungeon_quests').update(patch).eq('id', id);
+  if (error) { toast('⚠️', 'No se pudo guardar la misión. Inténtalo otra vez.'); return false; }
   const q = quests.find(x => x.id === id);
   if (q) Object.assign(q, patch);
   closeModal('editQuestModal');
   renderQuestList();
   updateBossBanner();
   toast('✏️', 'Misión actualizada');
+  return true;
 }
 
 /* ── ESCUDOS DE MISIÓN ──────────────────────────────────────────

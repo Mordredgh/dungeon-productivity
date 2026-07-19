@@ -14,6 +14,7 @@ async function _bootGuard(label, action) {
 })();
 
 async function bootApp() {
+  if (typeof initModalAccessibility === 'function') initModalAccessibility();
   if (typeof initPerformanceUX === 'function') initPerformanceUX();
   const savedTheme = localStorage.getItem('dungeon-theme');
   if (savedTheme) document.documentElement.dataset.theme = savedTheme;
