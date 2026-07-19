@@ -5,6 +5,7 @@ const hero = fs.readFileSync('js/hero.js', 'utf8');
 const character = fs.readFileSync('js/character.js', 'utf8');
 const quests = fs.readFileSync('js/quests.js', 'utf8');
 const inventory = fs.readFileSync('js/inventory.js', 'utf8');
+const habits = fs.readFileSync('js/habits.js', 'utf8');
 const auth = fs.readFileSync('js/auth.js', 'utf8');
 const beta = fs.readFileSync('js/beta.js', 'utf8');
 const economyMigration = fs.readFileSync('supabase/migrations/20260719_server_authoritative_economy.sql', 'utf8');
@@ -18,6 +19,8 @@ assert.match(character, /const heroName = .*initialHeroName/, 'la identidad vali
 assert.match(hero, /if \(error\)[\s\S]{0,400}return false/, 'saveHero informa fallo remoto y revierte el estado');
 assert.match(quests, /db\.rpc\('complete_dungeon_quest', \{ p_quest_id: id \}\)/, 'completar misión delega recompensa y cierre al servidor');
 assert.match(quests, /db\.rpc\('undo_dungeon_quest', \{ p_quest_id: id \}\)/, 'deshacer misión también revierte en el servidor');
+assert.match(habits, /db\.rpc\('complete_dungeon_quest', \{ p_quest_id: q\.id \}\)/, 'los hábitos usan la misma transacción autoritativa');
+assert.doesNotMatch(habits, /db\.from\('dungeon_quests'\)\.update\(\{ done: true/, 'un hábito no puede cerrarse por una mutación directa del cliente');
 assert.match(quests, /if \(error \|\| !reward\) \{[\s\S]{0,230}return;/, 'no se conceden recompensas si el servidor rechaza la operación');
 assert.match(inventory, /alreadyAwarded = false/, 'el modal de loot no duplica oro ya acreditado');
 assert.match(auth, /requestPasswordReset/, 'existe recuperación de contraseña para beta');

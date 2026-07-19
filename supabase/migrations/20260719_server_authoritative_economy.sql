@@ -45,6 +45,7 @@ declare
   v_quest public.dungeon_quests%rowtype;
   v_xp integer;
   v_gold integer;
+  v_negative_habit boolean := false;
   v_total integer;
   v_level integer := 1;
   v_threshold integer := 0;
@@ -96,6 +97,11 @@ begin
     v_xp := 60;
     v_gold := 30;
   end if;
+  v_negative_habit := v_quest.type = 'habit' and lower(coalesce(v_quest.tags, '')) like '%habit-%';
+  if v_negative_habit then
+    v_xp := 0;
+    v_gold := 0;
+  end if;
 
   -- Bonus de clase y raza que viven en el héroe, no en el cliente.
   if v_hero.hero_class = 'mago' or v_hero.hero_class = 'fundador' then
@@ -128,7 +134,7 @@ begin
   set xp_total = v_total,
       level = v_level,
       gold = coalesce(v_hero.gold, 0) + v_gold,
-      quests_done = coalesce(v_hero.quests_done, 0) + 1,
+      quests_done = coalesce(v_hero.quests_done, 0) + case when v_negative_habit then 0 else 1 end,
       main_done = coalesce(v_hero.main_done, 0) + case when v_quest.type = 'main' then 1 else 0 end
   where id = v_hero.id;
 
@@ -137,7 +143,7 @@ begin
 
   return query select v_now, v_xp, v_gold, v_total,
     coalesce(v_hero.gold, 0) + v_gold, v_level,
-    coalesce(v_hero.quests_done, 0) + 1,
+    coalesce(v_hero.quests_done, 0) + case when v_negative_habit then 0 else 1 end,
     coalesce(v_hero.main_done, 0) + case when v_quest.type = 'main' then 1 else 0 end;
 end;
 $$;

@@ -45,25 +45,38 @@ function checkHabitReminders() {
 
 async function completeHabitQuest(q) {
   if (!q || q.done || !hero) return;
-  const now = new Date().toISOString();
-  await db.from('dungeon_quests').update({ done: true, done_at: now }).eq('id', q.id);
-  q.done = true; q.done_at = now;
+  const { data: rewards, error } = await db.rpc('complete_dungeon_quest', { p_quest_id: q.id });
+  const reward = Array.isArray(rewards) ? rewards[0] : rewards;
+  if (error || !reward) {
+    console.error('complete_dungeon_quest habit', error);
+    toast('⚠️', 'No se pudo registrar el hábito. Tu progreso se mantiene.');
+    return;
+  }
+  q.done = true;
+  q.done_at = reward.done_at;
+  Object.assign(hero, {
+    xp_total: Number(reward.xp_total || hero.xp_total || 0),
+    gold: Number(reward.gold || hero.gold || 0),
+    level: Number(reward.level || hero.level || 1),
+    quests_done: Number(reward.quests_done || hero.quests_done || 0),
+    main_done: Number(reward.main_done || hero.main_done || 0),
+  });
+  deriveHero();
+  renderGold();
 
   const isNeg = isHabitNegative(q);
 
   if (!isNeg) {
-    await addXP(HABIT_XP, 'side', null);
-    if (typeof addGold === 'function') addGold(HABIT_GOLD);
     const newHp = Math.min(hero.hp_max || 100, (hero.hp || 100) + HABIT_HP_POS);
     hero.hp = newHp;
-    await saveHero({ hp: newHp, quests_done: (hero.quests_done || 0) + 1 });
+    await saveHero({ hp: newHp });
     if (typeof addMana === 'function') addMana(10);
     // Track habit history
     const hist = (() => { try { return JSON.parse(hero.habit_history || '{}'); } catch { return {}; } })();
     const todayH = new Date().toISOString().split('T')[0];
     if (!hist[q.id]) hist[q.id] = [];
     if (!hist[q.id].includes(todayH)) { hist[q.id].push(todayH); saveHero({ habit_history: JSON.stringify(hist) }); }
-    toast('✅', `Hábito cumplido · +${HABIT_XP} XP · +${HABIT_HP_POS} HP`);
+    toast('✅', `Hábito cumplido · +${Number(reward.xp_awarded || 0)} XP · +${HABIT_HP_POS} HP`);
   } else {
     const newHp = Math.max(10, (hero.hp || 100) - HABIT_HP_NEG);
     hero.hp = newHp;
