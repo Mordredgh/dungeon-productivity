@@ -107,20 +107,26 @@ async function claimFactionExclusive(factionId) {
 /* Llamado desde quests.js completeQuest() tras cada misión completada */
 async function checkFactionExclusiveProgress(questId) {
   if (!hero) return;
+  const completedQuest = quests.find(q => q.id === questId && q.done);
+  if (!completedQuest) return;
   const claims = _factionClaims();
-  const entry = claims.find(c => !c.done && (c.contract || (c.questIds && c.questIds.includes(questId))));
-  if (!entry) return;
-  const def = FACTION_DEFS.find(f => f.id === entry.id);
-  if (!def) return;
-  const allDone = entry.contract
-    ? quests.filter(q => q.done && q.type === def.type).length - (entry.completedAtStart || 0) >= (entry.goal || 3)
-    : entry.questIds.every(qid => quests.find(q => q.id === qid && q.done));
-  if (!allDone) return;
-  entry.done = true;
-  entry.doneAt = Date.now();
+  const completed = [];
+  claims.forEach(entry => {
+    if (entry.done) return;
+    const def = FACTION_DEFS.find(f => f.id === entry.id);
+    if (!def || def.type !== completedQuest.type) return;
+    const allDone = entry.contract
+      ? quests.filter(q => q.done && q.type === def.type).length - (entry.completedAtStart || 0) >= (entry.goal || 3)
+      : (entry.questIds || []).every(qid => quests.find(q => q.id === qid && q.done));
+    if (!allDone) return;
+    entry.done = true;
+    entry.doneAt = Date.now();
+    completed.push(def);
+  });
+  if (!completed.length) return;
   hero.faction_claims = JSON.stringify(claims);
   await saveHero({ faction_claims: hero.faction_claims });
-  if (def) {
+  for (const def of completed) {
     const salaFaction = typeof getSalaBonus === 'function' ? getSalaBonus('faction_xp') : 0;
     const rawXP = Math.round(def.exclusive.xp * (1 + salaFaction));
     const rewardXP = typeof balanceReward === 'function' ? balanceReward('xp', def.exclusive.xp, rawXP).amount : rawXP;
