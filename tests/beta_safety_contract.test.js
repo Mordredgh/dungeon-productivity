@@ -8,6 +8,9 @@ const auth = fs.readFileSync('js/auth.js', 'utf8');
 
 assert.match(hero, /name:\s*'Héroe sin nombre'/, 'un beta tester no inicia con el nombre del desarrollador');
 assert.match(character, /id="initialHeroName"/, 'la identidad inicial solicita nombre');
+assert.match(hero, /db\.auth\.getUser\(\)/, 'cada héroe se vincula al usuario autenticado');
+assert.match(hero, /\.eq\('user_id', authUser\.id\)/, 'cargar héroe nunca lee la partida de otro beta tester');
+assert.match(hero, /user_id:\s*authUser\.id/, 'la partida nueva conserva a su propietario');
 assert.match(character, /const heroName = .*initialHeroName/, 'la identidad valida el nombre antes de guardar');
 assert.match(hero, /if \(error\)[\s\S]{0,400}return false/, 'saveHero informa fallo remoto y revierte el estado');
 assert.match(quests, /const \{ error \} = await db\.from\('dungeon_quests'\)\.update\(\{ done: true, done_at: now \}\)/, 'completar misión comprueba el guardado remoto');

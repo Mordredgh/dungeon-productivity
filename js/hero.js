@@ -1,14 +1,23 @@
 ﻿/* HERO */
 async function loadHero() {
-  const { data } = await db.from('dungeon_heroes').select('*').limit(1);
+  const { data: { user: authUser } } = await db.auth.getUser();
+  if (!authUser) throw new Error('No hay una sesión válida para cargar el héroe.');
+
+  const { data, error: loadError } = await db.from('dungeon_heroes')
+    .select('*')
+    .eq('user_id', authUser.id)
+    .limit(1);
+  if (loadError) throw loadError;
   if (data && data.length) {
     hero = data[0];
   } else {
-    const { data: nh } = await db.from('dungeon_heroes').insert({
+    const { data: nh, error: createError } = await db.from('dungeon_heroes').insert({
+      user_id: authUser.id,
       name: 'Héroe sin nombre', hero_class: 'guerrero', avatar: '🧙',
       xp: 0, xp_total: 0, level: 1, hp: 100, hp_max: 100,
       streak: 0, longest_streak: 0, achievements: '[]', spells: '{}'
     }).select().single();
+    if (createError) throw createError;
     hero = nh;
   }
   deriveHero();
@@ -56,7 +65,11 @@ async function saveHero(patch) {
   const before = { ...hero };
   Object.assign(hero, patch);
   deriveHero();
-  const { error } = await db.from('dungeon_heroes').update(patch).eq('id', hero.id);
+  const { data: { user: authUser } } = await db.auth.getUser();
+  if (!authUser) return false;
+  const { error } = await db.from('dungeon_heroes').update(patch)
+    .eq('id', hero.id)
+    .eq('user_id', authUser.id);
   if (error) {
     Object.assign(hero, before);
     deriveHero();
