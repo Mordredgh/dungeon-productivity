@@ -91,7 +91,8 @@ function wmSpendAP(zoneId, route = 'xp') {
   const expires = Date.now() + 2 * 60 * 60 * 1000;
   localStorage.setItem('dungeon-map-bonus-' + zoneId, JSON.stringify({ expires, route }));
   const z = (typeof ZONES !== 'undefined' ? ZONES : []).find(z => z.id === zoneId);
-  toast('🗺️', `${z ? z.icon + ' ' + z.name : 'Zona'} activada: +15% XP por 2h (${ap - 1} AP restantes).`);
+  const routeText = { xp:'+15% XP', gold:'+20% oro', recovery:'+15 HP' }[route] || '+15% XP';
+  toast('Mapa', `${z?.name || 'Zona'} activada: ${routeText} durante 2h (${ap - 1} AP restantes).`);
   _wmOpenZone(zoneId);
 }
 

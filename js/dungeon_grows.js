@@ -298,6 +298,13 @@ function getActiveDungeonEffects() {
 
   const petBond = typeof getActivePetBondBonus === 'function' ? getActivePetBondBonus() : 0;
   if (petBond > 0) add('bond', 'nav_mascotas.webp', 'Vínculo de mascota', 'XP de aventuras', `+${Math.round(petBond * 100)}%`, '#86efac');
+  const routes = typeof getActiveMapExpeditions === 'function' ? getActiveMapExpeditions() : [];
+  const routeCopy = { xp:['Saber', '+15% XP'], gold:['Tesoro', '+20% oro'], recovery:['Refugio', '+15 HP'] };
+  routes.forEach(({ zone, route, expires }) => {
+    const [name, value] = routeCopy[route] || routeCopy.xp;
+    const mins = Math.max(1, Math.ceil((expires - Date.now()) / 60000));
+    add(`map-${zone.id}`, `map_${zone.id}.webp`, `${name}: ${zone.name}`, `${mins} min restantes`, value, zone.color || '#60a5fa');
+  });
   return effects;
 }
 

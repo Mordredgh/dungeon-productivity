@@ -97,6 +97,18 @@ function getMapExpeditionBonus(q, kind) {
   return 0;
 }
 
+/* Estado legible para HUD/Mi Dungeon. El cálculo continúa siendo local por
+   héroe, pero el beneficio deja de ser invisible al salir del mapa. */
+function getActiveMapExpeditions() {
+  if (typeof ZONES === 'undefined') return [];
+  return ZONES.map(zone => {
+    try {
+      const state = JSON.parse(localStorage.getItem('dungeon-map-bonus-' + zone.id) || 'null');
+      return state && state.expires > Date.now() ? { zone, route:state.route || 'xp', expires:state.expires } : null;
+    } catch { return null; }
+  }).filter(Boolean);
+}
+
 function renderZones() {
   const el = document.getElementById('zonesView');
   if (!el) return;
