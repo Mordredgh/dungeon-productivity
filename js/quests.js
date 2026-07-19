@@ -32,161 +32,29 @@ async function completeQuest(id, el) {
     return;
   }
 
-  const now = new Date().toISOString();
-  const { error } = await db.from('dungeon_quests').update({ done: true, done_at: now }).eq('id', id);
-  if (error) {
+  const { data: rewards, error } = await db.rpc('complete_dungeon_quest', { p_quest_id: id });
+  const reward = Array.isArray(rewards) ? rewards[0] : rewards;
+  if (error || !reward) {
+    console.error('complete_dungeon_quest', error);
     toast('⚠️', 'No se pudo completar la misión. Tu recompensa no fue aplicada.');
     return;
   }
-  q.done = true; q.done_at = now;
-
-  const _isDailySpecial = (q.tags || '').includes('mision-del-dia');
-  let xpAmt = _isDailySpecial ? DAILY_SPECIAL_XP : calcQuestXP(q);
-  const baseXPAmt = xpAmt;
-
-  // Tag-based class bonus (guerrero×2 en #ejercicio, mago×2 en #estudio, etc.)
-  const _tagMult = _getTagClassBonus(q);
-  if (_tagMult > 1) {
-    xpAmt = Math.round(xpAmt * _tagMult);
-    toast('🎯', `¡Bonus ${hero?.hero_class || ''}! ×${_tagMult} XP por tag`);
-  }
-
-  // Pivot boost (+50% XP si esta misión fue marcada con Pivot hoy)
-  const today = new Date().toISOString().split('T')[0];
-  const _pivotData = (() => { try { return JSON.parse(localStorage.getItem('dungeon-pivot-' + (hero?.id||'')) || '{}'); } catch { return {}; } })();
-  if (_pivotData.date === today && _pivotData.questId === q.id) {
-    xpAmt = Math.round(xpAmt * 1.5);
-    toast('🔄', '¡Pivot activado! +50% XP');
-    localStorage.removeItem('dungeon-pivot-' + (hero?.id||''));
-  }
-
-  // XP multipliers from RPG systems
-  const potionMult    = typeof getPotionMult    === 'function' ? getPotionMult()    : 1;
-  const berserkerExp  = hero ? (hero.berserker_exp || 0) : 0;
-  const berserkerMult = berserkerExp > Date.now() ? 2 : 1;
-  const weatherMult   = typeof getWeatherXPMult === 'function' ? getWeatherXPMult() : 1;
-  // famBonus removed — habilidades de mascota reemplazan al familiar
-
-  // Transmutación (mago): next side/daily → 100 XP
-  if (hero && hero.transmute_next && (q.type === 'side' || q.type === 'daily')) {
-    xpAmt = 100; hero.transmute_next = false; saveHero({ transmute_next: false });
-  }
-  // Lluvia de flechas (arquero): next weekly → 3×
-  if (hero && hero.arrow_rain && q.type === 'weekly') {
-    xpAmt *= 3; hero.arrow_rain = false; saveHero({ arrow_rain: false });
-  }
-  // Visión estratégica (fundador): next 5 quests → +25%
-  const stratCount = hero ? (hero.strategic_count || 0) : 0;
-  if (stratCount > 0) {
-    xpAmt = Math.round(xpAmt * 1.25);
-    hero.strategic_count = stratCount - 1; saveHero({ strategic_count: stratCount - 1 });
-  }
-  // Double-next event
-  if (hero && hero.double_next) {
-    xpAmt *= 2; hero.double_next = false; saveHero({ double_next: false });
-  }
-  // Main bonus event (+20 XP for main quests today)
-  if (q.type === 'main' && hero && hero.main_bonus_date === today) {
-    xpAmt += 20;
-  }
-  // Apply multipliers
-  xpAmt = Math.round(xpAmt * potionMult * berserkerMult * weatherMult);
-
-  // Habilidades de mascota activa
-  if (typeof getPetEffect === 'function') {
-    if (q.type === 'daily') xpAmt += getPetEffect('daily_xp') || 0;
-    const allMult = getPetEffect('all_xp');
-    if (allMult) {
-      xpAmt = Math.round(xpAmt * (1 + allMult));
-    } else {
-      const epicMult = getPetEffect('epic_xp');
-      if (epicMult && (q.priority === 'epico' || q.priority === 'legendario' || q.priority === 'mitico')) {
-        xpAmt = Math.round(xpAmt * (1 + epicMult));
-      }
-    }
-    if (q.type === 'side') {
-      const sideCrit = getPetEffect('side_crit');
-      if (sideCrit && Math.random() < sideCrit) {
-        xpAmt *= 2;
-        toast('🌑', '¡Golpe Crítico de Pantera! 2× XP');
-      }
-    }
-  }
-
-  // Runa de Fuerza — +8% XP en misiones épicas y superiores
-  if (typeof getRuneBonus === 'function') {
-    const runeEpicMult = getRuneBonus('epic_xp');
-    if (runeEpicMult && (q.priority === 'epico' || q.priority === 'legendario' || q.priority === 'mitico')) {
-      xpAmt = Math.round(xpAmt * (1 + runeEpicMult));
-    }
-  }
-
-  // Reputación por área (tags) — bonus de XP si superaste el umbral
-  if (typeof getReputationBonus === 'function') {
-    xpAmt = Math.round(xpAmt * (1 + getReputationBonus(q.tags)));
-  }
-
-  // Zona del Dungeon — bonus por rango en la zona de esta misión
-  if (typeof getZoneBonus === 'function') {
-    xpAmt = Math.round(xpAmt * (1 + getZoneBonus(q)));
-  }
-
-  // Facción del Dungeon — bonus pasivo por rango de gremio
-  if (typeof getFactionBonus === 'function') {
-    xpAmt = Math.round(xpAmt * (1 + getFactionBonus(q)));
-  }
-  if (typeof getFactionFocusBonus === 'function') {
-    xpAmt = Math.round(xpAmt * (1 + getFactionFocusBonus(q)));
-  }
-  if (typeof getActivePetBondBonus === 'function') {
-    xpAmt = Math.round(xpAmt * (1 + getActivePetBondBonus()));
-  }
-  if (typeof getSalaBonus === 'function') {
-    xpAmt = Math.round(xpAmt * (1 + getSalaBonus('quest_xp')));
-    const hour = new Date().getHours();
-    if (hour >= 20 || hour < 5) xpAmt = Math.round(xpAmt * (1 + getSalaBonus('night_xp')));
-  }
-
-  // Doble o Nada — multiplica (o anula) XP y oro de esta misión
-  const doubleNadaMult = typeof resolveDoubleOrNothing === 'function' ? resolveDoubleOrNothing(q) : 1;
-  xpAmt = Math.round(xpAmt * doubleNadaMult);
-
-  // Modo Pesadilla — doble XP y oro
-  if (hero && hero.nightmare_mode) xpAmt *= 2;
-
-  // Sistema de Combos — ráfaga activa multiplicador
-  if (typeof getComboMult === 'function') xpAmt = Math.round(xpAmt * getComboMult());
-
-  // Modo Furia — HP < 20% → +50% XP
-  if (hero) {
-    const hpPct = (hero.hp || 0) / (hero.hp_max || 100);
-    if (hpPct < 0.2) xpAmt = Math.round(xpAmt * 1.5);
-  }
-
-  const balancedXP = typeof balanceReward === 'function' ? balanceReward('xp', baseXPAmt, xpAmt) : { amount:xpAmt, capped:false };
-  xpAmt = balancedXP.amount;
-  if (balancedXP.capped) toast('⚖️', `Recompensa equilibrada: máximo ×${REWARD_CAPS.xp} XP por misión.`);
-  await addXP(xpAmt, q.type, el);
-
-  // Gold earned
-  const goldBase = _isDailySpecial ? DAILY_SPECIAL_GOLD : (GOLD_TABLE ? (GOLD_TABLE[q.type] || 10) : 10);
-  const goldMult = typeof getGoldMult === 'function' ? getGoldMult() : 1;
-  const todGoldMult    = typeof getTODBonus === 'function' ? getTODBonus().goldMult : 1;
-  const skillGoldMult  = typeof getSkillTreeGoldBonus === 'function' ? (1 + getSkillTreeGoldBonus()) : 1;
-  const runeGoldMult   = typeof getRuneBonus === 'function' ? (1 + getRuneBonus('gold')) : 1;
-  const weaponGoldMult  = 1 + getWeaponBonus('goldBonus');
-  const mountSpdMult   = typeof getPetMountStat   === 'function' ? (1 + getPetMountStat('spd') / 100) : 1;
-  const goldRushMult   = (hero && (hero.gold_rush_exp || 0) > Date.now()) ? 2 : 1;
-  let goldAmt  = Math.round(goldBase * goldMult * doubleNadaMult * todGoldMult * skillGoldMult * runeGoldMult * weaponGoldMult * goldRushMult * mountSpdMult);
-  if (typeof getMapExpeditionBonus === 'function') goldAmt = Math.round(goldAmt * (1 + getMapExpeditionBonus(q, 'gold')));
-  if (hero && hero.nightmare_mode) goldAmt *= 2;
-  const balancedGold = typeof balanceReward === 'function' ? balanceReward('gold', goldBase, goldAmt) : { amount:goldAmt, capped:false };
-  goldAmt = balancedGold.amount;
-  if (typeof recordRewardLedger === 'function') recordRewardLedger({ quest:q.name, type:q.type, xp:xpAmt, gold:goldAmt, xpMult:balancedXP.multiplier, goldMult:balancedGold.multiplier, capped:balancedXP.capped || balancedGold.capped });
-  if (typeof addGold === 'function') {
-    addGold(goldAmt);
-    if (typeof spawnGoldParticle === 'function') spawnGoldParticle(goldAmt, el);
-  }
+  q.done = true;
+  q.done_at = reward.done_at;
+  const xpAmt = Number(reward.xp_awarded || 0);
+  const goldAmt = Number(reward.gold_awarded || 0);
+  Object.assign(hero, {
+    xp_total: Number(reward.xp_total || hero.xp_total || 0),
+    gold: Number(reward.gold || hero.gold || 0),
+    level: Number(reward.level || hero.level || 1),
+    quests_done: Number(reward.quests_done || hero.quests_done || 0),
+    main_done: Number(reward.main_done || hero.main_done || 0),
+  });
+  deriveHero();
+  renderHeroUI();
+  renderGold();
+  if (typeof recordRewardLedger === 'function') recordRewardLedger({ quest:q.name, type:q.type, xp:xpAmt, gold:goldAmt, server:true });
+  if (typeof spawnGoldParticle === 'function') spawnGoldParticle(goldAmt, el);
   // Runas solo dropean de bosses (ver rpg.js damageBoss)
 
   // Apuesta del Dungeon — si ganaste a tiempo, recuperas el doble
@@ -236,9 +104,6 @@ async function completeQuest(id, el) {
     }
   }
 
-  const patch = { quests_done: (hero.quests_done || 0) + 1 };
-  if (q.type === 'main') patch.main_done = (hero.main_done || 0) + 1;
-  await saveHero(patch);
   if (typeof trackWeekQuest === 'function') trackWeekQuest();
 
   // Secret class progress tracking
@@ -288,7 +153,7 @@ async function completeQuest(id, el) {
     const _gold = goldAmt, _xp = xpAmt, _name = q.name, _type = q.type;
     setTimeout(async () => {
       const loots = rollLoot(q.priority || 'normal');
-      await grantLoot(loots, _gold, _xp, _name, _type);
+      if (!undoUsed) await grantLoot(loots, _gold, _xp, _name, _type, true);
     }, 700);
   }
 
@@ -325,19 +190,23 @@ async function completeQuest(id, el) {
 
 async function undoComplete() {
   if (!lastCompletedUndo) return;
-  const { id, xpAmt } = lastCompletedUndo;
+  const { id } = lastCompletedUndo;
   const q = quests.find(x => x.id === id);
   if (!q) return;
-  await db.from('dungeon_quests').update({ done: false, done_at: null }).eq('id', id);
+  const { data: reverted, error } = await db.rpc('undo_dungeon_quest', { p_quest_id: id });
+  const state = Array.isArray(reverted) ? reverted[0] : reverted;
+  if (error || !state) {
+    toast('⚠️', 'No se pudo revertir la misión. El progreso se mantiene.');
+    return;
+  }
   q.done = false; q.done_at = null;
-  const newTotal = Math.max(0, (hero.xp_total || 0) - xpAmt);
-  const newLevel = calcLevel(newTotal);
-  const patch = {
-    xp_total: newTotal, level: newLevel,
-    quests_done: Math.max(0, (hero.quests_done || 0) - 1)
-  };
-  if (q.type === 'main') patch.main_done = Math.max(0, (hero.main_done || 0) - 1);
-  await saveHero(patch);
+  Object.assign(hero, {
+    xp_total: Number(state.xp_total || 0), gold: Number(state.gold || 0),
+    level: Number(state.level || 1), quests_done: Number(state.quests_done || 0),
+    main_done: Number(state.main_done || 0),
+  });
+  deriveHero();
+  renderGold();
   lastCompletedUndo = null;
   toast('↩️', 'Misión revertida');
   renderQuestList(); renderHeroUI(); renderStats(); updateBossBanner();

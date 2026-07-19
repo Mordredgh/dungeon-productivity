@@ -100,10 +100,10 @@ function spellFragLabel(spellKey) {
   return labels[spellKey] || spellKey;
 }
 
-async function grantLoot(loots, goldAmt, xpAmt, questName, questType) {
+async function grantLoot(loots, goldAmt, xpAmt, questName, questType, alreadyAwarded = false) {
   if (!loots) return;
   const items = Array.isArray(loots) ? loots : [loots];
-  if (goldAmt) addGold(goldAmt);
+  if (goldAmt && !alreadyAwarded) addGold(goldAmt);
   showRewardModal(questName, questType, xpAmt || 0, goldAmt || 0, items);
   await Promise.all(items.map(l => addInvItem(l.key, l.type, l.qty)));
   if (typeof renderSpells === 'function') renderSpells();
