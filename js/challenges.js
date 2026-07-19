@@ -5,14 +5,14 @@
    ─────────────────────────────────────────────────────────── */
 
 const CHALLENGE_DEFS = [
-  { id:'quest30',   icon:'⚔️', name:'El Mes del Guerrero',     desc:'Completa 30 misiones en 30 días',               target:30,   type:'quests',      reward:{ xp:500,  gold:200 } },
-  { id:'streak30',  icon:'🔥', name:'La Racha Eterna',          desc:'Mantén tu racha activa durante 30 días',        target:30,   type:'streak',      reward:{ xp:800,  gold:300 } },
-  { id:'pom30',     icon:'🍅', name:'El Maratonista del Tiempo',desc:'Completa 30 pomodoros',                         target:30,   type:'pomodoros',   reward:{ xp:400,  gold:150 } },
-  { id:'main10',    icon:'⭐', name:'Héroe de Leyenda',          desc:'Completa 10 misiones épicas',                   target:10,   type:'main_quests', reward:{ xp:600,  gold:250 } },
-  { id:'habit30',   icon:'✅', name:'Maestro de Hábitos',       desc:'Completa hábitos positivos 20 veces',           target:20,   type:'habits',      reward:{ xp:350,  gold:120 } },
-  { id:'xp5000',    icon:'💠', name:'Tesoro de Poder',          desc:'Gana 5000 XP en este reto',                     target:5000, type:'xp',          reward:{ xp:1000, gold:400 } },
-  { id:'boss3',     icon:'🐉', name:'Cazador de Jefes',         desc:'Derrota al jefe semanal 3 veces',               target:3,    type:'boss_kills',  reward:{ xp:750,  gold:350 } },
-  { id:'daily50',   icon:'🌅', name:'Rutinario Legendario',     desc:'Completa 50 búsquedas diarias',                 target:50,   type:'dailies',     reward:{ xp:450,  gold:180 } },
+  { id:'quest30',   icon:'⚔️', img:'logro_centurion.webp', name:'El Mes del Guerrero',     desc:'Completa 30 misiones en 30 días',               target:30,   type:'quests',      reward:{ xp:500,  gold:200 } },
+  { id:'streak30',  icon:'🔥', img:'logro_eterno.webp', name:'La Racha Eterna',          desc:'Mantén tu racha activa durante 30 días',        target:30,   type:'streak',      reward:{ xp:800,  gold:300 } },
+  { id:'pom30',     icon:'🍅', img:'logro_maratonista.webp', name:'El Maratonista del Tiempo',desc:'Completa 30 pomodoros',                         target:30,   type:'pomodoros',   reward:{ xp:400,  gold:150 } },
+  { id:'main10',    icon:'⭐', img:'logro_leyenda.webp', name:'Héroe de Leyenda',          desc:'Completa 10 misiones épicas',                   target:10,   type:'main_quests', reward:{ xp:600,  gold:250 } },
+  { id:'habit30',   icon:'✅', img:'logro_forjado-hierro.webp', name:'Maestro de Hábitos',       desc:'Completa hábitos positivos 20 veces',           target:20,   type:'habits',      reward:{ xp:350,  gold:120 } },
+  { id:'xp5000',    icon:'💠', img:'logro_maestro-poder.webp', name:'Tesoro de Poder',          desc:'Gana 5000 XP en este reto',                     target:5000, type:'xp',          reward:{ xp:1000, gold:400 } },
+  { id:'boss3',     icon:'🐉', img:'logro_boss_slayer.webp', name:'Cazador de Jefes',         desc:'Derrota al jefe semanal 3 veces',               target:3,    type:'boss_kills',  reward:{ xp:750,  gold:350 } },
+  { id:'daily50',   icon:'🌅', img:'logro_daily_5.webp', name:'Rutinario Legendario',     desc:'Completa 50 búsquedas diarias',                 target:50,   type:'dailies',     reward:{ xp:450,  gold:180 } },
 ];
 
 function _getChallenges() {
@@ -143,7 +143,7 @@ function renderChallenges() {
       return `
         <div class="ch-card ${c.completed ? 'ch-done' : ''}">
           <div class="ch-header">
-            <span class="ch-icon">${def.icon}</span>
+            <span class="ch-icon"><img src="images/${def.img}" alt="" onerror="this.parentElement.textContent='${def.icon}'"></span>
             <div class="ch-info">
               <div class="ch-name">${escHtml(def.name)}</div>
               <div class="ch-desc">${escHtml(def.desc)}</div>
@@ -169,7 +169,7 @@ function renderChallenges() {
     html += available.map(def => `
       <div class="ch-card ch-available">
         <div class="ch-header">
-          <span class="ch-icon">${def.icon}</span>
+          <span class="ch-icon"><img src="images/${def.img}" alt="" onerror="this.parentElement.textContent='${def.icon}'"></span>
           <div class="ch-info">
             <div class="ch-name">${escHtml(def.name)}</div>
             <div class="ch-desc">${escHtml(def.desc)}</div>

@@ -22,34 +22,34 @@ const PET_MOVES = {
     { id:'eclipse',  name:'Eclipse Total',    icon:'🌑', img:'move_especial', power:4.0, type:'Especial', reqLevel:15 },
   ],
   'lobo-tormenta': [
-    { id:'mordisco', name:'Mordisco Eléctrico', icon:'⚡', power:1.0, type:'Normal',    reqLevel:0  },
-    { id:'aullido',  name:'Aullido de Trueno',  icon:'🌩️', power:1.5, type:'Eléctrico', reqLevel:0  },
-    { id:'rayo',     name:'Rayo Ártico',         icon:'❄️', power:2.5, type:'Eléctrico', reqLevel:5  },
-    { id:'tormenta', name:'Tormenta de Acero',   icon:'🌀', power:4.0, type:'Especial',  reqLevel:15 },
+    { id:'mordisco', name:'Mordisco Eléctrico', icon:'⚡', img:'move_normal', power:1.0, type:'Normal',    reqLevel:0  },
+    { id:'aullido',  name:'Aullido de Trueno',  icon:'🌩️', img:'move_electrico', power:1.5, type:'Eléctrico', reqLevel:0  },
+    { id:'rayo',     name:'Rayo Ártico',         icon:'❄️', img:'move_electrico', power:2.5, type:'Eléctrico', reqLevel:5  },
+    { id:'tormenta', name:'Tormenta de Acero',   icon:'🌀', img:'move_especial', power:4.0, type:'Especial',  reqLevel:15 },
   ],
   'grifo': [
-    { id:'picotazo', name:'Picotazo Arcano',   icon:'🦅', power:1.0, type:'Normal',   reqLevel:0  },
-    { id:'garra-g',  name:'Garra Épica',       icon:'✨', power:1.5, type:'Normal',   reqLevel:0  },
-    { id:'viento',   name:'Ráfaga de Viento',  icon:'💨', power:2.5, type:'Aéreo',    reqLevel:5  },
-    { id:'divino',   name:'Juicio Divino',     icon:'⚡', power:4.0, type:'Especial', reqLevel:15 },
+    { id:'picotazo', name:'Picotazo Arcano',   icon:'🦅', img:'move_normal', power:1.0, type:'Normal',   reqLevel:0  },
+    { id:'garra-g',  name:'Garra Épica',       icon:'✨', img:'move_normal', power:1.5, type:'Normal',   reqLevel:0  },
+    { id:'viento',   name:'Ráfaga de Viento',  icon:'💨', img:'move_aereo', power:2.5, type:'Aéreo',    reqLevel:5  },
+    { id:'divino',   name:'Juicio Divino',     icon:'⚡', img:'move_especial', power:4.0, type:'Especial', reqLevel:15 },
   ],
   'dragon-fuego': [
-    { id:'zarpa-d',  name:'Zarpa de Fuego',    icon:'🔥', power:1.0, type:'Normal',  reqLevel:0  },
-    { id:'mordida-d',name:'Mordida Llameante', icon:'🐉', power:1.5, type:'Fuego',   reqLevel:0  },
-    { id:'llamarada',name:'Llamarada',         icon:'🌋', power:2.5, type:'Fuego',   reqLevel:5  },
-    { id:'inferno',  name:'Infierno Eterno',   icon:'☄️', power:4.0, type:'Especial',reqLevel:15 },
+    { id:'zarpa-d',  name:'Zarpa de Fuego',    icon:'🔥', img:'move_normal', power:1.0, type:'Normal',  reqLevel:0  },
+    { id:'mordida-d',name:'Mordida Llameante', icon:'🐉', img:'move_fuego', power:1.5, type:'Fuego',   reqLevel:0  },
+    { id:'llamarada',name:'Llamarada',         icon:'🌋', img:'move_fuego', power:2.5, type:'Fuego',   reqLevel:5  },
+    { id:'inferno',  name:'Infierno Eterno',   icon:'☄️', img:'move_especial', power:4.0, type:'Especial',reqLevel:15 },
   ],
   'fenix-mitico': [
-    { id:'pluma',    name:'Pluma de Fuego',    icon:'🔥', power:1.0, type:'Normal',   reqLevel:0  },
-    { id:'llama-f',  name:'Llama Purificadora',icon:'✨', power:1.5, type:'Normal',   reqLevel:0  },
-    { id:'resurgir', name:'Resurgir',          icon:'💫', power:2.5, type:'Mágico',   reqLevel:5  },
-    { id:'sol-eterno',name:'Sol Eterno',       icon:'☀️', power:4.0, type:'Especial', reqLevel:15 },
+    { id:'pluma',    name:'Pluma de Fuego',    icon:'🔥', img:'move_normal', power:1.0, type:'Normal',   reqLevel:0  },
+    { id:'llama-f',  name:'Llama Purificadora',icon:'✨', img:'move_fuego', power:1.5, type:'Normal',   reqLevel:0  },
+    { id:'resurgir', name:'Resurgir',          icon:'💫', img:'move_magico', power:2.5, type:'Mágico',   reqLevel:5  },
+    { id:'sol-eterno',name:'Sol Eterno',       icon:'☀️', img:'move_especial', power:4.0, type:'Especial', reqLevel:15 },
   ],
   'rey-tempestad': [
-    { id:'corona',   name:'Corona de Truenos', icon:'👑', power:1.0, type:'Normal',    reqLevel:0  },
-    { id:'decreto',  name:'Decreto Imperial',  icon:'⚡', power:1.5, type:'Eléctrico', reqLevel:0  },
-    { id:'tifon',    name:'Tifón Real',        icon:'🌪️', power:2.5, type:'Cataclismo',reqLevel:5  },
-    { id:'apocalipsis',name:'Apocalipsis',     icon:'🌩️', power:4.0, type:'Especial',  reqLevel:15 },
+    { id:'corona',   name:'Corona de Truenos', icon:'👑', img:'move_normal', power:1.0, type:'Normal',    reqLevel:0  },
+    { id:'decreto',  name:'Decreto Imperial',  icon:'⚡', img:'move_electrico', power:1.5, type:'Eléctrico', reqLevel:0  },
+    { id:'tifon',    name:'Tifón Real',        icon:'🌪️', img:'move_elemental', power:2.5, type:'Cataclismo',reqLevel:5  },
+    { id:'apocalipsis',name:'Apocalipsis',     icon:'🌩️', img:'move_especial', power:4.0, type:'Especial',  reqLevel:15 },
   ],
 };
 
@@ -540,7 +540,7 @@ function _bbRender() {
         const rest  = _bbIsPetExhausted(p);
         return `<button class="bb-pet-chip${p.id === _bbPet.id ? ' active' : ''}${rest ? ' bb-pet-chip-resting' : ''}"
             onclick="_bbPickPet('${p.id}')" title="${rest ? 'Descansando' : ''}">
-          ${rest ? '😴' : (def?.icon || '🐾')} <span>${escHtml(def?.name?.split(' ')[0] || p.pet_key)}</span>
+          <img src="images/pet_${p.stage}_${p.pet_key}.webp" alt="" class="bb-pet-chip-art"> <span>${escHtml(def?.name?.split(' ')[0] || p.pet_key)}${rest ? ' · descansando' : ''}</span>
         </button>`;
       }).join('')}</div>` : '';
 
