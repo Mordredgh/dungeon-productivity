@@ -22,6 +22,15 @@ const GARDEN_EXPEDITIONS = {
   crystal: { label: 'Buscar cristales', icon: '💎', minutes: 60, desc: 'Trae fragmentos y oro.' },
   portal:  { label: 'Cruzar portal', icon: '🌀', minutes: 120, desc: 'Sólo monturas Nv.50. Recompensa rara.' },
 };
+const PET_ZONE_EXPEDITIONS = {
+  'zorro-naturaleza': { zone:'jardin', label:'Sendero de raíces', minutes:45, desc:'Recoge esencia y fortalece el Jardín Arcano.', rewards:{ gold:18, essence:5, food:1, zoneXP:45 } },
+  'pantera-sombra':   { zone:'cripta', label:'Caza de sombras', minutes:50, desc:'Rastrea reliquias en la Cripta.', rewards:{ gold:32, essence:4, rune:1, zoneXP:55 } },
+  'lobo-tormenta':    { zone:'fortaleza', label:'Guardia de tormenta', minutes:55, desc:'Patrulla la Fortaleza bajo relámpagos.', rewards:{ gold:25, essence:4, food:1, zoneXP:55 } },
+  grifo:              { zone:'torre', label:'Vuelo del erudito', minutes:60, desc:'Recupera fragmentos de la Torre del Saber.', rewards:{ gold:22, essence:5, rune:2, zoneXP:65 } },
+  'dragon-fuego':     { zone:'campo', label:'Incursión de ceniza', minutes:70, desc:'Asegura el Campo de Batalla.', rewards:{ gold:42, essence:6, rune:2, zoneXP:75 } },
+  'fenix-mitico':     { zone:'ciudadela', label:'Renacer de la guardia', minutes:75, desc:'Reaviva la Ciudadela.', rewards:{ gold:38, essence:7, food:1, zoneXP:80 } },
+  'rey-tempestad':    { zone:'campo', label:'Ojo del cataclismo', minutes:90, desc:'Sella una tormenta en el Campo.', rewards:{ gold:70, essence:10, rune:3, zoneXP:110 } },
+};
 const GARDEN_UPGRADES = [
   { id:'nest', name:'Nido cálido', icon:'🪺', desc:'Reduce 15% el descanso tras caer.', max:3 },
   { id:'feeder', name:'Comedero lunar', icon:'🍲', desc:'+5% XP de mascota por nivel.', max:3 },
@@ -95,12 +104,12 @@ function isPetOnGardenExpedition(petId) {
 }
 function gardenStartExpedition(petId, type) {
   const pet = (pets || []).find(p => p.id === petId);
-  const def = GARDEN_EXPEDITIONS[type];
+  const def = type === 'species' ? PET_ZONE_EXPEDITIONS[pet?.pet_key] : GARDEN_EXPEDITIONS[type];
   if (!pet || !def || pet.stage === 'egg') return;
   if (type === 'portal' && !(pet.stage === 'mount' && (pet.pet_level || 0) >= 50)) { toast('🌀', 'El portal sólo acepta monturas de Nv.50.'); return; }
   const current = _gardenExpedition();
   if (current && current.endsAt > Date.now()) { toast('⏳', 'Ya hay una expedición en marcha.'); return; }
-  _gardenWrite('expedition', { petId, petKey:pet.pet_key, type, endsAt:Date.now() + def.minutes * 60000 });
+  _gardenWrite('expedition', { petId, petKey:pet.pet_key, type, zone:def.zone || null, rewards:def.rewards || null, endsAt:Date.now() + def.minutes * 60000 });
   toast(def.icon, `${_petDef(pet.pet_key)?.name || 'Mascota'} partió: ${def.label}.`);
   _closeGardenModal(); renderGarden();
 }
@@ -109,13 +118,14 @@ async function gardenClaimExpedition() {
   const trip = _gardenExpedition();
   if (!trip) return;
   if (trip.endsAt > Date.now()) { toast('⏳', 'La expedición aún no regresa.'); return; }
-  const rewards = trip.type === 'portal' ? { gold:80, essence:8, rune:3, food:1 } : trip.type === 'crystal' ? { gold:28, essence:4, rune:2 } : { gold:12, essence:3, food:1 };
+  const rewards = trip.rewards || (trip.type === 'portal' ? { gold:80, essence:8, rune:3, food:1 } : trip.type === 'crystal' ? { gold:28, essence:4, rune:2 } : { gold:12, essence:3, food:1 });
   if (typeof addGold === 'function') addGold(rewards.gold);
   if (rewards.rune && typeof addInvItem === 'function') await addInvItem('rune_fragment', 'rune_fragment', rewards.rune);
   if (rewards.food && typeof addInvItem === 'function') await addInvItem('pet_food_' + trip.petKey, 'pet_food', rewards.food);
   _gardenSetEssence(_gardenEssence() + rewards.essence);
+  if (trip.zone && rewards.zoneXP && typeof addZoneExtXP === 'function') await addZoneExtXP(trip.zone, rewards.zoneXP);
   _gardenWrite('expedition', null);
-  toast('🎁', `Expedición resuelta: +${rewards.gold} oro, +${rewards.essence} esencia.`);
+  toast('🎁', `Expedición resuelta: +${rewards.gold} oro, +${rewards.essence} esencia${trip.zone ? ` y reputación en ${trip.zone}` : ''}.`);
   renderGarden();
 }
 
@@ -185,7 +195,7 @@ function renderGarden() {
       </section>
       <section class="garden-command-card garden-trip-card">
         <div class="garden-command-title">🧭 Encargo de jardín</div>
-        ${trip ? (activeTrip ? `<b>${GARDEN_EXPEDITIONS[trip.type]?.label || 'Expedición'}</b><p>${tripMins} min restantes · ${_petDef(trip.petKey)?.name || 'Mascota'} está explorando.</p>` : `<b>Tu mascota regresó</b><p>Hay recompensas listas para reclamar.</p><button class="garden-mini-btn" onclick="gardenClaimExpedition()">Reclamar botín</button>`) : `<b>Sin expedición activa</b><p>Selecciona una mascota y envíala desde su ficha.</p>`}
+        ${trip ? (activeTrip ? `<b>${trip.type === 'species' ? PET_ZONE_EXPEDITIONS[trip.petKey]?.label : GARDEN_EXPEDITIONS[trip.type]?.label || 'Expedición'}</b><p>${tripMins} min restantes · ${_petDef(trip.petKey)?.name || 'Mascota'} está explorando.</p>` : `<b>Tu mascota regresó</b><p>Hay recompensas listas para reclamar.</p><button class="garden-mini-btn" onclick="gardenClaimExpedition()">Reclamar botín</button>`) : `<b>Sin expedición activa</b><p>Selecciona una mascota y envíala desde su ficha.</p>`}
       </section>
       <section class="garden-command-card garden-upgrades-card">
         <div class="garden-command-title">🏡 Refugio del jardín</div>
@@ -375,6 +385,7 @@ function _openGardenModal(key) {
     </button>
     <div class="gm-garden-meta">🏕️ Hábitat ${habitat ? 'asignado' : 'sin asignar'} · 🐾 Vínculo ${bond}</div>
     <div class="gm-expedition-actions">
+      <button class="gm-zone-expedition" onclick="gardenStartExpedition('${pet.id}','species')">${PET_ZONE_EXPEDITIONS[key]?.label || 'Expedición de especie'} · ${PET_ZONE_EXPEDITIONS[key]?.minutes || 45}m</button>
       <button onclick="gardenStartExpedition('${pet.id}','forage')">🌿 Recolectar · 30m</button>
       <button onclick="gardenStartExpedition('${pet.id}','crystal')">💎 Cristales · 1h</button>
       ${canPortal ? `<button class="gm-portal-action" onclick="gardenStartExpedition('${pet.id}','portal')">🌀 Portal · 2h</button>` : ''}
