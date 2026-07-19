@@ -273,6 +273,34 @@ function getDungeonBonus(type) {
   }
 }
 
+/* Lectura central de efectos: evita que el jugador tenga que recordar qu\u00e9
+   edificio, v\u00ednculo o preparaci\u00f3n est\u00e1 modificando sus recompensas. */
+function getActiveDungeonEffects() {
+  if (!hero) return [];
+  const effects = [];
+  const add = (id, art, title, detail, value, tone = '#c084fc') => effects.push({ id, art, title, detail, value, tone });
+  const addRoom = (room, type, art, title, detail) => {
+    const mult = getDungeonBonus(type);
+    if (mult > 1) add(`room-${room}`, art, title, detail, `+${Math.round((mult - 1) * 100)}%`);
+    if (mult < 1) add(`room-${room}`, art, title, detail, `${Math.round((1 - mult) * 100)}% menos`, '#5eead4');
+  };
+  addRoom('observatorio', 'xp', 'stat_xp.webp', 'Conocimiento del Observatorio', 'XP de recompensas');
+  addRoom('tesoro', 'gold', 'stat_gold.webp', 'Cámara del Tesoro', 'Oro de recompensas');
+  addRoom('jardin', 'pet_xp', 'nav_mascotas.webp', 'Jardín fortalecido', 'XP de mascotas');
+  addRoom('arena', 'boss_dmg', 'dungeon_sala8.webp', 'Arena del Boss', 'Daño a jefes');
+  addRoom('biblioteca', 'mana', 'dungeon_sala4.webp', 'Biblioteca Arcana', 'Coste de maná');
+
+  const campaign = typeof getWeeklyCampaignBonus === 'function' ? getWeeklyCampaignBonus('boss_dmg') : 0;
+  if (campaign > 0) add('campaign', 'nav_misiones.webp', 'Campaña semanal', 'Daño al jefe semanal', `+${Math.round(campaign * 100)}%`, '#f5c95c');
+
+  const resonance = typeof getEquipmentResonance === 'function' ? getEquipmentResonance() : null;
+  if (resonance) add('resonance', 'nav_inventario.webp', resonance.name, 'Conjunto de cuatro piezas equipado', resonance.label, '#c084fc');
+
+  const petBond = typeof getActivePetBondBonus === 'function' ? getActivePetBondBonus() : 0;
+  if (petBond > 0) add('bond', 'nav_mascotas.webp', 'Vínculo de mascota', 'XP de aventuras', `+${Math.round(petBond * 100)}%`, '#86efac');
+  return effects;
+}
+
 /* ── Render principal ────────────────────────────────────── */
 function renderDungeonGrows() {
   const el = document.getElementById('dungeonGrowsContent');
@@ -294,6 +322,7 @@ function renderDungeonGrows() {
 
   el.innerHTML = `
     ${_renderWeekProgress(wQuests, wXP, wStreak, unlocked, weeks, nextRoom, weeksLeft)}
+    ${_renderActiveDungeonEffects()}
     <div class="dg-rooms-grid">
       ${DUNGEON_ROOMS.map((r, i) => _renderRoom(r, i < unlocked)).join('')}
     </div>`;
@@ -303,6 +332,24 @@ function renderDungeonGrows() {
     el.querySelectorAll('.dg-room').forEach((c, i) =>
       setTimeout(() => c.classList.add('dg-room-in'), i * 60));
   });
+}
+
+function _renderActiveDungeonEffects() {
+  const effects = getActiveDungeonEffects();
+  if (!effects.length) return `
+    <section class="dg-effects dg-effects-empty">
+      <div><span>EFECTOS ACTIVOS</span><b>Aún no hay mejoras permanentes</b><small>Fortalece salas, equipa un conjunto o forma vínculo con una mascota para activar bonificaciones.</small></div>
+    </section>`;
+  return `
+    <section class="dg-effects" aria-label="Efectos activos">
+      <header><div><span>EFECTOS ACTIVOS</span><b>Tu poder en este ciclo</b></div><small>${effects.length} bonificaci${effects.length === 1 ? 'ón' : 'ones'} aplicada${effects.length === 1 ? '' : 's'}</small></header>
+      <div class="dg-effects-grid">${effects.map(effect => `
+        <article class="dg-effect" style="--effect:${effect.tone}">
+          <img src="images/${effect.art}" alt="" loading="lazy">
+          <div><b>${effect.title}</b><small>${effect.detail}</small></div>
+          <strong>${effect.value}</strong>
+        </article>`).join('')}</div>
+    </section>`;
 }
 
 function _renderWeekProgress(q, xp, streak, unlocked, weeks, nextRoom, weeksLeft) {
