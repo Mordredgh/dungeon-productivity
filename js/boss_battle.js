@@ -185,7 +185,10 @@ function _bbAttackKey(cycle) {
   return 'dungeon-bb-atk-' + cycle + '-' + period;
 }
 /* La batalla debe permitir una sesión táctica real, no cinco clics y fuera. */
-function _bbMaxAttacks() { return 12 + (typeof getMasteryBonus === 'function' ? getMasteryBonus('voluntad') : 0); }
+function _bbMaxAttacks() {
+  const strategyBonus = typeof hasGoldUpgrade === 'function' && hasGoldUpgrade('war_table') ? 3 : 0;
+  return 12 + strategyBonus + (typeof getMasteryBonus === 'function' ? getMasteryBonus('voluntad') : 0);
+}
 function _bbLeft(cycle) { try { return Math.max(0, _bbMaxAttacks() - parseInt(localStorage.getItem(_bbAttackKey(cycle)) || '0', 10)); } catch { return _bbMaxAttacks(); } }
 function _bbUse(cycle)  { try { const k = _bbAttackKey(cycle); localStorage.setItem(k, String((parseInt(localStorage.getItem(k)||'0',10))+1)); } catch {} }
 

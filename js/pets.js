@@ -66,7 +66,8 @@ async function addActivePetXP(xp) {
   const salaPetXP = typeof getSalaBonus === 'function' ? 1 + getSalaBonus('pet_xp') : 1;
   const gardenPetXP = typeof getGardenBonus === 'function' ? 1 + getGardenBonus('pet_xp') : 1;
   const dungeonPetXP = typeof getDungeonBonus === 'function' ? getDungeonBonus('pet_xp') : 1;
-  let newXP  = (active.pet_xp || 0) + Math.round(xp * salaPetXP * gardenPetXP * dungeonPetXP);
+  const trainingMult = typeof hasGoldUpgrade === 'function' && hasGoldUpgrade('pet_training') ? 1.10 : 1;
+  let newXP  = (active.pet_xp || 0) + Math.round(xp * salaPetXP * gardenPetXP * dungeonPetXP * trainingMult);
   let newLvl = curLvl;
   while (newLvl < 15 && newXP >= petBabyXPForNextLevel(newLvl)) { newXP -= petBabyXPForNextLevel(newLvl); newLvl++; }
   await db.from('dungeon_pets').update({ pet_level: newLvl, pet_xp: newXP }).eq('id', active.id);
@@ -219,7 +220,8 @@ async function feedPet(petId) {
 
   if (petLvl < 15) {
     // Fase leveling: poción da XP
-    const xpGain = 50;
+    const trainingMult = typeof hasGoldUpgrade === 'function' && hasGoldUpgrade('pet_training') ? 1.10 : 1;
+    const xpGain = Math.round(50 * trainingMult);
     let newXP  = (pet.pet_xp || 0) + xpGain;
     let newLvl = petLvl;
     while (newLvl < 15 && newXP >= petBabyXPForNextLevel(newLvl)) { newXP -= petBabyXPForNextLevel(newLvl); newLvl++; }
@@ -260,7 +262,8 @@ async function feedPetFood(petId) {
 
   await consumeInvItem(foodKey, 1);
   localStorage.setItem('pet_lastfed_' + pet.id, String(Date.now()));
-  const gained  = def.food_xp || 50;
+  const trainingMult = typeof hasGoldUpgrade === 'function' && hasGoldUpgrade('pet_training') ? 1.10 : 1;
+  const gained  = Math.round((def.food_xp || 50) * trainingMult);
   const curLvl  = pet.pet_level || 1;
   let newXP     = (pet.pet_xp || 0) + gained;
   let newLvl    = curLvl;

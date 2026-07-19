@@ -334,6 +334,8 @@ const GOLD_UPGRADES = [
   { id:'forge_slot2', name:'Cola de Forja +1 (II)', icon:'⚒️', img:'upgrade_forge_slot2', cost:12000, desc:'+1 espacio adicional en la cola de forja (4→5)', reqUpgrade:'forge_slot' },
   { id:'drop_rate',   name:'Ojo del Coleccionista', icon:'🔮', img:'upgrade_drop_rate', cost:8000,  desc:'+5% drop rate base en todo el loot de misiones' },
   { id:'gold_boost',  name:'Pacto del Mercader',    icon:'💰', img:'upgrade_gold_boost', cost:10000, desc:'+10% oro permanente en todas las ganancias' },
+  { id:'pet_training', name:'Pabellón de Adiestramiento', icon:'🐾', img:'dungeon_sala5', cost:7500, desc:'+10% XP para mascotas bebé y monturas' },
+  { id:'war_table', name:'Mesa de Estrategia', icon:'⚔️', img:'dungeon_sala7', cost:18000, desc:'+3 energía de combate por jefe' },
 ];
 function hasGoldUpgrade(id) {
   if (!hero) return false;
