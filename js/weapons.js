@@ -59,9 +59,9 @@ async function unequipWeapon(id) {
   renderInventory(); renderSmithy();
 }
 
-/* Tres piezas equipadas del mismo rango forman una resonancia. El equipo deja
-   de ser sólo una lista de stats y obliga a decidir entre piezas individuales
-   fuertes o una construcción coherente. */
+/* Un set de armadura completo (casco, pecho, grebas y botas) del mismo rango
+   forma una resonancia. Guantes y armas conservan su papel individual: no
+   contaminan la decisión del set principal. */
 const EQUIPMENT_RESONANCES = {
   raro:       { name:'Resonancia Azul', effect:'xp', value:.03, label:'+3% XP' },
   epico:      { name:'Resonancia Violeta', effect:'gold', value:.05, label:'+5% oro' },
@@ -69,10 +69,16 @@ const EQUIPMENT_RESONANCES = {
   mitico:     { name:'Resonancia Mítica', effect:'all', value:.07, label:'+7% XP, oro y daño a jefes' },
 };
 function getEquipmentResonance() {
+  const setSlots = ['head', 'body', 'legs', 'feet'];
   const equipped = weapons.filter(item => item.is_equipped && !isForging(item));
-  const counts = equipped.reduce((out, item) => { out[item.tier] = (out[item.tier] || 0) + 1; return out; }, {});
-  return Object.entries(EQUIPMENT_RESONANCES).map(([tier, data]) => ({ tier, ...data, count:counts[tier] || 0 }))
-    .filter(item => item.count >= 3).sort((a, b) => b.count - a.count || b.value - a.value)[0] || null;
+  const setByTier = Object.keys(EQUIPMENT_RESONANCES).map(tier => {
+    const pieces = new Set(equipped.filter(item => item.tier === tier)
+      .map(item => WEAPON_DEFS.find(def => def.key === item.weapon_key)?.slot)
+      .filter(slot => setSlots.includes(slot)));
+    return { tier, pieces };
+  });
+  const active = setByTier.find(item => item.pieces.size === setSlots.length);
+  return active ? { tier:active.tier, ...EQUIPMENT_RESONANCES[active.tier], count:setSlots.length } : null;
 }
 function getEquipmentResonanceBonus(effect) {
   const resonance = getEquipmentResonance();
@@ -359,7 +365,7 @@ function renderInventory() {
 
   el.innerHTML = `
     <section class="vault-shell">
-      <header class="vault-header"><div><p class="vault-kicker">Bóveda del aventurero</p><h3>Inventario Arcano</h3><span>${equipped.length}/7 piezas equipadas · ${inv.length} tipos de objeto</span>${resonance ? `<div class="vault-resonance" style="--res:${WEAPON_TIERS[resonance.tier]?.color || '#c084fc'}"><b>${resonance.name}</b><span>${resonance.count} piezas · ${resonance.label}</span></div>` : '<div class="vault-resonance is-dormant"><b>Resonancia inactiva</b><span>Equipa 3 piezas del mismo rango para desbloquear un bonus.</span></div>'}</div><div class="vault-gold"><span>🪙</span><strong>${(typeof getGold === 'function' ? getGold() : 0).toLocaleString()}</strong><small>oro</small></div></header>
+      <header class="vault-header"><div><p class="vault-kicker">Bóveda del aventurero</p><h3>Inventario Arcano</h3><span>${equipped.length}/7 piezas equipadas · ${inv.length} tipos de objeto</span>${resonance ? `<div class="vault-resonance" style="--res:${WEAPON_TIERS[resonance.tier]?.color || '#c084fc'}"><b>${resonance.name}</b><span>Set de casco, pecho, grebas y botas · ${resonance.label}</span></div>` : '<div class="vault-resonance is-dormant"><b>Resonancia inactiva</b><span>Equipa casco, pecho, grebas y botas del mismo rango.</span></div>'}</div><div class="vault-gold"><span>🪙</span><strong>${(typeof getGold === 'function' ? getGold() : 0).toLocaleString()}</strong><small>oro</small></div></header>
       <nav class="vault-tabs" aria-label="Categorías de inventario">${tab('all','✦','Todo',inv.length + weapons.length)}${tab('equipment','⚔️','Equipo',weapons.length)}${tab('magic','🔮','Magia',groupCount('magic'))}${tab('pets','🐾','Mascotas',groupCount('pets'))}${tab('materials','◇','Materiales',groupCount('materials'))}</nav>
       ${showEquipment ? `<section class="vault-section"><div class="vault-section-head"><div><span>⚔️</span><h4>${_vaultActiveTab === 'all' ? 'Equipo activo' : 'Arsenal'}</h4></div><button class="vault-link" onclick="switchView('smithy')">Ir al Herrero →</button></div><div class="vault-gear-grid">${(equipped.length ? equipped : bag).map(_vaultEquipmentCard).join('') || '<div class="vault-empty">No tienes equipo todavía. La tienda del gremio tiene piezas comunes para iniciar.</div>'}</div>${_vaultActiveTab === 'all' && bag.length ? `<details class="vault-bag"><summary>Ver mochila de equipo <b>${bag.length}</b></summary><div class="vault-gear-grid">${bag.map(_vaultEquipmentCard).join('')}</div></details>` : ''}</section>` : ''}
       ${showItems ? `<section class="vault-section"><div class="vault-section-head"><div><span>✦</span><h4>${_vaultActiveTab === 'all' ? 'Objetos y recursos' : _vaultActiveTab === 'magic' ? 'Grimorio y runas' : _vaultActiveTab === 'pets' ? 'Suministros de mascotas' : 'Materiales'}</h4></div><button class="vault-link" onclick="switchView('shop')">Visitar tienda →</button></div>${tabItems.length ? `<div class="vault-item-grid">${tabItems.map(_vaultItemCard).join('')}</div>` : '<div class="vault-empty">Nada en esta categoría. Completa misiones, derrota jefes o visita la tienda.</div>'}</section>` : ''}
