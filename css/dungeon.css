@@ -9082,3 +9082,13 @@ html.performance-lite *,html.performance-lite *::before,html.performance-lite *:
 .faction-claim-btn:hover:not(:disabled) { opacity: .9; }
 .faction-claim-btn:active:not(:disabled) { transform: scale(.97); }
 .faction-claim-btn:disabled { cursor: not-allowed; opacity: .45; }
+
+/* ─── Beta feedback ────────────────────────────────────────── */
+.beta-feedback-modal { display:grid; place-items:center; padding:18px; background:rgba(7,4,15,.62); backdrop-filter:blur(10px); }
+.beta-feedback-card { width:min(100%,520px); padding:26px; display:grid; gap:10px; background:rgba(19,12,34,.88); border:1px solid rgba(181,103,255,.42); box-shadow:0 24px 70px rgba(0,0,0,.5); }
+.beta-feedback-card .beta-kicker { color:#dcb4ff; font-size:10px; font-weight:800; letter-spacing:.14em; }
+.beta-feedback-card h2 { margin:0; font-family:Cinzel,serif; font-size:21px; color:#fff5e7; }
+.beta-feedback-card p, .beta-feedback-card label { margin:0; color:var(--text2); font-size:12px; }
+.beta-feedback-card select, .beta-feedback-card textarea { width:100%; box-sizing:border-box; border:1px solid rgba(192,146,255,.32); border-radius:10px; background:rgba(8,6,18,.58); color:var(--text); padding:10px; font:inherit; }
+.beta-feedback-card textarea { min-height:120px; resize:vertical; }
+.beta-feedback-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:4px; }

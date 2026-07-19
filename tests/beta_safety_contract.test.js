@@ -5,6 +5,7 @@ const hero = fs.readFileSync('js/hero.js', 'utf8');
 const character = fs.readFileSync('js/character.js', 'utf8');
 const quests = fs.readFileSync('js/quests.js', 'utf8');
 const auth = fs.readFileSync('js/auth.js', 'utf8');
+const beta = fs.readFileSync('js/beta.js', 'utf8');
 
 assert.match(hero, /name:\s*'Héroe sin nombre'/, 'un beta tester no inicia con el nombre del desarrollador');
 assert.match(character, /id="initialHeroName"/, 'la identidad inicial solicita nombre');
@@ -18,6 +19,9 @@ assert.match(quests, /if \(error\) \{[\s\S]{0,180}return;/, 'no se conceden reco
 assert.match(auth, /requestPasswordReset/, 'existe recuperación de contraseña para beta');
 assert.match(auth, /completePasswordRecovery/, 'el enlace de recuperación permite definir una contraseña nueva');
 assert.match(auth, /onAuthStateChange/, 'el callback de recuperación abre su flujo aunque Supabase limpie la URL');
+assert.match(beta, /dungeon_beta_feedback/, 'beta incorpora un canal persistente de feedback');
+assert.match(beta, /dungeon_client_events/, 'beta registra fallos de cliente para diagnóstico');
+assert.match(beta, /window\.addEventListener\('error'/, 'los errores no capturados se reportan durante beta');
 assert.match(fs.readFileSync('js/ui.js', 'utf8'), /initModalAccessibility/, 'los modales ocultos quedan fuera del árbol accesible');
 assert.match(fs.readFileSync('deploy.ps1', 'utf8'), /Assets HTML: v\$new/, 'cada deploy renueva el fingerprint de JS y CSS');
 

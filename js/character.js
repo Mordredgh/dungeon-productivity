@@ -633,6 +633,7 @@ function renderConfigView() {
           <span class="chr-config-row-lbl">Notificaciones</span>
           <span class="chr-config-row-hint">Habilitar alertas del navegador</span>
         </div>
+        ${typeof betaFeedbackRow === 'function' ? betaFeedbackRow() : ''}
       </div>
 
       <div class="chr-config-card" style="margin-top:14px">
