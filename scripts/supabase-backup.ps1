@@ -1,7 +1,7 @@
 param(
   [string]$DatabaseUrl = $env:DUNGEON_SUPABASE_DB_URL,
   [string]$OutputDir = "tmp\backups",
-  [string]$DockerImage = "postgres:16-alpine",
+  [string]$DockerImage = "postgres:17-alpine",
   [string]$DockerNetwork = ""
 )
 

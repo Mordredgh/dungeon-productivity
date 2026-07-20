@@ -46,7 +46,7 @@ Comandos:
 
 `supabase-backup.ps1` genera un dump custom de Postgres dentro de `tmp/backups` y crea un `.sha256`. La carpeta `tmp/` esta ignorada por Git para evitar subir respaldos.
 
-`supabase-backup.ps1` usa `pg_dump` local si existe; si no, usa Docker con `postgres:16-alpine`. Esto mantiene el flujo compatible con Free Tier sin backups administrados.
+`supabase-backup.ps1` usa `pg_dump` local si existe; si no, usa Docker con `postgres:17-alpine`, alineado con Supabase Postgres 17. Esto mantiene el flujo compatible con Free Tier sin backups administrados.
 
 `supabase-restore-test.ps1` restaura un `.dump` en una base temporal usando `pg_restore`. Exige `-IUnderstandThisIsTemporary` y bloquea refs conocidas de produccion para evitar restaurar sobre el proyecto real.
 

@@ -1,5 +1,5 @@
 param(
-  [string]$DockerImage = "postgres:16-alpine"
+  [string]$DockerImage = "postgres:17-alpine"
 )
 
 $ErrorActionPreference = "Stop"

@@ -2,7 +2,7 @@ param(
   [Parameter(Mandatory = $true)][string]$BackupPath,
   [string]$RestoreDatabaseUrl = $env:DUNGEON_SUPABASE_RESTORE_TEST_DB_URL,
   [switch]$IUnderstandThisIsTemporary,
-  [string]$DockerImage = "postgres:16-alpine",
+  [string]$DockerImage = "postgres:17-alpine",
   [string]$DockerNetwork = ""
 )
 

@@ -20,7 +20,7 @@ assert.match(preflight, /dungeon_beta_feedback/);
 assert.match(preflight, /dungeon_beta_monitoring_24h/);
 assert.match(backup, /pg_dump/);
 assert.match(backup, /Get-FileHash/);
-assert.match(backup, /postgres:16-alpine/);
+assert.match(backup, /postgres:17-alpine/);
 assert.match(backup, /DockerNetwork/);
 assert.match(restore, /pg_restore/);
 assert.match(restore, /IUnderstandThisIsTemporary/);
