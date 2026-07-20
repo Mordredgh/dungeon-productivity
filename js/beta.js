@@ -13,6 +13,9 @@ async function recordBetaEvent(kind, detail = {}) {
       kind: String(kind).slice(0, 48),
       message,
       page: `${location.pathname}${location.hash}`.slice(0, 180),
+      http_status: Number.isFinite(Number(detail.status ?? detail.http_status))
+        ? Number(detail.status ?? detail.http_status)
+        : null,
       meta: { ...detail, message: undefined, reason: undefined, at: now },
     });
   } catch (error) {
