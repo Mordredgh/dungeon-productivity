@@ -7,4 +7,4 @@
 - [x] Migrar victoria, daño y recompensa de jefe a estado del servidor.
 - [x] Migrar recompensas de retos, facciones y eventos a ledger del servidor.
 - [x] Bloquear mutaciones directas de campos económicos tras migrar los flujos protegidos.
-- [ ] Añadir pruebas de integración con cuenta beta y publicar checklist final.
+- [x] Añadir pruebas de integración y publicar checklist final de beta.
