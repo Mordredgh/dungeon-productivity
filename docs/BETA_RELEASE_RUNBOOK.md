@@ -2,6 +2,7 @@
 
 ## Backup y rollback
 
+0. Confirmar variables operativas en `docs/BETA_ENVIRONMENT.md`. No escribir secretos en git ni en logs.
 1. Ejecutar `.\scripts\supabase-backup.ps1` antes de migrar y conservar el `.sha256`.
 2. Ejecutar `.\scripts\supabase-free-tier-drill.ps1`. Si existe `DUNGEON_SUPABASE_RESTORE_TEST_DB_URL`, tambien prueba restore temporal.
 3. Si no hay credenciales de produccion disponibles, ejecutar `.\scripts\supabase-free-tier-local-restore-drill.ps1` para validar el pipeline con Postgres temporal local.
