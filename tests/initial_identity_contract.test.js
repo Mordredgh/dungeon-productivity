@@ -12,6 +12,8 @@ const migration = fs.readFileSync('supabase/migrations/20260719_server_identity_
 assert.match(migration, /create or replace function public\.choose_initial_dungeon_identity/i);
 assert.match(migration, /auth\.uid\(\) is null/i);
 assert.match(migration, /for update/i);
+assert.match(migration, /add column if not exists race text/i);
+assert.match(migration, /skill_tree=v_tree/);
 assert.match(migration, /p_race not in \('humano','elfo','enano','orco'\)/i);
 assert.match(migration, /p_hero_class not in \('guerrero','mago','picaro','clerigo','arquero','fundador'\)/i);
 assert.match(character, /rpc\('choose_initial_dungeon_identity'/);

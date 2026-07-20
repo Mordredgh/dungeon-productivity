@@ -1,10 +1,12 @@
 -- El primer juramento se confirma de forma atómica y deja la raza sellada.
+alter table public.dungeon_heroes add column if not exists race text;
+drop function if exists public.choose_initial_dungeon_identity(text,text,text);
 create or replace function public.choose_initial_dungeon_identity(
   p_name text,
   p_race text,
   p_hero_class text
 )
-returns table (name text, race text, hero_class text, skill_tree text)
+returns table (name text, race text, hero_class text, skill_tree jsonb)
 language plpgsql security definer set search_path=public as $$
 declare
   v_hero public.dungeon_heroes%rowtype;
@@ -29,10 +31,10 @@ begin
   ), true);
 
   update public.dungeon_heroes
-  set name=v_name, race=p_race, hero_class=p_hero_class, skill_tree=v_tree::text
+  set name=v_name, race=p_race, hero_class=p_hero_class, skill_tree=v_tree
   where id=v_hero.id;
 
-  return query select v_name,p_race,p_hero_class,v_tree::text;
+  return query select v_name,p_race,p_hero_class,v_tree;
 end $$;
 
 revoke all on function public.choose_initial_dungeon_identity(text,text,text) from public;
