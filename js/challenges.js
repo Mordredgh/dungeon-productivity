@@ -107,11 +107,13 @@ async function claimChallengeReward(defId) {
   const c = arr.find(x => x.id === defId);
   const def = CHALLENGE_DEFS.find(d => d.id === defId);
   if (!c || !def || !c.completed || c.rewarded) return;
+  const { data, error } = await db.rpc('claim_dungeon_reward', { p_source:'challenge', p_reward_key:defId });
+  if (error) { toast('⚠️', error.message || 'No se pudo reclamar la recompensa.'); return; }
+  const reward = Array.isArray(data) ? data[0] : data;
   c.rewarded = true;
   await _saveChallenges(arr);
-  await addXP(def.reward.xp, 'main', null);
-  if (typeof addGold === 'function') addGold(def.reward.gold);
-  toast(def.icon, `¡Recompensa reclamada! +${def.reward.xp} XP · +${def.reward.gold}🪙`);
+  Object.assign(hero, { xp_total:reward.xp_total, gold:reward.gold, level:reward.level });
+  toast(def.icon, `¡Recompensa reclamada! +${reward.xp_awarded} XP · +${reward.gold_awarded}🪙`);
   renderChallenges();
 }
 
