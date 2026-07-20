@@ -280,21 +280,24 @@ async function _damageBossCycle(cycle, baseDmg) {
     Object.assign(state, result.boss_state);
     hero.boss_state = state;
   }
-  b.hp = result.hp;
-  b.maxHp = result.max_hp || b.maxHp;
-  b.defeated = !!result.defeated;
+  const updatedBoss = state[cycle] || b;
+  const previousHp = Number(updatedBoss.hp ?? b.hp ?? 0);
+  updatedBoss.hp = Number(result.hp ?? updatedBoss.hp);
+  updatedBoss.maxHp = Number(result.max_hp || updatedBoss.maxHp || b.maxHp || 1);
+  updatedBoss.defeated = !!result.defeated;
+  const appliedDamage = Math.max(0, Number(result.damage_applied ?? (previousHp - updatedBoss.hp) ?? finalDmg));
   if (result.defeated && result.xp_awarded) {
     hero.gold = result.gold; hero.xp_total = result.xp_total; hero.level = result.level;
-    if (typeof recordRewardLedger === 'function') recordRewardLedger({ type:'boss', boss:b.key, xp:result.xp_awarded, gold:result.gold_awarded, at:Date.now() });
-    if (typeof toast === 'function') toast('🏆', `¡${b.name} DERROTADO! +${result.gold_awarded}🪙 +${result.xp_awarded} XP`);
-    if (typeof dungeonPush === 'function') dungeonPush('🏆 ¡Jefe Derrotado!', `${b.name} venció. Recompensa entregada.`);
-    if (typeof recordBossDefeat === 'function') recordBossDefeat(b.key);
+    if (typeof recordRewardLedger === 'function') recordRewardLedger({ type:'boss', boss:updatedBoss.key, xp:result.xp_awarded, gold:result.gold_awarded, at:Date.now() });
+    if (typeof toast === 'function') toast('🏆', `¡${updatedBoss.name || b.name} DERROTADO! +${result.gold_awarded}🪙 +${result.xp_awarded} XP`);
+    if (typeof dungeonPush === 'function') dungeonPush('🏆 ¡Jefe Derrotado!', `${updatedBoss.name || b.name} venció. Recompensa entregada.`);
+    if (typeof recordBossDefeat === 'function') recordBossDefeat(updatedBoss.key);
     if (typeof trackBossKill === 'function') trackBossKill();
     if (typeof addActivePetXP === 'function') addActivePetXP({ daily:30, weekly:100, monthly:250 }[cycle] || 30);
   }
   if (typeof updateBossBanner   === 'function') updateBossBanner();
 
-  return Math.max(0, finalDmg);
+  return appliedDamage;
 }
 
 /* ── Agotamiento de mascota — al caer en batalla, no se cura sola ──
