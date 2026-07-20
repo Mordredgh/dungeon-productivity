@@ -1,6 +1,7 @@
 param(
   [string]$DatabaseUrl = $env:DUNGEON_SUPABASE_DB_URL,
-  [string]$OutputDir = "tmp\backups"
+  [string]$OutputDir = "tmp\backups",
+  [string]$DockerImage = "postgres:16-alpine"
 )
 
 $ErrorActionPreference = "Stop"
@@ -8,12 +9,6 @@ $ErrorActionPreference = "Stop"
 if (-not $DatabaseUrl) { $DatabaseUrl = $env:SUPABASE_DB_URL }
 if (-not $DatabaseUrl) {
   Write-Error "Falta DUNGEON_SUPABASE_DB_URL o SUPABASE_DB_URL."
-  exit 1
-}
-
-$pgDump = Get-Command pg_dump -ErrorAction SilentlyContinue
-if (-not $pgDump) {
-  Write-Error "No encuentro pg_dump en PATH. Instala PostgreSQL tools o agrega pg_dump al PATH."
   exit 1
 }
 
@@ -25,10 +20,26 @@ $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $backupPath = Join-Path $targetDir "dungeon-supabase-$stamp.dump"
 $hashPath = "$backupPath.sha256"
 
-& $pgDump.Source --format=custom --no-owner --no-acl --file $backupPath $DatabaseUrl
-if ($LASTEXITCODE -ne 0) {
-  Write-Error "pg_dump fallo."
-  exit 1
+$pgDump = Get-Command pg_dump -ErrorAction SilentlyContinue
+if ($pgDump) {
+  & $pgDump.Source --format=custom --no-owner --no-acl --file $backupPath $DatabaseUrl
+  if ($LASTEXITCODE -ne 0) {
+    Write-Error "pg_dump fallo."
+    exit 1
+  }
+} else {
+  $docker = Get-Command docker -ErrorAction SilentlyContinue
+  if (-not $docker) {
+    Write-Error "No encuentro pg_dump ni Docker. Instala PostgreSQL tools o Docker Desktop."
+    exit 1
+  }
+  $mountDir = (Resolve-Path $targetDir).Path
+  $fileName = [System.IO.Path]::GetFileName($backupPath)
+  & $docker.Source run --rm -v "${mountDir}:/backups" $DockerImage pg_dump --format=custom --no-owner --no-acl --file "/backups/$fileName" $DatabaseUrl
+  if ($LASTEXITCODE -ne 0) {
+    Write-Error "pg_dump via Docker fallo."
+    exit 1
+  }
 }
 
 $hash = Get-FileHash -Algorithm SHA256 -Path $backupPath

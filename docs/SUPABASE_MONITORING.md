@@ -28,12 +28,15 @@ Variables locales esperadas:
 - `DUNGEON_SUPABASE_URL`
 - `DUNGEON_SUPABASE_SERVICE_ROLE_KEY`
 - `DUNGEON_SUPABASE_DB_URL`
+- `DUNGEON_SUPABASE_RESTORE_TEST_DB_URL` (solo para una base temporal)
 
 Comandos:
 
 ```powershell
 .\scripts\supabase-beta-preflight.ps1
 .\scripts\supabase-backup.ps1
+.\scripts\supabase-restore-test.ps1 -BackupPath tmp\backups\<archivo>.dump -IUnderstandThisIsTemporary
+.\scripts\supabase-free-tier-drill.ps1
 .\scripts\supabase-beta-alerts.ps1
 .\scripts\beta-local-smoke.ps1
 ```
@@ -42,8 +45,14 @@ Comandos:
 
 `supabase-backup.ps1` genera un dump custom de Postgres dentro de `tmp/backups` y crea un `.sha256`. La carpeta `tmp/` esta ignorada por Git para evitar subir respaldos.
 
+`supabase-backup.ps1` usa `pg_dump` local si existe; si no, usa Docker con `postgres:16-alpine`. Esto mantiene el flujo compatible con Free Tier sin backups administrados.
+
+`supabase-restore-test.ps1` restaura un `.dump` en una base temporal usando `pg_restore`. Exige `-IUnderstandThisIsTemporary` y bloquea refs conocidas de produccion para evitar restaurar sobre el proyecto real.
+
+`supabase-free-tier-drill.ps1` corre backup y, si existe `DUNGEON_SUPABASE_RESTORE_TEST_DB_URL`, ejecuta restore de prueba. Si no existe, deja el backup verificado y marca restore como omitido.
+
 `supabase-beta-alerts.ps1` ejecuta `scan_dungeon_beta_alerts()` con `service_role`. Si hay alertas abiertas sale con codigo `2`, util para Uptime Kuma, cron o CI.
 
 En produccion se verifico el job `dungeon-beta-alert-scan` con `cron.schedule(...)` y resultado `1`.
 
-El panel actual esta en Free Plan: Supabase muestra Observability, pero no backups administrados ni restauracion a nuevo proyecto. La restauracion administrada depende de subir a Pro; mientras tanto, el camino verificable es `supabase-backup.ps1` + restauracion en un proyecto temporal con credenciales Postgres.
+El panel actual esta en Free Plan: Supabase muestra Observability, pero no backups administrados ni restauracion a nuevo proyecto. El camino Free Tier es backup logico (`pg_dump`) + restore de prueba (`pg_restore`) contra una base temporal.

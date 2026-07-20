@@ -3,12 +3,12 @@
 ## Backup y rollback
 
 1. Ejecutar `.\scripts\supabase-backup.ps1` antes de migrar y conservar el `.sha256`.
-2. Crear un backup manual desde **Supabase -> Database -> Backups** y anotar fecha, proyecto y migracion aplicada.
+2. Ejecutar `.\scripts\supabase-free-tier-drill.ps1`. Si existe `DUNGEON_SUPABASE_RESTORE_TEST_DB_URL`, tambien prueba restore temporal.
 3. Ejecutar `.\scripts\supabase-beta-preflight.ps1` despues de migrar.
 4. Ejecutar `.\scripts\supabase-beta-alerts.ps1` para confirmar que no hay alertas abiertas.
 5. Ejecutar `.\scripts\beta-local-smoke.ps1` antes del deploy.
 6. Guardar el SQL de la migracion nueva y su reversa en el registro de release; nunca editar datos de produccion a mano.
-7. Probar restauracion en un proyecto temporal antes de abrir invitaciones.
+7. Para Free Tier, probar restauracion con `.\scripts\supabase-restore-test.ps1 -BackupPath <dump> -IUnderstandThisIsTemporary` contra una base temporal.
 8. Si una migracion falla, detener el deploy, conservar los logs y ejecutar solo la reversa aprobada. No usar `reset` ni borrar tablas en produccion.
 
 ## Smoke antes de invitar

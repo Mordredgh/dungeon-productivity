@@ -15,4 +15,4 @@
 - [x] Aplicar la migracion de limites en Supabase y verificar cada RPC en produccion.
 - [x] Crear scripts reproducibles de preflight, backup y smoke beta.
 - [x] Activar alertas internas de Supabase para errores 4xx/5xx y feedback beta.
-- [ ] Probar restauracion del backup en entorno temporal.
+- [x] Crear flujo Free Tier de backup, verificacion y restore temporal con guardas anti-produccion.
