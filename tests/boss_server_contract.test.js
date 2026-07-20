@@ -9,7 +9,7 @@ assert.match(migration, /unique \(hero_id, request_id\)/i);
 assert.match(migration, /create or replace function public\.apply_dungeon_boss_damage/i);
 assert.match(migration, /for update/i);
 assert.match(migration, /dungeon_boss_rewards/i);
-assert.match(battle, /rpc\('apply_dungeon_boss_damage'/);
+assert.match(battle, /(?:rpc|rpcWithRetry)\('apply_dungeon_boss_damage'/);
 assert.doesNotMatch(battle, /if \(typeof addGold\s+===\s+'function'\) addGold\(gold\)/);
 
 console.log('Contrato de jefe autoritativo OK');

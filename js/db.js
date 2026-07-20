@@ -1,4 +1,23 @@
 ﻿/* SUPABASE — cliente creado al cargar el script para que auth.js lo use antes de initDB() */
+/* RPC resiliente: reintenta fallos transitorios y deja una marca recuperable. */
+async function rpcWithRetry(name, args, options = {}) {
+  const attempts = Math.max(1, Math.min(3, Number(options.attempts || 3)));
+  const pendingKey = options.pendingKey ? `dungeon:pending:${options.pendingKey}` : null;
+  if (pendingKey) sessionStorage.setItem(pendingKey, JSON.stringify({ name, at: Date.now() }));
+  let last = { data: null, error: new Error('No se pudo contactar al servidor') };
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try { last = await db.rpc(name, args); } catch (error) { last = { data: null, error }; }
+    if (!last.error) {
+      if (pendingKey) sessionStorage.removeItem(pendingKey);
+      return last;
+    }
+    const status = Number(last.error.status || 0);
+    if (status >= 400 && status < 500 && status !== 408 && status !== 429) break;
+    if (attempt + 1 < attempts) await new Promise(resolve => setTimeout(resolve, 350 * (attempt + 1)));
+  }
+  return last;
+}
+window.rpcWithRetry = rpcWithRetry;
 db = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 async function initDB() {

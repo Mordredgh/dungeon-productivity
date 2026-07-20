@@ -245,10 +245,10 @@ async function buyItem(id) {
   const requestId = sessionStorage.getItem(requestKey) || crypto.randomUUID();
   sessionStorage.setItem(requestKey, requestId);
   try {
-  const { data, error } = await db.rpc('purchase_dungeon_item', {
+  const { data, error } = await rpcWithRetry('purchase_dungeon_item', {
     p_item_id: id,
     p_request_id: requestId
-  });
+  }, { pendingKey: `shop:${requestId}` });
   if (error) { toast('✦', error.message || 'No se pudo completar la compra.'); return; }
   const receipt = Array.isArray(data) ? data[0] : data;
   if (!receipt) { toast('✦', 'La tienda no devolvió un recibo válido.'); return; }

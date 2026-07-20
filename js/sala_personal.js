@@ -264,7 +264,7 @@ async function buySalaFurniture(id) {
   const furniture = SALA_FURNITURE.find(item => item.id === id && !item.legacy);
   const data = _getSala();
   if (!furniture || _salaOwned(data).has(id)) return salaSelectFurniture(id);
-  const { data: receipt, error } = await db.rpc('purchase_sala_furniture', { p_furniture_id: id });
+  const { data: receipt, error } = await rpcWithRetry('purchase_sala_furniture', { p_furniture_id: id }, { pendingKey: `sala:${id}` });
   if (error) {
     if (typeof toast === 'function') toast('✦', error.message || 'No se pudo comprar el mueble.');
     return;

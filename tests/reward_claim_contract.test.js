@@ -8,6 +8,6 @@ assert.match(migration, /unique \(hero_id, source, reward_key\)/);
 assert.match(migration, /claim_dungeon_reward/);
 assert.match(migration, /for update/i);
 assert.match(migration, /dungeon_level_for_xp/);
-assert.match(factions, /rpc\('claim_dungeon_reward', \{ p_source:'faction'/);
-assert.match(events, /rpc\('claim_dungeon_reward', \{ p_source:'streak'/);
+assert.match(factions, /(?:rpc|rpcWithRetry)\('claim_dungeon_reward', \{ p_source:'faction'/);
+assert.match(events, /(?:rpc|rpcWithRetry)\('claim_dungeon_reward', \{ p_source:'streak'/);
 console.log('Contrato de recompensas autoritativas OK');

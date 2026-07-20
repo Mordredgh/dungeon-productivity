@@ -14,13 +14,13 @@ assert.match(migration, /unique \(hero_id, request_id\)/i);
 assert.match(migration, /for update/i);
 assert.match(migration, /create or replace function public\.forge_dungeon_weapon/i);
 const buyItem = shop.slice(shop.indexOf('async function buyItem'), shop.indexOf('function getPotionMult'));
-assert.match(buyItem, /rpc\('purchase_dungeon_item'/);
+assert.match(buyItem, /(?:rpc|rpcWithRetry)\('purchase_dungeon_item'/);
 assert.doesNotMatch(buyItem, /spendGold\(/);
-assert.match(weapons, /rpc\('forge_dungeon_weapon'/);
+assert.match(weapons, /(?:rpc|rpcWithRetry)\('forge_dungeon_weapon'/);
 assert.match(salaMigration, /create table if not exists public\.dungeon_sala_catalog/i);
 assert.match(salaMigration, /create or replace function public\.purchase_sala_furniture/i);
 assert.match(salaMigration, /for update/i);
-assert.match(sala, /rpc\('purchase_sala_furniture'/);
+assert.match(sala, /(?:rpc|rpcWithRetry)\('purchase_sala_furniture'/);
 assert.doesNotMatch(sala.slice(sala.indexOf('async function buySalaFurniture'), sala.indexOf('function salaSelectFurniture')), /spendGold\(/);
 
 console.log('server store contract: ok');

@@ -107,7 +107,7 @@ async function claimChallengeReward(defId) {
   const c = arr.find(x => x.id === defId);
   const def = CHALLENGE_DEFS.find(d => d.id === defId);
   if (!c || !def || !c.completed || c.rewarded) return;
-  const { data, error } = await db.rpc('claim_dungeon_reward', { p_source:'challenge', p_reward_key:defId });
+  const { data, error } = await rpcWithRetry('claim_dungeon_reward', { p_source:'challenge', p_reward_key:defId }, { pendingKey: `reward:challenge:${defId}` });
   if (error) { toast('⚠️', error.message || 'No se pudo reclamar la recompensa.'); return; }
   const reward = Array.isArray(data) ? data[0] : data;
   c.rewarded = true;

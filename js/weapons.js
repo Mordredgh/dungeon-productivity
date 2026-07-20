@@ -101,10 +101,10 @@ async function salvageWeapon(id) {
 async function craftWeapon(weaponKey, targetTier) {
   const recipe = CRAFT_RECIPES[targetTier];
   if (!recipe) return;
-  const { data, error } = await db.rpc('forge_dungeon_weapon', {
+  const { data, error } = await rpcWithRetry('forge_dungeon_weapon', {
     p_weapon_key: weaponKey,
     p_target_tier: targetTier
-  });
+  }, { pendingKey: `forge:${weaponKey}:${targetTier}` });
   if (error) { toast('⚒️', error.message || 'No se pudo forjar.'); return; }
   const newW = Array.isArray(data) ? data[0] : data;
   await loadWeapons();

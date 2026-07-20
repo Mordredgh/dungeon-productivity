@@ -127,7 +127,7 @@ async function checkFactionExclusiveProgress(questId) {
   hero.faction_claims = JSON.stringify(claims);
   await saveHero({ faction_claims: hero.faction_claims });
   for (const def of completed) {
-    const { data, error } = await db.rpc('claim_dungeon_reward', { p_source:'faction', p_reward_key:def.id });
+    const { data, error } = await rpcWithRetry('claim_dungeon_reward', { p_source:'faction', p_reward_key:def.id }, { pendingKey: `reward:faction:${def.id}` });
     if (error) { toast('⚠️', error.message || 'No se pudo acreditar la serie.'); continue; }
     const reward = Array.isArray(data) ? data[0] : data;
     Object.assign(hero, { xp_total:reward.xp_total, gold:reward.gold, level:reward.level });

@@ -282,7 +282,7 @@ async function checkStreakRewards() {
 
   for (const m of STREAK_REWARD_MILESTONES) {
     if (streak >= m.days && !claimed.includes(m.days)) {
-      const { data, error } = await db.rpc('claim_dungeon_reward', { p_source:'streak', p_reward_key:String(m.days) });
+      const { data, error } = await rpcWithRetry('claim_dungeon_reward', { p_source:'streak', p_reward_key:String(m.days) }, { pendingKey: `reward:streak:${m.days}` });
       if (error) continue;
       const reward = Array.isArray(data) ? data[0] : data;
       claimed.push(m.days);

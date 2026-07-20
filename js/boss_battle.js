@@ -268,10 +268,10 @@ async function _damageBossCycle(cycle, baseDmg) {
   const prepMult = getBossPreparation(cycle) === 'ruptura' ? 1 + BOSS_PREPARATIONS.ruptura.value : 1;
   const finalDmg = Math.min(Math.ceil((b.maxHp || 1) * 0.40), Math.max(1, Math.round((weather === 'storm' ? baseDmg * 2 : baseDmg) * petMult * petSpecMult * runeMult * dungeonMult * doctrineMult * equipmentResonanceMult * campaignMult * prepMult)));
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
-  const { data, error } = await db.rpc('apply_dungeon_boss_damage', {
+  const { data, error } = await rpcWithRetry('apply_dungeon_boss_damage', {
     p_cycle: cycle, p_boss_key: b.key, p_period_key: b.periodKey,
     p_rarity: b.rarity, p_damage: finalDmg, p_request_id: requestId,
-  });
+  }, { attempts: 2, pendingKey: `boss:${cycle}:${b.key}` });
   if (error) { toast('⚠️', error.message || 'No se pudo registrar el ataque.'); return 0; }
   const result = Array.isArray(data) ? data[0] : data;
   if (!result) return 0;

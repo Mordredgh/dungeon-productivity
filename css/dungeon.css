@@ -8919,6 +8919,12 @@ body::after {
 html.performance-lite *,html.performance-lite *::before,html.performance-lite *::after { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; box-shadow:none !important; animation:none !important; transition:none !important; }html.is-offline::before { content:'Sin conexión: se muestra la última versión disponible'; position:fixed; z-index:20000; right:12px; bottom:12px; padding:8px 11px; border:1px solid rgba(251,191,36,.55); border-radius:9px; background:rgba(36,24,7,.84); color:#fde68a; font-size:11px; }
 @media (max-width:600px) { .adv-cycle-main { grid-template-columns:38px minmax(0,1fr); }.adv-cycle-main button { grid-column:1/-1; }.adv-cycle-grid { grid-template-columns:1fr; } }
 
+/* Páginas legales y arte mínimo para el acceso: sin emojis de sistema. */
+.legal-page { width:min(760px,calc(100% - 32px)); margin:32px auto; padding:28px; color:var(--text); background:rgba(11,7,22,.72); border:1px solid rgba(216,180,254,.28); border-radius:18px; backdrop-filter:blur(8px); line-height:1.65; }
+.legal-page h1,.legal-page h2 { font-family:var(--font-head); color:#f0d9ff; }.legal-page h1 { margin:22px 0 4px; }.legal-page h2 { margin-top:24px; font-size:17px; }.legal-page p { color:#c9bdd6; }.legal-updated { font-size:12px; color:#a88fbd !important; }
+.login-art-email,.login-art-lock { width:14px; height:14px; display:inline-block; border:1px solid #c084fc; border-radius:3px; position:relative; opacity:.9; }
+.login-art-email::after { content:''; position:absolute; left:2px; right:2px; top:4px; height:5px; border-bottom:1px solid #c084fc; transform:skewY(-25deg); }.login-art-lock { border-radius:2px; margin-top:4px; }.login-art-lock::before { content:''; position:absolute; width:7px; height:7px; left:2px; top:-6px; border:1px solid #c084fc; border-bottom:0; border-radius:6px 6px 0 0; }
+
 /* Auditoría final de subcapas: ningún panel de vista queda opaco. */
 .garden-command-card,.garden-portal-card,.garden-harmony,.garden-essence,.garden-modal,.skt3-board,.skt3-node,.skt3-node.is-learned,.skt3-node.is-ready,.skt3-race,.bstd-art,.bstd-detail,.bstd-header,.bstd-shelf,.rns-altar,.rns-socket,.wm-legend-row,.wm-detail-panel,.wm-detail-inner,.sala-toolbar,.sala-props-panel,.sala-place-card,.faction-card,.faction-focus-active,.bb-command-panel,.bb-unit-card,.bb-boss-info,.bb-pet-info,.bb-move-panel { background:rgba(9,7,20,.08) !important; backdrop-filter:blur(3px) saturate(1.03) !important; -webkit-backdrop-filter:blur(3px) saturate(1.03) !important; border-color:rgba(216,180,254,.20) !important; box-shadow:inset 0 1px rgba(255,255,255,.09),0 6px 16px rgba(0,0,0,.09) !important; }
 .skt3-orb,.rns-socket,.garden-harmony i { background:rgba(4,3,12,.14) !important; }.skt3-node.is-ready:hover,.skt3-node.is-learned,.garden-upgrade:hover,.faction-focus-active { background:rgba(96,48,142,.16) !important; }
@@ -8955,6 +8961,23 @@ html.performance-lite *,html.performance-lite *::before,html.performance-lite *:
 .bb-pet-info .bb-entity-name { font-size:13px; overflow:visible; text-overflow:clip; }
 .bb-pet-info .bb-hp-row,.bb-pet-info .bb-stat-row { margin-top:5px; }
 @media (max-width:680px) { .bb-move-panel { width:calc(100% - 16px); padding:7px; }.bb-actions-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; }.bb-move-btn { min-height:46px; }.bb-prep-panel>div { grid-template-columns:1fr; }.bb-prep-panel small { display:none; }.bb-pet-info { width:min(255px,94%); } }
+
+@media (max-width:430px) {
+  .prestige-choice-overlay { padding:8px; align-items:start; overflow:auto; }
+  .prestige-choice-card { width:100%; max-height:calc(100dvh - 16px); overflow:auto; padding:16px 12px; border-radius:14px; }
+  .prestige-choice-card h2 { font-size:20px; }.prestige-choice-card p { font-size:12px; margin-bottom:12px; }
+  .progression-identity-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+  .progression-identity-grid button { min-height:76px; padding:7px; }.progression-identity-grid img { width:34px; height:34px; }
+  .bb-battle-shell { min-height:100dvh; padding-bottom:8px; }.bb-boss-info,.bb-pet-info { transform:scale(.9); transform-origin:center; }
+  .bb-command-panel,.bb-move-panel { width:calc(100% - 12px); margin-inline:6px; border-radius:10px; }
+  .bb-move-btn { min-height:42px; padding:7px 6px; font-size:11px; }.bb-move-btn strong { font-size:11px; }.bb-move-btn small { font-size:9px; }
+  .bb-actions-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.bb-prep-panel { display:none; }
+  #inventoryView { padding:4px 8px 16px; }.vault-shell { padding:8px; }.vault-gear-grid { grid-template-columns:1fr; }.vault-item-grid,.rpg-shop-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+  .vault-item-card,.rpg-shop-card { min-height:118px; padding:8px; }.vault-item-img,.vault-item-fallback,.rpg-shop-card img { width:42px; height:42px; }
+  .sala-room { height:360px; min-height:360px; }.sala-picker-grid { grid-template-columns:repeat(3,1fr); }.sala-picker-item { min-height:78px; padding:5px; }.sala-picker-item img { width:38px; height:38px; }
+  .sala-toolbar { bottom:8px; }.sala-tool-btn { min-width:58px; padding:7px 8px; font-size:15px; }.sala-tool-btn span { font-size:8px; }
+  #view-shop .view-header { padding:10px 8px; }.rpg-shop-tabs { gap:4px; }.rpg-shop-tab { padding:7px 8px; font-size:10px; }
+}
 
 /* ── Daño flotante en lado de la mascota ─────────────────── */
 .bb-dmg-float.bb-pet-side { color: #f87171; }

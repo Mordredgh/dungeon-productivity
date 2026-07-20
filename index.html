@@ -17,8 +17,8 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="https://xibmopqlgjbcypxixnri.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png" type="image/png">
 <link rel="apple-touch-icon" href="https://xibmopqlgjbcypxixnri.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png">
-<link rel="stylesheet" href="css/dungeon.css?v=300">
-<link rel="stylesheet" href="css/dungeon-v2.css?v=300">
+<link rel="stylesheet" href="css/dungeon.css?v=301">
+<link rel="stylesheet" href="css/dungeon-v2.css?v=301">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" defer></script>
 </head>
@@ -54,13 +54,13 @@
     <p class="login-subtitle">El Dungeon Productivo del Héroe</p>
     <div class="login-sep"><span>Identificación del Héroe</span></div>
     <div class="login-field">
-      <span class="login-field-icon">📧</span>
+      <span class="login-field-icon login-art-email" aria-hidden="true"></span>
       <input type="email" id="loginEmail" class="login-input" placeholder="correo@ejemplo.com" autocomplete="email">
     </div>
     <div class="login-field">
-      <span class="login-field-icon">🔒</span>
+      <span class="login-field-icon login-art-lock" aria-hidden="true"></span>
       <input type="password" id="loginPassword" class="login-input" placeholder="Contraseña" autocomplete="current-password">
-      <button type="button" class="login-toggle-pw" onclick="toggleLoginPw()" id="loginPwToggle">👁️</button>
+      <button type="button" class="login-toggle-pw" onclick="toggleLoginPw()" id="loginPwToggle" aria-label="Mostrar contraseña">Ver</button>
     </div>
     <p id="loginError" class="login-error"></p>
     <button class="login-btn" id="loginBtn" onclick="doLogin()">
@@ -73,7 +73,7 @@
       <input type="password" id="recoveryPassword" class="login-input" placeholder="Nueva contraseña (mínimo 8 caracteres)" autocomplete="new-password">
       <button type="button" class="login-btn" onclick="completePasswordRecovery()">Guardar contraseña nueva</button>
     </div>
-    <div class="login-footer">Arcanum · Solo para el héroe autorizado</div>
+    <div class="login-footer">Arcanum · Solo para el héroe autorizado · <a href="privacy.html">Privacidad</a> · <a href="beta-terms.html">Términos beta</a></div>
   </div>
 </div>
 
@@ -1376,58 +1376,58 @@
 <!-- Loot Drop Container -->
 <div id="lootDropContainer" style="position:fixed;inset:0;pointer-events:none;z-index:9000" aria-hidden="true"></div>
 
-<script src="js/config.js?v=300" defer></script>
-<script src="js/state.js?v=300" defer></script>
-<script src="js/db.js?v=300" defer></script>
-<script src="js/hero.js?v=300" defer></script>
-<script src="js/quests.js?v=300" defer></script>
-<script src="js/reward_engine.js?v=300" defer></script>
-<script src="js/timer.js?v=300" defer></script>
-<script src="js/inventory.js?v=300" defer></script>
-<script src="js/spells.js?v=300" defer></script>
-<script src="js/views.js?v=300" defer></script>
-<script src="js/ui.js?v=300" defer></script>
-<script src="js/events.js?v=300" defer></script>
-<script src="js/shop.js?v=300" defer></script>
-<script src="js/rpg.js?v=300" defer></script>
-<script src="js/pets.js?v=300" defer></script>
-<script src="js/weapons.js?v=300" defer></script>
-<script src="js/secret_sets.js?v=300" defer></script>
-<script src="js/goals.js?v=300" defer></script>
-<script src="js/reputation.js?v=300" defer></script>
-<script src="js/patterns.js?v=300" defer></script>
-<script src="js/mechanics.js?v=300" defer></script>
-<script src="js/character.js?v=300" defer></script>
-<script src="js/weather.js?v=300" defer></script>
-<script src="js/dungeon_clock.js?v=300" defer></script>
-<script src="js/skill_tree.js?v=300" defer></script>
-<script src="js/bestiary.js?v=300" defer></script>
-<script src="js/dungeon_grows.js?v=300" defer></script>
-<script src="js/runes.js?v=300" defer></script>
-<script src="js/google_fit.js?v=300" defer></script>
-<script src="js/hero_score.js?v=300" defer></script>
-<script src="js/push.js?v=300" defer></script>
-<script src="js/combos.js?v=300" defer></script>
-<script src="js/habits.js?v=300" defer></script>
-<script src="js/ruleta.js?v=300" defer></script>
-<script src="js/drops.js?v=300" defer></script>
-<script src="js/daily_goal.js?v=300" defer></script>
-<script src="js/weekly_summary.js?v=300" defer></script>
-<script src="js/challenges.js?v=300" defer></script>
-<script src="js/zones.js?v=300" defer></script>
-<script src="js/factions.js?v=300" defer></script>
-<script src="js/hero_card.js?v=300" defer></script>
-<script src="js/world_map.js?v=300" defer></script>
-<script src="js/sala_personal.js?v=300" defer></script>
-<script src="js/pet_garden.js?v=300" defer></script>
-<script src="js/animations.js?v=300" defer></script>
-<script src="js/effects.js?v=300" defer></script>
-<script src="js/boss_battle.js?v=300" defer></script>
-<script src="js/auth.js?v=300" defer></script>
-<script src="js/onboarding.js?v=300" defer></script>
-<script src="js/performance.js?v=300" defer></script>
-<script src="js/beta.js?v=300" defer></script>
-<script src="js/main.js?v=300" defer></script>
+<script src="js/config.js?v=301" defer></script>
+<script src="js/state.js?v=301" defer></script>
+<script src="js/db.js?v=301" defer></script>
+<script src="js/hero.js?v=301" defer></script>
+<script src="js/quests.js?v=301" defer></script>
+<script src="js/reward_engine.js?v=301" defer></script>
+<script src="js/timer.js?v=301" defer></script>
+<script src="js/inventory.js?v=301" defer></script>
+<script src="js/spells.js?v=301" defer></script>
+<script src="js/views.js?v=301" defer></script>
+<script src="js/ui.js?v=301" defer></script>
+<script src="js/events.js?v=301" defer></script>
+<script src="js/shop.js?v=301" defer></script>
+<script src="js/rpg.js?v=301" defer></script>
+<script src="js/pets.js?v=301" defer></script>
+<script src="js/weapons.js?v=301" defer></script>
+<script src="js/secret_sets.js?v=301" defer></script>
+<script src="js/goals.js?v=301" defer></script>
+<script src="js/reputation.js?v=301" defer></script>
+<script src="js/patterns.js?v=301" defer></script>
+<script src="js/mechanics.js?v=301" defer></script>
+<script src="js/character.js?v=301" defer></script>
+<script src="js/weather.js?v=301" defer></script>
+<script src="js/dungeon_clock.js?v=301" defer></script>
+<script src="js/skill_tree.js?v=301" defer></script>
+<script src="js/bestiary.js?v=301" defer></script>
+<script src="js/dungeon_grows.js?v=301" defer></script>
+<script src="js/runes.js?v=301" defer></script>
+<script src="js/google_fit.js?v=301" defer></script>
+<script src="js/hero_score.js?v=301" defer></script>
+<script src="js/push.js?v=301" defer></script>
+<script src="js/combos.js?v=301" defer></script>
+<script src="js/habits.js?v=301" defer></script>
+<script src="js/ruleta.js?v=301" defer></script>
+<script src="js/drops.js?v=301" defer></script>
+<script src="js/daily_goal.js?v=301" defer></script>
+<script src="js/weekly_summary.js?v=301" defer></script>
+<script src="js/challenges.js?v=301" defer></script>
+<script src="js/zones.js?v=301" defer></script>
+<script src="js/factions.js?v=301" defer></script>
+<script src="js/hero_card.js?v=301" defer></script>
+<script src="js/world_map.js?v=301" defer></script>
+<script src="js/sala_personal.js?v=301" defer></script>
+<script src="js/pet_garden.js?v=301" defer></script>
+<script src="js/animations.js?v=301" defer></script>
+<script src="js/effects.js?v=301" defer></script>
+<script src="js/boss_battle.js?v=301" defer></script>
+<script src="js/auth.js?v=301" defer></script>
+<script src="js/onboarding.js?v=301" defer></script>
+<script src="js/performance.js?v=301" defer></script>
+<script src="js/beta.js?v=301" defer></script>
+<script src="js/main.js?v=301" defer></script>
 
 <!-- Challenges Modal -->
 <!-- HECHIZOS MODAL -->
