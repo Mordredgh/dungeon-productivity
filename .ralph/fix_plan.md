@@ -5,6 +5,6 @@
 - [x] Migrar inicio/cierre de pomodoro a sesión validada por servidor.
 - [x] Migrar compras de tienda, forja y muebles a catálogo del servidor.
 - [x] Migrar victoria, daño y recompensa de jefe a estado del servidor.
-- [ ] Migrar recompensas de retos, facciones y eventos a ledger del servidor.
-- [ ] Bloquear mutaciones directas de campos económicos tras migrar todos los flujos.
+- [x] Migrar recompensas de retos, facciones y eventos a ledger del servidor.
+- [x] Bloquear mutaciones directas de campos económicos tras migrar los flujos protegidos.
 - [ ] Añadir pruebas de integración con cuenta beta y publicar checklist final.

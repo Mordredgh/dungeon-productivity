@@ -15,6 +15,14 @@
 5. Completar jefe y reto: premio visible una sola vez y persiste tras recarga.
 6. Crear héroe: raza queda sellada; clase aplica un cambio gratuito y después coste/enfriamiento.
 
+## Ejecución por pareja
+
+1. A y B inician sesión en ventanas privadas distintas.
+2. A anota su oro, XP, inventario y una misión; B anota los suyos.
+3. A compra un objeto, ataca un jefe y reclama un reto. B recarga: ninguno de sus valores debe cambiar.
+4. B repite la prueba. A recarga: ninguno de sus valores debe cambiar.
+5. Ambos repiten una compra y un ataque con doble clic y después de recargar. El servidor debe conservar un único recibo/resultado.
+
 ## Reporte de beta
 
 Cada reporte debe incluir: cuenta de prueba, hora local, pantalla, pasos exactos, resultado esperado, resultado real y captura de consola/red si existe. Nunca incluir contraseñas ni tokens.
