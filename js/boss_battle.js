@@ -65,12 +65,12 @@ function _bbMoves(petKey) { return PET_MOVES[petKey] || _BB_FALLBACK_MOVES; }
 function _bbMoveVisual(move) {
   const type = String(move?.type || 'Normal').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   const img = move?.img || `move_${type}`;
-  return `<img class="bb-move-art" src="images/${img}.webp" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none">${move?.icon || '✦'}</span>`;
+  return `<img class="bb-move-art" src="images/${img}.webp" alt="${escHtml(move?.name || 'Habilidad')}"><span class="bb-art-missing" aria-hidden="true"></span>`;
 }
 
 function _bbHeroVisual(heroClass, fallback) {
   const img = `habilidad_${heroClass || 'guerrero'}`;
-  return `<img class="bb-move-art" src="images/${img}.webp" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none">${fallback || '✦'}</span>`;
+  return `<img class="bb-move-art" src="images/${img}.webp" alt="Habilidad de ${escHtml(heroClass || 'héroe')}"><span class="bb-art-missing" aria-hidden="true"></span>`;
 }
 
 function _bbMoveUnlocked(move, pet) {
