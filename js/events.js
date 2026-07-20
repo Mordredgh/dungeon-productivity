@@ -282,12 +282,14 @@ async function checkStreakRewards() {
 
   for (const m of STREAK_REWARD_MILESTONES) {
     if (streak >= m.days && !claimed.includes(m.days)) {
+      const { data, error } = await db.rpc('claim_dungeon_reward', { p_source:'streak', p_reward_key:String(m.days) });
+      if (error) continue;
+      const reward = Array.isArray(data) ? data[0] : data;
       claimed.push(m.days);
       dirty = true;
-      if (typeof addXP === 'function')   await addXP(m.xp, 'main', null);
-      if (typeof addGold === 'function') addGold(m.gold);
-      toast('🔥', `¡Racha de ${m.days} días! +${m.xp} XP +${m.gold}🪙`);
-      if (typeof dungeonPush === 'function') dungeonPush('🔥 Hito de Racha', `${m.days} días consecutivos — +${m.xp} XP +${m.gold}🪙`);
+      Object.assign(hero, { xp_total:reward.xp_total, gold:reward.gold, level:reward.level });
+      toast('🔥', `¡Racha de ${m.days} días! +${reward.xp_awarded} XP +${reward.gold_awarded}🪙`);
+      if (typeof dungeonPush === 'function') dungeonPush('🔥 Hito de Racha', `${m.days} días consecutivos acreditados.`);
     }
   }
   if (dirty) await saveHero({ streak_rewards_claimed: JSON.stringify(claimed) });

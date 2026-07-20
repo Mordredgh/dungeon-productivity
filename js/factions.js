@@ -127,14 +127,12 @@ async function checkFactionExclusiveProgress(questId) {
   hero.faction_claims = JSON.stringify(claims);
   await saveHero({ faction_claims: hero.faction_claims });
   for (const def of completed) {
-    const salaFaction = typeof getSalaBonus === 'function' ? getSalaBonus('faction_xp') : 0;
-    const rawXP = Math.round(def.exclusive.xp * (1 + salaFaction));
-    const rewardXP = typeof balanceReward === 'function' ? balanceReward('xp', def.exclusive.xp, rawXP).amount : rawXP;
-    const rewardGold = typeof balanceReward === 'function' ? balanceReward('gold', def.exclusive.gold, def.exclusive.gold).amount : def.exclusive.gold;
-    await addXP(rewardXP, 'side', null);
-    if (typeof addGold === 'function') addGold(rewardGold);
-    if (typeof recordRewardLedger === 'function') recordRewardLedger({ type:'faction', faction:def.id, xp:rewardXP, gold:rewardGold, at:Date.now() });
-    toast(def.icon, `¡Serie de ${def.name} completada! +${rewardXP} XP, +${rewardGold} oro.`);
+    const { data, error } = await db.rpc('claim_dungeon_reward', { p_source:'faction', p_reward_key:def.id });
+    if (error) { toast('⚠️', error.message || 'No se pudo acreditar la serie.'); continue; }
+    const reward = Array.isArray(data) ? data[0] : data;
+    Object.assign(hero, { xp_total:reward.xp_total, gold:reward.gold, level:reward.level });
+    if (typeof recordRewardLedger === 'function') recordRewardLedger({ type:'faction', faction:def.id, xp:reward.xp_awarded, gold:reward.gold_awarded, at:Date.now() });
+    toast(def.icon, `¡Serie de ${def.name} completada! +${reward.xp_awarded} XP, +${reward.gold_awarded} oro.`);
   }
   renderFactions();
 }
