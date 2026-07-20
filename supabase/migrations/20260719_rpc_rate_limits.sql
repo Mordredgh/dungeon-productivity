@@ -37,9 +37,7 @@ begin
   select pg_get_functiondef('public.forge_dungeon_weapon(text,text)'::regprocedure) into v_def;
   v_def := replace(v_def, 'if v_hero is null then raise exception ''Héroe no encontrado''; end if;', 'if v_hero is null then raise exception ''Héroe no encontrado''; end if; perform public.assert_dungeon_rpc_rate_limit(''forge'',4,60);');
   execute v_def;
-  select pg_get_functiondef('public.purchase_sala_furniture(text)'::regprocedure) into v_def;
-  v_def := replace(v_def, E'\nbegin\n', E'\nbegin\n  perform public.assert_dungeon_rpc_rate_limit(''sala_purchase'',6,60);\n', 1);
-  execute v_def;
+  -- Sala se limita desde el cliente con RPC reintentable; no se reescribe su cuerpo.
   select pg_get_functiondef('public.apply_dungeon_boss_damage(text,text,text,text,integer,uuid)'::regprocedure) into v_def;
   v_def := replace(v_def, 'if p_cycle not in (''daily'',''weekly'',''monthly'') or p_request_id is null then raise exception ''Solicitud inválida''; end if;', 'if p_cycle not in (''daily'',''weekly'',''monthly'') or p_request_id is null then raise exception ''Solicitud inválida''; end if; perform public.assert_dungeon_rpc_rate_limit(''boss_attack'',30,60);');
   execute v_def;
