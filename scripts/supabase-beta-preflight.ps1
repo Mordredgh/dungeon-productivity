@@ -24,7 +24,7 @@ function Test-RestEndpoint([string]$Name, [string]$Path) {
     Invoke-RestMethod -Method GET -Uri $uri -Headers $headers | Out-Null
     Write-Host "[OK] $Name"
   } catch {
-    Write-Error "[FAIL] $Name: $($_.Exception.Message)"
+    Write-Error "[FAIL] ${Name}: $($_.Exception.Message)"
     exit 1
   }
 }
