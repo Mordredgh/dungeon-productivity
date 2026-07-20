@@ -39,6 +39,7 @@ create table if not exists public.dungeon_beta_feedback (
 );
 
 alter table public.dungeon_beta_feedback enable row level security;
+alter table public.dungeon_beta_feedback add column if not exists status text not null default 'open';
 create index if not exists dungeon_beta_feedback_created_idx on public.dungeon_beta_feedback(created_at desc);
 create index if not exists dungeon_beta_feedback_status_idx on public.dungeon_beta_feedback(status, created_at desc);
 

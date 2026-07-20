@@ -14,4 +14,5 @@
 - [x] Limites server-side versionados para operaciones sensibles.
 - [x] Aplicar la migracion de limites en Supabase y verificar cada RPC en produccion.
 - [x] Crear scripts reproducibles de preflight, backup y smoke beta.
-- [ ] Activar alertas de Supabase y probar restauracion del backup en entorno temporal.
+- [x] Activar alertas internas de Supabase para errores 4xx/5xx y feedback beta.
+- [ ] Probar restauracion del backup en entorno temporal.
