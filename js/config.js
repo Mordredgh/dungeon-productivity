@@ -574,14 +574,14 @@ const HERO_BATTLE_SKILLS = {
               desc:'Golpe físico puro — ignora elemento del jefe' },
   mago:     { name:'Ráfaga Arcana',       icon:'🔮', type:'Mágico', power:0.05,
               desc:'Daño mágico — nunca es resistido' },
-  clerigo:  { name:'Bendición Curativa',  icon:'✝️', type:'heal',   power:0.30,
-              desc:'Restaura 30% del HP máx de tu mascota en vez de atacar' },
+  clerigo:  { name:'Bendición Curativa',  icon:'✝️', type:'heal',   power:0.36,
+              desc:'Restaura 36% del HP máx de tu mascota en vez de atacar' },
   picaro:   { name:'Golpe Certero',       icon:'🗡️', type:'crit',   power:2.0,
               desc:'Crítico garantizado — duplica el daño de tu mejor movimiento' },
   arquero:  { name:'Tiro Preciso',        icon:'🏹', type:'double', power:1.0,
               desc:'Golpea dos veces con tu movimiento básico' },
-  fundador: { name:'Visión Estratégica',  icon:'🚀', type:'Normal', power:0.05,
-              desc:'Daño normal + convierte la mitad en oro extra' },
+  fundador: { name:'Visión Estratégica',  icon:'🚀', type:'Normal', power:0.35,
+              desc:'Ataque táctico: inflige 35% del HP máximo del jefe' },
 };
 
 /* ── EVENTOS ESTACIONALES ───────────────────────────────── */

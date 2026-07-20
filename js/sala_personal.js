@@ -264,16 +264,19 @@ async function buySalaFurniture(id) {
   const furniture = SALA_FURNITURE.find(item => item.id === id && !item.legacy);
   const data = _getSala();
   if (!furniture || _salaOwned(data).has(id)) return salaSelectFurniture(id);
-  if (!hasSalaBlueprint(id)) {
-    if (typeof toast === 'function') toast('Plano', 'Este mueble aún requiere su plano. Revisa el Mercado Arcano semanal.');
+  const { data: receipt, error } = await db.rpc('purchase_sala_furniture', { p_furniture_id: id });
+  if (error) {
+    if (typeof toast === 'function') toast('✦', error.message || 'No se pudo comprar el mueble.');
     return;
   }
-  if (typeof spendGold !== 'function' || !spendGold(furniture.price)) {
-    if (typeof toast === 'function') toast('✦', `Necesitas ${furniture.price.toLocaleString('es-MX')} oro para ${furniture.name}.`);
+  const purchase = Array.isArray(receipt) ? receipt[0] : receipt;
+  if (!purchase?.sala_personal) {
+    if (typeof toast === 'function') toast('✦', 'La compra no devolvió un recibo válido.');
     return;
   }
-  data.owned = [..._salaOwned(data), id];
-  await _saveSala(data);
+  hero.gold = purchase.gold;
+  hero.sala_personal = JSON.stringify(purchase.sala_personal);
+  if (typeof renderGold === 'function') renderGold();
   if (typeof toast === 'function') toast('✦', `${furniture.name} ya forma parte de tu santuario.`);
   _salaSelected = id;
   _salaSelectedPlaced = null;

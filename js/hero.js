@@ -254,7 +254,7 @@ const _CLASS_XP = {
   picaro:   { side: 1.1 },
   arquero:  { weekly: 1.1 },
   clerigo:  { daily: 1.05 },
-  fundador: { _: 1.05 },
+  fundador: {},
 };
 function classXPBonus(type) {
   const cls   = hero?.hero_class || 'guerrero';

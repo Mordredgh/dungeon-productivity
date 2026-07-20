@@ -235,98 +235,42 @@ async function equipAvatarFrame(id) {
   renderHeroUI();
 }
 
-async function buyItem(id, cost) {
+const pendingStorePurchases = new Set();
+
+async function buyItem(id) {
   const item = SHOP_ITEMS.find(i => i.id === id);
-  if (!item) return;
-  const goldBefore = getGold();
-  if (!spendGold(cost)) return;
+  if (!item || pendingStorePurchases.has(id)) return;
+  pendingStorePurchases.add(id);
+  const requestKey = `dungeon-shop-request:${id}`;
+  const requestId = sessionStorage.getItem(requestKey) || crypto.randomUUID();
+  sessionStorage.setItem(requestKey, requestId);
+  try {
+  const { data, error } = await db.rpc('purchase_dungeon_item', {
+    p_item_id: id,
+    p_request_id: requestId
+  });
+  if (error) { toast('✦', error.message || 'No se pudo completar la compra.'); return; }
+  const receipt = Array.isArray(data) ? data[0] : data;
+  if (!receipt) { toast('✦', 'La tienda no devolvió un recibo válido.'); return; }
 
-  /* ── Consumibles clásicos ───────────────────────── */
-  if (id === 'potion') {
-    const _pexp = Date.now() + 30 * 60 * 1000;
-    if (hero) { hero.potion_exp = _pexp; saveHero({ potion_exp: _pexp }); }
-    toast('⚗️', '¡Poción activada! 2× XP por 30 minutos.');
-  } else if (id === 'scroll') {
-    const pending = quests.filter(q => !q.done && q.deadline).sort((a, b) => a.deadline.localeCompare(b.deadline));
-    if (!pending.length) { toast('📜', 'No hay misiones con fecha límite.'); addGold(cost); return; }
-    const q = pending[0];
-    const d = new Date(q.deadline); d.setDate(d.getDate() + 1);
-    const nd = d.toISOString().split('T')[0];
-    await db.from('dungeon_quests').update({ deadline: nd }).eq('id', q.id);
-    q.deadline = nd; renderQuestList();
-    toast('📜', `"${q.name}" +1 día de plazo.`);
-  } else if (id === 'amulet') {
-    if (hero) { hero.amulet = true; saveHero({ amulet: true }); }
-    toast('🧿', '¡Amuleto equipado! Bloquea la próxima pérdida de HP.');
-  } else if (id === 'xpstone') {
-    await addXP(150, 'side', null);
-    toast('💠', '+150 XP de sabiduría antigua.');
-  } else if (id === 'revival') {
-    const newHp = hero.hp_max || 100;
-    hero.hp = newHp; await saveHero({ hp: newHp }); renderHeroUI();
-    toast('💊', '¡HP restaurada al máximo!');
-
-  /* ── Nuevos consumibles ───────────────────────────── */
-  } else if (id === 'hp_minor') {
-    const newHp = Math.min((hero.hp || 100) + 25, hero.hp_max || 100);
-    hero.hp = newHp; await saveHero({ hp: newHp }); renderHeroUI();
-    toast('🧪', '¡+25 HP recuperados!');
-
-  } else if (id === 'gold_rush') {
-    const exp = Date.now() + 3600000;
-    await saveHero({ gold_rush_exp: exp });
-    toast('💰', '¡2× Oro activo durante 1 hora!');
-
-  } else if (id === 'boss_shield') {
-    await saveHero({ boss_shield: true });
-    toast('🛡️', '¡Escudo Anti-Boss equipado! Bloquea la penalización semanal.');
-
-  } else if (id === 'xp_scroll_sm') {
-    await addXP(75, 'side', null);
-    toast('📜', '+75 XP del pergamino de poder.');
-
-  /* ── Huevos de mascota ──────────────────────────── */
-  } else if (id.startsWith('egg_')) {
-    const petKey = id.replace('egg_', '');
-    const delivery = await addInvItem('pet_egg_' + petKey, 'pet_egg', 1);
-    if (!delivery?.ok) { _cancelInventoryPurchase(goldBefore); return; }
-    toast('🥚', `¡Huevo de ${item.name} adquirido! Ve a Mascotas para eclosionarlo.`);
-
-  /* ── Fragmentos de hechizo ──────────────────────── */
-  } else if (id.startsWith('frag_')) {
-    const spellKey = id.replace('frag_', '');
-    const qty = item.qty || 5;
-    const delivery = await addInvItem('spell_' + spellKey, 'spell_fragment', qty);
-    if (!delivery?.ok) { _cancelInventoryPurchase(goldBefore); return; }
-    if (typeof renderSpells === 'function') renderSpells();
-    toast('✨', `+${qty} fragmentos de ${item.name}.`);
-
-  /* ── Pociones de mascota ────────────────────────── */
-  } else if (id.startsWith('pot_')) {
-    const petKey = id.replace('pot_', '');
-    const delivery = await addInvItem('pet_potion_' + petKey, 'pet_potion', 1);
-    if (!delivery?.ok) { _cancelInventoryPurchase(goldBefore); return; }
-    toast('🧪', `+1 Poción de ${item.name}.`);
-
-  /* ── Alimento de mascota ────────────────────────── */
-  } else if (id.startsWith('food_')) {
-    const petKey = id.replace('food_', '');
-    const delivery = await addInvItem('pet_food_' + petKey, 'pet_food', 1);
-    if (!delivery?.ok) { _cancelInventoryPurchase(goldBefore); return; }
-    if (typeof renderPets === 'function') renderPets();
-    if (typeof renderActivePet === 'function') renderActivePet();
-    toast('🍖', `Alimento adquirido. Ve a Mascotas → montura para dárselo.`);
-
-  /* ── Armas y Armaduras ───────────────────────────── */
-  } else if ((id.startsWith('weapon_') || id.startsWith('armor_')) && item.weaponKey) {
-    if (typeof addWeapon === 'function') {
-      await addWeapon(item.weaponKey, item.tier || 'comun');
-      toast(item.icon, `${item.name} obtenida. Ve al Inventario.`);
-    }
-  }
-
-  renderShopItems();
+  sessionStorage.removeItem(requestKey);
+  // Sin optimismo local: oro e inventario se recargan desde Supabase.
+  await Promise.all([
+    typeof loadHero === 'function' ? loadHero() : Promise.resolve(),
+    typeof loadInventory === 'function' ? loadInventory() : Promise.resolve(),
+    typeof loadWeapons === 'function' ? loadWeapons() : Promise.resolve()
+  ]);
+  if (typeof renderHeroUI === 'function') renderHeroUI();
+  if (typeof renderPets === 'function') renderPets();
+  if (typeof renderActivePet === 'function') renderActivePet();
+  if (typeof renderQuestList === 'function') renderQuestList();
+  if (typeof renderSpells === 'function') renderSpells();
   if (typeof renderInventory === 'function') renderInventory();
+  renderShopItems();
+  toast('✦', `${item.name} adquirido y guardado.`);
+  } finally {
+    pendingStorePurchases.delete(id);
+  }
 }
 
 function getPotionMult() {

@@ -4,9 +4,9 @@ const CLASS_LABELS = {
   guerrero: { name: 'Guerrero', icon: '⚔️', bonus: '+10% XP épicas',   img: 'clase_guerrero' },
   mago:     { name: 'Mago',     icon: '🧙', bonus: '+10% todo XP',      img: 'clase_mago' },
   picaro:   { name: 'Pícaro',   icon: '🗡️', bonus: '+10% XP encargos', img: 'clase_picaro' },
-  clerigo:  { name: 'Clérigo',  icon: '✝️', bonus: 'HP con búsquedas', img: 'clase_clerigo' },
+  clerigo:  { name: 'Clérigo',  icon: '✝️', bonus: 'Voto protector: +5 HP diario y cura 36% a mascotas', img: 'clase_clerigo' },
   arquero:  { name: 'Arquero',  icon: '🏹', bonus: '+10% XP crónicas', img: 'clase_arquero' },
-  fundador: { name: 'Fundador', icon: '🚀', bonus: 'Caótico',          img: 'clase_fundador' },
+  fundador: { name: 'Fundador', icon: '🚀', bonus: 'Arquitecto de campaña: +30% XP en #meta y #proyecto', img: 'clase_fundador' },
 };
 const RACE_LABELS = {
   humano: { name: 'Humano', icon: '🧑', bonus: '+10% XP',        img: 'raza_humano' },
@@ -121,11 +121,27 @@ async function confirmInitialIdentity() {
   if (!RACE_LABELS[race]) { toast('🔒', 'Elige una raza para comenzar.'); return; }
   const heroName = (document.getElementById('initialHeroName')?.value || '').trim();
   if (heroName.length < 2) { toast('✍️', 'Escribe un nombre para tu héroe.'); return; }
-  const tree = (() => { try { return JSON.parse(hero.skill_tree || '{}'); } catch { return {}; } })();
-  tree.__progression = { ...getHeroProgression(), raceLocked:true };
-  const saved = await saveHero({ name:heroName, race, hero_class:heroClass, skill_tree:JSON.stringify(tree) });
-  if (!saved) return;
-  heroRace = race;
+  const button = document.querySelector('#initialIdentityModal .btn-primary');
+  if (button?.disabled) return;
+  if (button) { button.disabled = true; button.textContent = 'Sellando juramento…'; }
+  const { data, error } = await db.rpc('choose_initial_dungeon_identity', {
+    p_name: heroName,
+    p_race: race,
+    p_hero_class: heroClass,
+  });
+  if (error) {
+    if (button) { button.disabled = false; button.textContent = 'Comenzar aventura'; }
+    toast('⚠️', error.message || 'No se pudo sellar tu identidad. Inténtalo de nuevo.');
+    return;
+  }
+  const saved = Array.isArray(data) ? data[0] : data;
+  if (!saved) {
+    if (button) { button.disabled = false; button.textContent = 'Comenzar aventura'; }
+    toast('⚠️', 'El servidor no confirmó tu identidad. Inténtalo de nuevo.');
+    return;
+  }
+  Object.assign(hero, saved);
+  heroRace = saved.race;
   document.getElementById('initialIdentityModal')?.remove();
   if (typeof applyClassTheme === 'function') applyClassTheme();
   toast('✨', `${RACE_LABELS[race].name} ${CLASS_LABELS[heroClass].name}: tu aventura comienza.`);

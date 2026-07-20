@@ -885,12 +885,6 @@ async function useHeroBattleSkill() {
     _bbSpawnDmgFloat(actualDmg, bossSpriteEl);
     toast(skill.icon, `${skill.name}! ${actualDmg} de daño.${wasCrit ? ' 💥 ¡Crítico!' : ''}`);
 
-    if (skill.type === 'Normal' && hero.hero_class === 'fundador' && typeof addGold === 'function') {
-      const bonusGold = Math.round(actualDmg * 0.5);
-      addGold(bonusGold);
-      toast('💰', `Visión Estratégica convierte daño en +${bonusGold} 🪙`);
-    }
-
     await _bbDelay(350);
     if (bossSpriteEl) bossSpriteEl.classList.remove('bb-hit');
   }

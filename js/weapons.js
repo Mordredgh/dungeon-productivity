@@ -101,25 +101,14 @@ async function salvageWeapon(id) {
 async function craftWeapon(weaponKey, targetTier) {
   const recipe = CRAFT_RECIPES[targetTier];
   if (!recipe) return;
-  const sources = weapons.filter(w => w.weapon_key === weaponKey && w.tier === recipe.from && !w.is_equipped && !isForging(w));
-  if (sources.length < recipe.count) {
-    const def = WEAPON_DEFS.find(d => d.key === weaponKey);
-    toast('⚒️', `Necesitas ${recipe.count}× ${def?.name} ${WEAPON_TIERS[recipe.from]?.label}.`);
-    return;
-  }
-  const toDelete = sources.slice(0, recipe.count).map(w => w.id);
-  const { error } = await db.from('dungeon_weapons').delete().in('id', toDelete);
-  if (error) { toast('❌', 'Error al forjar.'); return; }
-  weapons = weapons.filter(w => !toDelete.includes(w.id));
-  const masteryForgeMult = 1 - (typeof getMasteryBonus === 'function' ? getMasteryBonus('persistencia') : 0);
-  const salaForgeMult = typeof getSalaBonus === 'function' ? 1 - getSalaBonus('forge_speed') : 1;
-  const cooldownMs = FORGE_COOLDOWN_MS[targetTier] ? Math.round(FORGE_COOLDOWN_MS[targetTier] * masteryForgeMult * salaForgeMult) : 0;
-  const readyAt = cooldownMs ? new Date(Date.now() + cooldownMs).toISOString() : null;
-  const newW = await addWeapon(weaponKey, targetTier, readyAt);
-  if (newW) {
-    if (readyAt) toast('⏳', `${newW.name} en forja. Estará lista en ${cooldownMs >= 86400000 * 2 ? '3 días' : '24 horas'}.`);
-    else toast('⚒️', `¡${newW.name} forjada! ${WEAPON_TIERS[targetTier]?.xpBonus ? `+${Math.round(WEAPON_TIERS[targetTier].xpBonus*100)}% XP` : ''}`);
-  }
+  const { data, error } = await db.rpc('forge_dungeon_weapon', {
+    p_weapon_key: weaponKey,
+    p_target_tier: targetTier
+  });
+  if (error) { toast('⚒️', error.message || 'No se pudo forjar.'); return; }
+  const newW = Array.isArray(data) ? data[0] : data;
+  await loadWeapons();
+  if (newW) toast('⚒️', `¡${newW.name} forjada!`);
   renderInventory(); renderSmithy();
 }
 
