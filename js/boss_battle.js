@@ -252,7 +252,7 @@ function _bbBossDmg() {
 }
 
 /* ── Daño solo al ciclo objetivo ──────────────────────────── */
-function _damageBossCycle(cycle, baseDmg) {
+async function _damageBossCycle(cycle, baseDmg) {
   const state = getMultiBossState();
   const b = state[cycle];
   if (!b || b.defeated) return 0;
@@ -266,34 +266,35 @@ function _damageBossCycle(cycle, baseDmg) {
   const equipmentResonanceMult = typeof getEquipmentResonanceBonus === 'function' ? 1 + getEquipmentResonanceBonus('boss_dmg') : 1;
   const campaignMult = cycle === 'weekly' && typeof getWeeklyCampaignBonus === 'function' ? 1 + getWeeklyCampaignBonus('boss_dmg') : 1;
   const prepMult = getBossPreparation(cycle) === 'ruptura' ? 1 + BOSS_PREPARATIONS.ruptura.value : 1;
-  const finalDmg = Math.max(1, Math.round((weather === 'storm' ? baseDmg * 2 : baseDmg) * petMult * petSpecMult * runeMult * dungeonMult * doctrineMult * equipmentResonanceMult * campaignMult * prepMult));
-
-  b.hp = Math.max(0, b.hp - finalDmg);
-
-  if (b.hp === 0) {
-    b.defeated = true;
-    const reward = (typeof BOSS_DEFEAT_REWARDS !== 'undefined' && BOSS_DEFEAT_REWARDS[b.rarity]) || { gold:50, xp:100 };
-    setTimeout(async () => {
-      const xp = typeof balanceReward === 'function' ? balanceReward('xp', reward.xp, reward.xp).amount : reward.xp;
-      const gold = typeof balanceReward === 'function' ? balanceReward('gold', reward.gold, reward.gold).amount : reward.gold;
-      if (typeof addGold        === 'function') addGold(gold);
-      if (typeof addXP          === 'function') await addXP(xp, 'main', null);
-      if (typeof recordRewardLedger === 'function') recordRewardLedger({ type:'boss', boss:b.key, xp, gold, at:Date.now() });
-      if (typeof toast          === 'function') toast('🏆', `¡${b.name} DERROTADO! +${gold}🪙 +${xp} XP`);
-      if (typeof dungeonPush    === 'function') dungeonPush('🏆 ¡Jefe Derrotado!', `${b.name} venció. +${gold}🪙 +${xp} XP`);
-      if (typeof recordBossDefeat === 'function') recordBossDefeat(b.key);
-      if (typeof trackBossKill    === 'function') trackBossKill();
-      if (typeof addActivePetXP   === 'function') addActivePetXP({ daily:30, weekly:100, monthly:250 }[cycle] || 30);
-      if (typeof tryRuneDrop === 'function' && Math.random() < (reward.runeChance || 0)) setTimeout(() => tryRuneDrop('boss'), 1400);
-      if (getBossPreparation(cycle) === 'ruptura' && typeof addInvItem === 'function') await addInvItem('rune_fragment', 'rune_fragment', 1);
-      if (typeof updateBossBanner === 'function') updateBossBanner();
-    }, 800);
+  const finalDmg = Math.min(Math.ceil((b.maxHp || 1) * 0.40), Math.max(1, Math.round((weather === 'storm' ? baseDmg * 2 : baseDmg) * petMult * petSpecMult * runeMult * dungeonMult * doctrineMult * equipmentResonanceMult * campaignMult * prepMult)));
+  const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+  const { data, error } = await db.rpc('apply_dungeon_boss_damage', {
+    p_cycle: cycle, p_boss_key: b.key, p_period_key: b.periodKey,
+    p_rarity: b.rarity, p_damage: finalDmg, p_request_id: requestId,
+  });
+  if (error) { toast('⚠️', error.message || 'No se pudo registrar el ataque.'); return 0; }
+  const result = Array.isArray(data) ? data[0] : data;
+  if (!result) return 0;
+  if (result.boss_state && typeof result.boss_state === 'object') {
+    Object.keys(state).forEach(key => delete state[key]);
+    Object.assign(state, result.boss_state);
+    hero.boss_state = state;
   }
-
-  if (typeof saveMultiBossState === 'function') saveMultiBossState(state);
+  b.hp = result.hp;
+  b.maxHp = result.max_hp || b.maxHp;
+  b.defeated = !!result.defeated;
+  if (result.defeated && result.xp_awarded) {
+    hero.gold = result.gold; hero.xp_total = result.xp_total; hero.level = result.level;
+    if (typeof recordRewardLedger === 'function') recordRewardLedger({ type:'boss', boss:b.key, xp:result.xp_awarded, gold:result.gold_awarded, at:Date.now() });
+    if (typeof toast === 'function') toast('🏆', `¡${b.name} DERROTADO! +${result.gold_awarded}🪙 +${result.xp_awarded} XP`);
+    if (typeof dungeonPush === 'function') dungeonPush('🏆 ¡Jefe Derrotado!', `${b.name} venció. Recompensa entregada.`);
+    if (typeof recordBossDefeat === 'function') recordBossDefeat(b.key);
+    if (typeof trackBossKill === 'function') trackBossKill();
+    if (typeof addActivePetXP === 'function') addActivePetXP({ daily:30, weekly:100, monthly:250 }[cycle] || 30);
+  }
   if (typeof updateBossBanner   === 'function') updateBossBanner();
 
-  return finalDmg;
+  return Math.max(0, finalDmg);
 }
 
 /* ── Agotamiento de mascota — al caer en batalla, no se cura sola ──
@@ -712,7 +713,7 @@ async function executeBattleAttack(moveIdx) {
   await _bbDelay(130);
 
   /* ─ Aplicar daño al boss ─ */
-  const actualDmg = _damageBossCycle(_bbCycle, dmg);
+  const actualDmg = await _damageBossCycle(_bbCycle, dmg);
   _bbBattleStats.damage += actualDmg;
   _bbBattleStats.hits += 1;
   if (wasCrit) _bbBattleStats.crits += 1;
@@ -875,7 +876,7 @@ async function useHeroBattleSkill() {
 
     const variedDmg = _bbApplyVariance(dmg);
     const wasCrit    = _bbLastCrit;
-    const actualDmg = _damageBossCycle(_bbCycle, variedDmg);
+    const actualDmg = await _damageBossCycle(_bbCycle, variedDmg);
     _bbBattleStats.damage += actualDmg;
     _bbBattleStats.hits += 1;
     if (wasCrit) _bbBattleStats.crits += 1;
