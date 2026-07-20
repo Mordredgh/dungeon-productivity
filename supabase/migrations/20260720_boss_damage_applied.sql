@@ -78,7 +78,7 @@ begin
   v_state:=jsonb_set(v_state,array[p_cycle],v_boss,true);
   v_total:=coalesce(v_hero.xp_total,0)+v_xp; v_level:=public.dungeon_level_for_xp(v_total);
 
-  update public.dungeon_heroes set boss_state=v_state::text,xp_total=v_total,gold=coalesce(v_hero.gold,0)+v_gold,level=v_level where id=v_hero.id;
+  update public.dungeon_heroes set boss_state=v_state,xp_total=v_total,gold=coalesce(v_hero.gold,0)+v_gold,level=v_level where id=v_hero.id;
   insert into public.dungeon_boss_actions(hero_id,request_id,cycle,boss_key,damage,hp_after) values(v_hero.id,p_request_id,p_cycle,p_boss_key,v_damage,v_hp);
   return query select v_hp,v_max,v_defeated,v_damage,v_xp,v_gold,v_total,coalesce(v_hero.gold,0)+v_gold,v_level,v_state;
 end $$;
