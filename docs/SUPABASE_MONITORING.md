@@ -13,4 +13,26 @@ La migracion `20260719_beta_monitoring.sql` crea:
 - `dungeon_beta_feedback`: reportes de testers, tambien aislados por heroe.
 - `dungeon_beta_monitoring_24h`: vista operativa por hora para el rol privilegiado, con conteos 4xx/5xx e indices de fecha/tipo.
 
-La aplicacion registra `window_error`, `unhandled_rejection` y el `http_status` de operaciones fallidas sin credenciales. Las alertas del panel son configuracion de infraestructura y deben quedar verificadas por el propietario del proyecto antes del lanzamiento. La restauracion de backups administrados depende del plan de Supabase; conservar una exportacion SQL versionada antes de cada migracion permite rollback controlado.
+La aplicacion registra `window_error`, `unhandled_rejection` y el `http_status` de operaciones fallidas sin credenciales. La vista no queda expuesta a `anon` ni `authenticated`; solo `service_role` puede consultarla para tablero/alertas.
+
+## Preflight operativo
+
+Variables locales esperadas:
+
+- `DUNGEON_SUPABASE_URL`
+- `DUNGEON_SUPABASE_SERVICE_ROLE_KEY`
+- `DUNGEON_SUPABASE_DB_URL`
+
+Comandos:
+
+```powershell
+.\scripts\supabase-beta-preflight.ps1
+.\scripts\supabase-backup.ps1
+.\scripts\beta-local-smoke.ps1
+```
+
+`supabase-beta-preflight.ps1` valida lectura privilegiada de eventos, feedback y vista de monitoreo.
+
+`supabase-backup.ps1` genera un dump custom de Postgres dentro de `tmp/backups` y crea un `.sha256`. La carpeta `tmp/` esta ignorada por Git para evitar subir respaldos.
+
+Las alertas del panel son configuracion de infraestructura y deben quedar verificadas por el propietario del proyecto antes del lanzamiento. La restauracion de backups administrados depende del plan de Supabase; conservar una exportacion SQL versionada antes de cada migracion permite rollback controlado.

@@ -66,3 +66,4 @@ group by 1, 2
 order by 1 desc, 2;
 
 revoke all on public.dungeon_beta_monitoring_24h from anon, authenticated;
+grant select on public.dungeon_beta_monitoring_24h to service_role;
