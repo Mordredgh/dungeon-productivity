@@ -46,4 +46,9 @@ begin
   select pg_get_functiondef('public.claim_dungeon_reward(text,text)'::regprocedure) into v_def;
   v_def := replace(v_def, 'if auth.uid() is null then raise exception ''Autenticación requerida''; end if;', 'if auth.uid() is null then raise exception ''Autenticación requerida''; end if; perform public.assert_dungeon_rpc_rate_limit(''reward_claim'',10,60);');
   execute v_def;
+  select pg_get_functiondef('public.choose_initial_dungeon_identity(text,text,text)'::regprocedure) into v_def;
+  if v_def is not null then
+    v_def := replace(v_def, 'if auth.uid() is null then raise exception ''Autenticación requerida''; end if;', 'if auth.uid() is null then raise exception ''Autenticación requerida''; end if; perform public.assert_dungeon_rpc_rate_limit(''class_change'',3,300);');
+    execute v_def;
+  end if;
 end $$;
