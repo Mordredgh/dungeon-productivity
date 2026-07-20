@@ -1,0 +1,10 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const migration = fs.readFileSync('supabase/migrations/20260719_lock_economy_columns.sql', 'utf8');
+assert.match(migration, /dungeon_block_client_economy_update/);
+assert.match(migration, /current_user in \('authenticated','anon'\)/);
+assert.match(migration, /new\.gold is distinct from old\.gold/);
+assert.match(migration, /new\.xp_total is distinct from old\.xp_total/);
+assert.match(migration, /new\.level is distinct from old\.level/);
+assert.match(migration, /before update on public\.dungeon_heroes/);
+console.log('Contrato de bloqueo económico OK');
