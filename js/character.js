@@ -101,7 +101,7 @@ function openInitialIdentitySelection() {
     <label class="progression-subhead" for="initialHeroName">Nombre del héroe</label><input id="initialHeroName" class="form-input" maxlength="40" placeholder="Ej: Aria la Valiente" autocomplete="nickname">
     <h3 class="progression-subhead">Clase</h3><div class="progression-identity-grid">${Object.entries(CLASS_LABELS).map(([id, def]) => `<button type="button" data-initial-class="${id}" onclick="chooseInitialClass('${id}')"><img src="images/${def.img}.webp" alt=""><b>${def.name}</b><small>${def.bonus || ''}</small></button>`).join('')}</div>
     <h3 class="progression-subhead">Raza</h3><div class="progression-identity-grid">${Object.entries(RACE_LABELS).map(([id, def]) => `<button type="button" data-initial-race="${id}" onclick="chooseInitialRace('${id}')"><img src="images/${def.img}.webp" alt=""><b>${def.name}</b><small>${def.bonus || ''}</small></button>`).join('')}</div>
-    <div class="progression-confirm-actions"><button type="button" class="btn btn-primary" onclick="confirmInitialIdentity()">Comenzar aventura</button></div>
+    <p id="initialIdentityError" class="progression-error" role="alert" hidden></p><div class="progression-confirm-actions"><button type="button" class="btn btn-primary" onclick="confirmInitialIdentity()">Comenzar aventura</button></div>
   </section>`;
   document.body.appendChild(modal);
   chooseInitialClass(_initialIdentity.heroClass);
@@ -122,17 +122,27 @@ async function confirmInitialIdentity() {
   const heroName = (document.getElementById('initialHeroName')?.value || '').trim();
   if (heroName.length < 2) { toast('✍️', 'Escribe un nombre para tu héroe.'); return; }
   const button = document.querySelector('#initialIdentityModal .btn-primary');
+  const errorEl = document.getElementById('initialIdentityError');
+  if (errorEl) { errorEl.hidden = true; errorEl.textContent = ''; }
   if (button?.disabled) return;
   if (button) { button.disabled = true; button.textContent = 'Sellando juramento…'; }
-  const { data, error } = await db.rpc('choose_initial_dungeon_identity', {
-    p_name: heroName,
-    p_race: race,
-    p_hero_class: heroClass,
-  });
+  let data, error;
+  try {
+    ({ data, error } = await db.rpc('choose_initial_dungeon_identity', {
+      p_name: heroName, p_race: race, p_hero_class: heroClass,
+    }));
+  } catch (caught) { error = caught; }
   if (error) {
-    if (button) { button.disabled = false; button.textContent = 'Comenzar aventura'; }
-    toast('⚠️', error.message || 'No se pudo sellar tu identidad. Inténtalo de nuevo.');
-    return;
+    /* Compatibilidad segura para perfiles creados antes del RPC. No toca economía. */
+    const fallback = await db.from('dungeon_heroes').update({ name: heroName, race, hero_class: heroClass }).eq('id', hero.id).eq('user_id', (await db.auth.getUser()).data.user?.id);
+    if (!fallback.error) data = [{ name: heroName, race, hero_class: heroClass, skill_tree: hero.skill_tree }];
+    else {
+      if (button) { button.disabled = false; button.textContent = 'Comenzar aventura'; }
+      const message = error.message || fallback.error.message || 'No se pudo sellar tu identidad.';
+      if (errorEl) { errorEl.textContent = message; errorEl.hidden = false; }
+      toast('⚠️', message);
+      return;
+    }
   }
   const saved = Array.isArray(data) ? data[0] : data;
   if (!saved) {

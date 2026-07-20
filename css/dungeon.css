@@ -9092,3 +9092,5 @@ html.performance-lite *,html.performance-lite *::before,html.performance-lite *:
 .beta-feedback-card select, .beta-feedback-card textarea { width:100%; box-sizing:border-box; border:1px solid rgba(192,146,255,.32); border-radius:10px; background:rgba(8,6,18,.58); color:var(--text); padding:10px; font:inherit; }
 .beta-feedback-card textarea { min-height:120px; resize:vertical; }
 .beta-feedback-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:4px; }
+/* Error explícito en el primer juramento: nunca dejar un botón sin explicación. */
+.progression-error { margin:12px 0 0; padding:9px 11px; border:1px solid rgba(251,113,133,.65); border-radius:8px; background:rgba(127,29,29,.32); color:#fecdd3; font-size:12px; line-height:1.35; }

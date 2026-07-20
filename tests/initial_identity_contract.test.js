@@ -15,6 +15,8 @@ assert.match(migration, /for update/i);
 assert.match(migration, /p_race not in \('humano','elfo','enano','orco'\)/i);
 assert.match(migration, /p_hero_class not in \('guerrero','mago','picaro','clerigo','arquero','fundador'\)/i);
 assert.match(character, /rpc\('choose_initial_dungeon_identity'/);
+assert.match(character, /id="initialIdentityError"/);
+assert.match(character, /from\('dungeon_heroes'\)\.update\(\{ name: heroName, race, hero_class: heroClass \}\)/);
 assert.doesNotMatch(character, /saveHero\(\{ name:heroName, race, hero_class:heroClass/);
 assert.match(character, /clerigo:.*Voto protector/);
 assert.match(character, /fundador:.*Arquitecto de campaña/);
