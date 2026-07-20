@@ -1,7 +1,8 @@
 param(
   [string]$DatabaseUrl = $env:DUNGEON_SUPABASE_DB_URL,
   [string]$OutputDir = "tmp\backups",
-  [string]$DockerImage = "postgres:16-alpine"
+  [string]$DockerImage = "postgres:16-alpine",
+  [string]$DockerNetwork = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -35,7 +36,10 @@ if ($pgDump) {
   }
   $mountDir = (Resolve-Path $targetDir).Path
   $fileName = [System.IO.Path]::GetFileName($backupPath)
-  & $docker.Source run --rm -v "${mountDir}:/backups" $DockerImage pg_dump --format=custom --no-owner --no-acl --file "/backups/$fileName" $DatabaseUrl
+  $dockerArgs = @("run", "--rm")
+  if ($DockerNetwork) { $dockerArgs += @("--network", $DockerNetwork) }
+  $dockerArgs += @("-v", "${mountDir}:/backups", $DockerImage, "pg_dump", "--format=custom", "--no-owner", "--no-acl", "--file", "/backups/$fileName", $DatabaseUrl)
+  & $docker.Source @dockerArgs
   if ($LASTEXITCODE -ne 0) {
     Write-Error "pg_dump via Docker fallo."
     exit 1
@@ -47,3 +51,5 @@ $hash = Get-FileHash -Algorithm SHA256 -Path $backupPath
 
 Write-Host "[OK] Backup: $backupPath"
 Write-Host "[OK] SHA256: $hashPath"
+Write-Output "[OK] Backup: $backupPath"
+Write-Output "[OK] SHA256: $hashPath"

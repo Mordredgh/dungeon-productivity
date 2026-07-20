@@ -37,6 +37,7 @@ Comandos:
 .\scripts\supabase-backup.ps1
 .\scripts\supabase-restore-test.ps1 -BackupPath tmp\backups\<archivo>.dump -IUnderstandThisIsTemporary
 .\scripts\supabase-free-tier-drill.ps1
+.\scripts\supabase-free-tier-local-restore-drill.ps1
 .\scripts\supabase-beta-alerts.ps1
 .\scripts\beta-local-smoke.ps1
 ```
@@ -50,6 +51,8 @@ Comandos:
 `supabase-restore-test.ps1` restaura un `.dump` en una base temporal usando `pg_restore`. Exige `-IUnderstandThisIsTemporary` y bloquea refs conocidas de produccion para evitar restaurar sobre el proyecto real.
 
 `supabase-free-tier-drill.ps1` corre backup y, si existe `DUNGEON_SUPABASE_RESTORE_TEST_DB_URL`, ejecuta restore de prueba. Si no existe, deja el backup verificado y marca restore como omitido.
+
+`supabase-free-tier-local-restore-drill.ps1` valida el pipeline sin tocar Supabase: crea dos Postgres temporales en Docker, genera un dump del primero, lo restaura en el segundo y comprueba filas reales.
 
 `supabase-beta-alerts.ps1` ejecuta `scan_dungeon_beta_alerts()` con `service_role`. Si hay alertas abiertas sale con codigo `2`, util para Uptime Kuma, cron o CI.
 
