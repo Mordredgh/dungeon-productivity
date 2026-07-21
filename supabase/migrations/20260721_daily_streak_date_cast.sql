@@ -1,5 +1,5 @@
--- La racha toca campos bloqueados por dungeon_block_client_economy_update.
--- Debe vivir en servidor para que completar misiones no dispare PATCH 400.
+-- Corrección: dungeon_heroes.last_active_date es date, no text.
+-- Mantiene la RPC idempotente y evita respuestas 400 al tocar la racha.
 create or replace function public.touch_dungeon_daily_streak()
 returns table (
   changed boolean,
