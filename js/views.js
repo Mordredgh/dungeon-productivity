@@ -319,9 +319,9 @@ function renderQuestList() {
       html += group.map(q => renderQuestItem(q, blockedIds.has(q.id))).join('');
     });
     // Hábitos al final
-    const habits = quests.filter(q => q.type === 'habit');
+    const habits = quests.filter(q => q.type === 'habit' && !q.done);
     if (habits.length && typeof renderHabitItem === 'function') {
-      html += `<div class="type-separator">Hábitos<span>${habits.filter(h=>!h.done).length}</span></div>`;
+      html += `<div class="type-separator">Hábitos<span>${habits.length}</span></div>`;
       html += habits.map(q => renderHabitItem(q)).join('');
     }
   } else {
