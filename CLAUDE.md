@@ -74,7 +74,7 @@ spells.js → views.js → ui.js → events.js → oracle.js → shop.js → rpg
 pets.js → weapons.js → secret_sets.js → goals.js → reputation.js → patterns.js →
 mechanics.js → character.js → weather.js → dungeon_clock.js →
 skill_tree.js → bestiary.js → dungeon_grows.js → runes.js → google_fit.js →
-hero_score.js → push.js → combos.js → habits.js → ruleta.js → duolingo.js →
+hero_score.js → push.js → combos.js → habits.js → ruleta.js →
 drops.js → daily_goal.js → weekly_summary.js → challenges.js → zones.js →
 hero_card.js → world_map.js → sala_personal.js → pet_garden.js → boss_battle.js →
 animations.js → effects.js → auth.js → main.js
@@ -142,7 +142,6 @@ Agregar archivos nuevos **ANTES de `auth.js`**.
 | Archivo | Propósito | Funciones clave |
 |---------|-----------|----------------|
 | `google_fit.js` | Pasos diarios | `connectGoogleFit()`, `syncGoogleFitSteps()`, `renderFitWidget()` |
-| `duolingo.js` | Sync XP Duolingo | `syncDuolingo()`, `getDuoUsername()`, `renderDuolingoWidget()` |
 | `weather.js` | Clima real | `loadRealWeather()`, `renderWeatherDetail()` |
 | `push.js` | Web Push | `initPush()`, `dungeonPush(title, body, url?)`, `isPushSubscribed()` |
 | `dungeon_clock.js` | Reloj + TOD bonuses | `getDungeonTOD()`, `getTODBonus()`, `updateDungeonClock()` |
@@ -161,7 +160,7 @@ Agregar archivos nuevos **ANTES de `auth.js`**.
 | `inventory` | Inventario |
 | `pets` | Mascotas |
 | `goals` | Metas largas |
-| `integrations` | Fit + Duolingo |
+| `integrations` | Google Fit |
 | `dungeon-grows` | Mapa dungeon |
 | `character` | Character Hub (5 tabs) |
 | `zones` | Zonas del dungeon |
@@ -188,7 +187,6 @@ Sets secretos: forge_queue (jsonb) — cola de hasta 3 piezas en forja [{classKe
 Hábitos:      habit_history (jsonb) — fechas completadas por quest_id, para renderHabitHeatmap()
 Reporte mensual: monthly_report_text, monthly_report_date
 Integración:  fit_access_token, fit_refresh_token, fit_token_expiry, fit_sync_date, fit_xp_date
-              duo_username, duo_sync_date, duo_xp_date, duo_today_xp, duo_streak
 Meta diaria:  daily_goal, daily_goal_xp, daily_goal_date
 Perfil:       name, hero_class, race, avatar, guild_name, webhook_url
 ```
@@ -360,7 +358,6 @@ Solo para datos no críticos (se puede perder sin consecuencias):
 |---------|-----------|-----------|
 | `send-push` | false | Enviar Web Push notifications |
 | `google-oauth` | true | Exchange/refresh Google OAuth tokens |
-| `duolingo-proxy` | false | Proxy a API Duolingo (evita CORS) |
 
 ---
 
@@ -483,7 +480,7 @@ ca-central-1). `js/config.js` (`SUPA_URL`, `SUPA_KEY`, `CDN`) apunta ahí desde 
   `onerror` en las imágenes; el catálogo real vive en `images/*.webp` local, esto es solo respaldo).
   Migrado descargando cada archivo del bucket público viejo y subiéndolo al nuevo vía Storage REST
   API con `service_role` key.
-- **3 Edge Functions** (`send-push`, `google-oauth`, `duolingo-proxy`) — código fuente extraído del
+- **2 Edge Functions de Dungeon vigentes** (`send-push`, `google-oauth`) — código fuente extraído del
   proyecto viejo y redesplegado al nuevo vía `supabase functions deploy` (Supabase CLI + personal
   access token de la cuenta nueva, sin Docker corriendo — el CLI lo permite igual).
 
@@ -711,10 +708,9 @@ en Integraciones, script tag, entrada en sw.js ASSETS, llamada en `main.js`. Tor
 (zona) sigue funcionando solo con misiones manuales de estudio — perdió el canal de XP externo de
 Duolingo que se había agregado en v208, pero ese canal nunca llegó a funcionar en producción real.
 
-## Bonus pasivo de gremio + reclamo repetible + Fit/Duolingo alimentan zonas (v208, 2026-07-18)
+## Bonus pasivo de gremio + reclamo repetible + Fit alimenta zonas (v208, 2026-07-18)
 
-Gerardo preguntó qué más mejorar en Fortaleza (zona) y Gremio (Facciones); pidió también aprovechar
-la conexión con Duolingo. Tres mejoras:
+Gerardo preguntó qué más mejorar en Fortaleza (zona) y Gremio (Facciones). Tres mejoras:
 
 - **Bonus pasivo por rango de gremio.** Antes el rango de Facción era solo decorativo — a diferencia
   de Zonas, que dan +5/10/15/25% XP según rango. Ahora `FACTION_DEFS[].ranks[].bonus` (0/0.05/0.12)
@@ -725,13 +721,10 @@ la conexión con Duolingo. Tres mejoras:
   gremio quedaba sin más razón para jugarlo. `hero.faction_claims` ahora es histórico (se van
   agregando entradas `{id, questIds, done, doneAt}`, nunca se borran); `_factionLatestClaim()` mira
   la última entrada de esa facción para decidir si puede reclamar de nuevo.
-- **Google Fit → Fortaleza, Duolingo → Torre del Saber.** Ambas integraciones ya otorgaban XP suelto
-  (`addXP()`) que no contaba para ninguna zona porque `calcZoneXP()` solo suma XP de misiones
+- **Google Fit → Fortaleza.** La integración ya otorgaba XP suelto (`addXP()`) que no contaba para ninguna zona porque `calcZoneXP()` solo suma XP de misiones
   completadas, no de XP externo. Nueva función `addZoneExtXP(zoneId, amount)` en `zones.js` guarda
   XP acumulado externo en `hero.zone_ext_xp` (jsonb, requirió migración) y `calcZoneXP()` lo suma
-  al total de cada zona. `_applyFitXP()` (google_fit.js) alimenta `fortaleza`; `syncDuolingo()`
-  (duolingo.js) alimenta `torre`. Así pasos reales y XP de idiomas hacen subir de rango esas zonas
-  igual que las misiones manuales.
+  al total de cada zona. `_applyFitXP()` (google_fit.js) alimenta `fortaleza`. Torre del Saber queda ligada a misiones manuales de estudio, cursos y lectura.
 
 **Migración aplicada 2026-07-18** vía SQL Editor (misma sesión de Chrome logueada, MCP no alcanza
 esta cuenta): `ALTER TABLE dungeon_heroes ADD COLUMN IF NOT EXISTS zone_ext_xp jsonb DEFAULT '{}'::jsonb;`

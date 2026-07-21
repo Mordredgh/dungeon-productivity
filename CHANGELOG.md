@@ -238,3 +238,8 @@ Todas las fechas en formato YYYY-MM-DD (hora Monterrey, CDT = UTC-5).
 - Modo compacto / focus
 - Kanban (eliminado en v39)
 - Google Calendar (eliminado en v39)
+
+## [v239] — 2026-07-18
+
+### Eliminado
+- **Duolingo eliminado**: la API pública dejó de responder de forma usable. Se quitó `js/duolingo.js`, carga en `index.html`, tarjeta de Integraciones y dependencia del proxy. Torre del Saber continúa por misiones manuales de estudio/lectura.
