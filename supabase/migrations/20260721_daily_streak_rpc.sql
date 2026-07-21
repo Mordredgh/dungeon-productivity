@@ -36,7 +36,7 @@ begin
   for update;
   if not found then raise exception 'Héroe no encontrado'; end if;
 
-  v_last := nullif(v_hero.last_active_date, '');
+  v_last := nullif(v_hero.last_active_date::text, '');
   v_hp := coalesce(v_hero.hp, 100);
 
   if v_last = v_today then
