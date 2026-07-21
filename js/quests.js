@@ -19,10 +19,24 @@ async function addQuest(q) {
   showContratoEffect(q.name);
 }
 
+const _completingQuestIds = new Set();
 async function completeQuest(id, el) {
   const q = quests.find(x => x.id === id);
   if (!q || q.done) return;
+  // Guard contra doble envío (doble tap, red lenta, o el auto-complete de
+  // subtareas disparando junto con un click manual) — sin esto, dos llamadas
+  // concurrentes mandan el mismo p_quest_id al RPC y la segunda choca contra
+  // la constraint única de dungeon_reward_ledger (409) sin aplicar nada.
+  if (_completingQuestIds.has(id)) return;
+  _completingQuestIds.add(id);
+  try {
+    return await _completeQuestInner(id, el, q);
+  } finally {
+    _completingQuestIds.delete(id);
+  }
+}
 
+async function _completeQuestInner(id, el, q) {
   // Ensure streak is up-to-date even if app was left open overnight
   if (typeof checkDailyStreak === 'function') await checkDailyStreak();
 
