@@ -657,6 +657,37 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 
 ---
 
+## Bug crítico en DB: misiones diarias/hábitos fallaban para siempre tras el primer ciclo (2026-07-20)
+
+Gerardo reportó (screenshot de consola): "No se pudo completar la misión. Tu recompensa no fue
+aplicada." + 409 Conflict en `complete_dungeon_quest` con `duplicate key value violates unique
+constraint "dungeon_reward_ledger_hero_id_source_source_id_key"`.
+
+**Primer intento (insuficiente):** agregué guardia cliente `_completingQuestIds` en
+`quests.js completeQuest()` contra doble envío por doble-click. No era la causa real — seguía
+fallando.
+
+**Causa real, encontrada inspeccionando la función RPC vía SQL Editor de Supabase:**
+`complete_dungeon_quest` (función Postgres, no vive en este repo — es infraestructura de otra
+sesión/agente) insertaba en `dungeon_reward_ledger` usando `v_quest.id` (el ID de la fila de la
+misión) como `source_id`, con constraint única `(hero_id, source, source_id)`. Pero
+`resetDailyQuests()`/`resetRepeatQuests()` (`events.js`) NO crean una fila nueva cada ciclo —
+reutilizan la MISMA fila/ID, solo poniendo `done=false` de nuevo. Resultado: cualquier misión
+diaria/hábito/repetible pagaba correctamente la PRIMERA vez en su historia, y fallaba con 409 para
+siempre en cada ciclo posterior — bug permanente, no intermitente, afecta a cualquier usuario.
+
+La protección real contra pago duplicado ya existía de forma correcta y atómica: `select ... for
+update` sobre la misión + `if coalesce(v_quest.done,false) then raise exception 'La misión ya fue
+completada'` en la misma transacción. La unicidad del ledger era una segunda defensa redundante que
+rompía el caso legítimo de recurrencia.
+
+**Fix aplicado en producción** (SQL Editor, misma sesión de Chrome logueada — el MCP de Supabase
+no alcanza esta cuenta): `CREATE OR REPLACE FUNCTION complete_dungeon_quest` idéntica, cambiando
+solo `values (v_hero.id, 'quest', v_quest.id, v_xp, v_gold)` → `values (v_hero.id, 'quest',
+gen_random_uuid(), v_xp, v_gold)`. Cada pago ahora es una entrada de auditoría propia; la
+protección contra duplicados sigue intacta vía el lock de fila. Verificado con
+`pg_get_functiondef` tras aplicar.
+
 ## Google Fit arreglado + Duolingo eliminado (v236→v239, 2026-07-18)
 
 Gerardo reportó: Duolingo decía "usuario no existe" y Google Fit lo desconectaba constantemente.

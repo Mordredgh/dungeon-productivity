@@ -16,6 +16,17 @@ function getInvCount(key) {
   return row ? (row.quantity || 0) : 0;
 }
 
+function shouldFallbackInventoryWrite(error) {
+  if (!error) return false;
+  const text = `${error.code || ''} ${error.message || ''} ${error.details || ''} ${error.hint || ''}`.toLowerCase();
+  return error.code === '42P10'
+    || Number(error.status || 0) === 400
+    || text.includes('unique')
+    || text.includes('conflict')
+    || text.includes('constraint')
+    || text.includes('on conflict');
+}
+
 async function addInvItem(key, type, qty) {
   if (!hero || qty <= 0) return { ok:false, error:'invalid-request' };
   const existing = inventory.find(r => r.item_key === key);
@@ -25,7 +36,7 @@ async function addInvItem(key, type, qty) {
   let { error } = await db.from('dungeon_inventory').upsert(row, { onConflict: 'hero_id,item_key' });
   // Algunos despliegues antiguos no tienen el índice hero_id,item_key. En ese
   // caso Supabase rechaza upsert (42P10), aunque insert/update normal funciona.
-  if (error?.code === '42P10') {
+  if (shouldFallbackInventoryWrite(error)) {
     if (existing) {
       ({ error } = await db.from('dungeon_inventory')
         .update({ quantity:newQty, updated_at:row.updated_at })
@@ -51,7 +62,7 @@ async function consumeInvItem(key, qty) {
 
   const row = { hero_id: hero.id, item_key: key, item_type: existing.item_type, quantity: newQty, updated_at: new Date().toISOString() };
   let { error } = await db.from('dungeon_inventory').upsert(row, { onConflict: 'hero_id,item_key' });
-  if (error?.code === '42P10') {
+  if (shouldFallbackInventoryWrite(error)) {
     ({ error } = await db.from('dungeon_inventory')
       .update({ quantity:newQty, updated_at:row.updated_at })
       .eq('hero_id', hero.id).eq('item_key', key));

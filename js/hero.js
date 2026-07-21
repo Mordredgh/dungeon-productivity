@@ -319,48 +319,56 @@ async function addXP(amount, type, sourceEl) {
 /* STREAK */
 async function checkDailyStreak() {
   if (!hero) return;
-  const today = new Date().toISOString().split('T')[0];
-  const lastDay = hero.last_active_date || null;
-  if (lastDay === today) return;
-
-  const yesterday        = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-  const dayBeforeYest    = new Date(Date.now() - 2*86400000).toISOString().split('T')[0];
-  const isOrco           = typeof heroRace !== 'undefined' && heroRace === 'orco';
-  const orcoForgives     = isOrco && lastDay === dayBeforeYest;
-
-  let newStreak = (lastDay === yesterday || orcoForgives) ? (hero.streak || 0) + 1 : 1;
-  const longest = Math.max(newStreak, hero.longest_streak || 0);
-
-  let newHp = hero.hp || 100;
-  if (lastDay && lastDay !== yesterday && !orcoForgives) {
-    if (hero.amulet) {
-      hero.amulet = false; saveHero({ amulet: false });
-      toast('🧿', '¡Amuleto de Protección absorbió el daño del día sin actividad!');
-    } else {
-      newHp = Math.max(10, newHp - 10);
-      if (typeof spawnHPParticle === 'function') {
-        const el = document.getElementById('heroHp');
-        spawnHPParticle(-10, el);
-      }
-      toast('💔', 'Perdiste HP por días sin actividad.');
-    }
-  } else if (orcoForgives) {
-    toast('💪', '¡Resistencia Orca! La racha se mantiene.');
+  const callRpc = typeof rpcWithRetry === 'function'
+    ? () => rpcWithRetry('touch_dungeon_daily_streak', {}, { pendingKey:'daily-streak' })
+    : () => db.rpc('touch_dungeon_daily_streak', {});
+  const { data, error } = await callRpc();
+  const state = Array.isArray(data) ? data[0] : data;
+  if (error || !state) {
+    console.error('touch_dungeon_daily_streak', error);
+    return;
+  }
+  if (!state.changed) {
+    Object.assign(hero, {
+      streak: Number(state.streak || hero.streak || 0),
+      longest_streak: Number(state.longest_streak || hero.longest_streak || 0),
+      last_active_date: state.last_active_date || hero.last_active_date,
+      hp: Number(state.hp || hero.hp || 100),
+    });
+    deriveHero();
+    return;
   }
 
-  await saveHero({ streak: newStreak, longest_streak: longest, last_active_date: today, hp: newHp });
+  Object.assign(hero, {
+    streak: Number(state.streak || 1),
+    longest_streak: Number(state.longest_streak || state.streak || 1),
+    last_active_date: state.last_active_date,
+    hp: Number(state.hp || hero.hp || 100),
+    amulet: state.amulet_consumed ? false : hero.amulet,
+  });
   renderHeroUI();
+  if (state.amulet_consumed) {
+    toast('🧿', '¡Amuleto de Protección absorbió el daño del día sin actividad!');
+  } else if (Number(state.hp_lost || 0) > 0) {
+    if (typeof spawnHPParticle === 'function') {
+      const el = document.getElementById('heroHp');
+      spawnHPParticle(-Number(state.hp_lost), el);
+    }
+    toast('💔', 'Perdiste HP por días sin actividad.');
+  } else if (state.orco_forgiven) {
+    toast('💪', '¡Resistencia Orca! La racha se mantiene.');
+  }
   checkAchievements();
-  if (newStreak > 1 && typeof damageBoss === 'function') {
-    const dmg = Math.min(newStreak * 2, 30);
+  if ((hero.streak || 0) > 1 && typeof damageBoss === 'function') {
+    const dmg = Math.min((hero.streak || 0) * 2, 30);
     damageBoss(dmg);
-    toast('🔥', `¡Racha ×${newStreak}! El jefe recibe ${dmg} de daño.`);
+    toast('🔥', `¡Racha ×${hero.streak}! El jefe recibe ${dmg} de daño.`);
   }
 
   // Track total active days for Titán secret class
   const _prog = getSecretProgress();
   _prog.total_active_days = (_prog.total_active_days || 0) + 1;
-  if (newHp <= 10) _prog.hp_zeros = (_prog.hp_zeros || 0) + 1;
+  if ((hero.hp || 0) <= 10) _prog.hp_zeros = (_prog.hp_zeros || 0) + 1;
   await saveSecretProgress(_prog);
   checkSecretClassUnlocks();
 }
