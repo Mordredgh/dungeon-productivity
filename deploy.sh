@@ -24,6 +24,11 @@ echo "📦 Bumping v${OLD_VER} → v${NEW_VER}"
 sed -i "s/dungeon-v${OLD_VER}/dungeon-v${NEW_VER}/" sw.js
 echo "   Cache del Service Worker → v${NEW_VER}"
 
+# Bump también el query string ?v= en index.html — si no, el navegador
+# cachea JS/CSS por URL exacta y nunca baja el código nuevo aunque el SW cambie.
+sed -i "s/?v=${OLD_VER}/?v=${NEW_VER}/g" index.html
+echo "   Query strings ?v= en index.html → v${NEW_VER}"
+
 # Mantener las variantes gzip alineadas con el código que se publica.
 gzip -9 -kf index.html css/*.css js/*.js
 

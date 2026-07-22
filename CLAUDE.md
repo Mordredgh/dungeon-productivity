@@ -654,6 +654,16 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 
 ---
 
+## Dock flotante de escritorio tapaba la última tarea de la lista (2026-07-22, v313)
+
+Gerardo reportó (ventana angosta de escritorio, ≥641px): la última barra de tarea siempre chocaba
+con el dock flotante inferior. `.dungeon-dock` (`css/dungeon.css:7459`) es `position:fixed;bottom:18px`
+centrado, visible desde 641px en adelante (6 iconos: nueva misión, focus, D20, diario, pergamino,
+ruleta) — pero `.view` (contenedor scrolleable de cada pestaña) no reservaba espacio para él.
+
+**Fix:** `@media (min-width: 641px) { .view { padding-bottom: 96px; } }` justo debajo de la regla
+base de `.view` (línea 735). Deploy `v313`.
+
 ## Misión de zona (hábito/diaria) se duplicaba y resucitaba marcada para siempre (2026-07-22, v312)
 
 Gerardo reportó: "Esta mision de habitos aparece todos los días, pero aparece marcada y no se puede
