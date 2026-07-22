@@ -654,6 +654,25 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 
 ---
 
+## Misión de zona (hábito/diaria) se duplicaba y resucitaba marcada para siempre (2026-07-22, v312)
+
+Gerardo reportó: "Esta mision de habitos aparece todos los días, pero aparece marcada y no se puede
+quitar, ayer tu la quitaste, pero volvió a aparecer" — sobre "Medita o respira profundo 5 minutos"
+(misión de zona Jardín Arcano).
+
+**Causa:** `checkZoneRandomQuest()` (zones.js) inserta una fila nueva cada día pero nunca borra la
+del día anterior. Para type `'habit'`/`'daily'`, `resetDailyQuests()` (events.js) resetea a diario
+cualquier fila `done && done_at` de un día distinto al de hoy — como las filas viejas de zona nunca
+se eliminan, quedan reviviendo para siempre marcadas como "no hecha", acumulándose junto a la nueva
+de cada día. Agravante: las misiones tipo hábito no tienen botón de deshacer una vez marcadas
+(`habits.js renderHabitItem()` reemplaza el botón por un `<span>` estático) — por eso Gerardo no
+podía destildarla él mismo.
+
+**Fix aplicado:** en `checkZoneRandomQuest()`, cada inserción ahora se etiqueta con `zona-auto` en
+`tags`. Antes de insertar la misión del día, `_clearStaleZoneQuests()` borra (servidor + array local)
+cualquier fila `zona-auto` previa, más una limpieza única de residuos viejos sin la etiqueta (match
+exacto contra los 60 nombres de `ZONE_QUEST_TEMPLATES`). Deploy `v312`.
+
 ## Segundo bug del mismo tipo: reclamo de gremio (7 días) roto a nivel DB (2026-07-20)
 
 Gerardo pidió seguir buscando bugs tras el fix de misiones diarias. Sospeché que `claim_dungeon_reward`

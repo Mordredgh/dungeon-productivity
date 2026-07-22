@@ -733,6 +733,7 @@ input::placeholder, textarea::placeholder { color: var(--text3); }
 .views { flex: 1; overflow: hidden; }
 
 .view { display: none; height: 100%; overflow-y: auto; padding: 20px; }
+@media (min-width: 641px) { .view { padding-bottom: 96px; } }
 
 .view.active {
   display: flex;
