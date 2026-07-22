@@ -654,6 +654,27 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 
 ---
 
+## Segundo bug del mismo tipo: reclamo de gremio (7 días) roto a nivel DB (2026-07-20)
+
+Gerardo pidió seguir buscando bugs tras el fix de misiones diarias. Sospeché que `claim_dungeon_reward`
+(usada por racha/gremio/retos) podía tener el mismo problema — confirmado, con un giro distinto:
+
+`claim_dungeon_reward` tiene una tabla separada `dungeon_reward_claims` (no `dungeon_reward_ledger`)
+con este chequeo explícito e intencional: `if exists(select 1 from dungeon_reward_claims where
+hero_id=... and source=p_source and reward_key=p_reward_key) then raise exception 'Recompensa ya
+reclamada'`. Esto bloquea la MISMA combinación `(source, reward_key)` para siempre, a propósito —
+correcto para racha (hito de por vida) y retos (una vez por reto). Pero **rompe la feature de
+"reclamar serie de gremio cada 7 días"** que yo mismo agregué en `factions.js` en una sesión anterior
+(`FACTION_RECLAIM_COOLDOWN_MS`) — la función SIEMPRE rechaza un segundo reclamo del mismo gremio
+('campeones', etc), sin importar cuánto tiempo pasó. El botón cliente decía "podés reclamar de
+nuevo" pero el servidor rechazaba con "Recompensa ya reclamada" para siempre.
+
+**Fix aplicado (confirmado con Gerardo — quería que fuera repetible de verdad):** `CREATE OR REPLACE
+FUNCTION claim_dungeon_reward`, cambiando el chequeo a `and (p_source <> 'faction' or created_at >
+now() - interval '7 days')` — para racha/retos el bloqueo sigue siendo permanente (comportamiento
+correcto sin cambios); para facción, solo bloquea si el reclamo anterior fue hace menos de 7 días.
+Verificado con `pg_get_functiondef` tras aplicar.
+
 ## Bug crítico en DB: misiones diarias/hábitos fallaban para siempre tras el primer ciclo (2026-07-20)
 
 Gerardo reportó (screenshot de consola): "No se pudo completar la misión. Tu recompensa no fue

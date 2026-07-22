@@ -230,6 +230,26 @@ const ZONE_QUEST_TEMPLATES = {
   ],
 };
 
+/* Limpia misiones de zona de días anteriores antes de crear la de hoy.
+   Sin esto, las de tipo 'habit'/'daily' nunca mueren — el reset diario
+   las revive marcadas como "no hecha" para siempre (bug reportado por
+   Gerardo: misión de hábito reaparecía marcada y sin forma de quitarla). */
+async function _clearStaleZoneQuests() {
+  if (!hero) return;
+  const staleIds = quests.filter(q => (q.tags || '').includes('zona-auto')).map(q => q.id);
+  if (staleIds.length) {
+    await db.from('dungeon_quests').delete().in('id', staleIds).eq('hero_id', hero.id);
+    quests = quests.filter(q => !staleIds.includes(q.id));
+  }
+  // Limpieza única de restos viejos sin la etiqueta (generados antes de este fix)
+  const allNames = new Set(Object.values(ZONE_QUEST_TEMPLATES).flat().map(t => t.name));
+  const legacyIds = quests.filter(q => !(q.tags || '').includes('zona-auto') && allNames.has(q.name)).map(q => q.id);
+  if (legacyIds.length) {
+    await db.from('dungeon_quests').delete().in('id', legacyIds).eq('hero_id', hero.id);
+    quests = quests.filter(q => !legacyIds.includes(q.id));
+  }
+}
+
 async function checkZoneRandomQuest() {
   if (!hero) return;
   const today = new Date().toISOString().split('T')[0];
@@ -237,14 +257,17 @@ async function checkZoneRandomQuest() {
   if (localStorage.getItem(key)) return;
   localStorage.setItem(key, '1');
 
+  await _clearStaleZoneQuests();
+
   const zoneIds = Object.keys(ZONE_QUEST_TEMPLATES);
   const zoneId  = zoneIds[Math.floor(Math.random() * zoneIds.length)];
   const pool    = ZONE_QUEST_TEMPLATES[zoneId];
   const tpl     = pool[Math.floor(Math.random() * pool.length)];
   const z       = ZONES.find(zz => zz.id === zoneId);
+  const tags    = `${tpl.tags || ''} zona-auto`.trim();
 
   const { data } = await db.from('dungeon_quests').insert({
-    name: tpl.name, type: tpl.type, tags: tpl.tags || '', priority: 'normal',
+    name: tpl.name, type: tpl.type, tags, priority: 'normal',
     hero_id: hero.id, created_at: new Date().toISOString(), done: false,
   }).select().single();
 
