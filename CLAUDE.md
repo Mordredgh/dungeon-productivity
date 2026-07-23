@@ -715,6 +715,16 @@ pomodoro, metas) van primero; combate es válido pero de segunda prioridad, no l
 No autocensurar propuestas de combate — sí ponerlas después de las de productividad al presentar
 opciones o decidir en qué trabajar primero.
 
+## Botones de acción de misión/hábito invisibles sin hover (2026-07-23, v322)
+
+Gerardo reportó confusión real con un hábito negativo: "siempre aparecen cosas pero no las puedo
+quitar". Causa: `.quest-actions` (botones ✗/✓/🍅/📊 de cada tarjeta) tenía `opacity:0` por defecto en
+`css/dungeon.css`, solo se revelaba con `:hover` — un fallback a `opacity:1 !important` solo cubría
+`max-width:600px`. En pantallas más anchas que 600px sin mouse real (tablet, o desktop sin pasar el
+cursor), el botón de acción nunca aparecía — parecía que no había forma de interactuar. Fix: quitado
+el gating por hover, `.quest-actions` ahora siempre `opacity:1`. Relevante para beta cerrada: testers
+en tablet se iban a confundir igual.
+
 ## Auditoría beta cerrada: gap real de rate limit en RPCs nuevas (2026-07-23, sin bump de versión — solo DB)
 
 Gerardo pidió seguir revisando qué falta porque va a lanzar **beta cerrada** con testers reales — el

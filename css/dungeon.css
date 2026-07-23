@@ -1155,10 +1155,8 @@ img.efx-row-icon { width: 24px; height: 24px; object-fit: contain; }
   display: flex;
   gap: 3px;
   flex-shrink: 0;
-  opacity: 0;
-  transition: opacity .18s ease;
+  opacity: 1;
 }
-.quest-item:hover .quest-actions { opacity: 1; }
 
 .quest-action-btn {
   width: 26px;
