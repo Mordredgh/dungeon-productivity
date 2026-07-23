@@ -321,8 +321,13 @@ function renderQuestList() {
     // Hábitos al final
     const habits = quests.filter(q => q.type === 'habit' && !q.done);
     if (habits.length && typeof renderHabitItem === 'function') {
-      html += `<div class="type-separator">Hábitos<span>${habits.length}</span></div>`;
+      html += `<div class="type-separator">Hábitos<span>${habits.length}</span><button class="type-sep-help-btn" onclick="event.stopPropagation();openModal('habitHelpModal')" title="¿Cómo funcionan los hábitos?">❓</button></div>`;
       html += habits.map(q => renderHabitItem(q)).join('');
+      const hasNeg = typeof isHabitNegative === 'function' && habits.some(isHabitNegative);
+      if (hasNeg && !localStorage.getItem('dungeon-habit-help-seen')) {
+        localStorage.setItem('dungeon-habit-help-seen', '1');
+        setTimeout(() => openModal('habitHelpModal'), 400);
+      }
     }
   } else {
     html = pending.map(q => renderQuestItem(q, blockedIds.has(q.id))).join('');

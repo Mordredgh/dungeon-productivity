@@ -725,6 +725,36 @@ cursor), el botón de acción nunca aparecía — parecía que no había forma d
 el gating por hover, `.quest-actions` ahora siempre `opacity:1`. Relevante para beta cerrada: testers
 en tablet se iban a confundir igual.
 
+## Signup propio + feedback FAB visible + ayuda contextual de hábitos (2026-07-23, v324)
+
+3 decisiones de Gerardo sobre los hallazgos del audit de beta:
+
+**1. Signup — tester crea su propia cuenta.** `auth.js` solo tenía login+reset. Se agregó
+`toggleSignupMode()` (alterna login/signup en la misma tarjeta, muestra/oculta campo de confirmar
+contraseña) y `doSignup()` (`db.auth.signUp({email,password})`). Si `data.session` viene en la
+respuesta entra directo (`bootApp()`); si no (confirmación de correo activa en el proyecto de
+Supabase), vuelve a modo login con mensaje de "revisa tu correo". No se tocó `loadHero()` —
+ya auto-crea la fila en `dungeon_heroes` para cualquier `user_id` nuevo sin fila (política RLS
+`dungeon_heroes_owner` ya exige `auth.uid()=user_id`, así que el insert del cliente pasa solo). El
+modal "Primer Juramento" (`openInitialIdentitySelection`, ya existía, disparado en `hero.js:47` si
+`!hero.race`) sigue siendo el onboarding de nombre/clase/raza para el héroe nuevo — no se dupicó.
+
+**2. Botón de feedback siempre visible.** Antes solo vivía enterrado en Character Hub → Preferencias
+(`betaFeedbackRow()` en `beta.js`, llamado desde `character.js:662`). Se agregó `#betaFeedbackFab`
+(🐛, fijo abajo-izquierda, `z-index:90`, no choca con `mobile-fab`/`fab-dial`/`dungeon-dock` que viven
+abajo-derecha o centro) llamando `openBetaFeedback()` directo. Se queda oculto en pantalla de login
+porque `.login-overlay` tiene `z-index:9999`. La entrada vieja en Preferencias se deja también, no se
+quita — dos caminos al mismo modal no hace daño.
+
+**3. Ayuda contextual de hábitos.** Mismo patrón que el modal de mascotas: nuevo `#habitHelpModal` en
+`index.html` explicando positivo vs negativo (el ✗ se marca solo cuando SÍ ocurrió la mala conducta,
+no al evitarla — la confusión real que tuvo Gerardo). Botón ❓ agregado al separador "Hábitos" en
+`views.js` (`renderQuestList`). Además, auto-abre el modal una sola vez (`localStorage
+'dungeon-habit-help-seen'`) la primera vez que el héroe tiene un hábito negativo pendiente —
+`isHabitNegative()` ya existía en `habits.js`, se reusó.
+
+Test: `tests/beta_onboarding_contract.test.js`. Deploy v324.
+
 ## Auditoría beta cerrada: gap real de rate limit en RPCs nuevas (2026-07-23, sin bump de versión — solo DB)
 
 Gerardo pidió seguir revisando qué falta porque va a lanzar **beta cerrada** con testers reales — el

@@ -17,8 +17,8 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="https://xibmopqlgjbcypxixnri.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png" type="image/png">
 <link rel="apple-touch-icon" href="https://xibmopqlgjbcypxixnri.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png">
-<link rel="stylesheet" href="css/dungeon.css?v=323">
-<link rel="stylesheet" href="css/dungeon-v2.css?v=323">
+<link rel="stylesheet" href="css/dungeon.css?v=324">
+<link rel="stylesheet" href="css/dungeon-v2.css?v=324">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" defer></script>
 </head>
@@ -62,12 +62,17 @@
       <input type="password" id="loginPassword" class="login-input" placeholder="Contraseña" autocomplete="current-password">
       <button type="button" class="login-toggle-pw" onclick="toggleLoginPw()" id="loginPwToggle" aria-label="Mostrar contraseña">Ver</button>
     </div>
+    <div class="login-field" id="loginConfirmField" hidden>
+      <span class="login-field-icon login-art-lock" aria-hidden="true"></span>
+      <input type="password" id="loginConfirmPassword" class="login-input" placeholder="Confirma tu contraseña" autocomplete="new-password">
+    </div>
     <p id="loginError" class="login-error"></p>
-    <button class="login-btn" id="loginBtn" onclick="doLogin()">
+    <button class="login-btn" id="loginBtn" onclick="doAuthSubmit()">
       <span>⚔️ Entrar al Dungeon</span>
       <div class="login-btn-shine"></div>
     </button>
-    <button type="button" class="login-recovery" onclick="requestPasswordReset()">¿Olvidaste tu contraseña?</button>
+    <button type="button" class="login-recovery" id="loginRecoveryBtn" onclick="requestPasswordReset()">¿Olvidaste tu contraseña?</button>
+    <button type="button" class="login-recovery" id="loginSignupToggle" onclick="toggleSignupMode()">¿No tienes cuenta? Crear una</button>
     <div id="loginRecoveryPanel" class="login-recovery-panel" hidden>
       <p>Elige una contraseña nueva para volver al Dungeon.</p>
       <input type="password" id="recoveryPassword" class="login-input" placeholder="Nueva contraseña (mínimo 8 caracteres)" autocomplete="new-password">
@@ -755,6 +760,7 @@
   <button class="btn btn-primary" style="width:100%;margin-top:14px;padding:14px" onclick="submitMobileAdd()">⚔️ Agregar Misión</button>
 </div>
 <button class="mobile-fab" id="mobileFab" onclick="toggleFabDial()" aria-label="Acciones rápidas">+</button>
+<button class="beta-feedback-fab" id="betaFeedbackFab" onclick="openBetaFeedback()" title="Reportar bug o idea" aria-label="Enviar feedback de beta">🐛</button>
 
 <!-- ── FAB Speed-Dial sub-actions (mobile) ─────────────────── -->
 <div id="fabDial" class="fab-dial">
@@ -1062,6 +1068,24 @@
     </div>
     <div class="modal-footer" style="justify-content:center">
       <button class="btn btn-primary" onclick="closeModal('petHelpModal')">¡Entendido! ⚔️</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="habitHelpModal">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-title">🔁 Cómo funcionan los Hábitos</div>
+      <button class="modal-close" onclick="closeModal('habitHelpModal')">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;font-size:13.5px;color:var(--text2)">
+      <div><b style="color:var(--text)">✅ Hábito Positivo</b><p style="margin:4px 0 0">Algo que quieres hacer más seguido. Marca ✓ cada vez que SÍ lo hiciste — suma HP y XP.</p></div>
+      <div><b style="color:var(--text)">⛔ Hábito Negativo</b><p style="margin:4px 0 0">Algo que quieres evitar (ej. "No pospongas la decisión que evitas tomar"). No se "completa" — marca ✗ solo cuando SÍ caíste en esa conducta. Te cuesta HP como consecuencia. Si nunca la marcas, no pasa nada: queda ahí como recordatorio, no vence.</p></div>
+      <div><b style="color:var(--text)">🍅 Vincular Pomodoro</b><p style="margin:4px 0 0">Liga un hábito a tu próximo Pomodoro para verificar que de verdad le dedicaste tiempo enfocado.</p></div>
+      <div><b style="color:var(--text)">📊 Historial</b><p style="margin:4px 0 0">En hábitos positivos, el botón de mapa de calor muestra tu racha de los últimos 84 días.</p></div>
+    </div>
+    <div class="modal-footer" style="justify-content:center">
+      <button class="btn btn-primary" onclick="closeModal('habitHelpModal')">¡Entendido! ⚔️</button>
     </div>
   </div>
 </div>
@@ -1408,58 +1432,58 @@
 <!-- Loot Drop Container -->
 <div id="lootDropContainer" style="position:fixed;inset:0;pointer-events:none;z-index:9000" aria-hidden="true"></div>
 
-<script src="js/config.js?v=323" defer></script>
-<script src="js/state.js?v=323" defer></script>
-<script src="js/db.js?v=323" defer></script>
-<script src="js/hero.js?v=323" defer></script>
-<script src="js/quests.js?v=323" defer></script>
-<script src="js/reward_engine.js?v=323" defer></script>
-<script src="js/timer.js?v=323" defer></script>
-<script src="js/inventory.js?v=323" defer></script>
-<script src="js/spells.js?v=323" defer></script>
-<script src="js/views.js?v=323" defer></script>
-<script src="js/ui.js?v=323" defer></script>
-<script src="js/events.js?v=323" defer></script>
-<script src="js/shop.js?v=323" defer></script>
-<script src="js/rpg.js?v=323" defer></script>
-<script src="js/pets.js?v=323" defer></script>
-<script src="js/weapons.js?v=323" defer></script>
-<script src="js/secret_sets.js?v=323" defer></script>
-<script src="js/goals.js?v=323" defer></script>
-<script src="js/reputation.js?v=323" defer></script>
-<script src="js/patterns.js?v=323" defer></script>
-<script src="js/mechanics.js?v=323" defer></script>
-<script src="js/character.js?v=323" defer></script>
-<script src="js/weather.js?v=323" defer></script>
-<script src="js/dungeon_clock.js?v=323" defer></script>
-<script src="js/skill_tree.js?v=323" defer></script>
-<script src="js/bestiary.js?v=323" defer></script>
-<script src="js/dungeon_grows.js?v=323" defer></script>
-<script src="js/runes.js?v=323" defer></script>
-<script src="js/google_fit.js?v=323" defer></script>
-<script src="js/hero_score.js?v=323" defer></script>
-<script src="js/push.js?v=323" defer></script>
-<script src="js/combos.js?v=323" defer></script>
-<script src="js/habits.js?v=323" defer></script>
-<script src="js/ruleta.js?v=323" defer></script>
-<script src="js/drops.js?v=323" defer></script>
-<script src="js/daily_goal.js?v=323" defer></script>
-<script src="js/weekly_summary.js?v=323" defer></script>
-<script src="js/challenges.js?v=323" defer></script>
-<script src="js/zones.js?v=323" defer></script>
-<script src="js/factions.js?v=323" defer></script>
-<script src="js/hero_card.js?v=323" defer></script>
-<script src="js/world_map.js?v=323" defer></script>
-<script src="js/sala_personal.js?v=323" defer></script>
-<script src="js/pet_garden.js?v=323" defer></script>
-<script src="js/animations.js?v=323" defer></script>
-<script src="js/effects.js?v=323" defer></script>
-<script src="js/boss_battle.js?v=323" defer></script>
-<script src="js/auth.js?v=323" defer></script>
-<script src="js/onboarding.js?v=323" defer></script>
-<script src="js/performance.js?v=323" defer></script>
-<script src="js/beta.js?v=323" defer></script>
-<script src="js/main.js?v=323" defer></script>
+<script src="js/config.js?v=324" defer></script>
+<script src="js/state.js?v=324" defer></script>
+<script src="js/db.js?v=324" defer></script>
+<script src="js/hero.js?v=324" defer></script>
+<script src="js/quests.js?v=324" defer></script>
+<script src="js/reward_engine.js?v=324" defer></script>
+<script src="js/timer.js?v=324" defer></script>
+<script src="js/inventory.js?v=324" defer></script>
+<script src="js/spells.js?v=324" defer></script>
+<script src="js/views.js?v=324" defer></script>
+<script src="js/ui.js?v=324" defer></script>
+<script src="js/events.js?v=324" defer></script>
+<script src="js/shop.js?v=324" defer></script>
+<script src="js/rpg.js?v=324" defer></script>
+<script src="js/pets.js?v=324" defer></script>
+<script src="js/weapons.js?v=324" defer></script>
+<script src="js/secret_sets.js?v=324" defer></script>
+<script src="js/goals.js?v=324" defer></script>
+<script src="js/reputation.js?v=324" defer></script>
+<script src="js/patterns.js?v=324" defer></script>
+<script src="js/mechanics.js?v=324" defer></script>
+<script src="js/character.js?v=324" defer></script>
+<script src="js/weather.js?v=324" defer></script>
+<script src="js/dungeon_clock.js?v=324" defer></script>
+<script src="js/skill_tree.js?v=324" defer></script>
+<script src="js/bestiary.js?v=324" defer></script>
+<script src="js/dungeon_grows.js?v=324" defer></script>
+<script src="js/runes.js?v=324" defer></script>
+<script src="js/google_fit.js?v=324" defer></script>
+<script src="js/hero_score.js?v=324" defer></script>
+<script src="js/push.js?v=324" defer></script>
+<script src="js/combos.js?v=324" defer></script>
+<script src="js/habits.js?v=324" defer></script>
+<script src="js/ruleta.js?v=324" defer></script>
+<script src="js/drops.js?v=324" defer></script>
+<script src="js/daily_goal.js?v=324" defer></script>
+<script src="js/weekly_summary.js?v=324" defer></script>
+<script src="js/challenges.js?v=324" defer></script>
+<script src="js/zones.js?v=324" defer></script>
+<script src="js/factions.js?v=324" defer></script>
+<script src="js/hero_card.js?v=324" defer></script>
+<script src="js/world_map.js?v=324" defer></script>
+<script src="js/sala_personal.js?v=324" defer></script>
+<script src="js/pet_garden.js?v=324" defer></script>
+<script src="js/animations.js?v=324" defer></script>
+<script src="js/effects.js?v=324" defer></script>
+<script src="js/boss_battle.js?v=324" defer></script>
+<script src="js/auth.js?v=324" defer></script>
+<script src="js/onboarding.js?v=324" defer></script>
+<script src="js/performance.js?v=324" defer></script>
+<script src="js/beta.js?v=324" defer></script>
+<script src="js/main.js?v=324" defer></script>
 
 <!-- Challenges Modal -->
 <!-- HECHIZOS MODAL -->
