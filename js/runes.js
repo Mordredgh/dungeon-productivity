@@ -45,29 +45,30 @@ async function tryRuneDrop() {
 }
 
 async function craftRune(type) {
-  const def    = RUNE_DEFS[type];
+  const def = RUNE_DEFS[type];
   if (!def) return;
   const invKey = 'rune_frag_' + type;
-  const have   = typeof getInvCount === 'function' ? getInvCount(invKey) : 0;
+  const have = typeof getInvCount === 'function' ? getInvCount(invKey) : 0;
   if (have < RUNE_FRAG_COST) {
     toast('❌', `Necesitas ${RUNE_FRAG_COST} fragmentos de ${def.name} (tienes ${have}).`);
     return;
   }
-  const ok = typeof consumeInvItem === 'function' ? await consumeInvItem(invKey, RUNE_FRAG_COST) : false;
-  if (!ok) { toast('❌', 'Error al consumir fragmentos.'); return; }
-  const { data } = await db.from('dungeon_runes').insert({
-    hero_id:   hero.id,
-    rune_type: type,
-    rune_name: def.name,
-    level:     1,
-  }).select().single();
-  if (data) {
-    runes.push(data);
-    toast(def.icon, `⚒️ ¡${def.name} forjada! Ve a Runas para engastarla.`);
-    if (typeof renderRunePanel === 'function') renderRunePanel();
-    if (typeof renderSmithy    === 'function') renderSmithy();
-    if (typeof renderInventoryView === 'function') renderInventoryView();
+  // El costo de fragmentos y la inserción de la runa se validan y aplican
+  // juntos en el servidor (craft_dungeon_rune) — antes esto insertaba la
+  // runa directo desde el cliente sin que nada garantizara que el gasto
+  // de fragmentos realmente ocurrió.
+  const { data, error } = await db.rpc('craft_dungeon_rune', { p_rune_type: type });
+  const r = Array.isArray(data) ? data[0] : data;
+  if (error || !r) {
+    toast('❌', error?.message?.includes('fragmentos') ? error.message : 'No se pudo forjar la runa.');
+    return;
   }
+  runes.push(r);
+  if (typeof loadInventory === 'function') await loadInventory();
+  toast(def.icon, `⚒️ ¡${def.name} forjada! Ve a Runas para engastarla.`);
+  if (typeof renderRunePanel === 'function') renderRunePanel();
+  if (typeof renderSmithy    === 'function') renderSmithy();
+  if (typeof renderInventoryView === 'function') renderInventoryView();
 }
 
 async function socketRune(runeId, weaponId) {

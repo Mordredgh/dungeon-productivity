@@ -101,10 +101,17 @@ let _bbSpeed = 1;
 /* ── Último golpe fue crítico (leído justo tras _bbApplyVariance/_bbBossDmg) ── */
 let _bbLastCrit = false;
 
+// Pool de preparaciones tácticas: 3 originales + 3 variantes nuevas por el
+// mismo efecto (más variedad tras usar las mismas 3 semana tras semana). Los
+// 3 puntos de cálculo comparan por BOSS_PREPARATIONS[id].effect, no por id
+// fijo, así que agregar variantes aquí no requiere tocar nada más.
 const BOSS_PREPARATIONS = {
-  ruptura: { name:'Ruptura rúnica', desc:'+8% daño al jefe', effect:'boss_dmg', value:.08 },
-  guardia: { name:'Guardia de santuario', desc:'-20% daño recibido', effect:'boss_guard', value:.20 },
-  reserva: { name:'Reserva de combate', desc:'+2 energía contra este jefe', effect:'energy', value:2 },
+  ruptura:   { name:'Ruptura rúnica',       desc:'+8% daño al jefe',              effect:'boss_dmg',   value:.08 },
+  furia:     { name:'Furia contenida',      desc:'+14% daño al jefe',             effect:'boss_dmg',   value:.14 },
+  guardia:   { name:'Guardia de santuario', desc:'-20% daño recibido',            effect:'boss_guard', value:.20 },
+  bastion:   { name:'Bastión arcano',       desc:'-32% daño recibido',            effect:'boss_guard', value:.32 },
+  reserva:   { name:'Reserva de combate',   desc:'+2 energía contra este jefe',   effect:'energy',     value:2   },
+  resistencia: { name:'Resistencia forjada', desc:'+4 energía contra este jefe',  effect:'energy',     value:4   },
 };
 function _bbPrepKey(cycle) { return `dungeon-boss-prep-${cycle}-${typeof _bossPeriodKey === 'function' ? _bossPeriodKey(cycle) : new Date().toISOString().slice(0,10)}`; }
 function getBossPreparation(cycle = _bbCycle) { return cycle ? (localStorage.getItem(_bbPrepKey(cycle)) || '') : ''; }
@@ -202,7 +209,8 @@ function _bbAttackKey(cycle) {
 /* La batalla debe permitir una sesión táctica real, no cinco clics y fuera. */
 function _bbMaxAttacks() {
   const strategyBonus = typeof hasGoldUpgrade === 'function' && hasGoldUpgrade('war_table') ? 3 : 0;
-  const prepBonus = getBossPreparation() === 'reserva' ? BOSS_PREPARATIONS.reserva.value : 0;
+  const _prepId = getBossPreparation();
+  const prepBonus = (BOSS_PREPARATIONS[_prepId]?.effect === 'energy') ? BOSS_PREPARATIONS[_prepId].value : 0;
   return 12 + strategyBonus + prepBonus + (typeof getMasteryBonus === 'function' ? getMasteryBonus('voluntad') : 0);
 }
 function _bbLeft(cycle) { try { return Math.max(0, _bbMaxAttacks() - parseInt(localStorage.getItem(_bbAttackKey(cycle)) || '0', 10)); } catch { return _bbMaxAttacks(); } }
@@ -265,7 +273,8 @@ async function _damageBossCycle(cycle, baseDmg) {
   const doctrineMult = typeof getPrestigeDoctrineBonus === 'function' ? 1 + getPrestigeDoctrineBonus('boss_dmg') : 1;
   const equipmentResonanceMult = typeof getEquipmentResonanceBonus === 'function' ? 1 + getEquipmentResonanceBonus('boss_dmg') : 1;
   const campaignMult = cycle === 'weekly' && typeof getWeeklyCampaignBonus === 'function' ? 1 + getWeeklyCampaignBonus('boss_dmg') : 1;
-  const prepMult = getBossPreparation(cycle) === 'ruptura' ? 1 + BOSS_PREPARATIONS.ruptura.value : 1;
+  const _dmgPrepId = getBossPreparation(cycle);
+  const prepMult = (BOSS_PREPARATIONS[_dmgPrepId]?.effect === 'boss_dmg') ? 1 + BOSS_PREPARATIONS[_dmgPrepId].value : 1;
   const finalDmg = Math.min(Math.ceil((b.maxHp || 1) * 0.40), Math.max(1, Math.round((weather === 'storm' ? baseDmg * 2 : baseDmg) * petMult * petSpecMult * runeMult * dungeonMult * doctrineMult * equipmentResonanceMult * campaignMult * prepMult)));
   const requestId = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   const { data, error } = await rpcWithRetry('apply_dungeon_boss_damage', {
@@ -785,7 +794,8 @@ async function _bbBossCounterAttack() {
   await _bbDelay(150);
   if (bossSpriteEl2) bossSpriteEl2.style.transform = '';
 
-  const guardMult    = getBossPreparation(_bbCycle) === 'guardia' ? 1 - BOSS_PREPARATIONS.guardia.value : 1;
+  const _guardPrepId = getBossPreparation(_bbCycle);
+  const guardMult    = (BOSS_PREPARATIONS[_guardPrepId]?.effect === 'boss_guard') ? 1 - BOSS_PREPARATIONS[_guardPrepId].value : 1;
   const bossDmg      = Math.max(1, Math.round(_bbBossDmg() * guardMult));
   if (_bbLastCrit) toast('💥', '¡Golpe crítico del jefe!', 1000);
   // Bono de set Druida: mascota no cae en batalla durante 48h tras equipar

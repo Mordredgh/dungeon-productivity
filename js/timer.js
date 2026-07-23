@@ -1,7 +1,23 @@
 ﻿/* TIMER */
+// Sin esto, vincular el Pomodoro a una misión era un paso manual extra que
+// nadie recordaba hacer — la mayoría de los pomodoros corrían "sin misión
+// activa" y perdían el bono de 100% XP/oro sin que el usuario supiera por qué.
+const _POM_AUTO_LINK_PRIORITY = { mitico: 5, legendario: 4, epico: 3, normal: 2, comun: 1 };
+function _autoLinkTopQuestToPomodoro() {
+  if (timer.activeQuest || typeof quests === 'undefined' || !Array.isArray(quests)) return;
+  const today = new Date().toISOString().split('T')[0];
+  const candidates = quests.filter(q =>
+    !q.done && q.type !== 'habit' && (q.deadline === today || q.type === 'daily')
+  );
+  if (!candidates.length) return;
+  candidates.sort((a, b) => (_POM_AUTO_LINK_PRIORITY[b.priority] || 0) - (_POM_AUTO_LINK_PRIORITY[a.priority] || 0));
+  if (typeof setActiveQuest === 'function') setActiveQuest(candidates[0].id);
+}
+
 async function startTimer() {
   if (timer.running) { pauseTimer(); return; }
   if (timer.phase === 'focus' && !timer.serverPomSession) {
+    _autoLinkTopQuestToPomodoro();
     const { data, error } = await db.rpc('start_dungeon_pomodoro', { p_duration: timer.duration });
     if (error || !data) { toast('⚠️', 'No se pudo iniciar el pomodoro seguro. Inténtalo de nuevo.'); return; }
     timer.serverPomSession = data;

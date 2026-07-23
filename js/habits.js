@@ -76,18 +76,51 @@ async function completeHabitQuest(q) {
     const todayH = new Date().toISOString().split('T')[0];
     if (!hist[q.id]) hist[q.id] = [];
     if (!hist[q.id].includes(todayH)) { hist[q.id].push(todayH); saveHero({ habit_history: JSON.stringify(hist) }); }
-    toast('✅', `Hábito cumplido · +${Number(reward.xp_awarded || 0)} XP · +${HABIT_HP_POS} HP`);
   } else {
     const newHp = Math.max(10, (hero.hp || 100) - HABIT_HP_NEG);
     hero.hp = newHp;
     await saveHero({ hp: newHp });
-    toast('⛔', `Hábito negativo ocurrió · -${HABIT_HP_NEG} HP`);
   }
 
   renderHeroUI();
   renderQuestList();
   checkAchievements();
   if (typeof registerCombo === 'function' && !isNeg) registerCombo();
+
+  // Toast con "Deshacer" — mismo patrón y ventana de 6s del servidor que ya
+  // usan las misiones normales. Antes los hábitos no tenían ninguna forma
+  // de corregir un marcado accidental.
+  const msg = isNeg
+    ? `Hábito negativo ocurrió · -${HABIT_HP_NEG} HP`
+    : `Hábito cumplido · +${Number(reward.xp_awarded || 0)} XP · +${HABIT_HP_POS} HP`;
+  if (typeof lastCompletedUndo !== 'undefined') {
+    lastCompletedUndo = { id: q.id };
+    let undoUsed = false;
+    const undoTimeout = setTimeout(() => { if (!undoUsed) lastCompletedUndo = null; }, 5500);
+    const container = document.getElementById('toastContainer');
+    const div = document.createElement('div');
+    div.className = 'toast';
+    const iconEl = document.createElement('span');
+    iconEl.className = 'toast-icon';
+    iconEl.textContent = isNeg ? '⛔' : '✅';
+    const msgEl = document.createElement('span');
+    msgEl.className = 'toast-msg';
+    msgEl.textContent = msg;
+    const undoEl = document.createElement('span');
+    undoEl.className = 'toast-undo-btn';
+    undoEl.textContent = 'Deshacer';
+    div.append(iconEl, msgEl, undoEl);
+    container.appendChild(div);
+    undoEl.addEventListener('click', async () => {
+      undoUsed = true;
+      clearTimeout(undoTimeout);
+      div.remove();
+      await undoComplete();
+    });
+    setTimeout(() => { if (div.parentNode) div.remove(); }, 5000);
+  } else {
+    toast(isNeg ? '⛔' : '✅', msg);
+  }
 }
 
 /* ── RECORDATORIOS — UI ──────────────────────────────── */
