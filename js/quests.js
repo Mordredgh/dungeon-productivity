@@ -36,7 +36,25 @@ async function completeQuest(id, el) {
   }
 }
 
+// Tope diario por rareza — evita marcar todo como Épico/Legendario/Mítico
+// para inflar botín sin límite. Común/Normal quedan libres a propósito.
+const PRIORITY_DAILY_CAP   = { epico: 3, legendario: 1, mitico: 1 };
+const PRIORITY_CAP_LABEL   = { epico: 'Épicas', legendario: 'Legendarias', mitico: 'Míticas' };
+function priorityCapReached(q) {
+  const cap = PRIORITY_DAILY_CAP[q.priority];
+  if (cap == null) return false;
+  const today = new Date().toISOString().split('T')[0];
+  const doneToday = quests.filter(x =>
+    x.priority === q.priority && x.done && x.done_at && x.done_at.startsWith(today)
+  ).length;
+  if (doneToday < cap) return false;
+  toast('🚫', `Ya completaste el máximo de misiones ${PRIORITY_CAP_LABEL[q.priority]} hoy (${cap}).`);
+  return true;
+}
+
 async function _completeQuestInner(id, el, q) {
+  if (priorityCapReached(q)) return;
+
   // Ensure streak is up-to-date even if app was left open overnight
   if (typeof checkDailyStreak === 'function') await checkDailyStreak();
 

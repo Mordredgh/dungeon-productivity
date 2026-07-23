@@ -71,6 +71,20 @@ async function savePom() {
   Object.assign(hero, { xp_total:Number(reward.xp_total || hero.xp_total), gold:Number(reward.gold || hero.gold), pomodoros_done:Number(reward.pomodoros_done || hero.pomodoros_done) });
   deriveHero(); renderGold(); renderHeroUI();
 
+  // Pomodoro real y verificado en servidor vinculado a una misión activa:
+  // marca la misión como "verificada hoy" para que complete_dungeon_quest
+  // pague recompensa completa en vez del 50% de honor-system por defecto.
+  if (timer.activeQuest) {
+    const linkedQ = quests.find(x => x.id === timer.activeQuest);
+    if (linkedQ) {
+      const today   = new Date().toISOString().split('T')[0];
+      const newTags = (linkedQ.tags || '').replace(/#pom-ok-\d{4}-\d{2}-\d{2}/g, '').trim() + ` #pom-ok-${today}`;
+      await db.from('dungeon_quests').update({ tags: newTags }).eq('id', linkedQ.id);
+      linkedQ.tags = newTags;
+      toast('🍅', `"${linkedQ.name}" verificada — recompensa completa al marcarla.`);
+    }
+  }
+
   if (Number(reward.gold_awarded || 0) > 0) {
     const cycleNum = Math.floor(Number(reward.pomodoros_done) / 4);
     const goldAmt = Number(reward.gold_awarded);

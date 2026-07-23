@@ -654,6 +654,24 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 
 ---
 
+## Bug raíz: deploy.sh nunca actualizaba ?v= en index.html — deploys previos no llegaban al navegador (2026-07-22, v314)
+
+Gerardo probó el fix del dock (v313) y "sigo viendolo igual". Causa real, mucho más grave de lo que
+parecía: `index.html` tiene TODOS los `<script src="js/...?v=311">` y `<link ...?v=311>` con la
+versión clavada en texto. `deploy.sh` solo hacía `sed` sobre la constante `CACHE` dentro de `sw.js` —
+nunca tocaba ese `?v=311` en `index.html`. Como la URL completa (incluyendo query string) es idéntica
+deploy tras deploy, el navegador sirve el JS/CSS cacheado de disco sin ni siquiera preguntarle al
+Service Worker (el fetch dentro del SW respeta el HTTP cache del navegador). Resultado: probablemente
+NINGÚN fix de JS/CSS desde que se fijó `v=311` llegó realmente al navegador de Gerardo, aunque el SW
+sí subía de versión.
+
+**Fix:** `deploy.sh` ahora también hace `sed -i "s/?v=${OLD_VER}/?v=${NEW_VER}/g" index.html` justo
+después de bumpear `sw.js`. Forzado manualmente `v=311→v313` en este deploy y confirmado en
+`index.html` (54 ocurrencias). Deploy `v314`. **Todo lo previamente reportado como "arreglado" desde
+v312 en adelante (misión de zona duplicada, dock flotante) recién ahora tiene chance real de haber
+llegado al navegador — pedirle a Gerardo que haga hard refresh (Ctrl+Shift+R) o cierre y abra la PWA
+para confirmar ambos fixes.**
+
 ## Dock flotante de escritorio tapaba la última tarea de la lista (2026-07-22, v313)
 
 Gerardo reportó (ventana angosta de escritorio, ≥641px): la última barra de tarea siempre chocaba
