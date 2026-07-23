@@ -654,6 +654,14 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 
 ---
 
+## Última pieza del bug de economía: ajuste de curva de nivel al boot (2026-07-22/23, v318)
+
+Al revisar qué más podía mejorarse, apareció la última instancia del mismo bug: `loadHero()` (`hero.js:30`)
+ajusta `xp_total` al mínimo requerido para el nivel guardado en cada boot (protección para que la curva de
+nivel nueva nunca baje un nivel ya obtenido) — vía `db.from('dungeon_heroes').update({xp_total:...})`
+directo, mismo bloqueo del trigger. Fix: usa `grant_dungeon_currency` con el delta necesario. Con esto
+cierro por completo la auditoría de escrituras directas a campos de economía en el cliente. Deploy `v318`.
+
 ## Bug crítico: mitad de la economía del juego rota en silencio por el trigger anti-cheat (2026-07-22/23, v317)
 
 Gerardo pidió revisar todas las mecánicas del juego. Al chequear `saveHero()` (patch genérico usado en 13
