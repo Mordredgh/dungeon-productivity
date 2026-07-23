@@ -654,6 +654,54 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 
 ---
 
+## Prioridad ahora sí escala XP/oro (2026-07-22, post-v315, solo RPC)
+
+Gerardo pidió que la prioridad también diera más XP, no solo más botín (ver sección anterior). Fix
+en `complete_dungeon_quest`: nueva variable `v_prio_mult := case v_quest.priority when 'comun' then
+0.8 when 'normal' then 1.0 when 'epico' then 1.3 when 'legendario' then 1.6 when 'mitico' then 2.0
+else 1.0 end` — aplicada a `v_xp`/`v_gold` justo después del override de `mision-del-dia` y el cero
+de hábito negativo, ANTES de los bonos de clase/raza y del check de `v_verified` (para que el 50%
+por no-verificado siga aplicando sobre el total ya multiplicado por prioridad). Orden final:
+tipo → mision-del-dia → prioridad → clase/raza → verificado/pomodoro. Sin cambios de cliente — solo
+edición de la función vía SQL Editor, verificada con `pg_get_functiondef`. No requirió nuevo deploy
+del front (el RPC es lo único que cambió).
+
+## Anti-exploit: tope diario por rareza + recompensa completa solo con pomodoro vinculado (2026-07-22, v315)
+
+Gerardo planteó dos huecos de diseño: (1) no hay forma de validar que una misión manual (lavar
+trastes, barrer, leer) realmente se hizo, y (2) nada impedía marcar todas las misiones como
+Legendario/Mítico para maximizar botín sin límite.
+
+**Hallazgo previo a implementar:** la prioridad (`común/normal/épico/legendario/mítico`) NO afecta
+XP/oro directamente — `complete_dungeon_quest` calcula recompensa por `type` de misión (main/side/
+daily/weekly/habit), fijo. La prioridad solo controla la CANTIDAD de fragmentos/pociones vía
+`rollLoot(q.priority)` (`DROP_TABLE` en inventory.js). El exploit real era de botín, no de XP cruda.
+
+**Fix 1 — tope diario por rareza (cliente, `js/quests.js`):** `PRIORITY_DAILY_CAP = {epico:3,
+legendario:1, mitico:1}` — `priorityCapReached(q)` cuenta misiones de esa prioridad completadas
+hoy (`quests` local, `done_at` de hoy) y bloquea con toast si ya llegó al tope. Común/Normal quedan
+libres a propósito. Corre al inicio de `_completeQuestInner`, cubre también hábitos (que pasan por
+ahí antes de delegar a `completeHabitQuest`). Es un guardrail client-side — proporcional para una
+app de un solo usuario, no una defensa contra atacantes externos.
+
+**Fix 2 — recompensa real atada a algo medible (servidor, RPC `complete_dungeon_quest`):** ya existía
+`setActiveQuest(id)` (botón 🍅 en `views.js`/`habits.js`) que vincula una misión al Pomodoro activo
+(`timer.activeQuest`) — solo era cosmético (`pomTaskLabel`), no afectaba recompensa. Ahora:
+- `js/db.js savePom()` — al completar un pomodoro REAL (verificado en servidor vía
+  `start_dungeon_pomodoro`/`complete_dungeon_pomodoro`, RPCs ya existentes) con una misión vinculada,
+  el cliente le agrega el tag `#pom-ok-YYYY-MM-DD` a esa misión (reemplaza cualquier tag de otro día).
+  Auto-expira solo: al día siguiente el tag ya no matchea la fecha de hoy, no hace falta limpiarlo.
+- RPC `complete_dungeon_quest` — nueva variable `v_verified := coalesce(v_quest.tags,'') like
+  '%pom-ok-' || to_char(v_now,'YYYY-MM-DD') || '%'`. Si NO está verificada y no es hábito negativo,
+  `v_xp`/`v_gold` se reducen a la mitad (`greatest(1,...)`/`greatest(0,...)`) antes de aplicar todo lo
+  demás (ledger, nivel, etc). Sin cambiar la firma de la función — evita el riesgo de `DROP FUNCTION`
+  por ambigüedad de overload, solo se edita el cuerpo vía `CREATE OR REPLACE`.
+- Resultado: marcar una misión al toque (honor system) sigue funcionando siempre, pero da 50% XP/oro;
+  correr el Focus Timer vinculado a esa misión antes de marcarla da 100%.
+
+Verificado con `pg_get_functiondef` tras aplicar — texto completo confirmado carácter por carácter.
+Deploy `v315`.
+
 ## Bug raíz: deploy.sh nunca actualizaba ?v= en index.html — deploys previos no llegaban al navegador (2026-07-22, v314)
 
 Gerardo probó el fix del dock (v313) y "sigo viendolo igual". Causa real, mucho más grave de lo que

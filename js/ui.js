@@ -72,7 +72,16 @@ async function doImportCSV() {
 function setActiveQuest(id) {
   const q = quests.find(x => x.id === id);
   if (!q) return;
+  // Con el pomodoro ya corriendo el vínculo queda fijo hasta que termine o
+  // se reinicie — si no, se podría "robar" el bono de verificación de una
+  // tarea a otra al último segundo sin haberle dedicado tiempo real.
+  if (timer.running) {
+    toast('🔒', 'El Pomodoro ya está en marcha — no se puede cambiar la misión vinculada hasta que termine o lo reinicies.');
+    return;
+  }
+  timer.activeQuest = id;
   document.getElementById('pomTaskLabel').textContent = `⚔️ ${q.name}`;
+  if (typeof saveTimerState === 'function') saveTimerState();
   toast('🍅', `Pomodoro vinculado: ${q.name}`);
 }
 
