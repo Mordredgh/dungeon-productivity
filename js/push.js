@@ -31,7 +31,7 @@ async function subscribeToPush() {
     }
     if (hero && sub) {
       await db.from('dungeon_push_subscriptions').upsert(
-        { hero_id: hero.hero_id, subscription: JSON.stringify(sub), updated_at: new Date().toISOString() },
+        { hero_id: hero.id, subscription: JSON.stringify(sub), updated_at: new Date().toISOString() },
         { onConflict: 'hero_id' }
       );
     }
@@ -49,7 +49,7 @@ async function unsubscribeFromPush() {
     const reg = await navigator.serviceWorker.ready;
     const sub = await reg.pushManager.getSubscription();
     if (sub) await sub.unsubscribe();
-    if (hero) await db.from('dungeon_push_subscriptions').delete().eq('hero_id', hero.hero_id);
+    if (hero) await db.from('dungeon_push_subscriptions').delete().eq('hero_id', hero.id);
     toast('🔕', 'Push notifications desactivadas.');
   } catch(e) { console.warn('Push unsub:', e); }
 }

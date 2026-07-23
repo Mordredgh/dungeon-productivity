@@ -706,16 +706,44 @@ confirmé en la base que `xp_total` subió de verdad (41326→41653) y quedó re
 `dungeon_reward_ledger` (`source:'side', xp_awarded:327` tras multiplicadores) — sin errores de consola.
 Deploy `v317`.
 
-## Regla permanente: no más profundidad de combate (2026-07-23)
+## Regla de prioridad: productividad primero, combate sí pero después (2026-07-23, corregida)
 
-**Decisión explícita de Gerardo, no negociable en sesiones futuras:** el combate (`boss_battle.js`)
-ya tiene suficiente sistema (críticos, stat stages, estados alterados, shiny, PP, matriz elemental,
-preparación táctica) para una app cuyo objetivo real es *productividad*. Seguir agregando mecánicas de
-combate compite directamente con ese objetivo — riesgo real de que la app se vuelva un juego de
-grindeo en vez de herramienta. **No proponer ni implementar** nuevos estados alterados, más capas de
-RNG, nuevos sistemas de combate tipo Pokémon, o expansión de profundidad de batalla, salvo que
-Gerardo lo pida explícitamente. Energía de mejora futura va a mecánicas de productividad (misiones,
-hábitos, racha, pomodoro, metas), no a combate.
+**Corrección de Gerardo sobre la regla original (que decía "nunca más combate" — eso fue extremista).**
+El combate (`boss_battle.js`) SÍ se puede seguir mejorando, no está vetado. Lo que pidió es priorizar:
+cuando haya que elegir en qué invertir tiempo, mecánicas de productividad (misiones, hábitos, racha,
+pomodoro, metas) van primero; combate es válido pero de segunda prioridad, no la opción por defecto.
+No autocensurar propuestas de combate — sí ponerlas después de las de productividad al presentar
+opciones o decidir en qué trabajar primero.
+
+## Auditoría beta cerrada: gap real de rate limit en RPCs nuevas (2026-07-23, sin bump de versión — solo DB)
+
+Gerardo pidió seguir revisando qué falta porque va a lanzar **beta cerrada** con testers reales — el
+lente cambia de "single-player robusto" a "seguro con varios usuarios reales a la vez".
+
+**Fix aplicado — `grant_dungeon_currency` y `craft_dungeon_rune` sin freno de frecuencia.**
+`assert_dungeon_rpc_rate_limit(p_rpc_name, p_max, p_window_seconds)` ya existía (sliding window por
+hero+rpc+ventana) pero solo cubría 6 RPCs viejas (`purchase`, `forge`, `sala_purchase`, `boss_attack`,
+`reward_claim`, `class_change`) via whitelist hardcodeada (`if p_rpc_name not in (...)`). Las RPCs
+creadas AYER (`grant_dungeon_currency`, `craft_dungeon_rune`) topan el MONTO por llamada pero nada
+topaba CUÁNTAS veces por minuto se puede llamar — un tester real podría spamear
+`grant_dungeon_currency(p_xp:5000)` cientos de veces por segundo. Se agregó `'grant_currency'` y
+`'craft_rune'` a la whitelist y se llamó `perform assert_dungeon_rpc_rate_limit(...)` al inicio de
+ambas funciones (30 llamadas/60s para currency, 20/60s para runas). Migración:
+`supabase/migrations/20260723_rate_limit_grant_currency_craft_rune.sql`. Test:
+`tests/rate_limit_new_rpcs_contract.test.js`. Aplicado directo a producción vía conexión pg (no pasa
+por deploy.sh — es solo funciones de Postgres, sin cambio de cliente).
+
+**Hallazgos pendientes de decisión de Gerardo (no son bugs de código, necesitan su input):**
+- **Sin signup propio.** `js/auth.js` (100 líneas) solo tiene login + reset de contraseña — cero
+  `signUp`. Confirmado con grep en todo `js/` e `index.html`: cero coincidencias de
+  `signUp|Crear cuenta|Registrarse`. Comentario de cabecera del archivo: "Único usuario autorizado:
+  gerardosilvar16@gmail.com". Para beta cerrada, Gerardo tendría que crear manualmente cada usuario
+  de tester en el dashboard de Supabase Auth, o pedir que se construya un flujo de invitación/signup.
+- **Google OAuth (Fit) — estado de publicación del consent screen.** `GOOGLE_CLIENT_ID` en
+  `config.js` es único y compartido (arquitectura correcta). Pero si el proyecto de Google Cloud
+  Console sigue en modo "Testing" (no "Published"), el consent screen topa en 100 testers
+  explícitamente listados — fuera de mi visibilidad/acceso, Gerardo debe revisarlo directo en Google
+  Cloud Console.
 
 ## Duolingo — registro manual (sin API externa) + ayuda contextual de Mascotas (2026-07-23, v321)
 

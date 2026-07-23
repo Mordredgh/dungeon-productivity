@@ -35,7 +35,7 @@ async function checkWeeklySummary() {
   // Fetch quests completed last week
   const { data: doneQuests } = await db.from('dungeon_quests')
     .select('xp_reward,type,completed_at')
-    .eq('hero_id', hero.hero_id)
+    .eq('hero_id', hero.id)
     .eq('done', true)
     .gte('completed_at', prevMonday.toISOString())
     .lte('completed_at', prevSunday.toISOString());
@@ -43,7 +43,7 @@ async function checkWeeklySummary() {
   // Fetch pomodoros last week
   const { data: poms } = await db.from('dungeon_pomodoros')
     .select('duration_min')
-    .eq('hero_id', hero.hero_id)
+    .eq('hero_id', hero.id)
     .gte('started_at', prevMonday.toISOString())
     .lte('started_at', prevSunday.toISOString());
 
