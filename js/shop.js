@@ -3,7 +3,23 @@
    GOLD + TIENDA DEL GREMIO
    ============================================================ */
 function getGold()  { return hero ? (hero.gold || 0) : 0; }
-function setGold(n) { const g = Math.max(0, Math.round(n)); if (hero) { hero.gold = g; saveHero({ gold: g }); } renderGold(); }
+function setGold(n, source) {
+  const g = Math.max(0, Math.round(n));
+  const delta = g - getGold();
+  if (!hero || delta === 0) { renderGold(); return; }
+  hero.gold = g;
+  renderGold();
+  db.rpc('grant_dungeon_currency', { p_source: source || 'client_misc', p_gold: delta }).then(({ data, error }) => {
+    const r = Array.isArray(data) ? data[0] : data;
+    if (error || !r) {
+      toast('⚠️', 'No se pudo guardar tu progreso. Revisa la conexión e inténtalo de nuevo.');
+      return;
+    }
+    hero.gold = r.gold;
+    try { localStorage.setItem('dungeon-cache-hero', JSON.stringify(hero)); } catch {}
+    renderGold();
+  });
+}
 function addGold(n) {
   const bonus    = n > 0 && typeof getDungeonBonus === 'function' ? getDungeonBonus('gold') : 1;
   const agiBonus = n > 0 && hero?.agi ? 1 + hero.agi * 0.01 : 1;

@@ -654,6 +654,38 @@ también corre al inicio de `completeQuest()`, no solo al boot).
 
 ---
 
+## Revisión de los 3 huecos pendientes: bug real de dupe de oro + feature muerta + tope client-side (2026-07-22, v316)
+
+Gerardo pidió revisar los 3 puntos que quedaron abiertos tras la ronda anterior de anti-exploit.
+
+**1. `undo_dungeon_quest` — dupe de oro real, confirmado.** El refund usaba
+`greatest(0, coalesce(v_hero.gold,0) - v_reward.gold_awarded)` — si gastabas el oro otorgado (comprar
+algo) ANTES de deshacer dentro de la ventana de 6s, el clamp a 0 absorbía la deuda en vez de dejarla
+negativa: completabas misión (+50 oro) → comprabas item de 50 oro (saldo 0) → deshacías → oro seguía
+en 0 en vez de -50. Resultado: item gratis y la misión vuelve a estar disponible para completarla de
+nuevo. **Fix:** ahora calcula `v_new_gold` primero y si sería negativo, `raise exception 'No se puede
+deshacer: ya gastaste el oro obtenido de esta mision.'` — bloquea el undo en vez de clampear.
+Aprovechado para corregir también un bug de conteo: `quests_done` se restaba siempre en 1 al deshacer,
+pero `complete_dungeon_quest` NO incrementa `quests_done` para hábitos negativos — deshacer uno de esos
+inflaba el contador hacia abajo incorrectamente. Ahora usa la misma condición `v_negative_habit`.
+
+**2. Vínculo Pomodoro↔misión — estaba muerto, nunca funcionó.** `setActiveQuest(id)` en `ui.js` solo
+cambiaba el texto de la etiqueta y mostraba un toast — **nunca asignaba `timer.activeQuest`**. Mi fix
+de la sesión anterior (bono de XP completo solo con pomodoro vinculado) dependía 100% de esa variable
+y jamás se hubiera activado. Corregido: `setActiveQuest` ahora sí hace `timer.activeQuest = id` y
+persiste con `saveTimerState()`. De paso, con el pomodoro corriendo (`timer.running`) el vínculo queda
+bloqueado — si no, se podría empezar el timer pensando en una tarea y cambiar el vínculo al último
+segundo para robarle el bono a otra sin haberle dedicado tiempo real.
+
+**3. Tope diario de prioridad — ahora también server-side.** Antes solo vivía en `quests.js`
+(`priorityCapReached`), evitable llamando el RPC directo. Ahora `complete_dungeon_quest` cuenta
+misiones de la misma prioridad completadas HOY (`done_at` en el rango del día actual) y lanza
+`raise exception 'Tope diario de misiones % alcanzado (% de %)'` si ya llegó al tope (mismos números:
+épico 3, legendario 1, mítico 1). El chequeo cliente se mantiene para el toast bonito; el servidor es
+la autoridad real ahora.
+
+Las 3 correcciones verificadas con `pg_get_functiondef` tras aplicar. Deploy `v316` (client: `js/ui.js`).
+
 ## Prioridad ahora sí escala XP/oro (2026-07-22, post-v315, solo RPC)
 
 Gerardo pidió que la prioridad también diera más XP, no solo más botín (ver sección anterior). Fix

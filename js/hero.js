@@ -37,8 +37,7 @@ async function loadHero() {
   // One-time gold migration from localStorage
   const _localGold = parseInt(localStorage.getItem('dungeon-gold') || '0');
   if (_localGold > 0 && !(hero.gold > 0)) {
-    hero.gold = _localGold;
-    saveHero({ gold: _localGold });
+    setGold(_localGold, 'legacy_migration');
   }
   localStorage.removeItem('dungeon-gold');
   try { localStorage.setItem('dungeon-cache-hero', JSON.stringify(hero)); } catch {}
@@ -288,10 +287,18 @@ async function addXP(amount, type, sourceEl) {
 
   if (typeof trackWeekXP === 'function') trackWeekXP(finalXP);
   const prevLevel = calcLevel(hero.xp_total || 0);
-  const newTotal = (hero.xp_total || 0) + finalXP;
-  const newLevel = calcLevel(newTotal);
 
-  await saveHero({ xp_total: newTotal, level: newLevel });
+  const { data, error } = await db.rpc('grant_dungeon_currency', { p_source: type || 'client_misc', p_xp: finalXP });
+  const r = Array.isArray(data) ? data[0] : data;
+  if (error || !r) {
+    toast('⚠️', 'No se pudo guardar tu progreso. Revisa la conexión e inténtalo de nuevo.');
+    return;
+  }
+  hero.xp_total = r.xp_total;
+  hero.level = r.level;
+  const newLevel = r.level;
+  deriveHero();
+  try { localStorage.setItem('dungeon-cache-hero', JSON.stringify(hero)); } catch {}
   if (sourceEl) spawnParticle(`+${finalXP} XP`, sourceEl);
 
   if (newLevel > prevLevel) {
@@ -302,7 +309,7 @@ async function addXP(amount, type, sourceEl) {
     const hist = Array.isArray(hero.level_history)
       ? [...hero.level_history]
       : (() => { try { return JSON.parse(hero.level_history || '[]'); } catch { return []; } })();
-    hist.push({ level: newLevel, date: new Date().toISOString().split('T')[0], xp_total: newTotal });
+    hist.push({ level: newLevel, date: new Date().toISOString().split('T')[0], xp_total: hero.xp_total });
     await saveHero({ attr_points: hero.attr_points, skill_points: hero.skill_points, level_history: hist });
     showLevelUp(newLevel);
     checkAchievements();
