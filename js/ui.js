@@ -383,6 +383,7 @@ function switchCharTab(tab) {
 
 function renderIntegrations() {
   if (typeof renderFitWidget  === 'function') renderFitWidget();
+  if (typeof renderDuoManualWidget === 'function') renderDuoManualWidget();
 }
 
 function toggleCompact() {

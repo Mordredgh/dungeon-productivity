@@ -49,6 +49,35 @@ async function addZoneExtXP(zoneId, amount) {
   await saveHero({ zone_ext_xp: hero.zone_ext_xp });
 }
 
+/* ── Duolingo cerró su API pública (2026-07-18) — sin sync automático posible.
+   Registro manual diario: el jugador anota cuántas lecciones hizo y eso
+   alimenta Torre del Saber igual que hacía el sync viejo. ─────────────── */
+const DUO_LESSON_XP_PER = 8;
+const DUO_LESSON_XP_CAP = 50;
+async function registerDuolingoLessons() {
+  const input = document.getElementById('duoLessonsInput');
+  const n = parseInt(input?.value || '0', 10);
+  if (!hero || !n || n < 1) { toast('⚠️', 'Escribe cuántas lecciones completaste hoy.'); return; }
+  const today = new Date().toISOString().split('T')[0];
+  if (hero.duo_xp_date === today) { toast('📖', 'Ya registraste Duolingo hoy.'); return; }
+  await saveHero({ duo_xp_date: today });
+  const bonus = Math.min(DUO_LESSON_XP_CAP, n * DUO_LESSON_XP_PER);
+  await addXP(bonus, 'side', null);
+  await addZoneExtXP('torre', bonus);
+  toast('📖', `¡${n} lección${n === 1 ? '' : 'es'} registrada${n === 1 ? '' : 's'}! +${bonus} XP a Torre del Saber`);
+  if (input) input.value = '';
+  renderDuoManualWidget();
+}
+function renderDuoManualWidget() {
+  const el = document.getElementById('duoManualStatus');
+  if (!el || !hero) return;
+  const today = new Date().toISOString().split('T')[0];
+  const btn = document.getElementById('duoRegisterBtn');
+  const done = hero.duo_xp_date === today;
+  el.textContent = done ? '✅ Ya registrado hoy — vuelve mañana' : '';
+  if (btn) btn.disabled = done;
+}
+
 function calcZoneXP() {
   const out = {};
   ZONES.forEach(z => { out[z.id] = 0; });

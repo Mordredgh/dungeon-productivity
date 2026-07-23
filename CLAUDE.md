@@ -706,6 +706,108 @@ confirmé en la base que `xp_total` subió de verdad (41326→41653) y quedó re
 `dungeon_reward_ledger` (`source:'side', xp_awarded:327` tras multiplicadores) — sin errores de consola.
 Deploy `v317`.
 
+## Regla permanente: no más profundidad de combate (2026-07-23)
+
+**Decisión explícita de Gerardo, no negociable en sesiones futuras:** el combate (`boss_battle.js`)
+ya tiene suficiente sistema (críticos, stat stages, estados alterados, shiny, PP, matriz elemental,
+preparación táctica) para una app cuyo objetivo real es *productividad*. Seguir agregando mecánicas de
+combate compite directamente con ese objetivo — riesgo real de que la app se vuelva un juego de
+grindeo en vez de herramienta. **No proponer ni implementar** nuevos estados alterados, más capas de
+RNG, nuevos sistemas de combate tipo Pokémon, o expansión de profundidad de batalla, salvo que
+Gerardo lo pida explícitamente. Energía de mejora futura va a mecánicas de productividad (misiones,
+hábitos, racha, pomodoro, metas), no a combate.
+
+## Duolingo — registro manual (sin API externa) + ayuda contextual de Mascotas (2026-07-23, v321)
+
+Tras el FODA, Gerardo tomó 3 decisiones concretas:
+
+**1. Duolingo — solución sin API externa.** Duolingo sigue siendo la única app real que usa; como su
+API pública está muerta sin arreglo posible, se implementó **registro manual diario**: nueva tarjeta
+en Integraciones (`index.html` junto al widget de Google Fit) con un input numérico "Lecciones hoy" +
+botón Registrar. `registerDuolingoLessons()` en `zones.js` calcula `min(50, lecciones × 8)` XP, lo
+otorga vía `addXP()` (ya pasa por `grant_dungeon_currency`, la RPC arreglada ayer) y lo suma a Torre
+del Saber vía `addZoneExtXP('torre', bonus)` — mismo mecanismo que usaba el sync automático de Fit/
+Duolingo antes de que la API muriera. Gate de una vez al día vía `hero.duo_xp_date`, igual que
+`fit_xp_date`. `renderIntegrations()` (`ui.js`) ahora también llama `renderDuoManualWidget()`.
+
+**2. Ayuda contextual en Mascotas.** Nuevo botón "❓ Cómo funciona" en el header de la vista Mascotas,
+abre `petHelpModal` (nuevo, en `index.html`) con explicación en lenguaje llano de las 5 capas del
+sistema: progresión huevo→bebé→montura, especialización permanente, agotamiento tras derrota,
+expediciones ligadas a zona, y shiny cosmético. No simplifica el sistema — lo explica, que era lo que
+Gerardo pidió explícitamente en vez de recortar mecánicas ya construidas.
+
+**3. Enfocar energía en mecánicas de productividad** — ver regla permanente arriba, no requirió
+cambio de código en sí, solo dejar constancia para que no se revierta en sesiones futuras.
+
+## FODA de mecánicas: exploit real en runas cerrado + 3 features nuevas (2026-07-23, v320)
+
+Tras el FODA de las 14 mecánicas (artifact publicado), Gerardo pidió atacar todas las debilidades/
+oportunidades/amenazas encontradas.
+
+**Exploit real cerrado — forjar runas gratis.** `craftRune()` en `runes.js` chequeaba
+`getInvCount(invKey) >= RUNE_FRAG_COST` (5 fragmentos) solo en JS y luego hacía
+`db.from('dungeon_runes').insert(...)` directo — nada en el servidor validaba que el gasto de
+fragmentos realmente hubiera ocurrido antes de crear la runa. Con la política RLS `ALL` para el
+dueño en `dungeon_runes`, cualquiera podía llamar el insert directo vía devtools sin pasar por
+`consumeInvItem` en absoluto. **Fix:** nueva RPC `craft_dungeon_rune(p_rune_type)` — bloquea la fila
+de `dungeon_inventory` (`for update`), valida `quantity >= 5`, descuenta, e inserta la runa, todo en
+una transacción. La política de `dungeon_runes` se dividió: `dungeon_runes_select_owner` (SELECT) +
+`dungeon_runes_update_owner` (UPDATE, necesario para `weapon_id` al engastar/desengastar) — sin
+policy de INSERT para el cliente, así que el insert directo ya no es posible ni bypasseando el
+cliente. Migración: `supabase/migrations/20260723_craft_rune_rpc_and_rls.sql`.
+
+**Deshacer en hábitos (`habits.js completeHabitQuest`).** Era el único tipo de misión sin forma de
+corregir un marcado accidental — Gerardo lo reportó dos veces en la conversación. Ahora muestra el
+mismo toast con botón "Deshacer" (ventana de 6s) que usan las misiones normales, llamando
+`undoComplete()`/`lastCompletedUndo` ya existentes en `quests.js` (funcionan genéricos para cualquier
+tipo, `undo_dungeon_quest` ya maneja hábitos correctamente desde el fix de ayer). El toast se
+construye con `createElement`/`textContent` (no `innerHTML`) por el hook de seguridad del repo.
+
+**Auto-vínculo de Pomodoro (`timer.js startTimer`).** Vincular manualmente una misión al Pomodoro
+antes de arrancar era un paso que casi nadie recordaba — la mayoría de los pomodoros corrían "sin
+misión activa" y perdían el bono de 100% XP/oro sin que el usuario supiera por qué. Nueva función
+`_autoLinkTopQuestToPomodoro()`: si `!timer.activeQuest`, elige automáticamente la misión de mayor
+prioridad entre las de "Hoy" (`deadline === hoy || type === 'daily'`, excluyendo hábitos) y llama
+`setActiveQuest()` (ya existente). Solo actúa si no hay vínculo ya elegido — nunca sobrescribe una
+elección manual.
+
+**Pool de preparación táctica de jefe (`boss_battle.js`).** Solo 3 preparaciones fijas (`ruptura`,
+`guardia`, `reserva`) llevaban semanas repitiéndose. Ahora 6: 2 variantes por cada uno de los 3
+efectos (`boss_dmg`, `boss_guard`, `energy`) con distinta magnitud. Los 3 puntos de cálculo que antes
+comparaban `getBossPreparation() === 'reserva'` (id fijo) ahora comparan
+`BOSS_PREPARATIONS[id]?.effect === 'energy'` — agregar más variantes en el futuro no requiere tocar
+esos 3 sitios de nuevo.
+
+**Verificado, sin acción — Bestiario ya mostraba debilidades.** El FODA sugirió "mostrar debilidades
+descubiertas antes de rematch" como oportunidad; revisando `bestiary.js` esa feature ya existe
+(`chart.weakTo`/`chart.resists` se muestran en cuanto `defeated.includes(boss.key)`, es decir, apenas
+derrotas al jefe una vez). Falso positivo del análisis, no requirió cambio.
+
+**No atacado — requiere decisión de producto, no código:** reemplazo de Duolingo para alimentar
+Torre del Saber (API externa muerta, sin alternativa elegida), complejidad de mascotas para usuarios
+que regresan tras meses, tensión filosófica entre profundidad de combate y el objetivo de
+productividad de la app.
+
+Tests nuevos: `craft_rune_rpc_contract.test.js`, `zone_quest_no_duplicate_contract.test.js` — 21/21
+tests pasan. Deploy `v320`.
+
+## Auditoría de seguimiento: migraciones, tests, RLS y forge (2026-07-23)
+
+Tras cerrar el bug de economía de la sesión anterior, revisé qué quedaba suelto:
+- **Migraciones faltantes:** todos los cambios de RPC de esa sesión (`complete_dungeon_quest`,
+  `undo_dungeon_quest`, `grant_dungeon_currency`, `adjust_dungeon_streak`) se habían aplicado directo
+  a producción sin quedar en `supabase/migrations/` — creados 3 archivos con fecha 2026-07-22
+  replicando exacto lo que vive en producción.
+- **Tests de regresión:** 3 tests siguiendo el patrón existente (`grant_currency_rpc_contract`,
+  `undo_quest_negative_gold_guard_contract`, `quest_priority_verification_contract`).
+- **RLS auditado con `pg_policies`/`pg_class.relrowsecurity`:** 21 tablas `dungeon_*`, RLS activo en
+  todas, scoped por dueño donde manejan datos de usuario, 4 tablas de soporte sin políticas
+  (default-deny total al cliente).
+- **`forge_dungeon_weapon` revisado:** diseño atómico correcto (borra+inserta en una transacción), sin
+  bug real más allá del edge case de UX ya documentado (bajo impacto).
+- **Rendimiento remedido:** 52 scripts, 817KB sin comprimir / 249KB gzip real — igual que julio, ya
+  resuelto por fixes anteriores (v274 boot crítico, v276 gzip), nada que tocar.
+
 ## Revisión de los 3 huecos pendientes: bug real de dupe de oro + feature muerta + tope client-side (2026-07-22, v316)
 
 Gerardo pidió revisar los 3 puntos que quedaron abiertos tras la ronda anterior de anti-exploit.

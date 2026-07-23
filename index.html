@@ -17,8 +17,8 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="https://xibmopqlgjbcypxixnri.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png" type="image/png">
 <link rel="apple-touch-icon" href="https://xibmopqlgjbcypxixnri.supabase.co/storage/v1/object/public/assets/dungeon/logo-icon.png">
-<link rel="stylesheet" href="css/dungeon.css?v=320">
-<link rel="stylesheet" href="css/dungeon-v2.css?v=320">
+<link rel="stylesheet" href="css/dungeon.css?v=321">
+<link rel="stylesheet" href="css/dungeon-v2.css?v=321">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" defer></script>
 </head>
@@ -577,6 +577,18 @@
             <div class="integration-card">
               <div id="fitWidgetContent"></div>
             </div>
+            <div class="integration-card">
+              <div class="integration-connect">
+                <div class="integration-icon">📖</div>
+                <h3>Duolingo (registro manual)</h3>
+                <p>Duolingo cerró su API pública — sin sincronización automática posible. Anota cuántas lecciones hiciste hoy y suman a Torre del Saber.</p>
+                <div class="quest-inline-fields">
+                  <input class="form-input" id="duoLessonsInput" type="number" min="1" max="50" placeholder="Lecciones hoy">
+                  <button class="btn btn-primary" id="duoRegisterBtn" onclick="registerDuolingoLessons()">Registrar</button>
+                </div>
+                <div id="duoManualStatus" class="form-hint"></div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -609,7 +621,10 @@
         <div class="view" id="view-pets">
           <div class="view-header">
             <h2 class="view-title">🐾 Mascotas</h2>
-            <button class="btn btn-ghost" style="font-size:12px" onclick="switchView('shop')">🏪 Tienda</button>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost" style="font-size:12px" onclick="openModal('petHelpModal')" title="¿Cómo funciona el sistema de mascotas?">❓ Cómo funciona</button>
+              <button class="btn btn-ghost" style="font-size:12px" onclick="switchView('shop')">🏪 Tienda</button>
+            </div>
           </div>
           <div class="pets-tabs">
             <button class="pets-tab-btn pets-tab-active" data-tab="list" onclick="switchPetsTab('list')">📋 Lista</button>
@@ -1031,6 +1046,26 @@
   </div>
 </div>
 
+<!-- Ayuda contextual: Mascotas -->
+<div class="modal-overlay" id="petHelpModal">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-title">🐾 Cómo funcionan las Mascotas</div>
+      <button class="modal-close" onclick="closeModal('petHelpModal')">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;font-size:13.5px;color:var(--text2)">
+      <div><b style="color:var(--text)">🥚 → 🐣 → 🐴 Progresión</b><p style="margin:4px 0 0">Huevo se incuba, nace bebé (nivel 1-15), evoluciona a montura (nivel 1-50). Cada etapa da bonos pasivos distintos — sube alimentándola con pociones/comida.</p></div>
+      <div><b style="color:var(--text)">🎯 Especialización</b><p style="margin:4px 0 0">Al evolucionar a montura eliges una senda permanente: Cazador (+8% daño a jefe), Rastreador (+8% botín) o Guardián (+18% recuperación). Se puede cambiar después desde la ficha de mascota.</p></div>
+      <div><b style="color:var(--text)">😴 Agotamiento</b><p style="margin:4px 0 0">Si tu mascota cae en combate contra un jefe, queda agotada 2-8h (según qué tan fuerte era el jefe) — no se cura sola al reentrar. Una poción de curación la despierta antes.</p></div>
+      <div><b style="color:var(--text)">🗺️ Expediciones</b><p style="margin:4px 0 0">Cada especie tiene su propia expedición ligada a una zona del Mapa del Mundo. Al volver, suma reputación de esa zona además de recompensas propias.</p></div>
+      <div><b style="color:var(--text)">✨ Shiny</b><p style="margin:4px 0 0">~2% de probabilidad al eclosionar un huevo — puramente cosmético (brillo especial), no cambia estadísticas.</p></div>
+    </div>
+    <div class="modal-footer" style="justify-content:center">
+      <button class="btn btn-primary" onclick="closeModal('petHelpModal')">¡Entendido! ⚔️</button>
+    </div>
+  </div>
+</div>
+
 <!-- Shortcuts -->
 <div class="modal-overlay" id="shortcutsModal">
   <div class="modal" style="max-width:400px">
@@ -1373,58 +1408,58 @@
 <!-- Loot Drop Container -->
 <div id="lootDropContainer" style="position:fixed;inset:0;pointer-events:none;z-index:9000" aria-hidden="true"></div>
 
-<script src="js/config.js?v=320" defer></script>
-<script src="js/state.js?v=320" defer></script>
-<script src="js/db.js?v=320" defer></script>
-<script src="js/hero.js?v=320" defer></script>
-<script src="js/quests.js?v=320" defer></script>
-<script src="js/reward_engine.js?v=320" defer></script>
-<script src="js/timer.js?v=320" defer></script>
-<script src="js/inventory.js?v=320" defer></script>
-<script src="js/spells.js?v=320" defer></script>
-<script src="js/views.js?v=320" defer></script>
-<script src="js/ui.js?v=320" defer></script>
-<script src="js/events.js?v=320" defer></script>
-<script src="js/shop.js?v=320" defer></script>
-<script src="js/rpg.js?v=320" defer></script>
-<script src="js/pets.js?v=320" defer></script>
-<script src="js/weapons.js?v=320" defer></script>
-<script src="js/secret_sets.js?v=320" defer></script>
-<script src="js/goals.js?v=320" defer></script>
-<script src="js/reputation.js?v=320" defer></script>
-<script src="js/patterns.js?v=320" defer></script>
-<script src="js/mechanics.js?v=320" defer></script>
-<script src="js/character.js?v=320" defer></script>
-<script src="js/weather.js?v=320" defer></script>
-<script src="js/dungeon_clock.js?v=320" defer></script>
-<script src="js/skill_tree.js?v=320" defer></script>
-<script src="js/bestiary.js?v=320" defer></script>
-<script src="js/dungeon_grows.js?v=320" defer></script>
-<script src="js/runes.js?v=320" defer></script>
-<script src="js/google_fit.js?v=320" defer></script>
-<script src="js/hero_score.js?v=320" defer></script>
-<script src="js/push.js?v=320" defer></script>
-<script src="js/combos.js?v=320" defer></script>
-<script src="js/habits.js?v=320" defer></script>
-<script src="js/ruleta.js?v=320" defer></script>
-<script src="js/drops.js?v=320" defer></script>
-<script src="js/daily_goal.js?v=320" defer></script>
-<script src="js/weekly_summary.js?v=320" defer></script>
-<script src="js/challenges.js?v=320" defer></script>
-<script src="js/zones.js?v=320" defer></script>
-<script src="js/factions.js?v=320" defer></script>
-<script src="js/hero_card.js?v=320" defer></script>
-<script src="js/world_map.js?v=320" defer></script>
-<script src="js/sala_personal.js?v=320" defer></script>
-<script src="js/pet_garden.js?v=320" defer></script>
-<script src="js/animations.js?v=320" defer></script>
-<script src="js/effects.js?v=320" defer></script>
-<script src="js/boss_battle.js?v=320" defer></script>
-<script src="js/auth.js?v=320" defer></script>
-<script src="js/onboarding.js?v=320" defer></script>
-<script src="js/performance.js?v=320" defer></script>
-<script src="js/beta.js?v=320" defer></script>
-<script src="js/main.js?v=320" defer></script>
+<script src="js/config.js?v=321" defer></script>
+<script src="js/state.js?v=321" defer></script>
+<script src="js/db.js?v=321" defer></script>
+<script src="js/hero.js?v=321" defer></script>
+<script src="js/quests.js?v=321" defer></script>
+<script src="js/reward_engine.js?v=321" defer></script>
+<script src="js/timer.js?v=321" defer></script>
+<script src="js/inventory.js?v=321" defer></script>
+<script src="js/spells.js?v=321" defer></script>
+<script src="js/views.js?v=321" defer></script>
+<script src="js/ui.js?v=321" defer></script>
+<script src="js/events.js?v=321" defer></script>
+<script src="js/shop.js?v=321" defer></script>
+<script src="js/rpg.js?v=321" defer></script>
+<script src="js/pets.js?v=321" defer></script>
+<script src="js/weapons.js?v=321" defer></script>
+<script src="js/secret_sets.js?v=321" defer></script>
+<script src="js/goals.js?v=321" defer></script>
+<script src="js/reputation.js?v=321" defer></script>
+<script src="js/patterns.js?v=321" defer></script>
+<script src="js/mechanics.js?v=321" defer></script>
+<script src="js/character.js?v=321" defer></script>
+<script src="js/weather.js?v=321" defer></script>
+<script src="js/dungeon_clock.js?v=321" defer></script>
+<script src="js/skill_tree.js?v=321" defer></script>
+<script src="js/bestiary.js?v=321" defer></script>
+<script src="js/dungeon_grows.js?v=321" defer></script>
+<script src="js/runes.js?v=321" defer></script>
+<script src="js/google_fit.js?v=321" defer></script>
+<script src="js/hero_score.js?v=321" defer></script>
+<script src="js/push.js?v=321" defer></script>
+<script src="js/combos.js?v=321" defer></script>
+<script src="js/habits.js?v=321" defer></script>
+<script src="js/ruleta.js?v=321" defer></script>
+<script src="js/drops.js?v=321" defer></script>
+<script src="js/daily_goal.js?v=321" defer></script>
+<script src="js/weekly_summary.js?v=321" defer></script>
+<script src="js/challenges.js?v=321" defer></script>
+<script src="js/zones.js?v=321" defer></script>
+<script src="js/factions.js?v=321" defer></script>
+<script src="js/hero_card.js?v=321" defer></script>
+<script src="js/world_map.js?v=321" defer></script>
+<script src="js/sala_personal.js?v=321" defer></script>
+<script src="js/pet_garden.js?v=321" defer></script>
+<script src="js/animations.js?v=321" defer></script>
+<script src="js/effects.js?v=321" defer></script>
+<script src="js/boss_battle.js?v=321" defer></script>
+<script src="js/auth.js?v=321" defer></script>
+<script src="js/onboarding.js?v=321" defer></script>
+<script src="js/performance.js?v=321" defer></script>
+<script src="js/beta.js?v=321" defer></script>
+<script src="js/main.js?v=321" defer></script>
 
 <!-- Challenges Modal -->
 <!-- HECHIZOS MODAL -->
