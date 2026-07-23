@@ -1,6 +1,6 @@
 /* ArcANUM service worker: núcleo pequeño, arte bajo demanda.
    Nunca precachear sprites/fondos completos: el navegador los guarda al verlos. */
-const CACHE = 'dungeon-v317';
+const CACHE = 'dungeon-v318';
 const CORE = [
   '/',
   '/index.html',

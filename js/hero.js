@@ -26,8 +26,10 @@ async function loadHero() {
   const savedLevel = Math.max(1, hero.level || hero._level || 1);
   const minXPForSavedLevel = xpForLevel(savedLevel - 1);
   if ((hero.xp_total || 0) < minXPForSavedLevel) {
-    hero.xp_total = minXPForSavedLevel;
-    await db.from('dungeon_heroes').update({ xp_total: minXPForSavedLevel }).eq('id', hero.id);
+    const delta = minXPForSavedLevel - (hero.xp_total || 0);
+    const { data: curveData, error: curveError } = await db.rpc('grant_dungeon_currency', { p_source: 'level_curve_migration', p_xp: delta });
+    const curveR = Array.isArray(curveData) ? curveData[0] : curveData;
+    if (!curveError && curveR) hero.xp_total = curveR.xp_total;
     deriveHero();
   }
   // Init global state from hero record
