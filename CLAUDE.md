@@ -725,6 +725,32 @@ cursor), el botón de acción nunca aparecía — parecía que no había forma d
 el gating por hover, `.quest-actions` ahora siempre `opacity:1`. Relevante para beta cerrada: testers
 en tablet se iban a confundir igual.
 
+## La guía de primer uso ya existía — pero rota en los dos extremos (2026-07-23, v325)
+
+**Corrección de una afirmación previa:** en el audit de beta reporté "ningún tutorial/primer-uso
+general". Falso — `js/onboarding.js` existe desde antes, con 5 pasos (misiones, mascotas, habilidades,
+santuario, mapa), disparado desde `main.js` vía `showOnboardingIfNeeded()`. No hacía falta construirlo;
+hacía falta arreglarlo. Antes de proponer construir algo, verificar contra el código real.
+
+**Bug 1 — la guía regañaba para siempre.** `closeOnboarding(done = false)` solo escribía el flag
+`dungeon-onboarding-<heroId>` en localStorage cuando `done` era true, y eso solo pasaba al completar
+los 5 pasos (`onboardingGo` en el último paso llamaba `closeOnboarding(true)`). Tanto la × como el
+botón "Ahora no" llamaban `closeOnboarding()` sin argumento, así que descartarla nunca persistía y
+reaparecía en cada carga. Fix: `closeOnboarding()` ya no toma argumento y siempre marca como vista —
+cerrar es una acción deliberada del usuario.
+
+**Bug 2 — chocaba con el "Primer Juramento" en héroes nuevos.** `hero.js:47` abre
+`openInitialIdentitySelection()` (obligatorio, `.prestige-choice-overlay`, **z-index 12000**) en t=0
+si `!hero.race`; `main.js:81` llama `showOnboardingIfNeeded()` que abre la guía
+(`.onboarding-overlay`, **z-index 10050**) a los 900ms. La guía quedaba *detrás* del modal
+obligatorio, con su fondo oscuro + `backdrop-filter:blur(8px)` enturbiando la pantalla, y sus botones
+haciendo `switchView()` invisible por detrás. Solo lo ve un héroe recién creado — invisible para
+Gerardo, que ya tiene raza sellada y la guía marcada. Fix: `showOnboardingIfNeeded()` reintenta cada
+1.2s mientras `!hero.race` o el modal de identidad siga en el DOM, con tope de 120s para no dejar un
+timer colgado indefinidamente.
+
+Test: `tests/onboarding_first_run_contract.test.js`. Deploy v325.
+
 ## Signup propio + feedback FAB visible + ayuda contextual de hábitos (2026-07-23, v324)
 
 3 decisiones de Gerardo sobre los hallazgos del audit de beta:
@@ -1301,3 +1327,5 @@ mcp__11567dee...__apply_migration({
   políticas RLS completamente abiertas (`USING(true)`). Confirmado con Gerardo antes de `DROP TABLE`.
 - Otros advisories de Supabase (tablas `faqs`, `leads`, `posts`, `bestiary`, etc.) pertenecen a otros
   proyectos que comparten el mismo Supabase Aglaya — no son de Dungeon.
+
+> Ver AGENTS.md en la raiz de este repo — reglas compartidas entre Claude, Codex y Antigravity (mapa de codigo graphify, cuando actualizarlo).

@@ -20,7 +20,21 @@ function onboardingGo(step) {
   const item = ONBOARDING_STEPS[step];
   if (item.view) switchView(item.view);
   if (item.tab && typeof switchCharTab === 'function') switchCharTab(item.tab);
-  if (step >= ONBOARDING_STEPS.length - 1) closeOnboarding(true); else openOnboarding(step + 1);
+  if (step >= ONBOARDING_STEPS.length - 1) closeOnboarding(); else openOnboarding(step + 1);
 }
-function closeOnboarding(done = false) { const modal = document.getElementById('onboardingModal'); if (modal) modal.remove(); if (done) localStorage.setItem(_onboardingKey(), 'done'); }
-function showOnboardingIfNeeded() { if (hero && !localStorage.getItem(_onboardingKey())) setTimeout(() => openOnboarding(), 900); }
+/* Cerrar cuenta como visto aunque no se completen los 5 pasos: antes solo se
+   guardaba el flag al terminar la guía, así que descartarla con la × o con
+   "Ahora no" la hacía reaparecer en cada carga hasta completarla. */
+function closeOnboarding() { const modal = document.getElementById('onboardingModal'); if (modal) modal.remove(); localStorage.setItem(_onboardingKey(), 'done'); }
+function showOnboardingIfNeeded(waited = 0) {
+  if (!hero || localStorage.getItem(_onboardingKey())) return;
+  /* El "Primer Juramento" (identidad inicial) es obligatorio y vive en un
+     overlay con z-index mayor, así que la guía se abriría por detrás y sus
+     botones cambiarían de vista sin que el héroe nuevo lo vea. Espera a que
+     el héroe tenga raza sellada y el modal de identidad esté cerrado. */
+  if (!hero.race || document.getElementById('initialIdentityModal')) {
+    if (waited < 120000) setTimeout(() => showOnboardingIfNeeded(waited + 1200), 1200);
+    return;
+  }
+  setTimeout(() => openOnboarding(), 900);
+}
