@@ -293,7 +293,8 @@ function renderQuestList() {
         <line x1="56" y1="15" x2="64" y2="15" stroke="currentColor" stroke-width="2"/>
       </svg>
       <h3>Sin misiones</h3>
-      <p>Añade tu primera misión en el panel derecho</p>
+      <p>Cada misión que completes te da XP y oro. Empieza por una pequeña.</p>
+      <button class="btn btn-primary" onclick="openModal('quickAddModal')">➕ Crear mi primera misión</button>
     </div>`;
     updateDailyProgress();
     return;
