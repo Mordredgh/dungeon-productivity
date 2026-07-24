@@ -725,6 +725,76 @@ cursor), el botón de acción nunca aparecía — parecía que no había forma d
 el gating por hover, `.quest-actions` ahora siempre `opacity:1`. Relevante para beta cerrada: testers
 en tablet se iban a confundir igual.
 
+## Rate limit completo + paridad móvil + auditoría de productividad (2026-07-23, v328)
+
+Gerardo pidió "haz todo" sobre los 3 puntos que quedaban del menú.
+
+### 1. Rate limit en las 6 RPCs restantes (14 en total ya cubiertas)
+
+Agregadas al whitelist de `assert_dungeon_rpc_rate_limit` y con `perform` al inicio del cuerpo:
+`complete_dungeon_quest` (60/min, tolera ráfagas de ponerse al día), `undo_dungeon_quest` (30/min),
+`adjust_dungeon_streak` (**10/min**, la más explotable: cada llamada suma hasta 5 días de racha),
+`start_dungeon_pomodoro` (20/min), `complete_dungeon_pomodoro` (20/min),
+`touch_dungeon_daily_streak` (20/min).
+
+**Método (repetible, importante).** No se retranscribieron a mano los cuerpos (`complete_dungeon_quest`
+solo tiene 4.3 KB de lógica de juego). Un script lee `pg_get_functiondef` de producción, inserta la
+línea `perform` justo después del `begin`, y aplica. **Dos salvaguardas que valieron la pena:**
+(a) dry-run que escribe el SQL a archivo para revisar los puntos de inserción — ahí se detectó que
+`pg_get_functiondef` **no cierra con `;`**, así que las 7 sentencias quedaban pegadas y el lote no
+parseaba; (b) ensayo dentro de `begin … rollback` contra producción, que confirmó que el lote aplica
+limpio antes de tocar nada. Script en el scratchpad, migración en
+`supabase/migrations/20260723_rate_limit_remaining_rpcs.sql`.
+
+### 2. Los mensajes del servidor ya no se tiran a la basura (`rpcErrorMessage`)
+
+Hallazgo al verificar cómo saldría el error de rate limit: **el cliente tragaba todos los mensajes
+específicos del servidor**. `complete_dungeon_quest` lanza `'Tope diario de misiones épico alcanzado
+(3 de 3)'` y el usuario veía *"No se pudo completar la misión"*. Igual con `'ya gastaste el oro
+obtenido de esta misión'`, `'La ventana para deshacer terminó'` y ahora `'Demasiadas solicitudes'`.
+Nuevo helper `rpcErrorMessage(error, fallback)` en `db.js`: si `error.code === 'P0001'` (todo
+`raise exception` de plpgsql sin errcode propio llega así, o sea son nuestros mensajes deliberados en
+español) muestra el mensaje real; cualquier otro error cae al texto genérico para no filtrar detalles
+de Postgres. Aplicado en `quests.js` (completar y deshacer), `habits.js`, `runes.js` y `timer.js`.
+`runes.js` ya tenía una versión ad-hoc de esto (`error.message.includes('fragmentos')`) — el helper la
+generaliza.
+
+### 3. Paridad móvil — 3 herramientas eran inalcanzables en teléfono
+
+`.dungeon-dock` se oculta bajo 640px y la hoja "Más" del `mobile-nav` solo navega entre vistas, así
+que el `fab-dial` es la única superficie de herramientas en móvil. Tenía solo Nueva Misión y D20.
+**Modo Focus, Pergamino (notas rápidas) y Ruleta vivían únicamente en el dock: en teléfono no había
+ninguna forma de abrirlos.** Los dos primeros son mecánicas de productividad, la prioridad declarada.
+Agregados al `fab-dial`. (Diario sí se salvaba: `#diaryBtn` tiene clase `header-dock-dup` y la regla
+que oculta `#d20Btn, #focusBtn, #helpBtn` no lo incluye. `#helpBtn` oculto en móvil es **correcto** —
+son atajos de teclado.)
+
+También: **`.bb-prep-panel { display:none }` bajo 430px** amputaba la preparación táctica de jefe
+(se elige una vez por jefe y cambia daño/guardia/energía) en teléfonos chicos. Cambiado a panel
+compacto con scroll — adaptar, no amputar.
+
+Y un bug **introducido hoy por mí**: el `.beta-feedback-fab` de v324 quedaba encima de `.mobile-nav`
+(barra fija de 60px abajo, mismo `z-index: 90`; el FAB ocupaba 20–62px). Subido por encima de la barra
+en móvil.
+
+Verificado sano: sin anchos fijos > 375px, `min-width` topan en 220px, 20 contenedores con
+`overflow-x: auto`.
+
+### 4. Auditoría de productividad: no falta ninguna mecánica
+
+Inventario contra el código real de 22 mecanismos (captura rápida, búsqueda global Cmd+K, subtareas,
+recurrentes, fechas límite, prioridades, etiquetas, plantillas, metas, pomodoro, hábitos, racha,
+heatmap, retro semanal, resumen semanal, reporte mensual, diario, misión del día, recordatorios,
+notas rápidas, importar, modo focus): **los 22 existen y tienen punto de entrada real.**
+
+**Conclusión que importa para futuras sesiones: el hueco de productividad no es de features, es de
+alcance y claridad.** Los 8 bugs de hoy lo confirman — botones invisibles sin hover, guía que
+regañaba, cadenas que terminaban en callejón, herramientas amputadas en móvil, semántica de hábito
+negativo sin explicar. Antes de proponer construir una mecánica nueva, verificar si ya existe y
+simplemente no se alcanza.
+
+Tests: `tests/mobile_parity_contract.test.js`. Deploy v328.
+
 ## Barrido sistemático de primer uso (2026-07-23, v327)
 
 Barrido deliberado de las 15 vistas como héroe nivel 1 con cero datos, hecho leyendo código (Gerardo

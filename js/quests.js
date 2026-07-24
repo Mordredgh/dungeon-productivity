@@ -68,7 +68,7 @@ async function _completeQuestInner(id, el, q) {
   const reward = Array.isArray(rewards) ? rewards[0] : rewards;
   if (error || !reward) {
     console.error('complete_dungeon_quest', error);
-    toast('⚠️', 'No se pudo completar la misión. Tu recompensa no fue aplicada.');
+    toast('⚠️', rpcErrorMessage(error, 'No se pudo completar la misión. Tu recompensa no fue aplicada.'));
     return;
   }
   q.done = true;
@@ -228,7 +228,7 @@ async function undoComplete() {
   const { data: reverted, error } = await db.rpc('undo_dungeon_quest', { p_quest_id: id });
   const state = Array.isArray(reverted) ? reverted[0] : reverted;
   if (error || !state) {
-    toast('⚠️', 'No se pudo revertir la misión. El progreso se mantiene.');
+    toast('⚠️', rpcErrorMessage(error, 'No se pudo revertir la misión. El progreso se mantiene.'));
     return;
   }
   q.done = false; q.done_at = null;

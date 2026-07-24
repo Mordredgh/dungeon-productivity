@@ -18,6 +18,20 @@ async function rpcWithRetry(name, args, options = {}) {
   return last;
 }
 window.rpcWithRetry = rpcWithRetry;
+
+/* Los RPC del servidor lanzan mensajes en español pensados para el usuario
+   ("Tope diario de misiones épico alcanzado", "ya gastaste el oro obtenido",
+   "Demasiadas solicitudes..."). Todo `raise exception` de plpgsql sin errcode
+   propio llega como P0001, así que ese código marca los mensajes deliberados y
+   seguros de mostrar. Cualquier otro error (red, permisos, bug) cae al texto
+   genérico para no filtrar detalles de Postgres. */
+function rpcErrorMessage(error, fallback) {
+  const msg = typeof error?.message === 'string' ? error.message.trim() : '';
+  if (error?.code === 'P0001' && msg && msg.length <= 200) return msg;
+  return fallback;
+}
+window.rpcErrorMessage = rpcErrorMessage;
+
 db = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 async function initDB() {

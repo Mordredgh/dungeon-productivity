@@ -60,7 +60,7 @@ async function craftRune(type) {
   const { data, error } = await db.rpc('craft_dungeon_rune', { p_rune_type: type });
   const r = Array.isArray(data) ? data[0] : data;
   if (error || !r) {
-    toast('❌', error?.message?.includes('fragmentos') ? error.message : 'No se pudo forjar la runa.');
+    toast('❌', rpcErrorMessage(error, 'No se pudo forjar la runa.'));
     return;
   }
   runes.push(r);

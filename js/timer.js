@@ -19,7 +19,7 @@ async function startTimer() {
   if (timer.phase === 'focus' && !timer.serverPomSession) {
     _autoLinkTopQuestToPomodoro();
     const { data, error } = await db.rpc('start_dungeon_pomodoro', { p_duration: timer.duration });
-    if (error || !data) { toast('⚠️', 'No se pudo iniciar el pomodoro seguro. Inténtalo de nuevo.'); return; }
+    if (error || !data) { toast('⚠️', rpcErrorMessage(error, 'No se pudo iniciar el pomodoro seguro. Inténtalo de nuevo.')); return; }
     timer.serverPomSession = data;
   }
   timer.running = true;

@@ -49,7 +49,7 @@ async function completeHabitQuest(q) {
   const reward = Array.isArray(rewards) ? rewards[0] : rewards;
   if (error || !reward) {
     console.error('complete_dungeon_quest habit', error);
-    toast('⚠️', 'No se pudo registrar el hábito. Tu progreso se mantiene.');
+    toast('⚠️', rpcErrorMessage(error, 'No se pudo registrar el hábito. Tu progreso se mantiene.'));
     return;
   }
   q.done = true;
