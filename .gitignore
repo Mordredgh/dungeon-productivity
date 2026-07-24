@@ -1,6 +1,9 @@
 .DS_Store
 Thumbs.db
 images_png_backup/
+# Salida de graphify: grafo regenerable + caché AST. deploy.sh hace `git add -A`,
+# así que sin esta regla cada deploy arrastra ~2 MB de artefactos al repo.
+graphify-out/
 trivy-report.txt
 assets/node_modules/
 tmp/
