@@ -143,7 +143,14 @@ function renderShopItems() {
     hero?.gold_rush_exp > Date.now() ? '🪙 Oro doble activo' : '',
     hero?.boss_shield ? '🛡️ Escudo de jefe listo' : '',
   ].filter(Boolean);
-  const merchantHeader = `<section class="merchant-ledger"><div><span>GREMIO DE MERCADERES</span><h3>Mercado Arcano</h3><p>${activeBuffs.length ? activeBuffs.join(' · ') : 'Invierte oro en una decisión útil, no en ruido.'}</p></div><div class="merchant-ledger-gold"><b>🪙 ${gold.toLocaleString()}</b><small>oro disponible</small></div></section>${weeklyBlueprint ? `<section class="weekly-blueprint"><img src="images/${weeklyBlueprint.furniture.img}" alt=""><div><span>PLANO ROTATIVO DE LA SEMANA</span><b>${weeklyBlueprint.furniture.name}</b><small>Desbloquea su compra en tu Sala Personal.</small></div>${_weeklyBlueprintOwned(weeklyBlueprint.furniture.id) ? '<em>Plano adquirido</em>' : `<button onclick="buyWeeklyBlueprint('${weeklyBlueprint.furniture.id}',${weeklyBlueprint.cost})" ${gold < weeklyBlueprint.cost ? 'disabled' : ''}>${weeklyBlueprint.cost.toLocaleString()} oro</button>`}</section>` : ''}`;
+  /* Un héroe nuevo llega aquí con 0 oro (el item más barato cuesta 10) — desde
+     el empty state de Mascotas, que le dice "compra huevos en la tienda". Sin
+     esta pista veía todos los botones deshabilitados y ningún indicio de cómo
+     conseguir oro. */
+  const brokeHint = gold < 10
+    ? '🪙 Todavía no tienes oro. Completa misiones y pomodoros para ganarlo — cada misión paga según su prioridad.'
+    : (activeBuffs.length ? activeBuffs.join(' · ') : 'Invierte oro en una decisión útil, no en ruido.');
+  const merchantHeader = `<section class="merchant-ledger"><div><span>GREMIO DE MERCADERES</span><h3>Mercado Arcano</h3><p>${brokeHint}</p></div><div class="merchant-ledger-gold"><b>🪙 ${gold.toLocaleString()}</b><small>oro disponible</small></div></section>${weeklyBlueprint ? `<section class="weekly-blueprint"><img src="images/${weeklyBlueprint.furniture.img}" alt=""><div><span>PLANO ROTATIVO DE LA SEMANA</span><b>${weeklyBlueprint.furniture.name}</b><small>Desbloquea su compra en tu Sala Personal.</small></div>${_weeklyBlueprintOwned(weeklyBlueprint.furniture.id) ? '<em>Plano adquirido</em>' : `<button onclick="buyWeeklyBlueprint('${weeklyBlueprint.furniture.id}',${weeklyBlueprint.cost})" ${gold < weeklyBlueprint.cost ? 'disabled' : ''}>${weeklyBlueprint.cost.toLocaleString()} oro</button>`}</section>` : ''}`;
 
   if (shopCategory === 'mejoras') { el.innerHTML = merchantHeader + tabs + _renderGoldUpgrades(); return; }
   if (shopCategory === 'marcos')  { el.innerHTML = merchantHeader + tabs + _renderAvatarFrames(); return; }

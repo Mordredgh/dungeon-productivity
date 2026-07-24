@@ -725,6 +725,54 @@ cursor), el botón de acción nunca aparecía — parecía que no había forma d
 el gating por hover, `.quest-actions` ahora siempre `opacity:1`. Relevante para beta cerrada: testers
 en tablet se iban a confundir igual.
 
+## Barrido sistemático de primer uso (2026-07-23, v327)
+
+Barrido deliberado de las 15 vistas como héroe nivel 1 con cero datos, hecho leyendo código (Gerardo
+pidió no usar navegador). Resultado honesto: **la capa de datos está sólida, los problemas son de
+flujo.**
+
+**Lo que se verificó sano (no requirió cambio):**
+- `deriveHero()` defensivo en todo (`|| 0`). `boss_state` (jsonb, NULL en héroe nuevo) tiene guardia
+  en los 3 puntos de lectura (`boss_battle.js:287`, `rpg.js:143/145`).
+- Consultado `information_schema` de `dungeon_heroes` (103 columnas): 32 quedan NULL en un héroe
+  nuevo, pero todas son marcadores de fecha o tokens OAuth, donde NULL es el valor correcto.
+  `gold`, `hp`, `hp_max`, `quests_done`, `attr_points`, `skill_points` tienen default en DB.
+- Cálculos de porcentaje: los que dividen por dato del héroe están guardados (`total ? … : 0`,
+  `Math.max(1, …)`, `if (goal <= 0) return`); los sin guardia dividen por constantes (`WEEK_REQ`,
+  `def.target`, `def.evolve`), seguros.
+- `renderDiaryStats` maneja diario vacío (`diary.length ? … : 0`, `Math.max(…, 1)`).
+- Batalla de jefe **no** exige mascota (solo bonus de daño) — no hay bloqueo para nivel 1 sin mascota.
+- Vistas sin empty-state (logros, zonas, facciones, mapa) renderizan catálogo fijo en estado
+  bloqueado/rango 0 — correcto, no quedan en blanco.
+
+**Bug encontrado y corregido — cadena rota mascota → tienda.** El empty state de Mascotas
+(`pets.js`) dice "Compra huevos en la tienda" con botón **Ir a la Tienda**. Pero el héroe nuevo
+arranca con `gold = 0` (default de columna) y el item más barato de `dungeon_shop_catalog` cuesta 10
+(`frag_healing`). Al llegar veía **todos los botones `disabled`**, encabezado "Invierte oro en una
+decisión útil, no en ruido" y **ninguna pista de cómo conseguir oro** — callejón sin salida en el
+primer minuto. Fix: `renderShopView` ahora muestra, cuando `gold < 10`, "Todavía no tienes oro.
+Completa misiones y pomodoros para ganarlo — cada misión paga según su prioridad" en lugar del copy
+genérico.
+
+Test: `tests/first_run_flow_contract.test.js` (cubre además que ningún empty state vuelva a señalar
+el "panel derecho"). Deploy v327.
+
+## Empty state mandaba al "panel derecho", invisible en móvil (2026-07-23, v326)
+
+`css/dungeon.css:2176` hace `.right-panel { display: none; }` dentro de `@media (max-width: 900px)`,
+pero el empty state de misiones — tanto el dinámico (`views.js`, `renderQuestList`) como el estático
+de arranque (`index.html`) — le decía al usuario nuevo *"Añade tu primera misión en el panel
+derecho"*. En teléfono o tablet ese panel no existe: la ruta real es el FAB `+` o el botón `➕ Nueva`.
+Un beta tester en móvil abría la app, veía la pantalla vacía y no tenía indicación válida de qué
+hacer. Invisible para Gerardo, que usa escritorio. Fix: los dos empty states ahora traen un botón
+`➕ Crear mi primera misión` que abre `quickAddModal` directamente (existe en `index.html:1143`,
+`.add-quest-trigger-btn` no tiene regla de ocultado en móvil), más copy que explica el porqué (XP y
+oro) en vez de señalar una ubicación de pantalla.
+
+**Nota de higiene del repo (mismo día):** `deploy.sh` corre `git add -A`, así que el deploy de v325
+arrastró `graphify-out/` completo — 42k líneas, ~2.2 MB de grafo regenerable y caché AST. Sacado del
+índice (`git rm -r --cached`) y agregado a `.gitignore`; los archivos locales se conservan.
+
 ## La guía de primer uso ya existía — pero rota en los dos extremos (2026-07-23, v325)
 
 **Corrección de una afirmación previa:** en el audit de beta reporté "ningún tutorial/primer-uso
